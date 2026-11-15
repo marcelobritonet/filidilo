@@ -7,6 +7,7 @@ import type { Navegacao } from './App'
 import { textoContagem, useEstados } from './estado'
 import { Importar } from './Importar'
 import { Marca } from './Marca'
+import { pegarRecebido } from './recebido'
 
 interface EventoInstalar extends Event {
   prompt: () => Promise<void>
@@ -19,6 +20,20 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const [instalar, setInstalar] = useState<EventoInstalar | null>(null)
   const [plano, setPlano] = useState<PlanoImportacao | null>(null)
   const [erro, setErro] = useState('')
+
+  // Chegou pelo "Compartilhar" do Android (WhatsApp → Compartilhar → tatino.)?
+  useEffect(() => {
+    pegarRecebido().then(async (r) => {
+      if (!r) return
+      if ('erro' in r) return setErro(r.erro)
+      try {
+        setErro('')
+        setPlano(await planejar(lerBaralho(r.texto)))
+      } catch (err) {
+        setErro((err as Error).message)
+      }
+    })
+  }, [])
 
   const abrirRecebido = async (e: Event) => {
     const input = e.target as HTMLInputElement
@@ -118,9 +133,12 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
           </button>
           <label class="btn secundario arquivo">
             Abrir baralho recebido
-            <small>arquivo “(Tatino).txt” recebido pelo WhatsApp ou e-mail</small>
+            <small>escolha o arquivo “(Tatino).txt” que você recebeu</small>
             <input type="file" accept=".txt,.json,text/plain,application/json" onChange={abrirRecebido} />
           </label>
+          <p class="dica">
+            Mais fácil: no WhatsApp, segure o arquivo recebido → <strong>Compartilhar</strong> → <strong>tatino.</strong> (com o app instalado no celular).
+          </p>
           {erro && (
             <p class="resultado erro" role="alert">
               ✕ {erro}

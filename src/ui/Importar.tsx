@@ -23,7 +23,7 @@ export function Importar({ plano, nav, fechar }: { plano: PlanoImportacao; nav: 
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-importar">
         <h2 id="titulo-importar">{atual ? 'Atualizar baralho' : 'Baralho recebido'}</h2>
         <p>
-          <strong>{recebido.titulo}</strong> · {recebido.cartoes.length} cartões
+          <strong>{recebido.titulo}</strong> · {n(recebido.cartoes.length, 'cartão', 'cartões')}
         </p>
 
         {!atual ? (

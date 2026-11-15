@@ -2,6 +2,18 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o número do meio sobe a cada etapa nova, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [1.6.0] — 2026-11-15
+
+Abrir baralho recebido direto pelo Compartilhar do Android.
+
+### Novo
+- O **tatino.** aparece na lista do **Compartilhar** do Android (com o app instalado). No WhatsApp: segurar o arquivo `… (Tatino).txt` → Compartilhar → **tatino.** O app abre direto no resumo do baralho, com **Adicionar** ou **Atualizar**.
+- Também aceita quando o conteúdo chega como texto em vez de arquivo.
+- Dicas novas em Meus baralhos e em Compartilhar baralho explicando o caminho.
+
+### Corrigido
+- "1 cartões" no resumo de um baralho recebido.
+
 ## [1.5.0] — 2026-11-15
 
 Fase 2 · E4: criar cartões com o Gemini; e sessão de estudo mais confortável.
@@ -85,6 +97,7 @@ Fase 1: primeira versão publicada.
 - Reportar erro em qualquer cartão, revisão de conteúdo (✓/⚠/📝), backup e envio de reportes pelo WhatsApp.
 - Publicação automática no GitHub Pages.
 
+[1.6.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.6.0
 [1.5.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.5.0
 [1.4.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.4.0
 [1.3.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.3.0

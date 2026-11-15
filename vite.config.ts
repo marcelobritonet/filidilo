@@ -27,6 +27,18 @@ export default defineConfig({
         orientation: 'portrait',
         background_color: '#FFF5DC',
         theme_color: '#FFF5DC',
+        // Aparece no "Compartilhar" do Android quando o app está instalado:
+        // WhatsApp → segurar o arquivo → Compartilhar → tatino. (tratado em public/sw-receber.js).
+        share_target: {
+          action: `${base}receber`,
+          method: 'POST',
+          enctype: 'multipart/form-data',
+          params: {
+            title: 'title',
+            text: 'text',
+            files: [{ name: 'arquivo', accept: ['text/plain', '.txt', 'application/json', '.json'] }],
+          },
+        },
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
@@ -36,6 +48,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,json}'],
         navigateFallback: `${base}index.html`,
+        importScripts: ['sw-receber.js'],
       },
     }),
   ],

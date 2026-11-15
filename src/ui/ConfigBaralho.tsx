@@ -44,7 +44,7 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
     const arquivo = new File([texto], nome, { type: 'text/plain' })
     if (navigator.canShare?.({ files: [arquivo] })) {
       try {
-        await navigator.share({ files: [arquivo], title: baralho.titulo, text: `Baralho “${baralho.titulo}” do Tatino. Abra no app em “Abrir baralho recebido”.` })
+        await navigator.share({ files: [arquivo], title: baralho.titulo, text: `Baralho “${baralho.titulo}” do tatino. Para abrir: segure o arquivo → Compartilhar → tatino.` })
         return
       } catch (e) {
         if ((e as Error).name === 'AbortError') return
@@ -135,7 +135,7 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
         <button class="btn secundario" onClick={compartilhar}>
           Compartilhar baralho
         </button>
-        <p class="dica">Envia um arquivo com os cartões (sem o seu progresso). Quem recebe abre em “Abrir baralho recebido”.</p>
+        <p class="dica">Envia um arquivo com os cartões (sem o seu progresso). Quem recebe segura o arquivo no WhatsApp → Compartilhar → tatino. (ou usa “Abrir baralho recebido”).</p>
         <button class="btn secundario" onClick={fazerCopia}>
           Duplicar baralho
         </button>
