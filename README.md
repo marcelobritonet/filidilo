@@ -1,5 +1,7 @@
 # Tatino
 
+No ar: https://marcelobritonet.github.io/tatino/
+
 Flashcards offline (PWA) para estudar Hidrodinâmica / Fenômenos de Transporte. Funciona no celular e no computador, instalável pelo navegador, sem login.
 
 - **Modo prova**: 20 cartões por rodada, começando pelos errados e pelos temas que mais caem.
