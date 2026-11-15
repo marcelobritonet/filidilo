@@ -3,12 +3,13 @@ import { formatar, preencher, sortear } from '../core/calc'
 import { db, type Marca, type Reporte } from '../core/db'
 import { chave } from '../core/srs'
 import type { Baralho, Cartao } from '../core/types'
+import type { Navegacao } from './App'
 import { nomeTema } from './estado'
 import { Tex } from './Tex'
 
 type FiltroStatus = 'todos' | 'pendentes' | 'reportados' | 'erro' | 'ok'
 
-export function Revisar({ baralho, sair }: { baralho: Baralho; sair: () => void }) {
+export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) {
   const [tema, setTema] = useState(baralho.temas[0]?.id ?? '')
   const [status, setStatus] = useState<FiltroStatus>('todos')
   const [marcas, setMarcas] = useState<Map<string, Marca>>(new Map())
@@ -47,13 +48,21 @@ export function Revisar({ baralho, sair }: { baralho: Baralho; sair: () => void 
   return (
     <main class="tela revisar">
       <header class="barra-sessao">
-        <button class="fechar" aria-label="Voltar" onClick={sair}>
+        <button class="fechar" aria-label="Voltar" onClick={nav.voltar}>
           ←
         </button>
-        <span>Revisar conteúdo</span>
+        <span>Cartões</span>
         <span />
       </header>
-      <p class="dica">Confira cada cartão com a apostila e marque ✓ certo, ⚠ errado ou 📝 com uma observação.</p>
+      <div class="linha">
+        <button class="btn principal" onClick={() => nav.ir({ nome: 'cartao', id: baralho.id, tema: tema || undefined })}>
+          + Novo cartão
+        </button>
+        <button class="btn" onClick={() => nav.ir({ nome: 'colar', id: baralho.id })}>
+          Colar lista
+        </button>
+      </div>
+      <p class="dica">Toque em ✏️ para editar. Para revisar o conteúdo, confira cada cartão com a fonte e marque ✓ certo, ⚠ errado ou 📝 com uma observação.</p>
       <label class="campo">
         Tema
         <select value={tema} onChange={(e) => setTema((e.target as HTMLSelectElement).value)}>
@@ -79,7 +88,7 @@ export function Revisar({ baralho, sair }: { baralho: Baralho; sair: () => void 
       )}
       <ul class="lista-revisao">
         {lista.map((c) => (
-          <ItemRevisao key={c.id} baralho={baralho} c={c} marca={marcas.get(chave(baralho.id, c.id))} reps={reportes.get(chave(baralho.id, c.id)) ?? []} mudou={() => setV(v + 1)} />
+          <ItemRevisao key={c.id} baralho={baralho} c={c} editar={() => nav.ir({ nome: 'cartao', id: baralho.id, cartaoId: c.id })} marca={marcas.get(chave(baralho.id, c.id))} reps={reportes.get(chave(baralho.id, c.id)) ?? []} mudou={() => setV(v + 1)} />
         ))}
         {!lista.length && <p class="dica centro">Nenhum cartão com esse filtro.</p>}
       </ul>
@@ -87,7 +96,7 @@ export function Revisar({ baralho, sair }: { baralho: Baralho; sair: () => void 
   )
 }
 
-function ItemRevisao({ baralho, c, marca, reps, mudou }: { baralho: Baralho; c: Cartao; marca?: Marca; reps: Reporte[]; mudou: () => void }) {
+function ItemRevisao({ baralho, c, marca, reps, mudou, editar }: { baralho: Baralho; c: Cartao; marca?: Marca; reps: Reporte[]; mudou: () => void; editar: () => void }) {
   const [nota, setNota] = useState(marca?.nota ?? '')
   const [editando, setEditando] = useState(false)
   const k = chave(baralho.id, c.id)
@@ -106,6 +115,8 @@ function ItemRevisao({ baralho, c, marca, reps, mudou }: { baralho: Baralho; c: 
         <code>{c.id}</code>
         <span class="tema-chip">{nomeTema(baralho, c.tema)}</span>
         <span class="tipo">{{ conceito: 'conceito', vf: 'V/F', associacao: 'alternativas', calculo: 'cálculo' }[c.tipo]}</span>
+        {c.editado && <span class="tipo">editado</span>}
+        <button class="editar" aria-label="Editar cartão" onClick={editar}>✏️</button>
       </div>
       <Conteudo c={c} />
       {c.fonte && (

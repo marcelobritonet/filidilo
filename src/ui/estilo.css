@@ -225,3 +225,18 @@ input.texto { width: 100%; font: inherit; padding: 10px 12px; border-radius: 12p
   padding: 12px 16px; border-radius: 12px; background: var(--marinho); color: #fff; box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
 }
 .toast .link { color: #9fd3f5; font-weight: 600; }
+
+/* Fase 2: editor de cartões */
+.editar .segmentado { margin-bottom: 0; }
+.editar .segmentado button { font-size: .85rem; padding: 8px 4px; }
+.bloco .campo { color: var(--texto-2); }
+.alternativas-edit { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
+.alternativas-edit li { display: flex; align-items: center; gap: 8px; }
+.alternativas-edit input[type=radio] { width: 22px; height: 22px; flex: none; }
+.icone-pequeno { width: 36px; height: 36px; flex: none; border: 0; border-radius: 50%; background: var(--fundo); color: var(--texto-2); }
+.previa { border-style: dashed; }
+.problemas { list-style: none; margin: 8px 0; padding: 10px 12px; background: var(--erro-fundo); color: var(--erro); border-radius: 10px; display: grid; gap: 4px; font-size: .95rem; }
+.previa-lista { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: .95rem; }
+.item .cab .editar { margin-left: auto; border: 0; background: var(--fundo); border-radius: 50%; width: 40px; height: 40px; font-size: 1.05rem; }
+.revisar > .linha { margin-bottom: 8px; }
+code { background: var(--fundo); padding: 1px 6px; border-radius: 6px; }

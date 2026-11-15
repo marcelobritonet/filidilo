@@ -50,7 +50,9 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
       {total === 0 && (
         <section class="bloco">
           <p>Este baralho ainda não tem cartões.</p>
-          <p class="dica">Em breve: criar cartões aqui e gerar a partir de um PDF com o Gemini.</p>
+          <button class="btn principal" onClick={() => nav.ir({ nome: 'cartao', id })}>+ Criar um cartão</button>
+          <button class="btn" onClick={() => nav.ir({ nome: 'colar', id })}>Colar uma lista</button>
+          <p class="dica">Em breve: gerar cartões a partir de um PDF com o Gemini.</p>
         </section>
       )}
 
@@ -118,7 +120,7 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
 
       <nav class="rodape um">
         <button class="btn secundario" onClick={() => nav.ir({ nome: 'revisar', id })}>
-          📋 Revisar conteúdo
+          📋 Cartões (ver, editar e revisar)
         </button>
       </nav>
       <p class="versao">{total} cartões · funciona sem internet</p>

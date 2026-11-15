@@ -4,7 +4,9 @@ import { pedirPersistencia } from '../core/db'
 import type { OpcoesFila } from '../core/fila'
 import { Backup } from './Backup'
 import { Baralhos } from './Baralhos'
+import { ColarLista } from './ColarLista'
 import { ConfigBaralho } from './ConfigBaralho'
+import { EditarCartao } from './EditarCartao'
 import { useBaralhos } from './estado'
 import { Inicio } from './Inicio'
 import { Revisar } from './Revisar'
@@ -16,6 +18,8 @@ export type Tela =
   | { nome: 'sessao'; id: string; modo: Modo; opcoes: OpcoesFila }
   | { nome: 'revisar'; id: string }
   | { nome: 'config'; id: string }
+  | { nome: 'cartao'; id: string; cartaoId?: string; tema?: string }
+  | { nome: 'colar'; id: string }
   | { nome: 'backup' }
 
 export interface Aviso {
@@ -91,7 +95,9 @@ export function App() {
     )
   else if (tela.nome === 'baralho') conteudo = <Inicio baralho={baralho} nav={nav} versao={versao} />
   else if (tela.nome === 'sessao') conteudo = <Sessao baralho={baralho} modo={tela.modo} opcoes={tela.opcoes} sair={nav.voltar} />
-  else if (tela.nome === 'revisar') conteudo = <Revisar baralho={baralho} sair={nav.voltar} />
+  else if (tela.nome === 'revisar') conteudo = <Revisar baralho={baralho} nav={nav} />
+  else if (tela.nome === 'cartao') conteudo = <EditarCartao key={tela.cartaoId ?? 'novo'} baralho={baralho} cartaoId={tela.cartaoId} temaInicial={tela.tema} nav={nav} />
+  else if (tela.nome === 'colar') conteudo = <ColarLista baralho={baralho} nav={nav} />
   else conteudo = <ConfigBaralho baralho={baralho} nav={nav} />
 
   return (
