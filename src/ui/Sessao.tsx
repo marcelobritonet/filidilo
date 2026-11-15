@@ -3,8 +3,8 @@ import { confere, formatar, lerNumero, preencher, sortear, type Sorteio } from '
 import { db, type Nota } from '../core/db'
 import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../core/fila'
 import { chave, registrar } from '../core/srs'
-import type { Cartao, CartaoCalculo } from '../core/types'
-import { baralho, nomeTema } from './estado'
+import type { Baralho, Cartao, CartaoCalculo } from '../core/types'
+import { nomeTema } from './estado'
 import { Reportar } from './Reportar'
 import { Tex } from './Tex'
 
@@ -12,7 +12,7 @@ export type Modo = 'prova' | 'espacada' | 'calculo'
 
 const TITULO: Record<Modo, string> = { prova: 'Modo prova', espacada: 'Revisão espaçada', calculo: 'Exercícios de cálculo' }
 
-export function Sessao({ modo, opcoes, sair }: { modo: Modo; opcoes: OpcoesFila; sair: () => void }) {
+export function Sessao({ baralho, modo, opcoes, sair }: { baralho: Baralho; modo: Modo; opcoes: OpcoesFila; sair: () => void }) {
   const [fila, setFila] = useState<Cartao[] | null>(null)
   const [pos, setPos] = useState(0)
   const [placar, setPlacar] = useState({ certos: 0, errados: 0 })
@@ -69,13 +69,13 @@ export function Sessao({ modo, opcoes, sair }: { modo: Modo; opcoes: OpcoesFila;
       ) : (
         <>
           <div class="meta-cartao">
-            <span class="tema-chip">{nomeTema(cartao.tema)}</span>
+            <span class="tema-chip">{nomeTema(baralho, cartao.tema)}</span>
             <button class="link" onClick={() => setReportando(true)}>
               ⚠ Reportar erro
             </button>
           </div>
           <CartaoView key={`${pos}-${cartao.id}`} cartao={cartao} avaliar={avaliar} />
-          {reportando && <Reportar cartao={cartao} fechar={() => setReportando(false)} />}
+          {reportando && <Reportar baralho={baralho} cartao={cartao} fechar={() => setReportando(false)} />}
         </>
       )}
     </main>

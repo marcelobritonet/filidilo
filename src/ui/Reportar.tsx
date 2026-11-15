@@ -1,12 +1,11 @@
 import { useState } from 'preact/hooks'
 import { db, uuid } from '../core/db'
 import { chave } from '../core/srs'
-import type { Cartao } from '../core/types'
-import { baralho } from './estado'
+import type { Baralho, Cartao } from '../core/types'
 
 const MOTIVOS = ['Resposta errada', 'Pergunta confusa', 'Erro de digitação', 'Conta não bate', 'Outro']
 
-export function Reportar({ cartao, fechar }: { cartao: Cartao; fechar: () => void }) {
+export function Reportar({ baralho, cartao, fechar }: { baralho: Baralho; cartao: Cartao; fechar: () => void }) {
   const [motivo, setMotivo] = useState(MOTIVOS[0])
   const [texto, setTexto] = useState('')
   const [salvo, setSalvo] = useState(false)

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'preact/hooks'
 import { exportar, importar, textoReportes } from '../core/backup'
 import { db } from '../core/db'
-import { baralho } from './estado'
+import type { Baralho } from '../core/types'
 
-export function Backup({ sair }: { sair: () => void }) {
+export function Backup({ baralhos, sair }: { baralhos: Baralho[]; sair: () => void }) {
   const [msg, setMsg] = useState('')
   const [contagem, setContagem] = useState({ revisoes: 0, reportes: 0, novos: 0 })
 
@@ -43,7 +43,7 @@ export function Backup({ sair }: { sair: () => void }) {
     if (!f) return
     try {
       const r = await importar(await f.text())
-      setMsg(`✔ Backup restaurado: ${r.estados} cartões e ${r.revisoes} revisões atualizados.`)
+      setMsg(`✔ Backup restaurado: ${r.baralhos} baralhos, ${r.estados} cartões e ${r.revisoes} revisões atualizados.`)
       contar()
     } catch (err) {
       setMsg(`✘ ${(err as Error).message}`)
@@ -51,7 +51,7 @@ export function Backup({ sair }: { sair: () => void }) {
   }
 
   const enviar = async (apenasNovos: boolean) => {
-    const { texto, ids } = await textoReportes(baralho, apenasNovos)
+    const { texto, ids } = await textoReportes(baralhos, apenasNovos)
     let ok = false
     if (navigator.share) {
       try {
@@ -94,7 +94,7 @@ export function Backup({ sair }: { sair: () => void }) {
 
       <section class="bloco">
         <h2>💾 Backup do progresso</h2>
-        <p>O progresso fica guardado só neste aparelho ({contagem.revisoes} respostas até agora). Salve um backup de vez em quando, principalmente antes de trocar de celular.</p>
+        <p>Seus baralhos e o progresso ficam guardados só neste aparelho ({contagem.revisoes} respostas até agora). Salve um backup de vez em quando, principalmente antes de trocar de celular.</p>
         <button class="btn" onClick={salvar}>
           Salvar backup
         </button>

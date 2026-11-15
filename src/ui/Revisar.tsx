@@ -2,13 +2,13 @@ import { useEffect, useMemo, useState } from 'preact/hooks'
 import { formatar, preencher, sortear } from '../core/calc'
 import { db, type Marca, type Reporte } from '../core/db'
 import { chave } from '../core/srs'
-import type { Cartao } from '../core/types'
-import { baralho, nomeTema } from './estado'
+import type { Baralho, Cartao } from '../core/types'
+import { nomeTema } from './estado'
 import { Tex } from './Tex'
 
 type FiltroStatus = 'todos' | 'pendentes' | 'reportados' | 'erro' | 'ok'
 
-export function Revisar({ sair }: { sair: () => void }) {
+export function Revisar({ baralho, sair }: { baralho: Baralho; sair: () => void }) {
   const [tema, setTema] = useState(baralho.temas[0]?.id ?? '')
   const [status, setStatus] = useState<FiltroStatus>('todos')
   const [marcas, setMarcas] = useState<Map<string, Marca>>(new Map())
@@ -38,7 +38,7 @@ export function Revisar({ sair }: { sair: () => void }) {
           default: return true
         }
       }),
-    [tema, status, marcas, reportes],
+    [baralho, tema, status, marcas, reportes],
   )
 
   const revisados = baralho.cartoes.filter((c) => c.tema === tema && marcas.has(chave(baralho.id, c.id))).length
@@ -79,7 +79,7 @@ export function Revisar({ sair }: { sair: () => void }) {
       )}
       <ul class="lista-revisao">
         {lista.map((c) => (
-          <ItemRevisao key={c.id} c={c} marca={marcas.get(chave(baralho.id, c.id))} reps={reportes.get(chave(baralho.id, c.id)) ?? []} mudou={() => setV(v + 1)} />
+          <ItemRevisao key={c.id} baralho={baralho} c={c} marca={marcas.get(chave(baralho.id, c.id))} reps={reportes.get(chave(baralho.id, c.id)) ?? []} mudou={() => setV(v + 1)} />
         ))}
         {!lista.length && <p class="dica centro">Nenhum cartão com esse filtro.</p>}
       </ul>
@@ -87,7 +87,7 @@ export function Revisar({ sair }: { sair: () => void }) {
   )
 }
 
-function ItemRevisao({ c, marca, reps, mudou }: { c: Cartao; marca?: Marca; reps: Reporte[]; mudou: () => void }) {
+function ItemRevisao({ baralho, c, marca, reps, mudou }: { baralho: Baralho; c: Cartao; marca?: Marca; reps: Reporte[]; mudou: () => void }) {
   const [nota, setNota] = useState(marca?.nota ?? '')
   const [editando, setEditando] = useState(false)
   const k = chave(baralho.id, c.id)
@@ -104,7 +104,7 @@ function ItemRevisao({ c, marca, reps, mudou }: { c: Cartao; marca?: Marca; reps
     <li class={`item ${marca?.status ?? ''}`}>
       <div class="cab">
         <code>{c.id}</code>
-        <span class="tema-chip">{nomeTema(c.tema)}</span>
+        <span class="tema-chip">{nomeTema(baralho, c.tema)}</span>
         <span class="tipo">{{ conceito: 'conceito', vf: 'V/F', associacao: 'alternativas', calculo: 'cálculo' }[c.tipo]}</span>
       </div>
       <Conteudo c={c} />

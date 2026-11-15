@@ -1,10 +1,27 @@
 import { useEffect, useState } from 'preact/hooks'
+import { listar, semear } from '../core/baralhos'
 import { db, type Estado } from '../core/db'
+import type { Baralho } from '../core/types'
 import { hidrodinamica } from '../decks/carregar'
 
-export const baralho = hidrodinamica
+/** Baralhos que vêm instalados na primeira abertura. */
+const SEMENTES = [() => structuredClone(hidrodinamica)]
 
-export const nomeTema = (id: string) => baralho.temas.find((t) => t.id === id)?.nome ?? id
+let pronto: Promise<void> | null = null
+export const prepararBanco = () => (pronto ??= semear(SEMENTES))
+
+export const nomeTema = (b: Baralho, id: string) => b.temas.find((t) => t.id === id)?.nome ?? id
+
+/** Lista de baralhos, recarregada quando `versao` muda. */
+export function useBaralhos(versao: number) {
+  const [baralhos, setBaralhos] = useState<Baralho[] | null>(null)
+  useEffect(() => {
+    prepararBanco()
+      .then(listar)
+      .then(setBaralhos)
+  }, [versao])
+  return baralhos
+}
 
 /** Mapa id → estado, recarregado quando `versao` muda. */
 export function useEstados(versao: number) {
@@ -21,4 +38,11 @@ export function diasAte(iso: string): number {
   const hoje = new Date()
   const h = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()).getTime()
   return Math.round((alvo - h) / 86400000)
+}
+
+export function textoContagem(prova?: string): string | null {
+  if (!prova) return null
+  const dias = diasAte(prova)
+  if (dias < 0) return null
+  return dias === 0 ? 'A prova é hoje. Boa prova!' : dias === 1 ? 'Prova amanhã' : `Faltam ${dias} dias para a prova`
 }

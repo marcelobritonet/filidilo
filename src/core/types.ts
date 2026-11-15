@@ -16,6 +16,11 @@ interface CartaoBase {
   tema: string
   fonte?: Fonte
   explicacao?: string
+  /** Como o cartão nasceu. */
+  origem?: 'manual' | 'ia' | 'importado'
+  /** Editado pela estudante: atualizações importadas não sobrescrevem. */
+  editado?: boolean
+  atualizadoEm?: number
 }
 
 export interface CartaoConceito extends CartaoBase {
@@ -79,4 +84,6 @@ export interface Baralho {
   prova?: string
   temas: Tema[]
   cartoes: Cartao[]
+  criadoEm?: number
+  atualizadoEm?: number
 }

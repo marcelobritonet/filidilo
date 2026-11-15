@@ -2,7 +2,7 @@
 
 No ar: https://marcelobritonet.github.io/tatino/
 
-Flashcards offline (PWA) para estudar Hidrodinâmica / Fenômenos de Transporte. Funciona no celular e no computador, instalável pelo navegador, sem login.
+Flashcards offline (PWA) para estudar qualquer disciplina; começou com Hidrodinâmica / Fenômenos de Transporte. Funciona no celular e no computador, instalável pelo navegador, sem login.
 
 - **Modo prova**: 20 cartões por rodada, começando pelos errados e pelos temas que mais caem.
 - **Revisão espaçada**: FSRS (`ts-fsrs`).
@@ -19,9 +19,9 @@ npm test           # núcleo + validação do baralho + gabaritos dos cálculos
 npm run build      # gera dist/ (PWA)
 ```
 
-## Baralho
+## Baralhos
 
-`src/decks/hidrodinamica/baralho.json` (temas) + `partes/*.json` (cartões, um arquivo por tema). Tipos: `conceito`, `vf`, `associacao`, `calculo`. Formato em `src/core/types.ts`; `npm test` recusa baralho inválido.
+Os baralhos ficam no aparelho (IndexedDB, tabela `baralhos`). Hidrodinâmica vem de fábrica e é instalado uma única vez na primeira abertura (`src/core/baralhos.ts`); depois é um baralho comum. A fonte dele é `src/decks/hidrodinamica/baralho.json` (temas) + `partes/*.json` (cartões, um arquivo por tema). Tipos: `conceito`, `vf`, `associacao`, `calculo`. Formato em `src/core/types.ts`; `npm test` recusa baralho inválido.
 
 Cartões de cálculo usam expressões avaliadas por um avaliador seguro (`src/core/expr.ts`, sem `eval`). Marcadores `{nome}` e `{nome:casas}` no texto são trocados pelos valores sorteados.
 
@@ -29,4 +29,4 @@ Cartões de cálculo usam expressões avaliadas por um avaliador seguro (`src/co
 
 Push na `main` publica no GitHub Pages pelo workflow `.github/workflows/deploy.yml` (em *Settings → Pages*, a fonte deve ser **GitHub Actions**).
 
-Especificação e plano: `SPEC.md`, `PLANO.md`. Pendências: `PENDENCIAS.md`.
+Especificação e plano: `SPEC.md` e `PLANO.md` (fase 1), `SPEC-FASE2.md` e `PLANO-FASE2.md` (fase 2). Pendências: `PENDENCIAS.md`.

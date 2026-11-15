@@ -1,27 +1,16 @@
-import { useEffect, useMemo, useState } from 'preact/hooks'
+import { useMemo, useState } from 'preact/hooks'
 import { chave, dominado, vencido } from '../core/srs'
 import type { Filtro } from '../core/fila'
-import type { Tela } from './App'
-import { baralho, diasAte, useEstados } from './estado'
+import type { Baralho } from '../core/types'
+import type { Navegacao } from './App'
+import { textoContagem, useEstados } from './estado'
 
-interface EventoInstalar extends Event {
-  prompt: () => Promise<void>
-}
-
-export function Inicio({ ir, versao }: { ir: (t: Tela) => void; versao: number }) {
+/** Tela de um baralho: modos de estudo, temas e progresso. */
+export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navegacao; versao: number }) {
   const estados = useEstados(versao)
   const [temas, setTemas] = useState<string[]>([])
   const [filtro, setFiltro] = useState<Filtro>('tudo')
-  const [instalar, setInstalar] = useState<EventoInstalar | null>(null)
-
-  useEffect(() => {
-    const f = (e: Event) => {
-      e.preventDefault()
-      setInstalar(e as EventoInstalar)
-    }
-    window.addEventListener('beforeinstallprompt', f)
-    return () => window.removeEventListener('beforeinstallprompt', f)
-  }, [])
+  const id = baralho.id
 
   const porTema = useMemo(() => {
     const m = new Map<string, { total: number; dominados: number; vistos: number }>()
@@ -34,33 +23,35 @@ export function Inicio({ ir, versao }: { ir: (t: Tela) => void; versao: number }
       if (dominado(e)) r.dominados++
     }
     return m
-  }, [estados])
+  }, [estados, baralho])
 
   const paraHoje = useMemo(
     () => (estados ? baralho.cartoes.filter((c) => estados.has(chave(baralho.id, c.id)) && vencido(estados.get(chave(baralho.id, c.id)))).length : 0),
-    [estados],
+    [estados, baralho],
   )
   const temCalculo = baralho.cartoes.some((c) => c.tipo === 'calculo')
   const total = baralho.cartoes.length
   const dominadosTotal = [...porTema.values()].reduce((s, r) => s + r.dominados, 0)
-  const dias = baralho.prova ? diasAte(baralho.prova) : null
+  const contagem = textoContagem(baralho.prova)
   const alternar = (id: string) => setTemas((ts) => (ts.includes(id) ? ts.filter((t) => t !== id) : [...ts, id]))
   const opcoes = { temas, filtro }
 
   return (
     <main class="tela inicio">
-      <header class="topo">
-        <h1>Tatino</h1>
-        <p class="sub">{baralho.titulo}</p>
-        {dias !== null && dias >= 0 && (
-          <p class="contagem">{dias === 0 ? 'A prova é hoje. Boa prova!' : dias === 1 ? 'Prova amanhã' : `Faltam ${dias} dias para a prova`}</p>
-        )}
+      <header class="topo com-voltar">
+        <div class="topo-linha">
+          <button class="icone" aria-label="Voltar para Meus baralhos" onClick={nav.voltar}>←</button>
+          <button class="icone" aria-label="Configurar baralho" onClick={() => nav.ir({ nome: 'config', id })}>⚙</button>
+        </div>
+        <h1>{baralho.titulo}</h1>
+        {contagem && <p class="contagem">{contagem}</p>}
       </header>
 
-      {instalar && (
-        <button class="btn instalar" onClick={() => instalar.prompt().then(() => setInstalar(null))}>
-          📲 Instalar o app no celular
-        </button>
+      {total === 0 && (
+        <section class="bloco">
+          <p>Este baralho ainda não tem cartões.</p>
+          <p class="dica">Em breve: criar cartões aqui e gerar a partir de um PDF com o Gemini.</p>
+        </section>
       )}
 
       <section class="cartao-resumo">
@@ -73,16 +64,16 @@ export function Inicio({ ir, versao }: { ir: (t: Tela) => void; versao: number }
       </section>
 
       <section class="acoes">
-        <button class="btn principal" onClick={() => ir({ nome: 'sessao', modo: 'prova', opcoes })}>
+        <button class="btn principal" onClick={() => nav.ir({ nome: 'sessao', id, modo: 'prova', opcoes })}>
           🎯 Modo prova
           <small>20 cartões, começando pelo que você mais precisa</small>
         </button>
-        <button class="btn" onClick={() => ir({ nome: 'sessao', modo: 'espacada', opcoes })}>
+        <button class="btn" onClick={() => nav.ir({ nome: 'sessao', id, modo: 'espacada', opcoes })}>
           🔁 Revisão espaçada
           <small>{paraHoje ? `${paraHoje} para revisar hoje + novos` : 'Cartões novos'}</small>
         </button>
         {temCalculo && (
-          <button class="btn" onClick={() => ir({ nome: 'sessao', modo: 'calculo', opcoes: { temas, filtro: 'calculo' } })}>
+          <button class="btn" onClick={() => nav.ir({ nome: 'sessao', id, modo: 'calculo', opcoes: { temas, filtro: 'calculo' } })}>
             🧮 Exercícios de cálculo
             <small>Números novos a cada vez, com resolução passo a passo</small>
           </button>
@@ -125,15 +116,12 @@ export function Inicio({ ir, versao }: { ir: (t: Tela) => void; versao: number }
         </ul>
       </section>
 
-      <nav class="rodape">
-        <button class="btn secundario" onClick={() => ir({ nome: 'revisar' })}>
+      <nav class="rodape um">
+        <button class="btn secundario" onClick={() => nav.ir({ nome: 'revisar', id })}>
           📋 Revisar conteúdo
         </button>
-        <button class="btn secundario" onClick={() => ir({ nome: 'backup' })}>
-          💾 Backup e reportes
-        </button>
       </nav>
-      <p class="versao">Baralho v{baralho.versao} · funciona sem internet</p>
+      <p class="versao">{total} cartões · funciona sem internet</p>
     </main>
   )
 }

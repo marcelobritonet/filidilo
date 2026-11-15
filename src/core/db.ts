@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie'
 import type { Card as FsrsCard } from 'ts-fsrs'
+import type { Baralho } from './types'
 
 export type Nota = 1 | 2 | 3 | 4 // Errei, Difícil, Acertei, Fácil
 
@@ -50,6 +51,7 @@ class TatinoDB extends Dexie {
   reportes!: Table<Reporte, string>
   marcas!: Table<Marca, string>
   meta!: Table<Meta, string>
+  baralhos!: Table<Baralho, string>
 
   constructor() {
     super('tatino')
@@ -60,6 +62,8 @@ class TatinoDB extends Dexie {
       marcas: 'cartao',
       meta: 'chave',
     })
+    // Fase 2: baralhos passam a viver no aparelho.
+    this.version(2).stores({ baralhos: 'id' })
   }
 }
 
