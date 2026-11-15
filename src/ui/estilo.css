@@ -379,3 +379,62 @@ textarea { line-height: 1.5; resize: vertical; }
   *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; scroll-behavior: auto !important; }
   .btn:active:not(:disabled), .cartao-acao:active { transform: none; }
 }
+
+/* ---------- Criar com IA ---------- */
+.passo h2 { margin: 0; font-size: 21px; }
+.num-passo {
+  display: inline-grid; place-items: center; width: 30px; height: 30px; flex: none;
+  border-radius: 50%; background: var(--accent-soft); color: var(--accent-text); font: 700 15px/1 var(--font-ui);
+}
+.instrucoes { margin: 0; padding-left: 22px; display: grid; gap: 4px; }
+a.btn { text-decoration: none; }
+details summary { cursor: pointer; color: var(--accent-text); min-height: 44px; display: flex; align-items: center; }
+textarea.instrucao { font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; margin-top: 6px; }
+.problemas-ia { display: grid; gap: 8px; }
+.problemas-ia p { margin: 0; }
+.ia .lista-revisao .check { font-weight: 650; color: var(--text); }
+.passo h2 { flex-wrap: nowrap; }
+
+/* ---------- Sessão: pular e folha de resultado ---------- */
+.acoes-cartao { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.acoes-cartao .btn small { color: var(--text-muted); }
+.etapa-feita summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--text-muted); font-size: 15px; }
+.resposta-certa { margin: 0; font-size: 18px; }
+
+/* Folha que sobe de baixo (bottom sheet), no estilo das modais nativas do celular. */
+.folha-fundo {
+  position: fixed; inset: 0; z-index: 40; background: rgba(17, 20, 24, .45);
+  animation: folha-escurecer .25s ease both;
+}
+.folha {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 41;
+  max-width: 640px; margin: 0 auto; max-height: 78vh; max-height: 78dvh;
+  display: grid; grid-template-rows: auto auto 1fr auto;
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-bottom: 0;
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, .18);
+  padding: 0 20px calc(16px + env(safe-area-inset-bottom));
+  animation: folha-subir .32s cubic-bezier(.2, .8, .2, 1) both;
+}
+.folha.ok { border-top: 4px solid var(--success); }
+.folha.erro { border-top: 4px solid var(--danger); }
+.folha-alca { justify-self: center; width: 64px; height: 28px; border: 0; background: transparent; display: grid; place-items: center; padding: 0; }
+.folha-alca span { width: 40px; height: 5px; border-radius: 3px; background: var(--border); }
+.folha-titulo { margin: 0 0 8px; font-size: 22px; }
+.folha.ok .folha-titulo { color: var(--success); }
+.folha.erro .folha-titulo { color: var(--danger); }
+.folha-corpo { overflow-y: auto; overscroll-behavior: contain; display: grid; gap: 12px; align-content: start; padding-bottom: 12px; min-height: 0; }
+.folha-corpo .explicacao { margin-top: 0; }
+.folha-corpo .fonte { margin-top: 0; }
+.folha-acoes { display: grid; gap: 8px; padding-top: 12px; border-top: 1px solid var(--border); }
+.folha-acoes .notas { margin-top: 0; }
+.folha-acoes .dica { margin: 0; }
+.folha.recolhida { max-height: none; }
+.folha.recolhida .folha-acoes { border-top: 0; padding-top: 0; }
+.reportar-folha { justify-self: start; }
+/* Espaço para a folha recolhida não cobrir o fim da página. */
+.sessao:has(.folha) { padding-bottom: 280px; }
+
+@keyframes folha-subir { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes folha-escurecer { from { opacity: 0; } to { opacity: 1; } }

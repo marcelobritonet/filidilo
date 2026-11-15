@@ -5,20 +5,28 @@ import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../
 import { chave, registrar } from '../core/srs'
 import type { Baralho, Cartao, CartaoCalculo } from '../core/types'
 import { nomeTema } from './estado'
-import { Reportar } from './Reportar'
+import { Folha } from './Folha'
 import { Icone } from './Icone'
+import { Reportar } from './Reportar'
 import { Tex } from './Tex'
 
 export type Modo = 'prova' | 'espacada' | 'calculo'
 
 const TITULO: Record<Modo, string> = { prova: 'Modo prova', espacada: 'Revisão espaçada', calculo: 'Exercícios de cálculo' }
 
+/** Ações que o cartão pode usar dentro da folha de resultado. */
+interface Acoes {
+  avaliar: (n: Nota) => void
+  reportar: () => void
+}
+
 export function Sessao({ baralho, modo, opcoes, sair }: { baralho: Baralho; modo: Modo; opcoes: OpcoesFila; sair: () => void }) {
   const [fila, setFila] = useState<Cartao[] | null>(null)
   const [pos, setPos] = useState(0)
-  const [placar, setPlacar] = useState({ certos: 0, errados: 0 })
+  const [placar, setPlacar] = useState({ certos: 0, errados: 0, pulados: 0 })
   const [reportando, setReportando] = useState(false)
   const [rodada, setRodada] = useState(0)
+  const [vez, setVez] = useState(0) // força remontar o cartão ao pular
 
   useEffect(() => {
     db.estados.toArray().then((l) => {
@@ -26,7 +34,7 @@ export function Sessao({ baralho, modo, opcoes, sair }: { baralho: Baralho; modo
       const f = modo === 'espacada' ? filaEspacada(baralho, m, opcoes) : filaProva(baralho, m, { ...opcoes, tamanho: modo === 'calculo' ? 10 : 20 })
       setFila(f)
       setPos(0)
-      setPlacar({ certos: 0, errados: 0 })
+      setPlacar({ certos: 0, errados: 0, pulados: 0 })
     })
   }, [rodada])
 
@@ -50,6 +58,20 @@ export function Sessao({ baralho, modo, opcoes, sair }: { baralho: Baralho; modo
     window.scrollTo(0, 0)
   }
 
+  /** Pular: não registra nada; o cartão vai para o fim da sessão (se for o último, a sessão termina). */
+  const pular = () => {
+    setPlacar((p) => ({ ...p, pulados: p.pulados + 1 }))
+    if (pos < fila.length - 1) {
+      const nova = [...fila]
+      nova.push(nova.splice(pos, 1)[0])
+      setFila(nova)
+      setVez((v) => v + 1)
+    } else setPos(pos + 1)
+    window.scrollTo(0, 0)
+  }
+
+  const acoes: Acoes = { avaliar, reportar: () => setReportando(true) }
+
   return (
     <main class="tela sessao">
       <header class="barra-sessao">
@@ -72,10 +94,16 @@ export function Sessao({ baralho, modo, opcoes, sair }: { baralho: Baralho; modo
           <div class="meta-cartao">
             <span class="tema-chip">{nomeTema(baralho, cartao.tema)}</span>
           </div>
-          <CartaoView key={`${pos}-${cartao.id}`} cartao={cartao} avaliar={avaliar} />
-          <button class="btn terciario reportar" onClick={() => setReportando(true)}>
-            Reportar erro neste cartão
-          </button>
+          <CartaoView key={`${pos}-${vez}-${cartao.id}`} cartao={cartao} acoes={acoes} />
+          <div class="acoes-cartao">
+            <button class="btn terciario" onClick={pular}>
+              Pular
+              <small>{pos < fila.length - 1 ? 'volta no fim da sessão' : 'termina a sessão'}</small>
+            </button>
+            <button class="btn terciario" onClick={() => setReportando(true)}>
+              Reportar erro
+            </button>
+          </div>
           {reportando && <Reportar baralho={baralho} cartao={cartao} fechar={() => setReportando(false)} />}
         </>
       )}
@@ -83,7 +111,7 @@ export function Sessao({ baralho, modo, opcoes, sair }: { baralho: Baralho; modo
   )
 }
 
-function Fim({ placar, vazio, modo, outra, sair }: { placar: { certos: number; errados: number }; vazio: boolean; modo: Modo; outra: () => void; sair: () => void }) {
+function Fim({ placar, vazio, modo, outra, sair }: { placar: { certos: number; errados: number; pulados: number }; vazio: boolean; modo: Modo; outra: () => void; sair: () => void }) {
   if (vazio)
     return (
       <section class="fim">
@@ -98,7 +126,8 @@ function Fim({ placar, vazio, modo, outra, sair }: { placar: { certos: number; e
       <span class="icone-fim"><Icone nome="avancar" tamanho={48} /></span>
       <h2>Sessão concluída</h2>
       <p>
-        {placar.certos} acertos e {placar.errados} erros em {total} respostas.
+        {placar.certos} acertos e {placar.errados} erros em {total} respostas
+        {placar.pulados > 0 && <>; {placar.pulados} {placar.pulados === 1 ? 'pulo' : 'pulos'}</>}.
       </p>
       <p class="dica">Os cartões errados voltam primeiro na próxima rodada do modo prova.</p>
       <button class="btn principal" onClick={outra}>
@@ -141,7 +170,7 @@ function BotoesNota({ avaliar, acertou }: { avaliar: (n: Nota) => void; acertou?
       </div>
     )
   return (
-    <div class={`notas ${acertou ? 'tres' : ''}`}>
+    <div class={`notas ${acertou ? 'tres' : ''}`} role="group" aria-label="Como foi?">
       {acertou === undefined && (
         <button class="btn nota n1" onClick={() => avaliar(1)}>
           Errei
@@ -160,46 +189,50 @@ function BotoesNota({ avaliar, acertou }: { avaliar: (n: Nota) => void; acertou?
   )
 }
 
-function CartaoView({ cartao, avaliar }: { cartao: Cartao; avaliar: (n: Nota) => void }) {
+const LinkReportar = ({ acoes }: { acoes: Acoes }) => (
+  <button class="btn terciario compacto reportar-folha" onClick={acoes.reportar}>
+    Reportar erro neste cartão
+  </button>
+)
+
+function CartaoView({ cartao, acoes }: { cartao: Cartao; acoes: Acoes }) {
   switch (cartao.tipo) {
     case 'conceito':
-      return <Conceito c={cartao} avaliar={avaliar} />
+      return <Conceito c={cartao} acoes={acoes} />
     case 'vf':
-      return <Escolha c={cartao} pergunta={cartao.frente} opcoes={['Verdadeiro', 'Falso']} correta={cartao.resposta ? 0 : 1} avaliar={avaliar} rotulo="Verdadeiro ou falso" />
+      return <Escolha c={cartao} pergunta={cartao.frente} opcoes={['Verdadeiro', 'Falso']} correta={cartao.resposta ? 0 : 1} acoes={acoes} rotulo="Verdadeiro ou falso" />
     case 'associacao':
-      return <Escolha c={cartao} pergunta={cartao.frente} opcoes={cartao.opcoes} correta={cartao.correta} avaliar={avaliar} embaralhar />
+      return <Escolha c={cartao} pergunta={cartao.frente} opcoes={cartao.opcoes} correta={cartao.correta} acoes={acoes} embaralhar />
     case 'calculo':
-      return <Calculo c={cartao} avaliar={avaliar} />
+      return <Calculo c={cartao} acoes={acoes} />
   }
 }
 
-function Conceito({ c, avaliar }: { c: Extract<Cartao, { tipo: 'conceito' }>; avaliar: (n: Nota) => void }) {
+function Conceito({ c, acoes }: { c: Extract<Cartao, { tipo: 'conceito' }>; acoes: Acoes }) {
   const [virado, setVirado] = useState(false)
   return (
     <article class="cartao">
       <p class="rotulo">Pergunta</p>
       <Tex class="frente" texto={c.frente} />
-      {!virado ? (
+      {!virado && (
         <button class="btn principal virar" onClick={() => setVirado(true)}>
           Mostrar resposta
         </button>
-      ) : (
-        <>
-          <hr />
-          <p class="rotulo">Resposta</p>
+      )}
+      {virado && (
+        <Folha titulo="Resposta" rodape={<><p class="dica centro">Como foi?</p><BotoesNota avaliar={acoes.avaliar} /></>}>
           <Tex class="verso" texto={c.verso} />
           {c.explicacao && <Explicacao texto={c.explicacao} />}
           <Fonte c={c} />
-          <p class="dica centro">Como foi?</p>
-          <BotoesNota avaliar={avaliar} />
-        </>
+          <LinkReportar acoes={acoes} />
+        </Folha>
       )}
     </article>
   )
 }
 
-function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta: number; avaliar: (n: Nota) => void; embaralhar?: boolean; rotulo?: string }) {
-  const { c, pergunta, opcoes, correta, avaliar } = props
+function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta: number; acoes: Acoes; embaralhar?: boolean; rotulo?: string }) {
+  const { c, pergunta, opcoes, correta, acoes } = props
   const ordem = useMemo(() => {
     const idx = opcoes.map((_, i) => i)
     if (props.embaralhar) idx.sort(() => Math.random() - 0.5)
@@ -208,6 +241,7 @@ function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta
   const [escolhida, setEscolhida] = useState<number | null>(null)
   const respondeu = escolhida !== null
   const acertou = escolhida === correta
+  const certaTexto = opcoes[correta].replace(/[*$]/g, '')
   return (
     <article class="cartao">
       <p class="rotulo">{props.rotulo ?? 'Escolha a alternativa correta'}</p>
@@ -225,14 +259,16 @@ function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta
         })}
       </div>
       {respondeu && (
-        <>
-          <p class={`resultado ${acertou ? 'ok' : 'erro'}`} aria-live="polite">
-            {acertou ? '✓ Certo!' : `✕ Não foi dessa vez. Resposta certa: ${opcoes[correta].replace(/[*$]/g, '')}`}
-          </p>
+        <Folha titulo={acertou ? '✓ Certo!' : '✕ Não foi dessa vez'} tom={acertou ? 'ok' : 'erro'} rodape={<BotoesNota avaliar={acoes.avaliar} acertou={acertou} />}>
+          {!acertou && (
+            <p class="resposta-certa">
+              Resposta certa: <strong>{certaTexto}</strong>
+            </p>
+          )}
           {c.explicacao && <Explicacao texto={c.explicacao} />}
           <Fonte c={c} />
-          <BotoesNota avaliar={avaliar} acertou={acertou} />
-        </>
+          <LinkReportar acoes={acoes} />
+        </Folha>
       )}
     </article>
   )
@@ -240,13 +276,15 @@ function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta
 
 type Resp = { texto: string; ok: boolean | null; desistiu?: boolean }
 
-function Calculo({ c, avaliar }: { c: CartaoCalculo; avaliar: (n: Nota) => void }) {
+function Calculo({ c, acoes }: { c: CartaoCalculo; acoes: Acoes }) {
   const [s, setS] = useState<Sorteio>(() => sortear(c))
   const [etapa, setEtapa] = useState(0)
   const [resps, setResps] = useState<Resp[]>([])
   const [texto, setTexto] = useState('')
   const terminou = resps.length === c.etapas.length
   const acertouTudo = terminou && resps.every((r) => r.ok)
+  // A folha mostra o resultado da etapa recém-respondida.
+  const mostrando = resps.length > etapa ? etapa : null
 
   const responder = (valor: string | number, desistiu = false) => {
     const et = c.etapas[etapa]
@@ -273,6 +311,14 @@ function Calculo({ c, avaliar }: { c: CartaoCalculo; avaliar: (n: Nota) => void 
     setTexto('')
   }
 
+  const respostaCerta = (i: number) => {
+    const et = c.etapas[i]
+    return et.opcoes ? et.opcoes[s.respostas[i]] : `${formatar(s.respostas[i], et.casas ?? 2)}${et.unidade ? ` ${et.unidade}` : ''}`
+  }
+
+  const r = mostrando !== null ? resps[mostrando] : null
+  const ultima = mostrando === c.etapas.length - 1
+
   return (
     <article class="cartao calculo">
       <p class="rotulo">Cálculo · {c.titulo}</p>
@@ -280,81 +326,99 @@ function Calculo({ c, avaliar }: { c: CartaoCalculo; avaliar: (n: Nota) => void 
       <ol class="etapas">
         {c.etapas.map((et, i) => {
           if (i > etapa) return null
-          const r = resps[i]
+          const ri = resps[i]
           return (
-            <li class={r ? (r.ok ? 'ok' : 'erro') : 'atual'}>
+            <li class={ri ? (ri.ok ? 'ok' : 'erro') : 'atual'}>
               <Tex class="pergunta" texto={preencher(et.pergunta, s)} />
-              {!r ? (
-                et.opcoes ? (
-                  <div class="opcoes duas">
-                    {et.opcoes.map((o, k) => (
-                      <button class="opcao" onClick={() => responder(k)}>
-                        {o}
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <form
-                    class="entrada"
-                    onSubmit={(e) => {
-                      e.preventDefault()
-                      responder(texto)
-                    }}
-                  >
-                    <input
-                      inputMode="decimal"
-                      autoComplete="off"
-                      enterKeyHint="done"
-                      placeholder="sua resposta"
-                      value={texto}
-                      onInput={(e) => setTexto((e.target as HTMLInputElement).value)}
-                      aria-label={`Resposta em ${et.unidade ?? ''}`}
-                    />
-                    {et.unidade && <span class="unidade">{et.unidade}</span>}
-                    <button class="btn principal" type="submit" disabled={lerNumero(texto) === null}>
-                      Conferir
-                    </button>
-                  </form>
-                )
-              ) : (
-                <>
-                  <p class={`resultado ${r.ok ? 'ok' : 'erro'}`} aria-live="polite">
-                    {r.ok ? '✓ Resposta dentro da tolerância: ' : r.desistiu ? 'Resposta: ' : `✕ Ainda não: veja a resolução. Você: ${r.texto} · certo: `}
-                    <strong>
-                      {et.opcoes ? et.opcoes[s.respostas[i]] : `${formatar(s.respostas[i], et.casas ?? 2)}${et.unidade ? ` ${et.unidade}` : ''}`}
-                    </strong>
-                  </p>
+              {ri ? (
+                <details class="etapa-feita">
+                  <summary>
+                    {ri.ok ? '✓' : '✕'} {respostaCerta(i)} — ver resolução
+                  </summary>
                   <div class="resolucao">
                     {et.resolucao.map((linha) => (
                       <Tex texto={preencher(linha, s)} />
                     ))}
                   </div>
-                </>
+                </details>
+              ) : et.opcoes ? (
+                <div class="opcoes duas">
+                  {et.opcoes.map((o, k) => (
+                    <button class="opcao" onClick={() => responder(k)}>
+                      {o}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <form
+                  class="entrada"
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    responder(texto)
+                  }}
+                >
+                  <input
+                    inputMode="decimal"
+                    autoComplete="off"
+                    enterKeyHint="done"
+                    placeholder="sua resposta"
+                    value={texto}
+                    onInput={(e) => setTexto((e.target as HTMLInputElement).value)}
+                    aria-label={`Resposta em ${et.unidade ?? ''}`}
+                  />
+                  {et.unidade && <span class="unidade">{et.unidade}</span>}
+                  <button class="btn principal" type="submit" disabled={lerNumero(texto) === null}>
+                    Conferir
+                  </button>
+                </form>
               )}
-              {!r && (
+              {!ri && (
                 <button class="link" onClick={() => responder('', true)}>
                   Não sei — ver a resolução
-                </button>
-              )}
-              {r && i === etapa && i < c.etapas.length - 1 && (
-                <button class="btn principal" onClick={() => setEtapa(etapa + 1)}>
-                  Próxima etapa →
                 </button>
               )}
             </li>
           )
         })}
       </ol>
-      {terminou && (
-        <>
-          {c.explicacao && <Explicacao texto={c.explicacao} />}
-          <Fonte c={c} />
-          <button class="link" onClick={novoSorteio}>
-            Treinar de novo com outros números (não conta)
-          </button>
-          <BotoesNota avaliar={avaliar} acertou={acertouTudo} />
-        </>
+
+      {r && mostrando !== null && (
+        <Folha
+          key={mostrando}
+          titulo={r.ok ? '✓ Resposta dentro da tolerância' : r.desistiu ? 'Resolução' : '✕ Ainda não: veja a resolução'}
+          tom={r.ok ? 'ok' : r.desistiu ? 'neutro' : 'erro'}
+          rodape={
+            ultima ? (
+              <BotoesNota avaliar={acoes.avaliar} acertou={acertouTudo} />
+            ) : (
+              <button class="btn principal" onClick={() => setEtapa(etapa + 1)}>
+                Próxima etapa →
+              </button>
+            )
+          }
+        >
+          <p class="resposta-certa">
+            {!r.ok && !r.desistiu && <>Você: {r.texto} · </>}
+            Certo: <strong>{respostaCerta(mostrando)}</strong>
+          </p>
+          <div class="resolucao">
+            {c.etapas[mostrando].resolucao.map((linha) => (
+              <Tex texto={preencher(linha, s)} />
+            ))}
+          </div>
+          {ultima && (
+            <>
+              {c.explicacao && <Explicacao texto={c.explicacao} />}
+              <Fonte c={c} />
+              <button class="btn terciario compacto" onClick={novoSorteio}>
+                Treinar de novo com outros números (não conta)
+              </button>
+              <LinkReportar acoes={acoes} />
+            </>
+          )}
+        </Folha>
       )}
+      {terminou && mostrando === null && <BotoesNota avaliar={acoes.avaliar} acertou={acertouTudo} />}
     </article>
   )
 }

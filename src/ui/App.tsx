@@ -7,6 +7,7 @@ import { Backup } from './Backup'
 import { Baralhos } from './Baralhos'
 import { ColarLista } from './ColarLista'
 import { ConfigBaralho } from './ConfigBaralho'
+import { CriarComIA } from './CriarComIA'
 import { EditarCartao } from './EditarCartao'
 import { useBaralhos } from './estado'
 import { Inicio } from './Inicio'
@@ -23,6 +24,7 @@ export type Tela =
   | { nome: 'colar'; id: string }
   | { nome: 'backup' }
   | { nome: 'aparencia' }
+  | { nome: 'ia'; id?: string }
 
 export interface Aviso {
   texto: string
@@ -32,6 +34,8 @@ export interface Aviso {
 export interface Navegacao {
   ir: (t: Tela) => void
   voltar: () => void
+  /** Troca a tela atual por outra (o voltar não retorna a ela). */
+  substituir: (t: Tela) => void
   /** Recarrega listas e progresso depois de uma mudança. */
   mudou: () => void
   avisar: (a: Aviso) => void
@@ -75,6 +79,10 @@ export function App() {
       window.scrollTo(0, 0)
     },
     voltar: () => history.back(),
+    substituir: (t) => {
+      setPilha((p) => [...p.slice(0, -1), t])
+      window.scrollTo(0, 0)
+    },
     mudou: () => setVersao((v) => v + 1),
     avisar: setAviso,
   }
@@ -88,6 +96,7 @@ export function App() {
   else if (tela.nome === 'baralhos') conteudo = <Baralhos baralhos={baralhos} nav={nav} versao={versao} />
   else if (tela.nome === 'backup') conteudo = <Backup baralhos={baralhos} sair={nav.voltar} />
   else if (tela.nome === 'aparencia') conteudo = <Aparencia nav={nav} />
+  else if (tela.nome === 'ia') conteudo = <CriarComIA baralhos={baralhos} baralhoId={tela.id} nav={nav} />
   else if (carregando || !baralho)
     // Logo depois de criar um baralho a lista ainda está recarregando.
     conteudo = (

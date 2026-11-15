@@ -112,6 +112,10 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
           <button class="btn principal" onClick={() => setCriando(true)}>
             Novo baralho
           </button>
+          <button class="btn secundario" onClick={() => nav.ir({ nome: 'ia' })}>
+            Criar com IA
+            <small>o Gemini monta os cartões a partir de um PDF, texto ou assunto</small>
+          </button>
           <label class="btn secundario arquivo">
             Abrir baralho recebido
             <small>arquivo “(Tatino).txt” recebido pelo WhatsApp ou e-mail</small>

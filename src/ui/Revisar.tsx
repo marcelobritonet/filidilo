@@ -62,6 +62,9 @@ export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) 
           Colar lista
         </button>
       </div>
+      <button class="btn secundario" onClick={() => nav.ir({ nome: 'ia', id: baralho.id })}>
+        Criar com IA (Gemini)
+      </button>
       <p class="dica">Toque em Editar para mudar um cartão. Para revisar o conteúdo, confira cada cartão com a fonte e marque Certo, Errado ou Observação.</p>
       <label class="campo">
         Tema
@@ -150,7 +153,7 @@ function ItemRevisao({ baralho, c, marca, reps, mudou, editar }: { baralho: Bara
   )
 }
 
-function Conteudo({ c }: { c: Cartao }) {
+export function Conteudo({ c }: { c: Cartao }) {
   switch (c.tipo) {
     case 'conceito':
       return (

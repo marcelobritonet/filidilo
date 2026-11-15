@@ -64,7 +64,9 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
           <button class="btn secundario" onClick={() => nav.ir({ nome: 'colar', id })}>
             Colar uma lista
           </button>
-          <p class="dica">Em breve: gerar cartões a partir de um PDF com o Gemini.</p>
+          <button class="btn secundario" onClick={() => nav.ir({ nome: 'ia', id })}>
+            Criar com IA (Gemini)
+          </button>
         </section>
       ) : (
         <>

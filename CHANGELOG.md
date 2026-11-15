@@ -2,6 +2,21 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o número do meio sobe a cada etapa nova, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [1.5.0] — 2026-11-15
+
+Fase 2 · E4: criar cartões com o Gemini; e sessão de estudo mais confortável.
+
+### Novo
+- **Criar com IA** (Meus baralhos, tela do baralho e Cartões): a partir de um PDF de aula, de um texto colado ou de um assunto. O app monta a instrução, ela cola no Gemini, cola a resposta de volta e confere a prévia antes de salvar.
+- Instrução versionada com formato, regras (fidelidade ao material, página da fonte, tipos e proporções) e exemplos testados pelo validador do app.
+- Leitura tolerante da resposta: texto em volta, bloco de código, vírgula sobrando e aspas curvas. Cada cartão é validado separadamente (cálculos sorteados 60 vezes). Os cartões com problema geram um **pedido de correção** pronto para colar no Gemini, e os corrigidos entram na mesma prévia.
+- Temas reaproveitados do baralho de destino ou criados; destino pode ser um baralho novo ou um existente.
+- **Pular** na sessão: o cartão vai para o fim da sessão sem contar como resposta (no último, a sessão termina). O resumo mostra os pulos.
+
+### Mudou
+- **Resultado em folha que sobe de baixo**, como a modal nativa do celular: resposta, explicação, fonte e as avaliações aparecem sem precisar rolar. A alça (ou um toque fora) recolhe a folha para ver o cartão inteiro.
+- No cálculo, cada etapa abre a folha com a resolução e o botão "Próxima etapa"; as etapas feitas ficam resumidas no cartão, com a resolução recolhida.
+
 ## [1.4.0] — 2026-11-15
 
 Nova identidade visual: **tatino.** — editorial, calma e genérica para qualquer disciplina.
@@ -70,6 +85,7 @@ Fase 1: primeira versão publicada.
 - Reportar erro em qualquer cartão, revisão de conteúdo (✓/⚠/📝), backup e envio de reportes pelo WhatsApp.
 - Publicação automática no GitHub Pages.
 
+[1.5.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.5.0
 [1.4.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.4.0
 [1.3.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.3.0
 [1.2.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.2.0
