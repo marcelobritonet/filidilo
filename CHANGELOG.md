@@ -2,6 +2,20 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o número do meio sobe a cada etapa nova, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [1.7.0] — 2026-11-15
+
+Fase 2 · E5: Gemini direto — gerar cartões com um toque.
+
+### Novo
+- **Gemini direto** em "Criar com IA": com uma chave gratuita do Google AI Studio, ela escolhe o PDF no celular e toca em **Gerar com o Gemini**. O PDF vai junto, e o Gemini lê também imagens e fórmulas dos slides.
+- **Correção automática**: se algum cartão vier com problema, o app pede a correção ao Gemini uma vez, na mesma conversa, e junta os cartões corrigidos à prévia.
+- Configuração da chave dentro de "Criar com IA": passo a passo para criar a chave, **Salvar e testar** (confere a chave e escolhe o modelo Flash disponível), trocar ou remover.
+- Mensagens claras para chave inválida, cota gratuita esgotada, sem internet e PDF grande demais (limite de 14 MB). O copiar e colar continua disponível.
+
+### Segurança e privacidade
+- A chave fica só no aparelho (armazenamento local do navegador), fora do backup, e vai no cabeçalho da chamada, nunca na URL.
+- Aviso na tela: no plano gratuito, o Google pode usar o conteúdo enviado para melhorar os produtos dele.
+
 ## [1.6.1] — 2026-11-15
 
 ### Removido
@@ -102,6 +116,7 @@ Fase 1: primeira versão publicada.
 - Reportar erro em qualquer cartão, revisão de conteúdo (✓/⚠/📝), backup e envio de reportes pelo WhatsApp.
 - Publicação automática no GitHub Pages.
 
+[1.7.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.7.0
 [1.6.1]: https://github.com/marcelobritonet/tatino/releases/tag/v1.6.1
 [1.6.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.6.0
 [1.5.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.5.0

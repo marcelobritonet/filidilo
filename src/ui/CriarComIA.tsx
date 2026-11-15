@@ -1,9 +1,12 @@
-import { useMemo, useState } from 'preact/hooks'
+import { useMemo, useRef, useState } from 'preact/hooks'
 import { criar, salvar } from '../core/baralhos'
+import { arquivoParaBase64, gerarDireto } from '../core/ia/direto'
+import { LIMITE_PDF_BYTES, lerConfig } from '../core/ia/gemini'
 import { EXEMPLOS, montarCorrecao, montarInstrucao, type Mistura, type Origem } from '../core/ia/instrucao'
 import { extrairJson, lerResposta, type RespostaLida } from '../core/ia/resposta'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
+import { ConfigGemini } from './ConfigGemini'
 import { Conteudo } from './Revisar'
 
 const LINK_GEMINI = 'https://gemini.google.com/app'
@@ -26,6 +29,11 @@ export function CriarComIA({ baralhos, baralhoId, nav }: { baralhos: Baralho[]; 
   const [erroLeitura, setErroLeitura] = useState('')
   const [desmarcados, setDesmarcados] = useState<Set<string>>(new Set())
   const [salvando, setSalvando] = useState(false)
+  const [cfg, setCfg] = useState(lerConfig)
+  const [pdf, setPdf] = useState<File | null>(null)
+  const [gerando, setGerando] = useState<'' | 'gerando' | 'corrigindo'>('')
+  const [erroGeracao, setErroGeracao] = useState('')
+  const previa = useRef<HTMLDivElement>(null)
 
   const destino = baralhos.find((b) => b.id === destinoId)
   const destinoBase = destino ?? { id: 'novo', titulo: nomeNovo || 'Novo baralho', versao: 1, temas: [] }
@@ -47,6 +55,42 @@ export function CriarComIA({ baralhos, baralhoId, nav }: { baralhos: Baralho[]; 
 
   const fontePadrao = origem === 'pdf' ? nomePdf.trim() || undefined : origem === 'texto' ? 'Texto colado' : 'Gerado pelo Gemini'
 
+  /** Junta uma nova leitura aos cartões válidos já lidos (respostas de correção). */
+  const juntar = (r: RespostaLida) =>
+    setLida((ant) => {
+      if (!ant) return r
+      const temas = [...ant.temasNovos]
+      for (const t of r.temasNovos) if (!temas.some((x) => x.id === t.id)) temas.push(t)
+      return { temasNovos: temas, cartoes: [...ant.cartoes.filter((c) => !c.erros.length), ...r.cartoes] }
+    })
+
+  const mostrarPrevia = () => setTimeout(() => previa.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
+
+  const escolherPdf = (e: Event) => {
+    const f = (e.target as HTMLInputElement).files?.[0] ?? null
+    setPdf(f)
+    setErroGeracao('')
+    if (f && !nomePdf.trim()) setNomePdf(f.name.replace(/\.pdf$/i, ''))
+  }
+
+  /** Gemini direto: um toque gera, valida e corrige uma vez. */
+  const gerarAgora = async () => {
+    if (!cfg) return
+    setErroGeracao('')
+    if (origem === 'pdf' && !pdf) return setErroGeracao('Escolha o PDF da aula primeiro.')
+    if (pdf && pdf.size > LIMITE_PDF_BYTES) return setErroGeracao('O PDF passa de 14 MB. Escolha um arquivo menor, ou use o copiar e colar abaixo.')
+    try {
+      const anexo = origem === 'pdf' && pdf ? { base64: await arquivoParaBase64(pdf), mime: pdf.type || 'application/pdf' } : undefined
+      const r = await gerarDireto(cfg, { instrucao, pdf: anexo, destino: destinoBase, fontePadrao, andamento: setGerando })
+      juntar(r)
+      mostrarPrevia()
+    } catch (e) {
+      setErroGeracao((e as Error).message)
+    } finally {
+      setGerando('')
+    }
+  }
+
   const ler = () => {
     setErroLeitura('')
     try {
@@ -56,13 +100,9 @@ export function CriarComIA({ baralhos, baralhoId, nav }: { baralhos: Baralho[]; 
       if (r.cartoes.every((c) => frentesExemplo.has('frente' in c.cartao ? c.cartao.frente : c.cartao.titulo)))
         throw new Error('Parece que você colou a instrução, não a resposta. Cole no Gemini, espere a resposta e copie a resposta.')
       // Uma segunda resposta (ex.: correções) soma-se aos cartões válidos já lidos.
-      setLida((ant) => {
-        if (!ant) return r
-        const temas = [...ant.temasNovos]
-        for (const t of r.temasNovos) if (!temas.some((x) => x.id === t.id)) temas.push(t)
-        return { temasNovos: temas, cartoes: [...ant.cartoes.filter((c) => !c.erros.length), ...r.cartoes] }
-      })
+      juntar(r)
       setResposta('')
+      mostrarPrevia()
     } catch (e) {
       setErroLeitura((e as Error).message)
     }
@@ -118,7 +158,15 @@ export function CriarComIA({ baralhos, baralhoId, nav }: { baralhos: Baralho[]; 
         </div>
         {origem === 'pdf' && (
           <>
-            <p class="dica">Você vai anexar o PDF lá no Gemini. Aqui é só para a fonte dos cartões.</p>
+            {cfg ? (
+              <label class="btn secundario arquivo">
+                {pdf ? `PDF: ${pdf.name}` : 'Escolher o PDF da aula'}
+                <small>{pdf ? `${(pdf.size / 1024 / 1024).toFixed(1)} MB · toque para trocar` : 'até 14 MB'}</small>
+                <input type="file" accept="application/pdf,.pdf" onChange={escolherPdf} />
+              </label>
+            ) : (
+              <p class="dica">Você vai anexar o PDF lá no Gemini. Aqui é só para a fonte dos cartões.</p>
+            )}
             <label class="campo">
               Nome do PDF (opcional)
               <input class="texto" value={nomePdf} placeholder="Ex.: Aula 4 - Termodinâmica" onInput={(e) => setNomePdf((e.target as HTMLInputElement).value)} />
@@ -178,8 +226,25 @@ export function CriarComIA({ baralhos, baralhoId, nav }: { baralhos: Baralho[]; 
         )}
       </section>
 
+      {cfg ? (
+        <section class="bloco passo">
+          <h2><span class="num-passo">2</span> Gerar</h2>
+          <button class="btn principal grande" disabled={!materialOk || !!gerando} onClick={gerarAgora}>
+            {gerando === 'gerando' ? 'Gerando… pode levar um minuto' : gerando === 'corrigindo' ? 'Corrigindo alguns cartões…' : 'Gerar com o Gemini'}
+          </button>
+          <p class="dica" role="status" aria-live="polite">
+            {gerando ? 'Pode deixar a tela aberta. Os cartões aparecem logo abaixo.' : 'O Gemini lê o material e o tatino. confere cada cartão antes de mostrar.'}
+          </p>
+          {erroGeracao && (
+            <p class="resultado erro" role="alert">
+              ✕ {erroGeracao}
+            </p>
+          )}
+          <details>
+            <summary>Prefere copiar e colar no app do Gemini?</summary>
+            <div class="copiar-colar">
       <section class="bloco passo">
-        <h2><span class="num-passo">2</span> Peça ao Gemini</h2>
+        <h2><span class="num-passo">{cfg ? 'a' : 2}</span> Peça ao Gemini</h2>
         <ol class="instrucoes">
           <li>Toque em <strong>Copiar instrução</strong>.</li>
           <li>Abra o Gemini{origem === 'pdf' ? ', anexe o PDF (botão +)' : ''} e cole a instrução.</li>
@@ -203,7 +268,7 @@ export function CriarComIA({ baralhos, baralhoId, nav }: { baralhos: Baralho[]; 
       </section>
 
       <section class="bloco passo">
-        <h2><span class="num-passo">3</span> Cole a resposta</h2>
+        <h2><span class="num-passo">{cfg ? 'b' : 3}</span> Cole a resposta</h2>
         <textarea rows={6} value={resposta} placeholder="Cole aqui a resposta do Gemini…" onInput={(e) => setResposta((e.target as HTMLTextAreaElement).value)} />
         <button class="btn principal" disabled={!resposta.trim()} onClick={ler}>
           Ler cartões
@@ -215,9 +280,61 @@ export function CriarComIA({ baralhos, baralhoId, nav }: { baralhos: Baralho[]; 
         )}
       </section>
 
+            </div>
+          </details>
+          <button class="btn terciario compacto" onClick={() => setCfg(null)}>
+            Configuração do Gemini direto
+          </button>
+        </section>
+      ) : (
+        <>
+      <section class="bloco passo">
+        <h2><span class="num-passo">{cfg ? 'a' : 2}</span> Peça ao Gemini</h2>
+        <ol class="instrucoes">
+          <li>Toque em <strong>Copiar instrução</strong>.</li>
+          <li>Abra o Gemini{origem === 'pdf' ? ', anexe o PDF (botão +)' : ''} e cole a instrução.</li>
+          <li>Quando ele responder, copie a resposta inteira (o ícone de copiar embaixo da resposta).</li>
+        </ol>
+        <button class="btn principal" disabled={!materialOk} onClick={() => copiar(instrucao, 'instrucao')}>
+          {copiado === 'instrucao' ? '✓ Instrução copiada' : 'Copiar instrução'}
+        </button>
+        <a class="btn secundario" href={LINK_GEMINI} target="_blank" rel="noopener noreferrer">
+          Abrir o Gemini
+        </a>
+        {copiado === 'erro' && (
+          <p class="resultado erro" role="alert">
+            Não consegui copiar. Toque e segure no texto abaixo para copiar.
+          </p>
+        )}
+        <details>
+          <summary>Ver a instrução</summary>
+          <textarea class="instrucao" rows={8} readOnly value={instrucao} />
+        </details>
+      </section>
+
+      <section class="bloco passo">
+        <h2><span class="num-passo">{cfg ? 'b' : 3}</span> Cole a resposta</h2>
+        <textarea rows={6} value={resposta} placeholder="Cole aqui a resposta do Gemini…" onInput={(e) => setResposta((e.target as HTMLTextAreaElement).value)} />
+        <button class="btn principal" disabled={!resposta.trim()} onClick={ler}>
+          Ler cartões
+        </button>
+        {erroLeitura && (
+          <p class="resultado erro" role="alert">
+            ✕ {erroLeitura}
+          </p>
+        )}
+      </section>
+
+          <details class="bloco">
+            <summary>Gerar com um toque (Gemini direto)</summary>
+            <ConfigGemini embutido aoMudar={() => setCfg(lerConfig())} />
+          </details>
+        </>
+      )}
+
       {lida && (
-        <section class="bloco passo" aria-live="polite">
-          <h2><span class="num-passo">4</span> Confira e salve</h2>
+        <section class="bloco passo" aria-live="polite" ref={previa}>
+          <h2><span class="num-passo">{cfg ? 3 : 4}</span> Confira e salve</h2>
           <p>
             <strong>{validos.length}</strong> cartões prontos
             {comErro.length > 0 && <>, {comErro.length} com problema</>}. Desmarque os que não quiser.

@@ -437,3 +437,6 @@ textarea.instrucao { font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monosp
 
 @keyframes folha-subir { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes folha-escurecer { from { opacity: 0; } to { opacity: 1; } }
+.config-gemini { display: grid; gap: 4px; }
+.copiar-colar { display: grid; gap: 4px; margin-top: 8px; }
+details.bloco > summary { font-weight: 650; }
