@@ -333,7 +333,6 @@ textarea { line-height: 1.5; resize: vertical; }
 .reporte { margin: 0; color: var(--danger); font-size: 15px; background: var(--danger-soft); padding: 8px 12px; border-radius: var(--radius-sm); }
 .marcas { display: flex; gap: 8px; flex-wrap: wrap; }
 .resumo-importacao { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.acoes .arquivo small { display: block; }
 
 /* ---------- Aparência ---------- */
 .opcoes-tema { border: 0; margin: 0; padding: 0; display: grid; gap: 10px; }

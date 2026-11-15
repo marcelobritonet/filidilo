@@ -2,6 +2,11 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o número do meio sobe a cada etapa nova, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [1.6.1] — 2026-11-15
+
+### Removido
+- Botão **Abrir baralho recebido** (escolher o arquivo "(Tatino).txt" no seletor de arquivos) e o código dele. Receber um baralho agora é só pelo **Compartilhar → tatino.**, com o app instalado no celular.
+
 ## [1.6.0] — 2026-11-15
 
 Abrir baralho recebido direto pelo Compartilhar do Android.
@@ -97,6 +102,7 @@ Fase 1: primeira versão publicada.
 - Reportar erro em qualquer cartão, revisão de conteúdo (✓/⚠/📝), backup e envio de reportes pelo WhatsApp.
 - Publicação automática no GitHub Pages.
 
+[1.6.1]: https://github.com/marcelobritonet/tatino/releases/tag/v1.6.1
 [1.6.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.6.0
 [1.5.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.5.0
 [1.4.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.4.0

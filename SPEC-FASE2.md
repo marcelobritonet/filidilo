@@ -14,10 +14,10 @@ Transformar o Tatino num app de estudo para **qualquer disciplina**, sem reescre
 |---|---|
 | Onde ficam | No aparelho (IndexedDB). Não existe baralho "oficial": todos são dela e editáveis (G1). |
 | Hidrodinâmica | Pré-instalado na primeira abertura, como baralho comum. O progresso atual é mantido, porque as chaves já são `baralho/cartão`. |
-| Vários baralhos | Tela **Meus baralhos**: lista com progresso e data da prova; botões **+ Novo baralho**, **Criar com IA** e **Abrir baralho recebido**. |
+| Vários baralhos | Tela **Meus baralhos**: lista com progresso e data da prova; botões **+ Novo baralho** e **Criar com IA**. |
 | Configurar | Nome, temas, tema prioritário ("cai na prova") e data da prova (G11). |
 | Duplicar e excluir | Duplicar copia os cartões, não o progresso. Excluir pede confirmação e permite desfazer por alguns segundos. |
-| Compartilhar | Gera um arquivo `nome.tatino.json` e abre o compartilhamento do Android (WhatsApp etc.). Do outro lado: "Abrir baralho recebido" (G7). |
+| Compartilhar | Gera um arquivo `nome.tatino.json` e abre o compartilhamento do Android (WhatsApp etc.). Do outro lado: segurar o arquivo → Compartilhar → tatino. (G7; o botão "Abrir baralho recebido" foi removido na v1.6.1). |
 | Atualização (H4) | Importar um arquivo com o **mesmo id** de baralho atualiza por `id` de cartão: troca os não editados, **mantém os que ela editou**, acrescenta os novos e não apaga nada. Mostra um resumo antes de aplicar. |
 
 ## 3. Cartões

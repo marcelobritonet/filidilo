@@ -35,19 +35,6 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
     })
   }, [])
 
-  const abrirRecebido = async (e: Event) => {
-    const input = e.target as HTMLInputElement
-    const f = input.files?.[0]
-    input.value = ''
-    if (!f) return
-    try {
-      setErro('')
-      setPlano(await planejar(lerBaralho(await f.text())))
-    } catch (err) {
-      setErro((err as Error).message)
-    }
-  }
-
   useEffect(() => {
     const f = (e: Event) => {
       e.preventDefault()
@@ -131,13 +118,8 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
             Criar com IA
             <small>o Gemini monta os cartões a partir de um PDF, texto ou assunto</small>
           </button>
-          <label class="btn secundario arquivo">
-            Abrir baralho recebido
-            <small>escolha o arquivo “(Tatino).txt” que você recebeu</small>
-            <input type="file" accept=".txt,.json,text/plain,application/json" onChange={abrirRecebido} />
-          </label>
           <p class="dica">
-            Mais fácil: no WhatsApp, segure o arquivo recebido → <strong>Compartilhar</strong> → <strong>tatino.</strong> (com o app instalado no celular).
+            Recebeu um baralho? No WhatsApp, segure o arquivo → <strong>Compartilhar</strong> → <strong>tatino.</strong> (com o app instalado no celular).
           </p>
           {erro && (
             <p class="resultado erro" role="alert">

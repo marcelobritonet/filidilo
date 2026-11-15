@@ -9,11 +9,11 @@ export async function pegarRecebido(): Promise<{ texto: string } | { erro: strin
   const q = new URLSearchParams(location.search).get('receber')
   if (!q) return null
   history.replaceState(history.state, '', location.pathname)
-  if (q === 'erro') return { erro: 'Não consegui ler o arquivo compartilhado. Tente pelo botão “Abrir baralho recebido”.' }
+  if (q === 'erro') return { erro: 'Não consegui ler o arquivo compartilhado. Tente compartilhar de novo.' }
   try {
     const cache = await caches.open(CACHE)
     const r = await cache.match(chave())
-    if (!r) return { erro: 'O arquivo compartilhado não chegou. Tente de novo ou use “Abrir baralho recebido”.' }
+    if (!r) return { erro: 'O arquivo compartilhado não chegou. Tente compartilhar de novo.' }
     await cache.delete(chave())
     return { texto: await r.text() }
   } catch {

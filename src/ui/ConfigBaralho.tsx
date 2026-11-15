@@ -135,7 +135,7 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
         <button class="btn secundario" onClick={compartilhar}>
           Compartilhar baralho
         </button>
-        <p class="dica">Envia um arquivo com os cartões (sem o seu progresso). Quem recebe segura o arquivo no WhatsApp → Compartilhar → tatino. (ou usa “Abrir baralho recebido”).</p>
+        <p class="dica">Envia um arquivo com os cartões (sem o seu progresso). Quem recebe segura o arquivo no WhatsApp → Compartilhar → tatino.</p>
         <button class="btn secundario" onClick={fazerCopia}>
           Duplicar baralho
         </button>

@@ -33,7 +33,7 @@ Cartões de cálculo usam expressões avaliadas por um avaliador seguro (`src/co
 
 Histórico em [CHANGELOG.md](CHANGELOG.md) e nas [releases](https://github.com/marcelobritonet/tatino/releases). A versão vem do `package.json` e aparece no rodapé do app. Para lançar: subir a versão no `package.json`, escrever a seção no changelog, fazer o commit, criar a tag `vX.Y.Z` e a release.
 
-Correções num baralho do repositório: `npm run exportar-baralho -- hidrodinamica` gera o arquivo em `dist-baralhos/`; ela abre em “Abrir baralho recebido” → Atualizar (as edições dela são preservadas).
+Correções num baralho do repositório: `npm run exportar-baralho -- hidrodinamica` gera o arquivo em `dist-baralhos/`; ela segura o arquivo no WhatsApp → Compartilhar → tatino. → Atualizar (as edições dela são preservadas).
 
 ## Publicar
 

@@ -17,7 +17,8 @@ Atualizado em 15/11/2026.
 | P21 | Sessão: botão Pular e resultado em folha que sobe | ✅ Publicada na v1.5.0 (15/11) | Claude |
 | P22 | Testar "Criar com IA" com o Gemini de verdade e um PDF do professor (a estudante ou Marcelo) | Aberto | Marcelo / estudante |
 | P24 | Abrir baralho recebido pelo Compartilhar do Android | ✅ Publicada na v1.6.0 (15/11) | Claude |
-| P25 | Testar o Compartilhar → tatino. no Android dela (app instalado) | Aberto | Marcelo / estudante |
+| P25 | Testar o Compartilhar → tatino. no Android dela (app instalado) — agora é o único jeito de receber baralho | Aberto | Marcelo / estudante |
+| P26 | Botão "Abrir baralho recebido" removido a pedido do Marcelo | ✅ v1.6.1 (15/11) | Claude |
 | P23 | Fase 2 · E5 Gemini direto (chave no aparelho) | Próxima | Claude |
 | P5 | Fase 2 · IA para gerar cartões | ✅ Decidido: Gemini (direto pela API com chave no aparelho, mais copiar e colar como alternativa) | — |
 | P6 | Fase 2 · Sincronização | ✅ Decidido: Google Drive, por último e opcional (E7) | — |
