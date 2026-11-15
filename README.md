@@ -1,4 +1,4 @@
-# Tatino
+# tatino.
 
 No ar: https://marcelobritonet.github.io/tatino/
 
@@ -9,6 +9,10 @@ Flashcards offline (PWA) para estudar qualquer disciplina; começou com Hidrodin
 - **Exercícios de cálculo**: números sorteados a cada vez, resposta digitada, correção com tolerância de ±2% e resolução passo a passo.
 - **Revisar conteúdo**: lista dos cartões com a fonte (apostila e página), para marcar ✓/⚠/📝.
 - **Backup e reportes**: o progresso fica só no aparelho; o backup salva um arquivo, e os reportes saem por WhatsApp/e-mail.
+
+## Visual
+
+Marca e tokens do kit de marca (`src/assets/brand/`, `src/ui/estilo.css`). Aparência: sistema, claro ou escuro (`src/ui/tema.ts`, chave `tatino-theme` no `localStorage`). Ícones do PWA gerados do `simbolo.svg` e do `simbolo-maskable.svg`.
 
 ## Rodar
 

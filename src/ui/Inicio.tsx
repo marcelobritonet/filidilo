@@ -4,6 +4,8 @@ import type { Filtro } from '../core/fila'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
 import { textoContagem, useEstados } from './estado'
+import { Icone } from './Icone'
+import { Marca } from './Marca'
 
 /** Tela de um baralho: modos de estudo, temas e progresso. */
 export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navegacao; versao: number }) {
@@ -36,94 +38,139 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
   const alternar = (id: string) => setTemas((ts) => (ts.includes(id) ? ts.filter((t) => t !== id) : [...ts, id]))
   const opcoes = { temas, filtro }
 
+  const continuar = paraHoje > 0
   return (
     <main class="tela inicio">
-      <header class="topo com-voltar">
-        <div class="topo-linha">
-          <button class="icone" aria-label="Voltar para Meus baralhos" onClick={nav.voltar}>←</button>
-          <button class="icone" aria-label="Configurar baralho" onClick={() => nav.ir({ nome: 'config', id })}>⚙</button>
+      <header class="cabecalho">
+        <div class="cabecalho-linha">
+          <button class="voltar" aria-label="Voltar para Meus baralhos" onClick={nav.voltar}>
+            ←
+          </button>
+          <Marca />
+          <button class="btn terciario compacto" onClick={() => nav.ir({ nome: 'config', id })}>
+            Configurar
+          </button>
         </div>
         <h1>{baralho.titulo}</h1>
-        {contagem && <p class="contagem">{contagem}</p>}
+        {contagem && <p class="selo">{contagem}</p>}
       </header>
 
-      {total === 0 && (
+      {total === 0 ? (
         <section class="bloco">
           <p>Este baralho ainda não tem cartões.</p>
-          <button class="btn principal" onClick={() => nav.ir({ nome: 'cartao', id })}>+ Criar um cartão</button>
-          <button class="btn" onClick={() => nav.ir({ nome: 'colar', id })}>Colar uma lista</button>
+          <button class="btn principal" onClick={() => nav.ir({ nome: 'cartao', id })}>
+            Criar um cartão
+          </button>
+          <button class="btn secundario" onClick={() => nav.ir({ nome: 'colar', id })}>
+            Colar uma lista
+          </button>
           <p class="dica">Em breve: gerar cartões a partir de um PDF com o Gemini.</p>
         </section>
-      )}
+      ) : (
+        <>
+          <section class="cartao-resumo">
+            <p>
+              <strong>{dominadosTotal}</strong> de {total} cartões dominados
+            </p>
+            <div class="barra" aria-hidden="true">
+              <div style={{ width: `${(100 * dominadosTotal) / Math.max(total, 1)}%` }} />
+            </div>
+          </section>
 
-      <section class="cartao-resumo">
-        <div class="barra grande" aria-label={`${dominadosTotal} de ${total} cartões dominados`}>
-          <div style={{ width: `${(100 * dominadosTotal) / Math.max(total, 1)}%` }} />
-        </div>
-        <p>
-          <strong>{dominadosTotal}</strong> de {total} cartões dominados
-        </p>
-      </section>
-
-      <section class="acoes">
-        <button class="btn principal" onClick={() => nav.ir({ nome: 'sessao', id, modo: 'prova', opcoes })}>
-          🎯 Modo prova
-          <small>20 cartões, começando pelo que você mais precisa</small>
-        </button>
-        <button class="btn" onClick={() => nav.ir({ nome: 'sessao', id, modo: 'espacada', opcoes })}>
-          🔁 Revisão espaçada
-          <small>{paraHoje ? `${paraHoje} para revisar hoje + novos` : 'Cartões novos'}</small>
-        </button>
-        {temCalculo && (
-          <button class="btn" onClick={() => nav.ir({ nome: 'sessao', id, modo: 'calculo', opcoes: { temas, filtro: 'calculo' } })}>
-            🧮 Exercícios de cálculo
-            <small>Números novos a cada vez, com resolução passo a passo</small>
+          <button class="btn principal grande" onClick={() => nav.ir({ nome: 'sessao', id, modo: continuar ? 'espacada' : 'prova', opcoes })}>
+            {continuar ? 'Continuar estudando' : 'Começar uma sessão'}
+            <small>{continuar ? `${paraHoje} ${paraHoje === 1 ? 'cartão para revisar' : 'cartões para revisar'} hoje` : '20 cartões, começando pelo que você mais precisa'}</small>
           </button>
-        )}
-      </section>
 
-      <section>
-        <h2>Temas {temas.length > 0 && <button class="link" onClick={() => setTemas([])}>limpar seleção</button>}</h2>
-        <p class="dica">Toque nos temas para estudar só eles. Sem seleção, entram todos.</p>
-        {temCalculo && (
-          <div class="segmentado" role="radiogroup" aria-label="Tipo de cartão">
-            {(['tudo', 'teoria', 'calculo'] as Filtro[]).map((f) => (
-              <button role="radio" aria-checked={filtro === f} class={filtro === f ? 'ativo' : ''} onClick={() => setFiltro(f)}>
-                {f === 'tudo' ? 'Tudo' : f === 'teoria' ? 'Só teoria' : 'Só cálculo'}
+          <ul class="lista-acoes" aria-label="Modos de estudo">
+            <li>
+              <button class="cartao-acao" onClick={() => nav.ir({ nome: 'sessao', id, modo: 'prova', opcoes })}>
+                <Icone nome="avancar" />
+                <span>
+                  <strong>Modo prova</strong>
+                  <small>20 cartões, começando pelo que você mais precisa</small>
+                </span>
               </button>
-            ))}
-          </div>
-        )}
-        <ul class="temas">
-          {baralho.temas.map((t) => {
-            const r = porTema.get(t.id)!
-            if (!r.total) return null
-            const sel = temas.includes(t.id)
-            return (
+            </li>
+            <li>
+              <button class="cartao-acao" onClick={() => nav.ir({ nome: 'sessao', id, modo: 'espacada', opcoes })}>
+                <Icone nome="revisar" />
+                <span>
+                  <strong>Revisão espaçada</strong>
+                  <small>{paraHoje ? `${paraHoje} para revisar hoje, mais cartões novos` : 'Cartões novos'}</small>
+                </span>
+              </button>
+            </li>
+            {temCalculo && (
               <li>
-                <button class={`tema ${sel ? 'sel' : ''}`} aria-pressed={sel} onClick={() => alternar(t.id)}>
-                  <span class="nome">
-                    {sel ? '☑' : '☐'} {t.nome} {t.prioritario && <span class="selo">cai na prova</span>}
-                  </span>
-                  <span class="barra">
-                    <span style={{ width: `${(100 * r.dominados) / r.total}%` }} />
-                  </span>
-                  <span class="num">
-                    {r.dominados}/{r.total}
+                <button class="cartao-acao" onClick={() => nav.ir({ nome: 'sessao', id, modo: 'calculo', opcoes: { temas, filtro: 'calculo' } })}>
+                  <Icone nome="praticar" />
+                  <span>
+                    <strong>Exercícios de cálculo</strong>
+                    <small>Números novos a cada vez, com resolução passo a passo</small>
                   </span>
                 </button>
               </li>
-            )
-          })}
-        </ul>
-      </section>
+            )}
+          </ul>
 
-      <nav class="rodape um">
-        <button class="btn secundario" onClick={() => nav.ir({ nome: 'revisar', id })}>
-          📋 Cartões (ver, editar e revisar)
+          <section>
+            <h2>
+              Temas
+              {temas.length > 0 && (
+                <button class="btn terciario compacto" onClick={() => setTemas([])}>
+                  Limpar seleção
+                </button>
+              )}
+            </h2>
+            <p class="dica">Toque nos temas para estudar só eles. Sem seleção, entram todos.</p>
+            {temCalculo && (
+              <div class="segmentado" role="radiogroup" aria-label="Tipo de cartão">
+                {(['tudo', 'teoria', 'calculo'] as Filtro[]).map((f) => (
+                  <button role="radio" aria-checked={filtro === f} class={filtro === f ? 'ativo' : ''} onClick={() => setFiltro(f)}>
+                    {f === 'tudo' ? 'Tudo' : f === 'teoria' ? 'Só teoria' : 'Só cálculo'}
+                  </button>
+                ))}
+              </div>
+            )}
+            <ul class="temas">
+              {baralho.temas.map((t) => {
+                const r = porTema.get(t.id)!
+                if (!r.total) return null
+                const sel = temas.includes(t.id)
+                return (
+                  <li>
+                    <button class={`tema ${sel ? 'sel' : ''}`} aria-pressed={sel} onClick={() => alternar(t.id)}>
+                      <span class="nome">
+                        <span class="marcador" aria-hidden="true">{sel ? '✓' : ''}</span>
+                        {t.nome} {t.prioritario && <span class="selo">cai na prova</span>}
+                      </span>
+                      <span class="barra" aria-hidden="true">
+                        <span style={{ width: `${(100 * r.dominados) / r.total}%` }} />
+                      </span>
+                      <span class="num">
+                        {r.dominados} de {r.total}
+                      </span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </section>
+        </>
+      )}
+
+      <nav class="rodape" aria-label="Mais opções">
+        <button class="btn terciario" onClick={() => nav.ir({ nome: 'revisar', id })}>
+          Cartões: ver, editar e revisar
+        </button>
+        <button class="btn terciario" onClick={() => nav.ir({ nome: 'backup' })}>
+          Backup e reportes
+        </button>
+        <button class="btn terciario" onClick={() => nav.ir({ nome: 'aparencia' })}>
+          Aparência
         </button>
       </nav>
-      <p class="versao">{total} cartões · funciona sem internet</p>
     </main>
   )
 }

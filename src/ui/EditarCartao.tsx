@@ -93,7 +93,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
     <main class="tela editar">
       <header class="barra-sessao">
         <button class="fechar" aria-label="Voltar sem salvar" onClick={nav.voltar}>←</button>
-        <span>{original ? 'Editar cartão' : 'Novo cartão'}</span>
+        <h1 class="titulo-barra">{original ? 'Editar cartão' : 'Novo cartão'}</h1>
         <span />
       </header>
 
@@ -220,7 +220,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
           Salvar
         </button>
         {!original && (
-          <button class="btn" onClick={() => gravar(true)}>
+          <button class="btn secundario" onClick={() => gravar(true)}>
             Salvar e criar outro
           </button>
         )}

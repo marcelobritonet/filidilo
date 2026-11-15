@@ -20,7 +20,7 @@ export function Reportar({ baralho, cartao, fechar }: { baralho: Baralho; cartao
     <div class="modal-fundo" onClick={(e) => e.target === e.currentTarget && fechar()}>
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-reporte">
         {salvo ? (
-          <p class="resultado ok">✔ Obrigado! Reporte guardado.</p>
+          <p class="resultado ok" role="status" aria-live="polite">✓ Obrigado! Reporte guardado.</p>
         ) : (
           <>
             <h2 id="titulo-reporte">Reportar erro neste cartão</h2>

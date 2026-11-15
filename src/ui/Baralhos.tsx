@@ -6,6 +6,7 @@ import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
 import { textoContagem, useEstados } from './estado'
 import { Importar } from './Importar'
+import { Marca } from './Marca'
 
 interface EventoInstalar extends Event {
   prompt: () => Promise<void>
@@ -54,14 +55,14 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
 
   return (
     <main class="tela inicio">
-      <header class="topo">
-        <h1>Tatino</h1>
-        <p class="sub">Meus baralhos</p>
+      <header class="cabecalho">
+        <Marca />
+        <h1>Meus baralhos</h1>
       </header>
 
       {instalar && (
-        <button class="btn instalar" onClick={() => instalar.prompt().then(() => setInstalar(null))}>
-          📲 Instalar o app no celular
+        <button class="btn secundario" onClick={() => instalar.prompt().then(() => setInstalar(null))}>
+          Instalar o app no celular
         </button>
       )}
 
@@ -72,16 +73,18 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
           const contagem = textoContagem(b.prova)
           return (
             <li>
-              <button class="baralho-item" onClick={() => nav.ir({ nome: 'baralho', id: b.id })}>
+              <button class="baralho-item cartao-acao" onClick={() => nav.ir({ nome: 'baralho', id: b.id })}>
                 <span class="titulo">{b.titulo}</span>
                 <span class="detalhe">
                   {total} {total === 1 ? 'cartão' : 'cartões'}
                   {contagem && <span class="selo">{contagem}</span>}
                 </span>
-                <span class="barra">
+                <span class="barra" aria-hidden="true">
                   <span style={{ width: `${total ? (100 * dom) / total : 0}%` }} />
                 </span>
-                <span class="num">{dom}/{total} dominados</span>
+                <span class="num">
+                  {dom} de {total} dominados
+                </span>
               </button>
             </li>
           )
@@ -96,30 +99,41 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
             <input class="texto" value={nome} placeholder="Ex.: Física 1" autoFocus onInput={(e) => setNome((e.target as HTMLInputElement).value)} />
           </label>
           <div class="linha">
-            <button type="button" class="btn secundario" onClick={() => setCriando(false)}>Cancelar</button>
-            <button type="submit" class="btn principal" disabled={!nome.trim()}>Criar</button>
+            <button type="button" class="btn secundario" onClick={() => setCriando(false)}>
+              Cancelar
+            </button>
+            <button type="submit" class="btn principal" disabled={!nome.trim()}>
+              Criar
+            </button>
           </div>
         </form>
       ) : (
         <section class="acoes">
           <button class="btn principal" onClick={() => setCriando(true)}>
-            + Novo baralho
+            Novo baralho
           </button>
-          <label class="btn arquivo">
-            📥 Abrir baralho recebido
+          <label class="btn secundario arquivo">
+            Abrir baralho recebido
             <small>arquivo “(Tatino).txt” recebido pelo WhatsApp ou e-mail</small>
             <input type="file" accept=".txt,.json,text/plain,application/json" onChange={abrirRecebido} />
           </label>
-          {erro && <p class="resultado erro" role="alert">✘ {erro}</p>}
+          {erro && (
+            <p class="resultado erro" role="alert">
+              ✕ {erro}
+            </p>
+          )}
         </section>
       )}
 
-      <nav class="rodape um">
-        <button class="btn secundario" onClick={() => nav.ir({ nome: 'backup' })}>
-          💾 Backup e reportes
+      <nav class="rodape" aria-label="Mais opções">
+        <button class="btn terciario" onClick={() => nav.ir({ nome: 'backup' })}>
+          Backup e reportes
+        </button>
+        <button class="btn terciario" onClick={() => nav.ir({ nome: 'aparencia' })}>
+          Aparência
         </button>
       </nav>
-      <p class="versao">Tatino v{__VERSAO__} · funciona sem internet · seus dados ficam neste aparelho</p>
+      <p class="versao">Funciona sem internet · seus dados ficam neste aparelho</p>
       {plano && <Importar plano={plano} nav={nav} fechar={() => setPlano(null)} />}
     </main>
   )

@@ -6,6 +6,7 @@ import { chave, registrar } from '../core/srs'
 import type { Baralho, Cartao, CartaoCalculo } from '../core/types'
 import { nomeTema } from './estado'
 import { Reportar } from './Reportar'
+import { Icone } from './Icone'
 import { Tex } from './Tex'
 
 export type Modo = 'prova' | 'espacada' | 'calculo'
@@ -53,13 +54,13 @@ export function Sessao({ baralho, modo, opcoes, sair }: { baralho: Baralho; modo
     <main class="tela sessao">
       <header class="barra-sessao">
         <button class="fechar" aria-label="Sair da sessão" onClick={sair}>
-          ✕
+          ←
         </button>
-        <span>{TITULO[modo]}</span>
-        <span class="contador">{cartao ? `${pos + 1}/${fila.length}` : ''}</span>
+        <span class="titulo-barra">{TITULO[modo]}</span>
+        <span class="contador">{cartao ? `${pos + 1} de ${fila.length}` : ''}</span>
       </header>
       {fila.length > 0 && (
-        <div class="progresso">
+        <div class="progresso" role="progressbar" aria-label="Progresso da sessão" aria-valuemin={0} aria-valuemax={fila.length} aria-valuenow={pos}>
           <div style={{ width: `${(100 * pos) / fila.length}%` }} />
         </div>
       )}
@@ -70,11 +71,11 @@ export function Sessao({ baralho, modo, opcoes, sair }: { baralho: Baralho; modo
         <>
           <div class="meta-cartao">
             <span class="tema-chip">{nomeTema(baralho, cartao.tema)}</span>
-            <button class="link" onClick={() => setReportando(true)}>
-              ⚠ Reportar erro
-            </button>
           </div>
           <CartaoView key={`${pos}-${cartao.id}`} cartao={cartao} avaliar={avaliar} />
+          <button class="btn terciario reportar" onClick={() => setReportando(true)}>
+            Reportar erro neste cartão
+          </button>
           {reportando && <Reportar baralho={baralho} cartao={cartao} fechar={() => setReportando(false)} />}
         </>
       )}
@@ -86,7 +87,7 @@ function Fim({ placar, vazio, modo, outra, sair }: { placar: { certos: number; e
   if (vazio)
     return (
       <section class="fim">
-        <p class="grande">🎉</p>
+        <span class="icone-fim"><Icone nome="avancar" tamanho={48} /></span>
         <p>{modo === 'espacada' ? 'Nada para revisar agora. Volte mais tarde ou use o modo prova.' : 'Nenhum cartão com esse filtro.'}</p>
         <button class="btn principal" onClick={sair}>Voltar ao início</button>
       </section>
@@ -94,15 +95,28 @@ function Fim({ placar, vazio, modo, outra, sair }: { placar: { certos: number; e
   const total = placar.certos + placar.errados
   return (
     <section class="fim">
-      <p class="grande">{placar.errados === 0 ? '🏆' : '💪'}</p>
+      <span class="icone-fim"><Icone nome="avancar" tamanho={48} /></span>
       <h2>Sessão concluída</h2>
       <p>
         {placar.certos} acertos e {placar.errados} erros em {total} respostas.
       </p>
       <p class="dica">Os cartões errados voltam primeiro na próxima rodada do modo prova.</p>
-      <button class="btn principal" onClick={outra}>Mais uma rodada</button>
+      <button class="btn principal" onClick={outra}>
+        <span class="com-icone"><Icone nome="praticar" /> Mais uma rodada</span>
+      </button>
       <button class="btn secundario" onClick={sair}>Voltar ao início</button>
     </section>
+  )
+}
+
+function Explicacao({ texto }: { texto: string }) {
+  return (
+    <div class="explicacao">
+      <span class="rotulo-icone">
+        <Icone nome="entender" tamanho={20} /> Explicação
+      </span>
+      <Tex texto={texto} />
+    </div>
   )
 }
 
@@ -110,7 +124,7 @@ function Fonte({ c }: { c: Cartao }) {
   if (!c.fonte) return null
   return (
     <p class="fonte">
-      📄 {c.fonte.apostila}
+      Fonte: {c.fonte.apostila}
       {c.fonte.pagina !== undefined && `, p. ${c.fonte.pagina}`}
     </p>
   )
@@ -151,7 +165,7 @@ function CartaoView({ cartao, avaliar }: { cartao: Cartao; avaliar: (n: Nota) =>
     case 'conceito':
       return <Conceito c={cartao} avaliar={avaliar} />
     case 'vf':
-      return <Escolha c={cartao} pergunta={cartao.frente} opcoes={['Verdadeiro', 'Falso']} correta={cartao.resposta ? 0 : 1} avaliar={avaliar} rotulo="Verdadeiro ou falso?" />
+      return <Escolha c={cartao} pergunta={cartao.frente} opcoes={['Verdadeiro', 'Falso']} correta={cartao.resposta ? 0 : 1} avaliar={avaliar} rotulo="Verdadeiro ou falso" />
     case 'associacao':
       return <Escolha c={cartao} pergunta={cartao.frente} opcoes={cartao.opcoes} correta={cartao.correta} avaliar={avaliar} embaralhar />
     case 'calculo':
@@ -174,7 +188,7 @@ function Conceito({ c, avaliar }: { c: Extract<Cartao, { tipo: 'conceito' }>; av
           <hr />
           <p class="rotulo">Resposta</p>
           <Tex class="verso" texto={c.verso} />
-          {c.explicacao && <Tex class="explicacao" texto={c.explicacao} />}
+          {c.explicacao && <Explicacao texto={c.explicacao} />}
           <Fonte c={c} />
           <p class="dica centro">Como foi?</p>
           <BotoesNota avaliar={avaliar} />
@@ -212,8 +226,10 @@ function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta
       </div>
       {respondeu && (
         <>
-          <p class={`resultado ${acertou ? 'ok' : 'erro'}`}>{acertou ? '✔ Certo!' : `✘ Resposta certa: ${opcoes[correta]}`}</p>
-          {c.explicacao && <Tex class="explicacao" texto={c.explicacao} />}
+          <p class={`resultado ${acertou ? 'ok' : 'erro'}`} aria-live="polite">
+            {acertou ? '✓ Certo!' : `✕ Não foi dessa vez. Resposta certa: ${opcoes[correta].replace(/[*$]/g, '')}`}
+          </p>
+          {c.explicacao && <Explicacao texto={c.explicacao} />}
           <Fonte c={c} />
           <BotoesNota avaliar={avaliar} acertou={acertou} />
         </>
@@ -259,7 +275,7 @@ function Calculo({ c, avaliar }: { c: CartaoCalculo; avaliar: (n: Nota) => void 
 
   return (
     <article class="cartao calculo">
-      <p class="rotulo">🧮 {c.titulo}</p>
+      <p class="rotulo">Cálculo · {c.titulo}</p>
       <Tex class="frente" texto={preencher(c.enunciado, s)} />
       <ol class="etapas">
         {c.etapas.map((et, i) => {
@@ -302,8 +318,8 @@ function Calculo({ c, avaliar }: { c: CartaoCalculo; avaliar: (n: Nota) => void 
                 )
               ) : (
                 <>
-                  <p class={`resultado ${r.ok ? 'ok' : 'erro'}`}>
-                    {r.ok ? '✔ Certo: ' : r.desistiu ? 'Resposta: ' : `✘ Você: ${r.texto} · certo: `}
+                  <p class={`resultado ${r.ok ? 'ok' : 'erro'}`} aria-live="polite">
+                    {r.ok ? '✓ Resposta dentro da tolerância: ' : r.desistiu ? 'Resposta: ' : `✕ Ainda não: veja a resolução. Você: ${r.texto} · certo: `}
                     <strong>
                       {et.opcoes ? et.opcoes[s.respostas[i]] : `${formatar(s.respostas[i], et.casas ?? 2)}${et.unidade ? ` ${et.unidade}` : ''}`}
                     </strong>
@@ -331,10 +347,10 @@ function Calculo({ c, avaliar }: { c: CartaoCalculo; avaliar: (n: Nota) => void 
       </ol>
       {terminou && (
         <>
-          {c.explicacao && <Tex class="explicacao" texto={c.explicacao} />}
+          {c.explicacao && <Explicacao texto={c.explicacao} />}
           <Fonte c={c} />
           <button class="link" onClick={novoSorteio}>
-            🎲 Treinar de novo com outros números (não conta)
+            Treinar de novo com outros números (não conta)
           </button>
           <BotoesNota avaliar={avaliar} acertou={acertouTudo} />
         </>

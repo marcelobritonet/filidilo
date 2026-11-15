@@ -39,18 +39,18 @@ export function Importar({ plano, nav, fechar }: { plano: PlanoImportacao; nav: 
               Você já tem este baralho (“{atual.titulo}”). Veja o que muda se atualizar:
             </p>
             <ul class="resumo-importacao">
-              <li>➕ {n(plano.novos.length, 'cartão novo', 'cartões novos')}</li>
-              <li>🔄 {n(plano.atualizados.length, 'cartão corrigido', 'cartões corrigidos')}</li>
-              <li>✋ {n(plano.preservados.length, 'cartão que você editou: fica como está', 'cartões que você editou: ficam como estão')}</li>
-              <li>＝ {n(plano.iguais, 'igual', 'iguais')}</li>
-              {plano.soNoMeu > 0 && <li>📌 {n(plano.soNoMeu, 'só seu: continua', 'só seus: continuam')} no baralho</li>}
-              {plano.temasNovos.length > 0 && <li>🏷 temas novos: {plano.temasNovos.map((t) => t.nome).join(', ')}</li>}
+              <li>Novos: {n(plano.novos.length, 'cartão novo', 'cartões novos')}</li>
+              <li>Corrigidos: {n(plano.atualizados.length, 'cartão corrigido', 'cartões corrigidos')}</li>
+              <li>Preservados: {n(plano.preservados.length, 'cartão que você editou: fica como está', 'cartões que você editou: ficam como estão')}</li>
+              <li>Iguais: {n(plano.iguais, 'igual', 'iguais')}</li>
+              {plano.soNoMeu > 0 && <li>Só no seu: {n(plano.soNoMeu, 'só seu: continua', 'só seus: continuam')} no baralho</li>}
+              {plano.temasNovos.length > 0 && <li>Temas novos: {plano.temasNovos.map((t) => t.nome).join(', ')}</li>}
             </ul>
             <p class="dica">Seu progresso, nome e data da prova não mudam.</p>
             <button class="btn principal" disabled={ocupado || !mudancas} onClick={() => concluir(() => aplicar(plano), '“{t}” atualizado.')}>
               {mudancas ? `Atualizar (${n(mudancas, 'mudança', 'mudanças')})` : 'Nada para atualizar'}
             </button>
-            <button class="btn" disabled={ocupado} onClick={() => concluir(() => importarComoCopia(recebido), 'Importado como “{t}”.')}>
+            <button class="btn secundario" disabled={ocupado} onClick={() => concluir(() => importarComoCopia(recebido), 'Importado como “{t}”.')}>
               Importar como baralho separado
             </button>
           </>

@@ -77,7 +77,7 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
     <main class="tela config">
       <header class="barra-sessao">
         <button class="fechar" aria-label="Voltar" onClick={nav.voltar}>←</button>
-        <span>Configurar baralho</span>
+        <h1 class="titulo-barra">Configurar baralho</h1>
         <span />
       </header>
 
@@ -132,8 +132,8 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
       </button>
 
       <section class="bloco">
-        <button class="btn" onClick={compartilhar}>
-          📤 Compartilhar baralho
+        <button class="btn secundario" onClick={compartilhar}>
+          Compartilhar baralho
         </button>
         <p class="dica">Envia um arquivo com os cartões (sem o seu progresso). Quem recebe abre em “Abrir baralho recebido”.</p>
         <button class="btn secundario" onClick={fazerCopia}>

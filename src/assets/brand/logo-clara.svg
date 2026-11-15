@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="300" viewBox="0 0 960 300">
+  <rect width="960" height="300" rx="42" fill="#FFF5DC"/>
+  <g transform="translate(78 55)">
+    <path d="M15 30q0-20 23-20h142v174H38q-23 0-23-22z" fill="#263F31"/>
+    <path d="M180 30q0-20-23-20H38v174h119q23 0 23-22z" fill="#FFF5DC" stroke="#E85A36" stroke-width="9"/>
+    <path d="M65 57h82M65 91h59M65 137q27-25 57 0" fill="none" stroke="#E85A36" stroke-width="11" stroke-linecap="round"/>
+  </g>
+  <text x="325" y="155" font-family="Georgia, Times New Roman, serif" font-size="112" font-weight="700" letter-spacing="-6" fill="#263F31">tatino.</text>
+  <text x="331" y="202" font-family="Arial, sans-serif" font-size="22" letter-spacing="1.4" fill="#E85A36">APRENDA NO SEU RITMO</text>
+</svg>

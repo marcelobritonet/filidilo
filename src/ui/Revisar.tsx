@@ -51,18 +51,18 @@ export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) 
         <button class="fechar" aria-label="Voltar" onClick={nav.voltar}>
           ←
         </button>
-        <span>Cartões</span>
+        <h1 class="titulo-barra">Cartões</h1>
         <span />
       </header>
       <div class="linha">
         <button class="btn principal" onClick={() => nav.ir({ nome: 'cartao', id: baralho.id, tema: tema || undefined })}>
           + Novo cartão
         </button>
-        <button class="btn" onClick={() => nav.ir({ nome: 'colar', id: baralho.id })}>
+        <button class="btn secundario" onClick={() => nav.ir({ nome: 'colar', id: baralho.id })}>
           Colar lista
         </button>
       </div>
-      <p class="dica">Toque em ✏️ para editar. Para revisar o conteúdo, confira cada cartão com a fonte e marque ✓ certo, ⚠ errado ou 📝 com uma observação.</p>
+      <p class="dica">Toque em Editar para mudar um cartão. Para revisar o conteúdo, confira cada cartão com a fonte e marque Certo, Errado ou Observação.</p>
       <label class="campo">
         Tema
         <select value={tema} onChange={(e) => setTema((e.target as HTMLSelectElement).value)}>
@@ -116,12 +116,13 @@ function ItemRevisao({ baralho, c, marca, reps, mudou, editar }: { baralho: Bara
         <span class="tema-chip">{nomeTema(baralho, c.tema)}</span>
         <span class="tipo">{{ conceito: 'conceito', vf: 'V/F', associacao: 'alternativas', calculo: 'cálculo' }[c.tipo]}</span>
         {c.editado && <span class="tipo">editado</span>}
-        <button class="editar" aria-label="Editar cartão" onClick={editar}>✏️</button>
+        {marca && <span class={`status-marca ${marca.status}`}>{{ ok: '✓ Certo', erro: '✕ Com erro', nota: '✎ Com observação' }[marca.status]}</span>}
+        <button class="btn terciario compacto editar" onClick={editar}>Editar</button>
       </div>
       <Conteudo c={c} />
       {c.fonte && (
         <p class="fonte">
-          📄 {c.fonte.apostila}
+          Fonte: {c.fonte.apostila}
           {c.fonte.pagina !== undefined && `, p. ${c.fonte.pagina}`}
         </p>
       )}
@@ -135,14 +136,14 @@ function ItemRevisao({ baralho, c, marca, reps, mudou, editar }: { baralho: Bara
         <textarea rows={2} placeholder="Observação" value={nota} onInput={(e) => setNota((e.target as HTMLTextAreaElement).value)} onBlur={() => marca && marca.status !== 'ok' && marcar(marca.status)} />
       )}
       <div class="marcas">
-        <button class={`chip ${marca?.status === 'ok' ? 'ativo ok' : ''}`} onClick={() => marcar('ok')}>
+        <button class={`chip ${marca?.status === 'ok' ? 'ativo ok' : ''}`} aria-pressed={marca?.status === 'ok'} onClick={() => marcar('ok')}>
           ✓ Certo
         </button>
-        <button class={`chip ${marca?.status === 'erro' ? 'ativo erro' : ''}`} onClick={() => marcar('erro')}>
-          ⚠ Errado
+        <button class={`chip ${marca?.status === 'erro' ? 'ativo erro' : ''}`} aria-pressed={marca?.status === 'erro'} onClick={() => marcar('erro')}>
+          ✕ Errado
         </button>
-        <button class={`chip ${marca?.status === 'nota' ? 'ativo' : ''}`} onClick={() => marcar('nota')}>
-          📝 Observação
+        <button class={`chip ${marca?.status === 'nota' ? 'ativo' : ''}`} aria-pressed={marca?.status === 'nota'} onClick={() => marcar('nota')}>
+          ✎ Observação
         </button>
       </div>
     </li>

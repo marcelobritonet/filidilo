@@ -1,6 +1,25 @@
 # Changelog
 
-Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o número do meio sobe a cada etapa nova, o último a cada correção. A versão em uso aparece no rodapé de **Meus baralhos** e de **Backup e reportes**.
+Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o número do meio sobe a cada etapa nova, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
+
+## [1.4.0] — 2026-11-15
+
+Nova identidade visual: **tatino.** — editorial, calma e genérica para qualquer disciplina.
+
+### Novo
+- **Marca e ícone do app** com o símbolo da ficha aberta (ícone normal, *maskable* do Android e do iPhone). Sai o ícone antigo com onda.
+- **Aparência**: Usar tema do aparelho, Claro ou Escuro. A escolha fica salva no aparelho e é aplicada antes de a tela aparecer (sem piscar). A cor da barra do navegador acompanha o tema.
+- **Versão no rodapé de todas as telas.**
+- Ícones de linha da marca (Revisar, Entender, Praticar, Avançar) nos modos de estudo, na explicação e no fim da sessão.
+
+### Mudou
+- Tipografia: serifada (Georgia) só na marca, nos títulos e nas perguntas; sans-serif nos controles e textos. Perguntas com 26–30 px.
+- Paleta papel/verde/coral no claro e grafite/marfim no escuro, com contraste AA conferido.
+- Tela do baralho com uma ação principal ("Continuar estudando" ou "Começar uma sessão") e os modos como cartões de ação.
+- Sessão: contador "4 de 20", "Reportar erro" depois das avaliações, explicação em destaque e textos de correção claros ("Resposta dentro da tolerância", "Ainda não: veja a resolução").
+- Certo e errado não dependem só da cor: alternativas com ✓/✕ e borda diferente; marcações da revisão com texto.
+- Emojis usados como ícones foram trocados por texto ou pelos ícones da marca.
+- Foco visível pelo teclado e respeito a "reduzir movimento".
 
 ## [1.3.0] — 2026-11-15
 
@@ -51,6 +70,7 @@ Fase 1: primeira versão publicada.
 - Reportar erro em qualquer cartão, revisão de conteúdo (✓/⚠/📝), backup e envio de reportes pelo WhatsApp.
 - Publicação automática no GitHub Pages.
 
+[1.4.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.4.0
 [1.3.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.3.0
 [1.2.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.2.0
 [1.1.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.1.0

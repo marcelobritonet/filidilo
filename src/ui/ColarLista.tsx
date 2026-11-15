@@ -22,7 +22,7 @@ export function ColarLista({ baralho, nav }: { baralho: Baralho; nav: Navegacao 
     <main class="tela colar">
       <header class="barra-sessao">
         <button class="fechar" aria-label="Voltar" onClick={nav.voltar}>←</button>
-        <span>Colar lista</span>
+        <h1 class="titulo-barra">Colar lista</h1>
         <span />
       </header>
       <p class="dica">

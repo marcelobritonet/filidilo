@@ -23,7 +23,7 @@ export function Backup({ baralhos, sair }: { baralhos: Baralho[]; sair: () => vo
     if (navigator.canShare?.({ files: [arquivo] })) {
       try {
         await navigator.share({ files: [arquivo], title: 'Backup do Tatino' })
-        setMsg('✔ Backup compartilhado.')
+        setMsg('✓ Backup compartilhado.')
         return
       } catch (e) {
         if ((e as Error).name === 'AbortError') return
@@ -35,7 +35,7 @@ export function Backup({ baralhos, sair }: { baralhos: Baralho[]; sair: () => vo
     a.download = nomeArquivo
     a.click()
     URL.revokeObjectURL(url)
-    setMsg('✔ Backup salvo em Downloads.')
+    setMsg('✓ Backup salvo em Downloads.')
   }
 
   const restaurar = async (e: Event) => {
@@ -43,10 +43,10 @@ export function Backup({ baralhos, sair }: { baralhos: Baralho[]; sair: () => vo
     if (!f) return
     try {
       const r = await importar(await f.text())
-      setMsg(`✔ Backup restaurado: ${r.baralhos} baralhos, ${r.estados} cartões e ${r.revisoes} revisões atualizados.`)
+      setMsg(`✓ Backup restaurado: ${r.baralhos} baralhos, ${r.estados} cartões e ${r.revisoes} revisões atualizados.`)
       contar()
     } catch (err) {
-      setMsg(`✘ ${(err as Error).message}`)
+      setMsg(`✕ ${(err as Error).message}`)
     }
   }
 
@@ -63,8 +63,8 @@ export function Backup({ baralhos, sair }: { baralhos: Baralho[]; sair: () => vo
     }
     if (!ok) {
       await navigator.clipboard.writeText(texto)
-      setMsg('✔ Texto copiado. Cole no WhatsApp ou e-mail.')
-    } else setMsg('✔ Reportes enviados.')
+      setMsg('✓ Texto copiado. Cole no WhatsApp ou e-mail.')
+    } else setMsg('✓ Reportes enviados.')
     await db.reportes.where('id').anyOf(ids).modify({ enviado: true })
     contar()
   }
@@ -75,12 +75,12 @@ export function Backup({ baralhos, sair }: { baralhos: Baralho[]; sair: () => vo
         <button class="fechar" aria-label="Voltar" onClick={sair}>
           ←
         </button>
-        <span>Backup e reportes</span>
+        <h1 class="titulo-barra">Backup e reportes</h1>
         <span />
       </header>
 
       <section class="bloco">
-        <h2>⚠ Reportes</h2>
+        <h2>Reportes</h2>
         <p>
           {contagem.reportes} reportes no total, {contagem.novos} ainda não enviados.
         </p>
@@ -93,7 +93,7 @@ export function Backup({ baralhos, sair }: { baralhos: Baralho[]; sair: () => vo
       </section>
 
       <section class="bloco">
-        <h2>💾 Backup do progresso</h2>
+        <h2>Backup do progresso</h2>
         <p>Seus baralhos e o progresso ficam guardados só neste aparelho ({contagem.revisoes} respostas até agora). Salve um backup de vez em quando, principalmente antes de trocar de celular.</p>
         <button class="btn" onClick={salvar}>
           Salvar backup
@@ -104,10 +104,8 @@ export function Backup({ baralhos, sair }: { baralhos: Baralho[]; sair: () => vo
         </label>
       </section>
 
-      <p class="versao">Tatino v{__VERSAO__}</p>
-
       {msg && (
-        <p class="resultado" role="status">
+        <p class="resultado" role="status" aria-live="polite">
           {msg}
         </p>
       )}

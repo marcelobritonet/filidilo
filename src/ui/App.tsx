@@ -2,6 +2,7 @@ import { useEffect, useState } from 'preact/hooks'
 import { useRegisterSW } from 'virtual:pwa-register/preact'
 import { pedirPersistencia } from '../core/db'
 import type { OpcoesFila } from '../core/fila'
+import { Aparencia } from './Aparencia'
 import { Backup } from './Backup'
 import { Baralhos } from './Baralhos'
 import { ColarLista } from './ColarLista'
@@ -21,6 +22,7 @@ export type Tela =
   | { nome: 'cartao'; id: string; cartaoId?: string; tema?: string }
   | { nome: 'colar'; id: string }
   | { nome: 'backup' }
+  | { nome: 'aparencia' }
 
 export interface Aviso {
   texto: string
@@ -85,6 +87,7 @@ export function App() {
   if (!baralhos) conteudo = <main class="tela"><p>Carregando…</p></main>
   else if (tela.nome === 'baralhos') conteudo = <Baralhos baralhos={baralhos} nav={nav} versao={versao} />
   else if (tela.nome === 'backup') conteudo = <Backup baralhos={baralhos} sair={nav.voltar} />
+  else if (tela.nome === 'aparencia') conteudo = <Aparencia nav={nav} />
   else if (carregando || !baralho)
     // Logo depois de criar um baralho a lista ainda está recarregando.
     conteudo = (
@@ -103,7 +106,7 @@ export function App() {
   return (
     <>
       {atualizar && (
-        <div class="aviso-atualizacao" role="status">
+        <div class="aviso-atualizacao" role="status" aria-live="polite">
           <span>Nova versão disponível.</span>
           <button class="btn pequeno" onClick={() => updateServiceWorker(true)}>
             Atualizar
@@ -111,8 +114,9 @@ export function App() {
         </div>
       )}
       {conteudo}
+      <footer class="rodape-versao">tatino. v{__VERSAO__}</footer>
       {aviso && (
-        <div class="toast" role="status">
+        <div class="toast" role="status" aria-live="polite">
           <span>{aviso.texto}</span>
           {aviso.desfazer && (
             <button

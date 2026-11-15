@@ -3,11 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0f2a3d" />
-    <meta name="description" content="Flashcards de Hidrodinâmica para estudar offline" />
+    <meta name="theme-color" content="#FFF5DC" />
+    <meta name="description" content="Flashcards para estudar no seu ritmo, offline" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="icon-192.png" />
-    <title>Tatino</title>
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <title>tatino.</title>
+    <script>
+      // Aplica o tema antes de pintar a tela (evita piscar claro→escuro). Lógica completa em src/ui/tema.ts.
+      try {
+        var p = localStorage.getItem('tatino-theme')
+        var t = p === 'light' || p === 'dark' ? p : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        document.documentElement.dataset.theme = t
+        document.querySelector('meta[name="theme-color"]').content = t === 'dark' ? '#111418' : '#FFF5DC'
+      } catch (e) {
+        document.documentElement.dataset.theme = 'light'
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>

@@ -12,6 +12,7 @@ Atualizado em 15/11/2026.
 | P16 | Fase 2 · E1 Vários baralhos | ✅ Publicada (15/11) | Claude |
 | P17 | Fase 2 · E2 Editor de cartões + colar lista | ✅ Publicada (15/11) | Claude |
 | P18 | Fase 2 · E3 Compartilhar e atualizar baralho por arquivo | ✅ Publicada na v1.3.0 (15/11) | Claude |
+| P20 | Nova identidade visual (kit de marca), aparência claro/escuro e versão no rodapé | ✅ Publicada na v1.4.0 (15/11) | Claude |
 | P19 | Fase 2 · E4 Harness IA (copiar e colar com o Gemini) | Próxima | Claude |
 | P5 | Fase 2 · IA para gerar cartões | ✅ Decidido: Gemini (direto pela API com chave no aparelho, mais copiar e colar como alternativa) | — |
 | P6 | Fase 2 · Sincronização | ✅ Decidido: Google Drive, por último e opcional (E7) | — |
