@@ -25,6 +25,12 @@ Os baralhos ficam no aparelho (IndexedDB, tabela `baralhos`). Hidrodinâmica vem
 
 Cartões de cálculo usam expressões avaliadas por um avaliador seguro (`src/core/expr.ts`, sem `eval`). Marcadores `{nome}` e `{nome:casas}` no texto são trocados pelos valores sorteados.
 
+## Versões
+
+Histórico em [CHANGELOG.md](CHANGELOG.md) e nas [releases](https://github.com/marcelobritonet/tatino/releases). A versão vem do `package.json` e aparece no rodapé do app. Para lançar: subir a versão no `package.json`, escrever a seção no changelog, fazer o commit, criar a tag `vX.Y.Z` e a release.
+
+Correções num baralho do repositório: `npm run exportar-baralho -- hidrodinamica` gera o arquivo em `dist-baralhos/`; ela abre em “Abrir baralho recebido” → Atualizar (as edições dela são preservadas).
+
 ## Publicar
 
 Push na `main` publica no GitHub Pages pelo workflow `.github/workflows/deploy.yml` (em *Settings → Pages*, a fonte deve ser **GitHub Actions**).

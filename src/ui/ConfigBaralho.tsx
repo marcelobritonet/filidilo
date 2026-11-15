@@ -1,5 +1,6 @@
 import { useState } from 'preact/hooks'
 import { duplicar, excluir, novoId, restaurar, salvar } from '../core/baralhos'
+import { arquivoDoBaralho } from '../core/compartilhar'
 import type { Baralho, Tema } from '../core/types'
 import type { Navegacao } from './App'
 
@@ -36,6 +37,27 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
     const c = await duplicar(baralho.id)
     nav.mudou()
     nav.avisar({ texto: `Criado “${c.titulo}”.` })
+  }
+
+  const compartilhar = async () => {
+    const { nome, texto } = arquivoDoBaralho(baralho)
+    const arquivo = new File([texto], nome, { type: 'text/plain' })
+    if (navigator.canShare?.({ files: [arquivo] })) {
+      try {
+        await navigator.share({ files: [arquivo], title: baralho.titulo, text: `Baralho “${baralho.titulo}” do Tatino. Abra no app em “Abrir baralho recebido”.` })
+        return
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') return
+      }
+    }
+    // Sem compartilhamento de arquivos (ex.: computador): baixa o arquivo.
+    const url = URL.createObjectURL(arquivo)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = nome
+    a.click()
+    URL.revokeObjectURL(url)
+    nav.avisar({ texto: `Arquivo “${nome}” salvo em Downloads.` })
   }
 
   const apagar = async () => {
@@ -110,6 +132,10 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
       </button>
 
       <section class="bloco">
+        <button class="btn" onClick={compartilhar}>
+          📤 Compartilhar baralho
+        </button>
+        <p class="dica">Envia um arquivo com os cartões (sem o seu progresso). Quem recebe abre em “Abrir baralho recebido”.</p>
         <button class="btn secundario" onClick={fazerCopia}>
           Duplicar baralho
         </button>

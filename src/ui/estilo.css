@@ -240,3 +240,7 @@ input.texto { width: 100%; font: inherit; padding: 10px 12px; border-radius: 12p
 .item .cab .editar { margin-left: auto; border: 0; background: var(--fundo); border-radius: 50%; width: 40px; height: 40px; font-size: 1.05rem; }
 .revisar > .linha { margin-bottom: 8px; }
 code { background: var(--fundo); padding: 1px 6px; border-radius: 6px; }
+
+/* Fase 2: compartilhar e importar */
+.resumo-importacao { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.acoes .arquivo small { display: block; }

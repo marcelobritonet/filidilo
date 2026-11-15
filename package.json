@@ -1,6 +1,6 @@
 {
   "name": "tatino",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "description": "Flashcards offline (PWA) — Hidrodinâmica",
   "scripts": {
     "dev": "vite",
@@ -8,7 +8,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "validate-deck": "vitest run src/decks"
+    "validate-deck": "vitest run src/decks",
+    "exportar-baralho": "node scripts/exportar-baralho.mjs"
   },
   "keywords": [],
   "type": "module",

@@ -104,6 +104,8 @@ export function Backup({ baralhos, sair }: { baralhos: Baralho[]; sair: () => vo
         </label>
       </section>
 
+      <p class="versao">Tatino v{__VERSAO__}</p>
+
       {msg && (
         <p class="resultado" role="status">
           {msg}

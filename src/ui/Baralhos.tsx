@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'preact/hooks'
 import { criar } from '../core/baralhos'
+import { lerBaralho, planejar, type PlanoImportacao } from '../core/compartilhar'
 import { chave, dominado } from '../core/srs'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
 import { textoContagem, useEstados } from './estado'
+import { Importar } from './Importar'
 
 interface EventoInstalar extends Event {
   prompt: () => Promise<void>
@@ -14,6 +16,21 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const [criando, setCriando] = useState(false)
   const [nome, setNome] = useState('')
   const [instalar, setInstalar] = useState<EventoInstalar | null>(null)
+  const [plano, setPlano] = useState<PlanoImportacao | null>(null)
+  const [erro, setErro] = useState('')
+
+  const abrirRecebido = async (e: Event) => {
+    const input = e.target as HTMLInputElement
+    const f = input.files?.[0]
+    input.value = ''
+    if (!f) return
+    try {
+      setErro('')
+      setPlano(await planejar(lerBaralho(await f.text())))
+    } catch (err) {
+      setErro((err as Error).message)
+    }
+  }
 
   useEffect(() => {
     const f = (e: Event) => {
@@ -88,6 +105,12 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
           <button class="btn principal" onClick={() => setCriando(true)}>
             + Novo baralho
           </button>
+          <label class="btn arquivo">
+            📥 Abrir baralho recebido
+            <small>arquivo “(Tatino).txt” recebido pelo WhatsApp ou e-mail</small>
+            <input type="file" accept=".txt,.json,text/plain,application/json" onChange={abrirRecebido} />
+          </label>
+          {erro && <p class="resultado erro" role="alert">✘ {erro}</p>}
         </section>
       )}
 
@@ -96,7 +119,8 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
           💾 Backup e reportes
         </button>
       </nav>
-      <p class="versao">Funciona sem internet · seus dados ficam neste aparelho</p>
+      <p class="versao">Tatino v{__VERSAO__} · funciona sem internet · seus dados ficam neste aparelho</p>
+      {plano && <Importar plano={plano} nav={nav} fechar={() => setPlano(null)} />}
     </main>
   )
 }

@@ -1,12 +1,16 @@
 import { defineConfig } from 'vitest/config'
 import preact from '@preact/preset-vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import pkg from './package.json' with { type: 'json' }
 
 // GitHub Pages publica em https://<usuario>.github.io/tatino/
 const base = process.env.BASE_PATH ?? '/tatino/'
 
 export default defineConfig({
   base,
+  define: {
+    __VERSAO__: JSON.stringify(pkg.version),
+  },
   plugins: [
     preact(),
     VitePWA({
