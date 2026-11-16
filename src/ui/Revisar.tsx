@@ -1,9 +1,8 @@
 import { useState } from 'preact/hooks'
 import { formatar, preencher, sortear } from '../core/calc'
-import { arquivoDosCartoes } from '../core/compartilhar'
 import type { Baralho, Cartao } from '../core/types'
 import type { Navegacao } from './App'
-import { enviarArquivo, MENSAGEM_ENVIO } from './enviar'
+import { enviarCartao } from './enviar'
 import { nomeTema } from './estado'
 import { Tex } from './Tex'
 
@@ -13,9 +12,7 @@ export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) 
   const lista = baralho.cartoes.filter((c) => !tema || c.tema === tema)
 
   const enviar = async (c: Cartao) => {
-    const { nome, texto } = arquivoDosCartoes(baralho, [c])
-    const r = await enviarArquivo(nome, texto, `Cartão do tatino. ${MENSAGEM_ENVIO}`)
-    if (r === 'baixado') nav.avisar({ texto: 'Arquivo salvo em Downloads.' })
+    if ((await enviarCartao(baralho, c)) === 'baixado') nav.avisar({ texto: 'Arquivo salvo em Downloads.' })
   }
 
   return (

@@ -6,7 +6,7 @@ Atualizado em 16/11/2026.
 |---|---|---|---|
 | P1 | Aprovar a especificação e o plano da fase 1 | ✅ Aprovado | Marcelo |
 | P2 | Repositório público no GitHub + Pages | ✅ No ar: https://marcelobritonet.github.io/tatino/ (repo `marcelobritonet/tatino`; push na `main` publica sozinho) | — |
-| P3 | Instalar o app no Android dela: abrir o link no Chrome → "Instalar o app" (ou menu ⋮ → Instalar app) | Aberto | Marcelo |
+| P3 | Instalar o app no Android dela: abrir o link no Chrome → "Instalar o app" (ou menu ⋮ → Instalar app) | ✅ Feito (16/11) | Marcelo |
 | P13 | Fase 2: aprovar SPEC-FASE2.md e PLANO-FASE2.md | ✅ Aprovado (15/11) | Marcelo |
 | P16 | Fase 2 · E1 Vários baralhos | ✅ Publicada (15/11) | Claude |
 | P17 | Fase 2 · E2 Editor de cartões + colar lista | ✅ Publicada (15/11) | Claude |
@@ -14,12 +14,12 @@ Atualizado em 16/11/2026.
 | P20 | Nova identidade visual (kit de marca), aparência claro/escuro e versão no rodapé | ✅ Publicada na v1.4.0 (15/11) | Claude |
 | P19 | Fase 2 · E4 Harness IA (copiar e colar com o Gemini) | ✅ Publicada na v1.5.0 (15/11) | Claude |
 | P21 | Sessão: botão Pular e resultado em folha que sobe | ✅ Publicada na v1.5.0 (15/11) | Claude |
-| P22 | Testar "Criar com IA" com o Gemini de verdade e um PDF de aula real (a estudante ou Marcelo) | Aberto | Marcelo / estudante |
+| P22 | Testar "Criar com IA" com o Gemini de verdade e um PDF de aula real (a estudante ou Marcelo) | ✅ Feito com sucesso (16/11) | Marcelo / estudante |
 | P24 | Abrir baralho recebido pelo Compartilhar do Android | ✅ Publicada na v1.6.0 (15/11) | Claude |
-| P25 | Testar o Compartilhar → tatino. no Android dela (app instalado) — agora é o único jeito de receber baralho | Aberto | Marcelo / estudante |
+| P25 | Testar o Compartilhar → tatino. no Android dela (app instalado) — agora é o único jeito de receber baralho | ✅ Funcionou, enviando e recebendo (16/11) | Marcelo / estudante |
 | P26 | Botão "Abrir baralho recebido" removido a pedido do Marcelo | ✅ v1.6.1 (15/11) | Claude |
 | P23 | Fase 2 · E5 Gemini direto (chave no aparelho) | ✅ Publicada na v1.7.0 (15/11) | Claude |
-| P27 | E6 Avaliação da instrução com PDFs de aula reais (rodar numa IA e medir % de cartões válidos) | Aberto | Claude + Marcelo |
+| P27 | E6 Avaliação da instrução com PDFs de aula reais (rodar numa IA e medir % de cartões válidos) | Aberto: Marcelo testa depois | Claude + Marcelo |
 | P5 | Fase 2 · IA para gerar cartões | ✅ Decidido: Gemini (direto pela API com chave no aparelho, mais copiar e colar como alternativa) | — |
 | P6 | Fase 2 · Sincronização | ✅ Decidido: Google Drive, por último e opcional (E7) | — |
 | P7 | Fase 2 · Criar cartões por formulário e compartilhar por arquivo | ✅ Decidido (E2 e E3) | — |
@@ -35,3 +35,4 @@ Atualizado em 16/11/2026.
 | P34 | Baralho de exemplo One Piece (Going Merry, Lore, Marinha) no lugar do antigo | ✅ Publicada na v2.1.0 (16/11) | — |
 | P35 | Tirar de Meus baralhos o aviso "Recebeu um cartão ou baralho? No WhatsApp, segure o arquivo → Compartilhar → tatino." | ✅ Removido na v2.1.2 (16/11) | — |
 | P36 | One Piece sem spoilers: baralho só com o começo da história (East Blue) e correção automática em quem já tem a v2.1.0 | ✅ Publicada na v2.1.1 (16/11) | — |
+| P37 | Ícone de enviar no cartão (estudo) e no baralho (ao lado do nome) | ✅ Publicada na v2.2.0 (16/11) | — |

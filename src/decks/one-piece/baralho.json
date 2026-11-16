@@ -1,7 +1,7 @@
 {
   "id": "one-piece",
   "titulo": "One Piece",
-  "versao": 2,
+  "versao": 3,
   "temas": [
     {
       "id": "tripulacao-going-merry",
@@ -51,6 +51,7 @@
     "op-m-15",
     "op-t-02",
     "op-t-16",
-    "op-l-02"
+    "op-l-02",
+    "op-l-10"
   ]
 }

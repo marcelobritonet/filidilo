@@ -14,7 +14,7 @@
     {"id": "op-l-09", "tipo": "conceito", "tema": "lore", "frente": "O que são a Red Line e o Calm Belt?", "verso": "A **Red Line** é o continente que dá a volta no mundo. O **Calm Belt** são faixas de mar sem vento e cheias de Reis do Mar, que cercam a Grand Line."},
     {"id": "op-l-19", "tipo": "conceito", "tema": "lore", "frente": "Como se chega à Grand Line saindo do East Blue?", "verso": "Subindo a **Reverse Mountain**, uma montanha onde as correntes dos quatro mares sobem e descem até a Grand Line."},
     {"id": "op-l-18", "tipo": "associacao", "tema": "lore", "frente": "Por qual apelido a Grand Line é conhecida?", "opcoes": ["Cemitério dos piratas", "Mar da calmaria", "Caminho do rei", "Mar dos sonhos"], "correta": 0},
-    {"id": "op-l-10", "tipo": "associacao", "tema": "lore", "frente": "Por que uma bússola comum não funciona na Grand Line?", "opcoes": ["Os campos magnéticos das ilhas confundem a bússola; usa-se o Log Pose", "Porque a Grand Line não tem norte", "Porque o mar é feito de Kairoseki", "Porque só funciona de dia"], "correta": 0},
+    {"id": "op-l-29", "tipo": "associacao", "tema": "lore", "frente": "Por que uma bússola comum não funciona na Grand Line?", "opcoes": ["Os campos magnéticos das ilhas confundem a bússola; usa-se o Log Pose", "Porque a Grand Line não tem norte", "Porque as ilhas mudam de lugar", "Porque só funciona de dia"], "correta": 0},
     {"id": "op-l-24", "tipo": "conceito", "tema": "lore", "frente": "O que são os Shichibukai?", "verso": "Os **Sete Senhores da Guerra do Mar**: piratas que têm permissão do Governo Mundial para agir, em troca de colaborar com ele."}
   ]
 }

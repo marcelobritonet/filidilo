@@ -101,6 +101,15 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
   background: transparent; color: var(--text); font-size: 1.35rem; line-height: 1;
 }
 .fechar:hover, .voltar:hover { background: var(--surface-subtle); }
+.icone-btn {
+  display: inline-grid; place-items: center; width: 44px; height: 44px; flex: none;
+  border: 1px solid transparent; border-radius: 50%; background: transparent; color: var(--accent);
+}
+.icone-btn:hover { background: var(--surface-subtle); }
+.meta-cartao .icone-btn { margin-left: auto; margin-block: -10px; }
+.titulo-acoes { display: flex; align-items: center; gap: 8px; }
+.titulo-acoes h1 { flex: 1; min-width: 0; }
+.titulo-acoes .icone-btn { margin-right: -10px; }
 .contador { color: var(--text-muted); font-size: 15px; text-align: right; font-variant-numeric: tabular-nums; }
 
 /* ---------- Botões ---------- */

@@ -6,6 +6,7 @@ import { chave, registrar } from '../core/srs'
 import type { Baralho, Cartao, CartaoCalculo } from '../core/types'
 import { nomeTema } from './estado'
 import { CorrigirCartao } from './CorrigirCartao'
+import { enviarCartao } from './enviar'
 import { Folha } from './Folha'
 import { Icone } from './Icone'
 import { Tex } from './Tex'
@@ -151,6 +152,9 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
         <>
           <div class="meta-cartao">
             <span class="tema-chip">{nomeTema(baralho, cartao.tema)}</span>
+            <button class="icone-btn" aria-label="Enviar este cartão" title="Enviar este cartão" onClick={() => enviarCartao(baralho, cartao)}>
+              <Icone nome="enviar" />
+            </button>
           </div>
           <CartaoView key={`${pos}-${vez}-${cartao.id}`} cartao={cartao} acoes={acoes} />
           <div class="acoes-cartao">

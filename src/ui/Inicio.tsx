@@ -3,7 +3,9 @@ import type { Filtro } from '../core/fila'
 import { chave, dominado, vencido } from '../core/srs'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
+import { enviarBaralho } from './enviar'
 import { textoContagem, useEstados } from './estado'
+import { Icone } from './Icone'
 import { Marca } from './Marca'
 
 /** Última escolha de como estudar, guardada por baralho. */
@@ -68,6 +70,10 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
   const alternarTema = (t: string) => setEscolha({ ...escolha, temas: escolha.temas.includes(t) ? escolha.temas.filter((x) => x !== t) : [...escolha.temas, t] })
   const todosMarcados = temasComCartoes.every((t) => escolha.temas.includes(t.id))
 
+  const enviar = async () => {
+    if ((await enviarBaralho(baralho)) === 'baixado') nav.avisar({ texto: 'Arquivo salvo em Downloads.' })
+  }
+
   const comecar = () => {
     try {
       localStorage.setItem(chaveEscolha(id), JSON.stringify(escolha))
@@ -98,7 +104,14 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
             Configurar baralho
           </button>
         </div>
-        <h1>{baralho.titulo}</h1>
+        <div class="titulo-acoes">
+          <h1>{baralho.titulo}</h1>
+          {total > 0 && (
+            <button class="icone-btn" aria-label="Enviar baralho" title="Enviar baralho" onClick={enviar}>
+              <Icone nome="enviar" />
+            </button>
+          )}
+        </div>
         {contagem && <p class="selo">{contagem}</p>}
       </header>
 

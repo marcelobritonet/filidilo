@@ -1,9 +1,8 @@
 import { useState } from 'preact/hooks'
 import { duplicar, excluir, novoId, restaurar, salvar } from '../core/baralhos'
 import type { Baralho, Tema } from '../core/types'
-import { arquivoDoBaralho } from '../core/compartilhar'
 import type { Navegacao } from './App'
-import { enviarArquivo, MENSAGEM_ENVIO } from './enviar'
+import { enviarBaralho } from './enviar'
 
 /** Cartões (criar, ver, enviar), nome, data da prova e temas de um baralho; duplicar e excluir. */
 export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) {
@@ -53,10 +52,8 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
     history.go(-2) // sai da configuração e da tela do baralho excluído
   }
 
-  const enviarBaralho = async () => {
-    const { nome, texto } = arquivoDoBaralho(baralho)
-    const r = await enviarArquivo(nome, texto, `Baralho “${baralho.titulo}”. ${MENSAGEM_ENVIO}`)
-    if (r === 'baixado') nav.avisar({ texto: 'Arquivo salvo em Downloads.' })
+  const enviar = async () => {
+    if ((await enviarBaralho(baralho)) === 'baixado') nav.avisar({ texto: 'Arquivo salvo em Downloads.' })
   }
 
   return (
@@ -75,7 +72,7 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
         <button class="btn secundario" onClick={() => nav.ir({ nome: 'revisar', id: baralho.id })}>
           Ver e editar ({baralho.cartoes.length})
         </button>
-        <button class="btn secundario" disabled={!baralho.cartoes.length} onClick={enviarBaralho}>
+        <button class="btn secundario" disabled={!baralho.cartoes.length} onClick={enviar}>
           Enviar baralho
         </button>
       </section>
