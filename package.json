@@ -1,6 +1,6 @@
 {
   "name": "tatino",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Flashcards offline (PWA) — Hidrodinâmica",
   "scripts": {
     "dev": "vite",

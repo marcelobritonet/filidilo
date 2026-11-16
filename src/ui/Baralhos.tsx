@@ -134,9 +134,6 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
           <button class="btn principal" onClick={() => setCriando(true)}>
             Novo baralho
           </button>
-          <p class="dica">
-            Recebeu um cartão ou baralho? No WhatsApp, segure o arquivo → <strong>Compartilhar</strong> → <strong>tatino.</strong>
-          </p>
           {erro && (
             <p class="resultado erro" role="alert">
               ✕ {erro}

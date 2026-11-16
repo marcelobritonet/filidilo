@@ -2,6 +2,11 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [2.1.2] — 2026-11-16
+
+### Removido
+- Aviso "Recebeu um cartão ou baralho?…" em Meus baralhos. Receber pelo Compartilhar do Android continua funcionando.
+
 ## [2.1.1] — 2026-11-16
 
 ### Corrigido
@@ -171,6 +176,7 @@ Fase 1: primeira versão publicada.
 - Reportar erro em qualquer cartão, revisão de conteúdo (✓/⚠/📝), backup e envio de reportes pelo WhatsApp.
 - Publicação automática no GitHub Pages.
 
+[2.1.2]: https://github.com/marcelobritonet/tatino/releases/tag/v2.1.2
 [2.1.1]: https://github.com/marcelobritonet/tatino/releases/tag/v2.1.1
 [2.1.0]: https://github.com/marcelobritonet/tatino/releases/tag/v2.1.0
 [2.0.1]: https://github.com/marcelobritonet/tatino/releases/tag/v2.0.1
