@@ -2,10 +2,10 @@ import { useEffect, useState } from 'preact/hooks'
 import { listar, semear } from '../core/baralhos'
 import { db, type Estado } from '../core/db'
 import type { Baralho } from '../core/types'
-import { baralhosDeFabrica } from '../decks/carregar'
+import { sementesDeFabrica } from '../decks/carregar'
 
 /** Baralhos que vêm instalados na primeira abertura. */
-const SEMENTES = baralhosDeFabrica.map((b) => () => structuredClone(b))
+const SEMENTES = sementesDeFabrica
 
 let pronto: Promise<void> | null = null
 export const prepararBanco = () => (pronto ??= semear(SEMENTES))

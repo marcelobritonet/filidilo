@@ -6,7 +6,7 @@ import { db } from './db'
 import { registrar } from './srs'
 
 const fabrica = baralhosDeFabrica[0]
-const semente = () => structuredClone(fabrica)
+const semente = () => ({ baralho: structuredClone(fabrica) })
 
 describe('baralhos no aparelho', () => {
   beforeEach(async () => {
@@ -34,6 +34,31 @@ describe('baralhos no aparelho', () => {
     const meu = await criar('Meu baralho')
     await semear([semente])
     expect((await listar()).map((b) => b.id).sort()).toEqual([fabrica.id, meu.id].sort())
+  })
+
+  it('versão nova de fábrica troca os cartões retirados e mantém os da pessoa e o progresso', async () => {
+    const v1 = { id: 'x', titulo: 'X', versao: 1, temas: [{ id: 'a', nome: 'A' }], cartoes: [
+      { id: 'velho', tipo: 'vf' as const, tema: 'a', frente: 'spoiler', resposta: true },
+      { id: 'fica', tipo: 'vf' as const, tema: 'a', frente: 'ok', resposta: true },
+    ] }
+    await semear([() => ({ baralho: structuredClone(v1) })])
+    const instalado = (await listar())[0]
+    await salvar({ ...instalado, cartoes: [...instalado.cartoes, { id: 'meu', tipo: 'vf', tema: 'a', frente: 'meu', resposta: false }] })
+    await registrar('x/fica', 3, 'prova')
+
+    const v2 = { ...v1, versao: 2, cartoes: [v1.cartoes[1], { id: 'novo', tipo: 'vf' as const, tema: 'a', frente: 'novo', resposta: true }] }
+    const s2 = () => ({ baralho: structuredClone(v2), retirados: ['velho'] })
+    await semear([s2])
+    await semear([s2])
+    const b = (await listar())[0]
+    expect(b.versao).toBe(2)
+    expect(b.cartoes.map((c) => c.id)).toEqual(['fica', 'meu', 'novo'])
+    expect((await db.estados.get('x/fica'))?.ultimaNota).toBe(3)
+
+    // Excluído não volta, nem com versão nova.
+    await excluir('x')
+    await semear([() => ({ baralho: { ...structuredClone(v2), versao: 3 } })])
+    expect(await listar()).toEqual([])
   })
 
   it('cria, duplica (sem progresso), exclui e restaura', async () => {

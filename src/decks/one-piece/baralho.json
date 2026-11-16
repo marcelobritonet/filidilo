@@ -1,10 +1,56 @@
 {
   "id": "one-piece",
   "titulo": "One Piece",
-  "versao": 1,
+  "versao": 2,
   "temas": [
-    { "id": "tripulacao-going-merry", "nome": "Tripulação do Going Merry" },
-    { "id": "lore", "nome": "Lore" },
-    { "id": "marinha", "nome": "Marinha" }
+    {
+      "id": "tripulacao-going-merry",
+      "nome": "Tripulação do Going Merry"
+    },
+    {
+      "id": "lore",
+      "nome": "Lore"
+    },
+    {
+      "id": "marinha",
+      "nome": "Marinha"
+    }
+  ],
+  "retirados": [
+    "op-t-03",
+    "op-t-07",
+    "op-t-09",
+    "op-t-12",
+    "op-t-13",
+    "op-t-14",
+    "op-t-15",
+    "op-t-17",
+    "op-t-18",
+    "op-l-03",
+    "op-l-05",
+    "op-l-06",
+    "op-l-07",
+    "op-l-11",
+    "op-l-12",
+    "op-l-13",
+    "op-l-14",
+    "op-l-15",
+    "op-l-16",
+    "op-m-02",
+    "op-m-03",
+    "op-m-04",
+    "op-m-05",
+    "op-m-06",
+    "op-m-07",
+    "op-m-08",
+    "op-m-09",
+    "op-m-10",
+    "op-m-11",
+    "op-m-12",
+    "op-m-13",
+    "op-m-15",
+    "op-t-02",
+    "op-t-16",
+    "op-l-02"
   ]
 }

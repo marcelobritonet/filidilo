@@ -1,21 +1,32 @@
 import { db } from './db'
 import type { Baralho } from './types'
 
-/** Baralhos que vêm com o app e são instalados uma única vez, na primeira abertura. */
-export type Semente = () => Baralho
+/** Baralho que vem com o app, com os ids de cartões que versões anteriores tinham e ele não tem mais. */
+export type Semente = () => { baralho: Baralho; retirados?: string[] }
 
 /**
- * Instala cada baralho de fábrica uma única vez (marca "semeado:<id>"). Depois disso
+ * Instala cada baralho de fábrica uma única vez (marca "semeado:<id>" com a versão). Depois disso
  * ele é um baralho comum: a pessoa pode editar ou excluir, e o app não o recria.
+ * Quando a versão de fábrica sobe, o baralho instalado perde os cartões retirados e ganha os novos;
+ * os cartões que a pessoa criou e o progresso ficam.
  */
 export async function semear(sementes: Semente[]): Promise<void> {
   await db.transaction('rw', db.baralhos, db.meta, async () => {
     for (const s of sementes) {
-      const b = s()
+      const { baralho: b, retirados = [] } = s()
       const marca = `semeado:${b.id}`
-      if (await db.meta.get(marca)) continue
-      if (!(await db.baralhos.get(b.id))) await db.baralhos.put({ ...b, criadoEm: Date.now(), atualizadoEm: Date.now() })
-      await db.meta.put({ chave: marca, valor: '1' })
+      const semeado = await db.meta.get(marca)
+      if (semeado && Number(semeado.valor) >= b.versao) continue
+      const atual = await db.baralhos.get(b.id)
+      if (!semeado && !atual) await db.baralhos.put({ ...b, criadoEm: Date.now(), atualizadoEm: Date.now() })
+      else if (semeado && atual) {
+        const fora = new Set(retirados)
+        const mantidos = atual.cartoes.filter((c) => !fora.has(c.id))
+        const tem = new Set(mantidos.map((c) => c.id))
+        const temas = [...atual.temas, ...b.temas.filter((t) => !atual.temas.some((x) => x.id === t.id))]
+        await db.baralhos.put({ ...atual, versao: b.versao, temas, cartoes: [...mantidos, ...b.cartoes.filter((c) => !tem.has(c.id))], atualizadoEm: Date.now() })
+      }
+      await db.meta.put({ chave: marca, valor: String(b.versao) })
     }
   })
 }

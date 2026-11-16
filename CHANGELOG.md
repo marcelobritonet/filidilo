@@ -2,6 +2,12 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [2.1.1] — 2026-11-16
+
+### Corrigido
+- **One Piece sem spoilers**: o baralho foi revisado para ficar no começo da história (o East Blue), com o perfil de cada personagem e as regras do mundo, sem contar o que acontece depois. Saíram 35 cartões que entregavam a história, inclusive alternativas com nomes que só aparecem mais tarde; entraram cartões novos, e os três temas continuam com 49 cartões no total.
+- Quem já tinha o baralho recebe a correção sozinho ao abrir o app. Os cartões que a pessoa criou e o progresso nos cartões que ficaram continuam.
+
 ## [2.1.0] — 2026-11-16
 
 ### Novo
@@ -165,6 +171,7 @@ Fase 1: primeira versão publicada.
 - Reportar erro em qualquer cartão, revisão de conteúdo (✓/⚠/📝), backup e envio de reportes pelo WhatsApp.
 - Publicação automática no GitHub Pages.
 
+[2.1.1]: https://github.com/marcelobritonet/tatino/releases/tag/v2.1.1
 [2.1.0]: https://github.com/marcelobritonet/tatino/releases/tag/v2.1.0
 [2.0.1]: https://github.com/marcelobritonet/tatino/releases/tag/v2.0.1
 [2.0.0]: https://github.com/marcelobritonet/tatino/releases/tag/v2.0.0

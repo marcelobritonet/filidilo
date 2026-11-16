@@ -34,3 +34,4 @@ Atualizado em 16/11/2026.
 | P33 | **v2.0.0** — cada um monta o seu: criar baralho num passo, IA por copiar e colar (Gemini, ChatGPT, Claude, Copilot), enviar cartão/baralho, corrigir cartão com IA, Estudar por tempo ou até acertar, novas respostas e "Não sei", incentivo a criar mais cartões; Gemini direto, reportes e "cai na prova" removidos | ✅ Publicada (16/11) | — |
 | P34 | Baralho de exemplo One Piece (Going Merry, Lore, Marinha) no lugar do antigo | ✅ Publicada na v2.1.0 (16/11) | — |
 | P35 | Tirar de Meus baralhos o aviso "Recebeu um cartão ou baralho? No WhatsApp, segure o arquivo → Compartilhar → tatino." | Aberto: Claude recomenda tirar | Marcelo |
+| P36 | One Piece sem spoilers: baralho só com o começo da história (East Blue) e correção automática em quem já tem a v2.1.0 | ✅ Publicada na v2.1.1 (16/11) | — |
