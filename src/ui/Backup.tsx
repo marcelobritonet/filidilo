@@ -1,3 +1,4 @@
+import { evento } from '../core/telemetria'
 import { useEffect, useState } from 'preact/hooks'
 import { exportar, importar } from '../core/backup'
 import { db } from '../core/db'
@@ -14,6 +15,7 @@ export function Backup({ sair }: { sair: () => void }) {
   const nomeArquivo = `tatino-backup-${new Date().toISOString().slice(0, 10)}.json`
 
   const salvar = async () => {
+    evento('backup_salvo')
     const blob = await exportar()
     const arquivo = new File([blob], nomeArquivo, { type: 'application/json' })
     if (navigator.canShare?.({ files: [arquivo] })) {
@@ -39,6 +41,7 @@ export function Backup({ sair }: { sair: () => void }) {
     if (!f) return
     try {
       const r = await importar(await f.text())
+      evento('backup_restaurado')
       setMsg(`✓ Backup restaurado: ${r.baralhos} baralhos, ${r.estados} cartões e ${r.revisoes} revisões atualizados.`)
       contar()
     } catch (err) {

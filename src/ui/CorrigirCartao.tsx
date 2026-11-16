@@ -1,3 +1,4 @@
+import { evento } from '../core/telemetria'
 import { useMemo, useState } from 'preact/hooks'
 import { gravarCartao } from '../core/cartoes'
 import { lerCartaoCorrigido, montarPedidoCorrecao } from '../core/ia/corrigir'
@@ -37,6 +38,7 @@ export function CorrigirCartao({ baralho, cartao, aoSalvar, fechar }: { baralho:
   const salvar = async () => {
     if (!lido || lido.erros.length) return
     setSalvando(true)
+    evento('corrigir_salvo', { tipo: lido.cartao.tipo })
     const b = await gravarCartao(baralho, lido.cartao)
     aoSalvar(lido.cartao, b)
   }

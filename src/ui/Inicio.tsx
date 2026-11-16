@@ -3,6 +3,7 @@ import type { Filtro } from '../core/fila'
 import { chave, dominado, vencido } from '../core/srs'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
+import { evento } from '../core/telemetria'
 import { enviarBaralho } from './enviar'
 import { textoContagem, useEstados } from './estado'
 import { Icone } from './Icone'
@@ -71,6 +72,7 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
   const todosMarcados = temasComCartoes.every((t) => escolha.temas.includes(t.id))
 
   const enviar = async () => {
+    evento('enviar', { o_que: 'baralho', onde: 'baralho' })
     if ((await enviarBaralho(baralho)) === 'baixado') nav.avisar({ texto: 'Arquivo salvo em Downloads.' })
   }
 
@@ -82,6 +84,7 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
     }
     setPerguntando(false)
     const todos = escolha.temas.length === temasComCartoes.length
+    evento('sessao_iniciada', { por: escolha.por, meta: escolha.por === 'tempo' ? escolha.minutos : escolha.acertos, temas: escolha.temas.length, temas_total: temasComCartoes.length, cartoes: total })
     nav.ir({
       nome: 'sessao',
       id,

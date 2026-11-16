@@ -1,3 +1,4 @@
+import { evento } from '../core/telemetria'
 import { useState } from 'preact/hooks'
 import { criar } from '../core/baralhos'
 import { adicionarCartoesRecebidos, aplicar, importarComoCopia, type CartoesRecebidos, type PlanoImportacao } from '../core/compartilhar'
@@ -13,6 +14,7 @@ export function Importar({ plano, nav, fechar }: { plano: PlanoImportacao; nav: 
 
   const concluir = async (fazer: () => Promise<{ id: string; titulo: string }>, msg: string) => {
     setOcupado(true)
+    evento('recebido_baralho', { acao: msg.includes('Importado como') ? 'copia' : plano.atual ? 'atualizar' : 'novo', novos: plano.novos.length, atualizados: plano.atualizados.length })
     const b = await fazer()
     nav.mudou()
     nav.avisar({ texto: msg.replace('{t}', b.titulo) })
@@ -76,6 +78,7 @@ export function ImportarCartoes({ recebido, baralhos, nav, fechar }: { recebido:
 
   const guardar = async () => {
     setOcupado(true)
+    evento('recebido_cartoes', { cartoes: recebido.cartoes.length })
     let alvo = baralhos.find((b) => b.id === destino)
     if (!alvo) alvo = { ...(await criar(recebido.origem)), temas: [] }
     const b = await adicionarCartoesRecebidos(alvo, recebido)

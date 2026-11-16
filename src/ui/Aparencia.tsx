@@ -1,4 +1,5 @@
 import { useState } from 'preact/hooks'
+import { evento, ligarTelemetria, telemetriaDisponivel, telemetriaLigada } from '../core/telemetria'
 import type { Navegacao } from './App'
 import { lerPreferencia, salvarPreferencia, type PreferenciaTema } from './tema'
 
@@ -11,10 +12,18 @@ const OPCOES: { valor: PreferenciaTema; nome: string; descricao: string; cores: 
 /** Escolha de aparência: salva e aplica na hora, sem botão de confirmar. */
 export function Aparencia({ nav }: { nav: Navegacao }) {
   const [pref, setPref] = useState<PreferenciaTema>(lerPreferencia)
+  const [estatisticas, setEstatisticas] = useState(telemetriaLigada)
 
   const escolher = (p: PreferenciaTema) => {
     setPref(p)
     salvarPreferencia(p)
+    evento('tema_escolhido', { tema: p })
+  }
+
+  const alternarEstatisticas = (ligar: boolean) => {
+    if (!ligar) evento('estatisticas_desligadas')
+    ligarTelemetria(ligar)
+    setEstatisticas(ligar)
   }
 
   return (
@@ -41,6 +50,15 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
           </label>
         ))}
       </fieldset>
+      {telemetriaDisponivel() && (
+        <label class="opcao-estatisticas">
+          <input type="checkbox" checked={estatisticas} onChange={(e) => alternarEstatisticas((e.target as HTMLInputElement).checked)} />
+          <span class="textos">
+            <strong>Enviar estatísticas de uso</strong>
+            <small>Anônimas: só quais funções são usadas, nunca o texto dos cartões. Ajudam a melhorar o tatino.</small>
+          </span>
+        </label>
+      )}
     </main>
   )
 }

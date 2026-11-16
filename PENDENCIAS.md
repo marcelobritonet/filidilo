@@ -37,3 +37,5 @@ Atualizado em 16/11/2026.
 | P36 | One Piece sem spoilers: baralho só com o começo da história (East Blue) e correção automática em quem já tem a v2.1.0 | ✅ Publicada na v2.1.1 (16/11) | — |
 | P37 | Ícone de enviar no cartão (estudo) e no baralho (ao lado do nome) | ✅ Publicada na v2.2.0 (16/11) | — |
 | P38 | Alternativas que mudam (C: 2 formas da certa + erradas sorteadas) e sem alternativas quando dominado (D); IA, editor e One Piece no formato novo | ✅ Publicada na v2.3.0 (16/11) | — |
+| P39 | Telemetria com PostHog (anônima, sem cookies, fila offline, desligar em Aparência) | ✅ Pronto (projeto PostHog, região EUA; chave na variável VITE_POSTHOG_KEY do repositório); publicada na v2.4.0 (16/11) | — |
+| P40 | Atualizar o baralho de Hidrodinâmica dela com conteúdo novo, sem perder progresso nem edições | Arquivo pronto e validado (251 cartões: 190 antigos iguais + 61 novos); simulação de importação ok | Marcelo manda o arquivo para ela e ela toca em Atualizar |

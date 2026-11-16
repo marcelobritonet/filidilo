@@ -1,3 +1,5 @@
+import { evento } from '../core/telemetria'
+
 const IAS = [
   { nome: 'Gemini', url: 'https://gemini.google.com/app' },
   { nome: 'ChatGPT', url: 'https://chatgpt.com/' },
@@ -12,7 +14,7 @@ export function AbrirIA() {
       <span class="dica">Abrir:</span>
       <div class="abrir-ia-opcoes">
         {IAS.map((ia) => (
-          <a class="btn secundario compacto" href={ia.url} target="_blank" rel="noopener noreferrer">
+          <a class="btn secundario compacto" href={ia.url} target="_blank" rel="noopener noreferrer" onClick={() => evento('ia_aberta', { ia: ia.nome })}>
             {ia.nome}
           </a>
         ))}

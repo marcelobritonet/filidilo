@@ -1,3 +1,4 @@
+import { evento } from '../core/telemetria'
 import { useState } from 'preact/hooks'
 import { excluirCartao, gravarCartao, novoIdCartao, problemasDoCartao, reinserirCartao } from '../core/cartoes'
 import type { Baralho, Cartao } from '../core/types'
@@ -64,6 +65,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
     const p = verificar(c)
     setProblemas(p)
     if (p.length) return
+    evento('cartao_salvo', { tipo: c.tipo, novo: !original })
     await gravarCartao(baralho, c)
     nav.mudou()
     if (eOutro) {

@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks'
 import { formatar, preencher, sortear } from '../core/calc'
 import type { Baralho, Cartao } from '../core/types'
 import type { Navegacao } from './App'
+import { evento } from '../core/telemetria'
 import { enviarCartao } from './enviar'
 import { nomeTema } from './estado'
 import { Tex } from './Tex'
@@ -12,6 +13,7 @@ export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) 
   const lista = baralho.cartoes.filter((c) => !tema || c.tema === tema)
 
   const enviar = async (c: Cartao) => {
+    evento('enviar', { o_que: 'cartao', onde: 'lista' })
     if ((await enviarCartao(baralho, c)) === 'baixado') nav.avisar({ texto: 'Arquivo salvo em Downloads.' })
   }
 

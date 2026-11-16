@@ -1,3 +1,4 @@
+import { evento } from '../core/telemetria'
 import { useEffect, useState } from 'preact/hooks'
 import { criar, novoId, salvar } from '../core/baralhos'
 import { lerRecebido, planejar, type CartoesRecebidos, type PlanoImportacao } from '../core/compartilhar'
@@ -52,6 +53,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const novo = async (e: Event) => {
     e.preventDefault()
     const nomes = [...new Set(temasTexto.split(/[\n,;]/).map((t) => t.trim()).filter(Boolean))]
+    evento('baralho_criado', { temas: nomes.length, com_prova: !!prova })
     const base = await criar(nome)
     const b = await salvar({
       ...base,
@@ -150,7 +152,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
           Aparência
         </button>
       </nav>
-      <p class="versao">Funciona sem internet · seus dados ficam neste aparelho</p>
+      <p class="versao">Funciona sem internet · seus cartões ficam neste aparelho</p>
       {plano && <Importar plano={plano} nav={nav} fechar={() => setPlano(null)} />}
       {cartoesRecebidos && <ImportarCartoes recebido={cartoesRecebidos} baralhos={baralhos} nav={nav} fechar={() => setCartoesRecebidos(null)} />}
     </main>

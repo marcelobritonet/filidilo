@@ -1,3 +1,4 @@
+import { evento } from '../core/telemetria'
 import { useMemo, useRef, useState } from 'preact/hooks'
 import { salvar } from '../core/baralhos'
 import { EXEMPLOS, montarCorrecao, montarInstrucao, type Mistura, type Origem } from '../core/ia/instrucao'
@@ -37,6 +38,7 @@ export function CriarComIA({ baralho, assuntoInicial, nav }: { baralho: Baralho;
     try {
       await navigator.clipboard.writeText(conteudo)
       setCopiado(qual)
+      evento('ia_copiado', { qual, origem })
     } catch {
       setCopiado('erro')
     }
@@ -56,10 +58,12 @@ export function CriarComIA({ baralho, assuntoInicial, nav }: { baralho: Baralho;
         for (const t of r.temasNovos) if (!temas.some((x) => x.id === t.id)) temas.push(t)
         return { temasNovos: temas, cartoes: [...ant.cartoes.filter((c) => !c.erros.length), ...r.cartoes] }
       })
+      evento('ia_resposta_lida', { cartoes: r.cartoes.length, com_erro: r.cartoes.filter((c) => c.erros.length).length })
       setResposta('')
       setTimeout(() => previa.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
     } catch (e) {
       setErroLeitura((e as Error).message)
+      evento('ia_resposta_invalida')
     }
   }
 
@@ -77,6 +81,7 @@ export function CriarComIA({ baralho, assuntoInicial, nav }: { baralho: Baralho;
   const adicionar = async () => {
     if (!lida || !escolhidos.length) return
     setSalvando(true)
+    evento('ia_cartoes_salvos', { cartoes: escolhidos.length, desmarcados: validos.length - escolhidos.length })
     const usados = new Set(escolhidos.map((c) => c.cartao.tema))
     const temasNovos = lida.temasNovos.filter((t) => usados.has(t.id) && !baralho.temas.some((x) => x.id === t.id))
     await salvar({ ...baralho, temas: [...baralho.temas, ...temasNovos], cartoes: [...baralho.cartoes, ...escolhidos.map((c) => c.cartao)] })

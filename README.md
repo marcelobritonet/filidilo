@@ -30,6 +30,10 @@ Os baralhos ficam no aparelho (IndexedDB, tabela `baralhos`). Baralhos que vêm 
 
 Cartões de cálculo usam expressões avaliadas por um avaliador seguro (`src/core/expr.ts`, sem `eval`). Marcadores `{nome}` e `{nome:casas}` no texto são trocados pelos valores sorteados.
 
+## Estatísticas de uso
+
+O app manda eventos anônimos ao PostHog (projeto na região EUA): nome do evento e números, sem cookies, sem nome ou e-mail e nunca o texto dos cartões. Um id aleatório por aparelho; fila no aparelho para quando estiver sem internet. Código e lista de eventos em `src/core/telemetria.ts` e nas chamadas `evento(...)`. A pessoa desliga em Aparência. A chave pública vem da variável `VITE_POSTHOG_KEY` do repositório (GitHub → Settings → Secrets and variables → Actions → Variables), passada no build pelo `deploy.yml`. Sem ela (no computador ou em cópias do repositório), nada é enviado.
+
 ## Versões
 
 Histórico em [CHANGELOG.md](CHANGELOG.md) e nas [releases](https://github.com/marcelobritonet/tatino/releases). A versão vem do `package.json` e aparece no rodapé do app. Para lançar: subir a versão no `package.json`, escrever a seção no changelog, fazer o commit, criar a tag `vX.Y.Z` e a release.

@@ -2,6 +2,14 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [2.4.0] — 2026-11-16
+
+### Novo
+- **Estatísticas de uso anônimas** (PostHog, servidor nos EUA): o app conta quais funções são usadas (estudo, respostas, Criar com IA, enviar, receber, backup etc.) para orientar as próximas melhorias. Sem cookies, sem nome ou e-mail e nunca o texto dos cartões. Uso sem internet é enviado depois. Dá para desligar em **Aparência → Enviar estatísticas de uso**.
+
+### Mudou
+- Rodapé: "seus cartões ficam neste aparelho".
+
 ## [2.3.0] — 2026-11-16
 
 ### Novo
@@ -193,6 +201,7 @@ Fase 1: primeira versão publicada.
 - Reportar erro em qualquer cartão, revisão de conteúdo (✓/⚠/📝), backup e envio de reportes pelo WhatsApp.
 - Publicação automática no GitHub Pages.
 
+[2.4.0]: https://github.com/marcelobritonet/tatino/releases/tag/v2.4.0
 [2.3.0]: https://github.com/marcelobritonet/tatino/releases/tag/v2.3.0
 [2.2.0]: https://github.com/marcelobritonet/tatino/releases/tag/v2.2.0
 [2.1.2]: https://github.com/marcelobritonet/tatino/releases/tag/v2.1.2

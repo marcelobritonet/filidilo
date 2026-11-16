@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks'
 import { duplicar, excluir, novoId, restaurar, salvar } from '../core/baralhos'
 import type { Baralho, Tema } from '../core/types'
 import type { Navegacao } from './App'
+import { evento } from '../core/telemetria'
 import { enviarBaralho } from './enviar'
 
 /** Cartões (criar, ver, enviar), nome, data da prova e temas de um baralho; duplicar e excluir. */
@@ -34,12 +35,14 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
   }
 
   const fazerCopia = async () => {
+    evento('baralho_duplicado')
     const c = await duplicar(baralho.id)
     nav.mudou()
     nav.avisar({ texto: `Criado “${c.titulo}”.` })
   }
 
   const apagar = async () => {
+    evento('baralho_excluido', { cartoes: baralho.cartoes.length })
     const removido = await excluir(baralho.id)
     nav.mudou()
     nav.avisar({
@@ -53,6 +56,7 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
   }
 
   const enviar = async () => {
+    evento('enviar', { o_que: 'baralho', onde: 'configurar' })
     if ((await enviarBaralho(baralho)) === 'baixado') nav.avisar({ texto: 'Arquivo salvo em Downloads.' })
   }
 

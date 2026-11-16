@@ -1,3 +1,4 @@
+import { evento } from '../core/telemetria'
 import { useMemo, useState } from 'preact/hooks'
 import { adicionarCartoes, lerLista } from '../core/cartoes'
 import type { Baralho } from '../core/types'
@@ -12,6 +13,7 @@ export function ColarLista({ baralho, nav }: { baralho: Baralho; nav: Navegacao 
   const invalidos = linhas.filter((l) => l.erro)
 
   const adicionar = async () => {
+    evento('lista_colada', { cartoes: validos.length })
     await adicionarCartoes(baralho, validos.map((l) => l.cartao!))
     nav.mudou()
     nav.avisar({ texto: `${validos.length} cartões adicionados.` })
