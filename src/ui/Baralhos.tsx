@@ -1,11 +1,10 @@
 import { evento } from '../core/telemetria'
 import { useEffect, useState } from 'preact/hooks'
-import { criar, novoId, salvar } from '../core/baralhos'
 import { lerRecebido, planejar, type CartoesRecebidos, type PlanoImportacao } from '../core/compartilhar'
 import { chave, dominado } from '../core/srs'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
-import { textoContagem, useEstados } from './estado'
+import { useEstados } from './estado'
 import { Importar, ImportarCartoes } from './Importar'
 import { Marca } from './Marca'
 import { pegarRecebido } from './recebido'
@@ -14,12 +13,15 @@ interface EventoInstalar extends Event {
   prompt: () => Promise<void>
 }
 
+const SEM_INTERNET = 'Precisa de internet para falar com a IA.'
+
+/** Faixa do texto digitado, só para o evento: curto, médio ou longo. */
+const faixa = (t: string): 'curto' | 'medio' | 'longo' => (t.length <= 20 ? 'curto' : t.length <= 60 ? 'medio' : 'longo')
+
 export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: Navegacao; versao: number }) {
   const estados = useEstados(versao)
-  const [criando, setCriando] = useState(false)
-  const [nome, setNome] = useState('')
-  const [prova, setProva] = useState('')
-  const [temasTexto, setTemasTexto] = useState('')
+  const [pedido, setPedido] = useState('')
+  const [semInternet, setSemInternet] = useState<'' | 'campo' | 'botao'>('')
   const [instalar, setInstalar] = useState<EventoInstalar | null>(null)
   const [plano, setPlano] = useState<PlanoImportacao | null>(null)
   const [cartoesRecebidos, setCartoesRecebidos] = useState<CartoesRecebidos | null>(null)
@@ -50,22 +52,13 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
     return () => window.removeEventListener('beforeinstallprompt', f)
   }, [])
 
-  const novo = async (e: Event) => {
-    e.preventDefault()
-    const nomes = [...new Set(temasTexto.split(/[\n,;]/).map((t) => t.trim()).filter(Boolean))]
-    evento('baralho_criado', { temas: nomes.length, com_prova: !!prova })
-    const base = await criar(nome)
-    const b = await salvar({
-      ...base,
-      prova: prova || undefined,
-      temas: nomes.length ? nomes.map((t) => ({ id: novoId(t), nome: t })) : base.temas,
-    })
-    setNome('')
-    setProva('')
-    setTemasTexto('')
-    setCriando(false)
-    nav.mudou()
-    nav.ir({ nome: 'baralho', id: b.id })
+  /** Abre o fluxo Aprender; sem internet, avisa e não abre. */
+  const aprender = (de: 'campo' | 'botao') => {
+    const texto = de === 'campo' ? pedido.trim() : ''
+    evento('aprender_aberto', { de, tamanho: faixa(texto) })
+    if (navigator.onLine === false) return setSemInternet(de)
+    setSemInternet('')
+    nav.ir(texto ? { nome: 'aprender', pedido: texto } : { nome: 'aprender' })
   }
 
   return (
@@ -74,6 +67,21 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         <Marca />
         <h1>Meus baralhos</h1>
       </header>
+
+      <section class="bloco aprender">
+        <label class="campo">
+          Aprender uma coisa nova hoje
+          <input class="texto" value={pedido} placeholder="Ex.: espanhol para viajar, revisão de Cálculo 1, história da arte" onInput={(e) => setPedido((e.target as HTMLInputElement).value)} />
+        </label>
+        <button class="btn principal" disabled={pedido.trim().length < 3} onClick={() => aprender('campo')}>
+          Começar
+        </button>
+        {semInternet === 'campo' && (
+          <p class="resultado erro" role="alert">
+            {SEM_INTERNET}
+          </p>
+        )}
+      </section>
 
       {instalar && (
         <button class="btn secundario" onClick={() => instalar.prompt().then(() => setInstalar(null))}>
@@ -85,14 +93,12 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         {baralhos.map((b) => {
           const total = b.cartoes.length
           const dom = estados ? b.cartoes.filter((c) => dominado(estados.get(chave(b.id, c.id)))).length : 0
-          const contagem = textoContagem(b.prova)
           return (
             <li>
               <button class="baralho-item cartao-acao" onClick={() => nav.ir({ nome: 'baralho', id: b.id })}>
                 <span class="titulo">{b.titulo}</span>
                 <span class="detalhe">
                   {total} {total === 1 ? 'cartão' : 'cartões'}
-                  {contagem && <span class="selo">{contagem}</span>}
                 </span>
                 <span class="barra" aria-hidden="true">
                   <span style={{ width: `${total ? (100 * dom) / total : 0}%` }} />
@@ -104,45 +110,24 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
             </li>
           )
         })}
-        {!baralhos.length && <p class="dica centro">Nenhum baralho ainda. Crie o primeiro abaixo.</p>}
+        {!baralhos.length && <p class="dica centro">Nenhum baralho ainda. Comece acima ou crie o primeiro abaixo.</p>}
       </ul>
 
-      {criando ? (
-        <form class="bloco" onSubmit={novo}>
-          <h2>Novo baralho</h2>
-          <label class="campo">
-            Disciplina
-            <input class="texto" value={nome} placeholder="Física 1" autoFocus onInput={(e) => setNome((e.target as HTMLInputElement).value)} />
-          </label>
-          <label class="campo">
-            Temas (opcional, um por linha)
-            <textarea rows={3} value={temasTexto} placeholder={'Cinemática\nDinâmica'} onInput={(e) => setTemasTexto((e.target as HTMLTextAreaElement).value)} />
-          </label>
-          <label class="campo">
-            Data da prova (opcional)
-            <input class="texto" type="date" value={prova} onInput={(e) => setProva((e.target as HTMLInputElement).value)} />
-          </label>
-          <div class="linha">
-            <button type="button" class="btn secundario" onClick={() => setCriando(false)}>
-              Cancelar
-            </button>
-            <button type="submit" class="btn principal" disabled={!nome.trim()}>
-              Criar
-            </button>
-          </div>
-        </form>
-      ) : (
-        <section class="acoes">
-          <button class="btn principal" onClick={() => setCriando(true)}>
-            Novo baralho
-          </button>
-          {erro && (
-            <p class="resultado erro" role="alert">
-              ✕ {erro}
-            </p>
-          )}
-        </section>
-      )}
+      <section class="acoes">
+        <button class="btn secundario" onClick={() => aprender('botao')}>
+          Novo baralho
+        </button>
+        {semInternet === 'botao' && (
+          <p class="resultado erro" role="alert">
+            {SEM_INTERNET}
+          </p>
+        )}
+        {erro && (
+          <p class="resultado erro" role="alert">
+            ✕ {erro}
+          </p>
+        )}
+      </section>
 
       <nav class="rodape" aria-label="Mais opções">
         <button class="btn terciario" onClick={() => nav.ir({ nome: 'backup' })}>

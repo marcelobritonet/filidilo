@@ -41,3 +41,15 @@ Atualizado em 16/11/2026.
 | P40 | Atualizar o baralho de Hidrodinâmica dela com conteúdo novo, sem perder progresso nem edições | ✅ Feito: ela atualizou (16/11) | — |
 | P41 | Observar se o modo "Sem alternativas" aparece cedo demais (hoje: 1 "Acertei, foi fácil" basta). Se sim, exigir 2 acertos fáceis seguidos | Observando | Marcelo avisa |
 | P42 | PostHog: depois de alguns dias de uso, montar gráficos (funções mais usadas, funil do Criar com IA, sessões abandonadas, retenção) | Aguardando dados | Marcelo / Claude |
+| P43 | **v3 — aprender qualquer coisa**: decisões da `docs/v3/SPEC-V3.md` respondidas em 16/11; data da prova fora da v3 | ✅ Aprovada | Marcelo |
+| P44 | v3 · E0 Instrução de planejamento: pronta e publicada na v3.0.0. Falta a avaliação com os 8 pedidos de teste (PLANO-V3) nas 4 IAs (≥ 90% de cartões válidos) | A fazer (avaliação) | Marcelo roda nas IAs / Claude ajusta |
+| P45 | v3 · E1 Dados: objetivo do baralho, nível e descrição dos temas, compatíveis com baralhos, arquivos e backups antigos | ✅ Publicada na v3.0.0 (16/11) | Claude |
+| P46 | v3 · E2 Criar com IA refinado pelo objetivo (nível, foco, evitar, temas descritos; sem repetir cartões, com o resumo comprimido do que o baralho já cobre) | ✅ Publicada na v3.0.0 (16/11) | Claude |
+| P47 | v3 · E3 Fluxo "Aprender uma coisa nova hoje" em Meus baralhos; "Novo baralho" abre o mesmo fluxo; formulário manual removido; PDF ou texto opcional | ✅ Publicada na v3.0.0 (16/11) | Claude |
+| P48 | v3 · E4 Editar objetivo, nível, foco e evitar em Configurar baralho | ✅ Publicada na v3.0.0 (16/11) | Claude |
+| P49 | v3 · E5 Incentivo usando o objetivo ("Que tal mais cartões?" e "Quer subir de nível?") | ✅ Publicada na v3.0.0 (16/11) | Claude |
+| P50 | v3 · E6 Mote "Aprenda qualquer coisa" e textos genéricos (sem tocar em `marketing/`) | ✅ Publicada na v3.0.0 (16/11) | Claude |
+| P51 | v3 · One Piece com objetivo e "evitar spoilers" | ⏸ Não se aplica: Marcelo decidiu manter como está (V13-B, 16/11) | — |
+| P53 | v3 · E8 Tirar a data da prova de todo o app (campo, contagem "Faltam N dias", textos, instrução à IA); o campo `prova` de arquivos antigos é ignorado | ✅ Publicada na v3.0.0 (16/11): único lugar com a data era o formulário de criar baralho | Claude |
+| P54 | v3 · Sugerir o primeiro tema com poucos cartões depois da primeira sessão de um baralho novo (SPEC-V3 §6), ficou fora da v3.0.0 | A fazer | Claude |
+| P52 | v3 · E7 Testar o fluxo novo com gente de verdade (um baralho com PDF de aula e um de assunto livre) | A fazer, depois da publicação | Marcelo / estudante |

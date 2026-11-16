@@ -5,7 +5,7 @@ import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
 import { evento } from '../core/telemetria'
 import { enviarBaralho } from './enviar'
-import { textoContagem, useEstados } from './estado'
+import { useEstados } from './estado'
 import { Icone } from './Icone'
 import { Marca } from './Marca'
 
@@ -57,7 +57,8 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
   const dominadosTotal = estados ? baralho.cartoes.filter((c) => dominado(estados.get(chave(id, c.id)))).length : 0
   const paraHoje = estados ? baralho.cartoes.filter((c) => estados.has(chave(id, c.id)) && vencido(estados.get(chave(id, c.id)))).length : 0
   const temCalculo = baralho.cartoes.some((c) => c.tipo === 'calculo')
-  const contagem = textoContagem(baralho.prova)
+  // Quase tudo dominado (80% ou mais, com pelo menos 10 cartões): sugere cartões de um nível acima.
+  const subirNivel = total >= 10 && dominadosTotal >= 0.8 * total
 
   // Temas marcados na pergunta: os da última vez que ainda existem; senão, todos.
   const marcadosSalvos = escolha.temas.filter((t) => temasComCartoes.some((x) => x.id === t))
@@ -115,7 +116,6 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
             </button>
           )}
         </div>
-        {contagem && <p class="selo">{contagem}</p>}
       </header>
 
       {total === 0 ? (
@@ -147,6 +147,23 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
             {paraHoje > 0 && <small>{paraHoje} para revisar hoje</small>}
           </button>
 
+          {subirNivel && (
+            <section class="incentivo-ia">
+              <Icone nome="entender" />
+              <div>
+                <p>Você já domina quase tudo. Quer subir de nível?</p>
+                <button
+                  class="btn secundario"
+                  onClick={() => {
+                    evento('sugestao_subir_nivel')
+                    nav.ir({ nome: 'ia', id, assunto: 'Cartões um nível acima do atual' })
+                  }}
+                >
+                  Criar cartões um nível acima
+                </button>
+              </div>
+            </section>
+          )}
         </>
       )}
 

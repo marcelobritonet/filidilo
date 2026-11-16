@@ -1,23 +1,55 @@
 import { useState } from 'preact/hooks'
 import { duplicar, excluir, novoId, restaurar, salvar } from '../core/baralhos'
-import type { Baralho, Tema } from '../core/types'
+import { NIVEIS, type Baralho, type Nivel, type Objetivo, type Tema } from '../core/types'
 import type { Navegacao } from './App'
 import { evento } from '../core/telemetria'
 import { enviarBaralho } from './enviar'
 
-/** Cartões (criar, ver, enviar), nome, data da prova e temas de um baralho; duplicar e excluir. */
+const linhas = (s: string) => s.split('\n').map((x) => x.trim()).filter(Boolean)
+
+/** Forma comparável do objetivo: ausente e vazio contam como iguais. */
+const normalizar = (o?: Objetivo) =>
+  JSON.stringify({ pedido: o?.pedido ?? null, resumo: o?.resumo ?? null, nivel: o?.nivel ?? null, foco: o?.foco ?? [], evitar: o?.evitar ?? [] })
+
+/** Cartões (criar, ver, enviar), nome, objetivo e temas de um baralho; duplicar e excluir. */
 export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) {
   const [titulo, setTitulo] = useState(baralho.titulo)
-  const [prova, setProva] = useState(baralho.prova ?? '')
+  const [resumo, setResumo] = useState(baralho.objetivo?.resumo ?? '')
+  const [nivel, setNivel] = useState<Nivel | ''>(baralho.objetivo?.nivel ?? '')
+  const [foco, setFoco] = useState((baralho.objetivo?.foco ?? []).join('\n'))
+  const [evitar, setEvitar] = useState((baralho.objetivo?.evitar ?? []).join('\n'))
   const [temas, setTemas] = useState<Tema[]>(baralho.temas)
   const [novoTema, setNovoTema] = useState('')
   const [confirmarExclusao, setConfirmarExclusao] = useState(false)
 
   const qtd = (id: string) => baralho.cartoes.filter((c) => c.tema === id).length
   const mudarTema = (id: string, m: Partial<Tema>) => setTemas((ts) => ts.map((t) => (t.id === id ? { ...t, ...m } : t)))
-  const alterado =
-    titulo.trim() !== baralho.titulo || prova !== (baralho.prova ?? '') || JSON.stringify(temas) !== JSON.stringify(baralho.temas)
-  const valido = titulo.trim() && temas.length > 0 && temas.every((t) => t.nome.trim())
+
+  // Objetivo como fica se salvar; campos vazios saem do objeto.
+  const novoObjetivo = (): Objetivo | undefined => {
+    const o: Objetivo = {
+      pedido: baralho.objetivo?.pedido || undefined,
+      resumo: resumo.trim() || undefined,
+      nivel: nivel || undefined,
+      foco: linhas(foco).length ? linhas(foco) : undefined,
+      evitar: linhas(evitar).length ? linhas(evitar) : undefined,
+    }
+    return Object.values(o).some((v) => v !== undefined) ? o : undefined
+  }
+  const objetivo = novoObjetivo()
+  const objetivoMudou = normalizar(objetivo) !== normalizar(baralho.objetivo)
+
+  const erroObjetivo =
+    resumo.trim().length > 160
+      ? 'O objetivo tem no máximo 160 caracteres.'
+      : linhas(foco).length > 5 || linhas(evitar).length > 5
+        ? 'Foco e Evitar aceitam até 5 linhas cada.'
+        : linhas(foco).concat(linhas(evitar)).some((x) => x.length > 60)
+          ? 'Cada linha de Foco e Evitar tem no máximo 60 caracteres.'
+          : ''
+
+  const alterado = titulo.trim() !== baralho.titulo || objetivoMudou || JSON.stringify(temas) !== JSON.stringify(baralho.temas)
+  const valido = titulo.trim() && temas.length > 0 && temas.every((t) => t.nome.trim()) && !erroObjetivo
 
   const adicionarTema = (e: Event) => {
     e.preventDefault()
@@ -28,7 +60,8 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
   }
 
   const gravar = async () => {
-    await salvar({ ...baralho, titulo: titulo.trim(), prova: prova || undefined, temas: temas.map((t) => ({ ...t, nome: t.nome.trim() })) })
+    if (objetivoMudou) evento('objetivo_editado', { nivel_mudou: (baralho.objetivo?.nivel ?? '') !== (objetivo?.nivel ?? '') })
+    await salvar({ ...baralho, titulo: titulo.trim(), objetivo, temas: temas.map((t) => ({ ...t, nome: t.nome.trim() })) })
     nav.mudou()
     nav.avisar({ texto: 'Baralho salvo.' })
     nav.voltar()
@@ -86,14 +119,36 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
           Nome
           <input class="texto" value={titulo} onInput={(e) => setTitulo((e.target as HTMLInputElement).value)} />
         </label>
+      </section>
+
+      <section class="bloco">
+        <h2>Objetivo</h2>
+        {!baralho.objetivo && <p class="dica">Ainda não definido. Defina para a IA criar cartões melhores.</p>}
         <label class="campo">
-          Data da prova (opcional)
-          <input class="texto" type="date" value={prova} onInput={(e) => setProva((e.target as HTMLInputElement).value)} />
+          Objetivo
+          <input class="texto" maxLength={160} value={resumo} onInput={(e) => setResumo((e.target as HTMLInputElement).value)} />
         </label>
-        {prova && (
-          <button class="link" onClick={() => setProva('')}>
-            Remover data da prova
-          </button>
+        <label class="campo">
+          Nível
+          <select value={nivel} onChange={(e) => setNivel((e.target as HTMLSelectElement).value as Nivel | '')}>
+            <option value="">—</option>
+            {NIVEIS.map((n) => (
+              <option value={n.valor}>{n.nome}</option>
+            ))}
+          </select>
+        </label>
+        <label class="campo">
+          Foco (um por linha)
+          <textarea rows={3} value={foco} onInput={(e) => setFoco((e.target as HTMLTextAreaElement).value)} />
+        </label>
+        <label class="campo">
+          Evitar (um por linha)
+          <textarea rows={2} value={evitar} onInput={(e) => setEvitar((e.target as HTMLTextAreaElement).value)} />
+        </label>
+        {erroObjetivo && (
+          <p class="resultado erro" role="alert">
+            {erroObjetivo}
+          </p>
         )}
       </section>
 

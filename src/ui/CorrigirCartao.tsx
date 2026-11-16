@@ -15,7 +15,7 @@ export function CorrigirCartao({ baralho, cartao, aoSalvar, fechar }: { baralho:
   const [lido, setLido] = useState<{ cartao: Cartao; erros: string[] } | null>(null)
   const [erro, setErro] = useState('')
   const [salvando, setSalvando] = useState(false)
-  const pedido = useMemo(() => montarPedidoCorrecao(baralho, cartao, problema), [baralho, cartao, problema])
+  const pedido = useMemo(() => montarPedidoCorrecao(baralho, cartao, problema, baralho.objetivo), [baralho, cartao, problema])
 
   const copiar = async () => {
     try {

@@ -15,6 +15,14 @@ describe('corrigir um cartão com a IA', () => {
     expect(p).toContain('SOMENTE com um bloco de código JSON')
   })
 
+  it('com objetivo e nível, o pedido mantém o recorte', () => {
+    const p = montarPedidoCorrecao(b, errado, undefined, { resumo: 'Estudar estequiometria', nivel: 'avancado', evitar: ['ácidos'] })
+    expect(p).toContain('Objetivo do baralho: Estudar estequiometria.')
+    expect(p).toContain('Nível: avançado.')
+    expect(p).toContain('Não crie nada sobre: ácidos.')
+    expect(montarPedidoCorrecao(b, errado)).not.toContain('Nível:')
+  })
+
   it('lê o cartão corrigido, mantém id, tema, origem e fonte', () => {
     const resp = 'Corrigido:\n```json\n{"id":"outro","tipo":"vf","tema":"inventado","frente":"Um mol tem 6,02·10²³ entidades.","resposta":"true","explicacao":"Constante de Avogadro."}\n```'
     const r = lerCartaoCorrigido(resp, b, errado)

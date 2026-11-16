@@ -1,6 +1,6 @@
 // Lê a resposta da IA: extrai o JSON, ajusta temas e ids e valida cartão a cartão.
 import { problemasDoCartao, novoIdCartao } from '../cartoes'
-import type { Baralho, Cartao, Tema } from '../types'
+import { NIVEIS, type Baralho, type Cartao, type Nivel, type Objetivo, type Tema } from '../types'
 
 export interface CartaoLido {
   cartao: Cartao
@@ -17,7 +17,7 @@ export interface RespostaLida {
 /** Acha o JSON na resposta: dentro de ```json … ```, ou do primeiro { ao último }. */
 export function extrairJson(texto: string): unknown {
   const t = texto.trim()
-  if (!t) throw new Error('A resposta está vazia. Cole a resposta inteira do Gemini.')
+  if (!t) throw new Error('A resposta está vazia. Cole a resposta inteira da IA.')
   const blocos = [...t.matchAll(/```(?:json)?\s*([\s\S]*?)```/gi)].map((m) => m[1].trim())
   const candidatos = blocos.length ? blocos : [t]
   for (const c of candidatos) {
@@ -33,7 +33,7 @@ export function extrairJson(texto: string): unknown {
       }
     }
   }
-  throw new Error('Não encontrei um JSON válido na resposta. Copie a resposta inteira do Gemini (o bloco de código).')
+  throw new Error('Não encontrei um JSON válido na resposta. Copie a resposta inteira da IA (o bloco de código).')
 }
 
 /** Consertos comuns: vírgula sobrando, aspas tipográficas. */
@@ -75,7 +75,12 @@ export function lerResposta(dados: unknown, destino: Pick<Baralho, 'id' | 'titul
     for (const k of chaves) porChave.set(k, novo.id)
     return novo.id
   }
-  for (const t of temasIA) if (t?.id || t?.nome) resolverTema(t.id, t.nome)
+  for (const t of temasIA) {
+    if (!t?.id && !t?.nome) continue
+    const id = resolverTema(t.id, t.nome)
+    const novo = temasNovos.find((x) => x.id === id)
+    if (novo && typeof t.descricao === 'string' && t.descricao.trim()) novo.descricao = t.descricao.trim()
+  }
 
   const baralhoTeste: Baralho = { ...destino, temas, cartoes: [] }
   const cartoes: CartaoLido[] = (lista as Record<string, unknown>[]).map((bruto, i) => {
@@ -94,4 +99,64 @@ export function lerResposta(dados: unknown, destino: Pick<Baralho, 'id' | 'titul
     return { cartao: c, idIA, erros: problemasDoCartao(baralhoTeste, c) }
   })
   return { temasNovos, cartoes }
+}
+
+export interface PlanoLido extends RespostaLida {
+  baralho: { titulo: string; objetivo?: Objetivo }
+}
+
+const NIVEIS_VALIDOS = new Set<string>(NIVEIS.map((n) => n.valor))
+const aparar = (v: unknown, max: number): string => (typeof v === 'string' ? v.trim().slice(0, max) : '')
+const lista = (v: unknown): string[] =>
+  Array.isArray(v)
+    ? v
+        .filter((x): x is string => typeof x === 'string')
+        .map((x) => x.trim().slice(0, 60))
+        .filter(Boolean)
+        .slice(0, 5)
+    : []
+
+/**
+ * Lê o plano da instrução "Aprender": bloco `baralho` (com limites), temas e cartões.
+ * Sem o bloco `baralho`, o título é o pedido cortado em 40 caracteres e não há objetivo.
+ */
+export function lerPlano(dados: unknown, pedido: string): PlanoLido {
+  const d = (Array.isArray(dados) ? { cartoes: dados } : (dados ?? {})) as Record<string, unknown>
+  const bruto = d.baralho && typeof d.baralho === 'object' ? (d.baralho as Record<string, unknown>) : undefined
+  const pedidoLimpo = pedido.trim()
+  const titulo = aparar(bruto?.titulo, 40) || pedidoLimpo.slice(0, 40).trim()
+
+  let objetivo: Objetivo | undefined
+  if (bruto) {
+    const nivel = typeof bruto.nivel === 'string' && NIVEIS_VALIDOS.has(bruto.nivel) ? (bruto.nivel as Nivel) : undefined
+    const foco = lista(bruto.foco)
+    const evitar = lista(bruto.evitar)
+    objetivo = { pedido: pedidoLimpo }
+    const resumo = aparar(bruto.objetivo, 160)
+    if (resumo) objetivo.resumo = resumo
+    if (nivel) objetivo.nivel = nivel
+    if (foco.length) objetivo.foco = foco
+    if (evitar.length) objetivo.evitar = evitar
+  }
+
+  const temas = Array.isArray(d.temas)
+    ? d.temas.map((t) => (t && typeof t === 'object' ? { ...(t as object), descricao: aparar((t as Record<string, unknown>).descricao, 120) || undefined } : t))
+    : d.temas
+  // O id só existe para o validador (que exige id e título); o baralho ainda não foi criado.
+  const r = lerResposta({ ...d, temas }, { id: 'novo', titulo, versao: 1, temas: [] }, 'Gerado por IA')
+  return { baralho: objetivo ? { titulo, objetivo } : { titulo }, temasNovos: r.temasNovos, cartoes: r.cartoes }
+}
+
+/** A IA respondeu com perguntas (sem JSON) em vez do plano? */
+export function parecePerguntas(texto: string): boolean {
+  try {
+    extrairJson(texto)
+    return false
+  } catch {
+    /* sem JSON: vale checar as perguntas */
+  }
+  return texto.split(/\r?\n/).some((linha) => {
+    const t = linha.trim()
+    return t.endsWith('?') && t.length <= 200
+  })
 }

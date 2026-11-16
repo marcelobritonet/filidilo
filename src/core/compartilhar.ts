@@ -157,8 +157,8 @@ export async function aplicar(p: PlanoImportacao): Promise<Baralho> {
   if (!p.atual) return salvar({ ...p.recebido, cartoes: p.recebido.cartoes.map(marcarImportado), criadoEm: undefined })
   const trocar = new Map(p.atualizados.map((c) => [c.id, c]))
   const cartoes = [...p.atual.cartoes.map((c) => (trocar.has(c.id) ? marcarImportado(trocar.get(c.id)!) : c)), ...p.novos.map(marcarImportado)]
-  // Nome, data da prova e temas que ela já tem continuam os dela; só entram os temas novos.
-  return salvar({ ...p.atual, cartoes, temas: [...p.atual.temas, ...p.temasNovos] })
+  // Nome, objetivo e temas que ela já tem continuam os dela; só entram os temas novos e um objetivo que ela não tenha.
+  return salvar({ ...p.atual, cartoes, temas: [...p.atual.temas, ...p.temasNovos], objetivo: p.atual.objetivo ?? p.recebido.objetivo })
 }
 
 /** Importa como um baralho separado, sem tocar no que ela já tem. */

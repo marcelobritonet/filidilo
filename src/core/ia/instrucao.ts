@@ -1,8 +1,10 @@
-// Harness "Criar com IA": monta a instrução que a estudante cola no Gemini.
+// Harness "Criar com IA": monta a instrução que a estudante cola na IA.
 // Versão da instrução: mude ao alterar regras, para comparar a qualidade entre versões (E6).
-import type { Baralho, Cartao, Tema } from '../types'
+import type { Baralho, Cartao, Objetivo, Tema } from '../types'
+import { NIVEIS } from '../types'
+import { jaCobertos } from './cobertos'
 
-export const VERSAO_INSTRUCAO = 2
+export const VERSAO_INSTRUCAO = 3
 
 export type Origem = 'pdf' | 'texto' | 'tema'
 export type Mistura = 'misto' | 'teoria' | 'calculo'
@@ -19,8 +21,10 @@ export interface PedidoIA {
   assunto?: string
   quantidade: number
   mistura: Mistura
-  /** Baralho de destino: os temas dele são reaproveitados. */
-  baralho?: Pick<Baralho, 'titulo' | 'temas'>
+  /** Baralho de destino: os temas, o objetivo e os cartões dele entram na instrução. */
+  baralho?: Pick<Baralho, 'titulo' | 'temas'> & Partial<Pick<Baralho, 'objetivo' | 'cartoes'>>
+  /** Id do tema que a pessoa quer reforçar ("Que tal mais cartões?"). */
+  temaPrioritario?: string
 }
 
 /** Exemplos que vão dentro da instrução. Testados pelo validador (instrucao.test.ts). */
@@ -87,7 +91,31 @@ const PROPORCAO: Record<Mistura, string> = {
   calculo: 'Crie só cartões do tipo "calculo", cobrindo as fórmulas e os tipos de problema do material.',
 }
 
-function origemTexto(p: PedidoIA): string {
+/** Regras de cada tipo de cartão. Usadas pela instrução de cartões e pela de planejamento (plano.ts). `fonte` é o trecho JSON da fonte. */
+export function regrasTipos(fonte: string): string {
+  return `Cada cartão tem "id" (curto e único, ex.: "c1"), "tipo", "tema" (o id de um tema), "explicacao" (curta, opcional) e ${fonte}. Por tipo:
+- "conceito": "frente" (pergunta) e "verso" (resposta).
+- "vf": "frente" (afirmação) e "resposta" (true ou false). Toda afirmação falsa precisa de "explicacao" dizendo o que está errado.
+- "associacao": "frente" (pergunta), "opcoes" (1 certa e 5 ou 6 erradas plausíveis, sem repetir), "correta" (índice da certa, começando em 0) e "outrasFormas" (lista com 1 outra forma de dizer a resposta certa, com palavras diferentes e o mesmo sentido). O app mostra 4 de cada vez e alterna as formas da certa, então nenhuma errada pode ser obviamente absurda e a outra forma não pode ser maior nem mais detalhada que as erradas. Varie a posição da correta.
+- "calculo": exercício com números sorteados. Campos:
+  - "titulo" e "enunciado"; no enunciado, {nome} mostra o valor sorteado.
+  - "parametros": { "nome": { "min": n, "max": n, "passo": n, "unidade": "..." } }. Escolha faixas realistas.
+  - "derivados" (opcional): { "nome": "expressão" }, valores intermediários.
+  - "condicao" (opcional): expressão que precisa dar verdadeira; senão o app sorteia de novo.
+  - "etapas": lista de passos. Cada um com "pergunta", "expr" (a conta da resposta), "unidade", "casas" (casas decimais) e "resolucao" (lista de linhas explicando o passo). "nome" guarda o resultado para as etapas seguintes. Etapa de escolha: "opcoes" (lista) e uma "expr" que devolve o índice da opção certa.
+  - Expressões: números com ponto (1.5, 1e-5), + - * / ^, parênteses, comparações (< > <= >= == !=) e as funções sqrt, abs, sin, cos, tan (radianos), sind, cosd, tand (graus), asin, log10, ln, exp, min, max, round(x, casas), floor, ceil, se(condição, valor_se_sim, valor_se_não), além de pi e e. Sem outras funções, sem texto e sem unidades dentro da expressão.
+  - Nos textos, {nome:2} mostra o valor com 2 casas e {resultado} é a resposta da última etapa.`
+}
+
+/** Regras de formato do texto (LaTeX, negrito, JSON). Usadas pelas duas instruções. */
+export function regrasTextoJson(): string {
+  return `- Fórmulas podem ir entre $...$ em LaTeX; dentro do JSON, escreva a barra invertida dobrada (\\\\Delta).
+- **Negrito** com dois asteriscos é permitido. Nada de HTML.
+- JSON válido: aspas duplas, sem vírgula sobrando, sem comentários.`
+}
+
+/** Material: PDF e texto usam o mesmo texto de sempre. */
+export function origemTexto(p: PedidoIA): string {
   if (p.origem === 'pdf') {
     const pag = p.paginas?.trim() ? `, somente as páginas ${p.paginas.trim()}` : ''
     return `Use como material o PDF que anexei${p.nomePdf ? ` ("${p.nomePdf}")` : ''}${pag}. Leia também o que estiver em imagens, tabelas e fórmulas dos slides.`
@@ -99,12 +127,34 @@ function origemTexto(p: PedidoIA): string {
 function temasTexto(p: PedidoIA): string {
   const temas = p.baralho?.temas ?? []
   if (!temas.length) return 'Crie de 2 a 8 temas que organizem o material (id em minúsculas, sem acento, com hífens).'
-  return `O baralho "${p.baralho!.titulo}" já tem estes temas; reaproveite-os quando couber (use o mesmo "id") e crie novos só se precisar:\n${temas.map((t) => `- "${t.id}": ${t.nome}`).join('\n')}`
+  const linhas = temas.map(
+    (t) => `- "${t.id}": ${t.nome}${t.descricao ? ` — ${t.descricao}` : ''}${t.id === p.temaPrioritario ? ' (prioridade: crie mais cartões deste tema)' : ''}`,
+  )
+  return `O baralho "${p.baralho!.titulo}" já tem estes temas; reaproveite-os quando couber (use o mesmo "id") e crie novos só se precisar:\n${linhas.join('\n')}`
 }
 
-/** Instrução completa para colar no Gemini. */
+/** Seção do objetivo do baralho; vazia quando o baralho não tem objetivo. */
+function objetivoTexto(obj?: Objetivo): string {
+  if (!obj) return ''
+  const linhas: string[] = []
+  const resumo = obj.resumo || obj.pedido
+  if (resumo) linhas.push(`Objetivo: ${resumo}`)
+  const nivel = NIVEIS.find((n) => n.valor === obj.nivel)
+  if (nivel) linhas.push(`Escreva para o nível ${nivel.nome.toLowerCase()}.`)
+  if (obj.foco?.length) linhas.push(`Foque em: ${obj.foco.join('; ')}.`)
+  if (obj.evitar?.length) linhas.push(`Não crie nada sobre: ${obj.evitar.join('; ')}. Isso vale também para spoilers.`)
+  return linhas.length ? `## Objetivo do baralho\n${linhas.join('\n')}\n\n` : ''
+}
+
+/** Instrução completa para colar na IA. */
 export function montarInstrucao(p: PedidoIA): string {
-  const fonte = p.origem === 'pdf' ? `"fonte": { "apostila": "${p.nomePdf?.trim() || 'nome do material'}", "pagina": número da página }` : p.origem === 'texto' ? '"fonte": { "apostila": "Texto colado" }' : '"fonte": { "apostila": "Gerado pelo Gemini" }'
+  const fonte = p.origem === 'pdf' ? `"fonte": { "apostila": "${p.nomePdf?.trim() || 'nome do material'}", "pagina": número da página }` : p.origem === 'texto' ? '"fonte": { "apostila": "Texto colado" }' : '"fonte": { "apostila": "Gerado por IA" }'
+  const objetivo = objetivoTexto(p.baralho?.objetivo)
+  const cobertos = jaCobertos({ temas: p.baralho?.temas ?? [], cartoes: p.baralho?.cartoes ?? [] })
+  const coberturaSecao = cobertos
+    ? `## Já cobertos\nJá cobertos (não repita o mesmo assunto com a mesma pergunta; pode aprofundar):\n${cobertos}\n\n`
+    : ''
+  const prioridade = objetivo ? 'Priorize o que mais serve ao objetivo.' : 'Priorize o que é mais importante do assunto.'
   return `Você vai criar flashcards de estudo para o app Tatino. Responda SOMENTE com um bloco de código JSON, sem texto antes ou depois.
 
 ## Material
@@ -113,33 +163,20 @@ ${origemTexto(p)}
 ## Quantidade e tipos
 Crie ${p.quantidade} cartões. ${PROPORCAO[p.mistura]}
 
-## Temas
+${objetivo}## Temas
 ${temasTexto(p)}
 
-## Formato da resposta
+${coberturaSecao}## Formato da resposta
 Um objeto JSON com "temas" e "cartoes":
 { "temas": [ { "id": "...", "nome": "..." } ], "cartoes": [ ... ] }
 
-Cada cartão tem "id" (curto e único, ex.: "c1"), "tipo", "tema" (o id de um tema), "explicacao" (curta, opcional) e ${fonte}. Por tipo:
-- "conceito": "frente" (pergunta) e "verso" (resposta).
-- "vf": "frente" (afirmação) e "resposta" (true ou false). Toda afirmação falsa precisa de "explicacao" dizendo o que está errado.
-- "associacao": "frente" (pergunta), "opcoes" (1 certa e 5 ou 6 erradas plausíveis, sem repetir), "correta" (índice da certa, começando em 0) e "outrasFormas" (lista com 1 outra forma de dizer a resposta certa, com palavras diferentes e o mesmo sentido). O app mostra 4 de cada vez e alterna as formas da certa, então nenhuma errada pode ser obviamente absurda e a outra forma não pode ser maior nem mais detalhada que as erradas. Varie a posição da correta.
-- "calculo": exercício com números sorteados. Campos:
-  - "titulo" e "enunciado"; no enunciado, {nome} mostra o valor sorteado.
-  - "parametros": { "nome": { "min": n, "max": n, "passo": n, "unidade": "..." } }. Escolha faixas realistas.
-  - "derivados" (opcional): { "nome": "expressão" }, valores intermediários.
-  - "condicao" (opcional): expressão que precisa dar verdadeira; senão o app sorteia de novo.
-  - "etapas": lista de passos. Cada um com "pergunta", "expr" (a conta da resposta), "unidade", "casas" (casas decimais) e "resolucao" (lista de linhas explicando o passo). "nome" guarda o resultado para as etapas seguintes. Etapa de escolha: "opcoes" (lista) e uma "expr" que devolve o índice da opção certa.
-  - Expressões: números com ponto (1.5, 1e-5), + - * / ^, parênteses, comparações (< > <= >= == !=) e as funções sqrt, abs, sin, cos, tan (radianos), sind, cosd, tand (graus), asin, log10, ln, exp, min, max, round(x, casas), floor, ceil, se(condição, valor_se_sim, valor_se_não), além de pi e e. Sem outras funções, sem texto e sem unidades dentro da expressão.
-  - Nos textos, {nome:2} mostra o valor com 2 casas e {resultado} é a resposta da última etapa.
+${regrasTipos(fonte)}
 
 ## Regras
 - Português do Brasil. Uma ideia por cartão. Pergunta que se entende sozinha, sem "segundo o texto".
 - Fiel ao material: não invente dados, valores ou fórmulas que não estejam nele${p.origem === 'tema' ? ' (aqui, fiel ao conhecimento estabelecido)' : ''}.
-${p.origem === 'pdf' ? '- Em "fonte.pagina", ponha a página do PDF de onde saiu o cartão.\n' : ''}- Priorize o que é mais importante e mais cobrado em prova.
-- Fórmulas podem ir entre $...$ em LaTeX; dentro do JSON, escreva a barra invertida dobrada (\\\\Delta).
-- **Negrito** com dois asteriscos é permitido. Nada de HTML.
-- JSON válido: aspas duplas, sem vírgula sobrando, sem comentários.
+${p.origem === 'pdf' ? '- Em "fonte.pagina", ponha a página do PDF de onde saiu o cartão.\n' : ''}- ${prioridade}
+${regrasTextoJson()}
 
 ## Exemplo (formato; não copie o conteúdo)
 \`\`\`json

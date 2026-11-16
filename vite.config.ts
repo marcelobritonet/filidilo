@@ -19,7 +19,7 @@ export default defineConfig({
       manifest: {
         name: 'tatino. — flashcards',
         short_name: 'tatino.',
-        description: 'Flashcards para estudar no seu ritmo, offline',
+        description: 'Aprenda qualquer coisa: flashcards com IA, estudados no seu ritmo, offline',
         lang: 'pt-BR',
         start_url: base,
         scope: base,

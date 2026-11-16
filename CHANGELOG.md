@@ -2,6 +2,30 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.0.0] — 2026-11-16
+
+**Aprenda qualquer coisa.** Em **Meus baralhos**, diga o que quer aprender hoje e a IA monta o baralho inteiro: objetivo, nível, temas e os primeiros cartões. O baralho nasce configurado para o que você quer, não só com a lista de cartões.
+
+**O que muda para quem já usava:** baralhos, cartões e progresso continuam iguais (nada se perde). Saiu o formulário de criar baralho à mão e a data da prova; o que já estava salvo com data da prova continua funcionando, só que a data não aparece mais.
+
+### Novo
+- **Aprender uma coisa nova hoje**: campo no topo de Meus baralhos (e o botão **Novo baralho** abre o mesmo fluxo). Você escreve o assunto, copia a instrução para a IA, cola a resposta e confere os cartões antes de criar. Dá para anexar um PDF ou um texto de aula.
+- **Objetivo do baralho**: nível (iniciante, intermediário ou avançado), foco, o que evitar e uma frase de objetivo. Fica em **Configurar baralho**, onde dá para editar tudo.
+- **Subir de nível**: quando você já domina 80% ou mais dos cartões de um baralho (pelo menos 10), a tela do baralho sugere cartões um nível acima.
+- Fim de sessão com objetivo: "Quer avançar em …? A IA cria mais 15 cartões." quando não há um tema com mais erros.
+- Sem internet, o fluxo Aprender avisa "Precisa de internet para falar com a IA." e não abre.
+- Novo mote "Aprenda qualquer coisa" na descrição do app instalado, na página e no README.
+
+### Mudou
+- **Criar com IA** usa o objetivo e o nível do baralho e não repete o que ele já tem (o resumo do que já existe vai junto na instrução). Ao vir do fim de uma sessão, a IA recebe o tema em que você errou mais.
+- Sem objetivo, o Criar com IA mostra um link discreto **Definir objetivo**.
+- **Corrigir cartão com IA** leva o objetivo e o nível, para a correção não sair do recorte.
+- A fonte padrão dos cartões criados pela IA é "Gerado por IA".
+
+### Removido
+- Criar baralho à mão (Meus baralhos → Novo baralho com disciplina, temas e data). O botão agora abre o fluxo com IA.
+- Data da prova: o campo sumiu da criação de baralho e a instrução à IA não fala mais de datas.
+
 ## [2.4.0] — 2026-11-16
 
 ### Novo

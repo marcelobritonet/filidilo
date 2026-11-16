@@ -1,6 +1,6 @@
 // Corrigir um cartão com ajuda da IA: monta o pedido e lê o cartão corrigido.
 import { problemasDoCartao } from '../cartoes'
-import type { Baralho, Cartao } from '../types'
+import { NIVEIS, type Baralho, type Cartao, type Objetivo } from '../types'
 import { extrairJson } from './resposta'
 
 const REGRAS_TIPO: Record<Cartao['tipo'], string> = {
@@ -17,11 +17,20 @@ function paraIA(c: Cartao): Record<string, unknown> {
   return resto
 }
 
-/** Pedido para colar na IA, na mesma conversa ou numa nova. */
-export function montarPedidoCorrecao(b: Pick<Baralho, 'titulo' | 'temas'>, c: Cartao, problema?: string): string {
+/**
+ * Pedido para colar na IA, na mesma conversa ou numa nova.
+ * `objetivo` (opcional) mantém a correção dentro do recorte e do nível do baralho.
+ */
+export function montarPedidoCorrecao(b: Pick<Baralho, 'titulo' | 'temas'>, c: Cartao, problema?: string, objetivo?: Objetivo): string {
   const tema = b.temas.find((t) => t.id === c.tema)?.nome ?? c.tema
+  const nivel = NIVEIS.find((n) => n.valor === objetivo?.nivel)?.nome.toLowerCase()
+  const contexto = [
+    objetivo?.resumo && `Objetivo do baralho: ${objetivo.resumo}.`,
+    nivel && `Nível: ${nivel}.`,
+    objetivo?.evitar?.length && `Não crie nada sobre: ${objetivo.evitar.join('; ')}.`,
+  ].filter(Boolean)
   return `Este flashcard do app tatino. pode estar errado. Disciplina: "${b.titulo}". Tema: "${tema}".
-${problema?.trim() ? `\nO que parece errado: ${problema.trim()}\n` : ''}
+${contexto.length ? `\n${contexto.join(' ')}\nMantenha o recorte e o nível: não aumente a dificuldade nem saia do objetivo.\n` : ''}${problema?.trim() ? `\nO que parece errado: ${problema.trim()}\n` : ''}
 Cartão atual (JSON):
 \`\`\`json
 ${JSON.stringify(paraIA(c), null, 1)}

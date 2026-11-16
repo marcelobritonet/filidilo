@@ -5,7 +5,7 @@ import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../
 import { formaDaCerta, sortearAlternativas } from '../core/alternativas'
 import { chave, dominado, registrar } from '../core/srs'
 import { evento } from '../core/telemetria'
-import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo } from '../core/types'
+import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, Objetivo } from '../core/types'
 import { nomeTema } from './estado'
 import { CorrigirCartao } from './CorrigirCartao'
 import { enviarCartao } from './enviar'
@@ -33,7 +33,7 @@ interface Acoes {
   corrigir: () => void
 }
 
-export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais }: { baralho: Baralho; modo: Modo; opcoes: OpcoesFila; limite?: Limite; sair: () => void; criarMais: (assunto?: string) => void }) {
+export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais }: { baralho: Baralho; modo: Modo; opcoes: OpcoesFila; limite?: Limite; sair: () => void; criarMais: (assunto?: string, temaId?: string) => void }) {
   // Cópia local: correções feitas durante a sessão entram aqui sem reiniciar a sessão.
   const [baralho, setBaralho] = useState(inicial)
   const [corrigindo, setCorrigindo] = useState(false)
@@ -80,6 +80,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   }, [rodada])
 
   if (!fila) return <main class="tela"><p>Carregando…</p></main>
+  const fracoId = temaFracoId(fracos)
 
   const bateuMeta = meta > 0 && placar.certos >= meta
   const cartao = esgotou || bateuMeta ? undefined : fila[pos]
@@ -159,7 +160,20 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
       )}
 
       {!cartao ? (
-        <Fim fimMotivo={fila.length === 0 ? 'vazia' : bateuMeta ? 'meta' : esgotou ? 'tempo' : 'fila'} placar={placar} vazio={fila.length === 0} modo={modo} tempo={porTempo ? (esgotou ? 'esgotado' : relogio(totalMs - restante)) : undefined} bateuMeta={bateuMeta} outra={() => setRodada((r) => r + 1)} sair={sair} temaFraco={temaFraco(baralho, fracos)} criarMais={criarMais} />
+        <Fim
+          fimMotivo={fila.length === 0 ? 'vazia' : bateuMeta ? 'meta' : esgotou ? 'tempo' : 'fila'}
+          placar={placar}
+          vazio={fila.length === 0}
+          modo={modo}
+          tempo={porTempo ? (esgotou ? 'esgotado' : relogio(totalMs - restante)) : undefined}
+          bateuMeta={bateuMeta}
+          outra={() => setRodada((r) => r + 1)}
+          sair={sair}
+          temaFraco={fracoId ? nomeTema(baralho, fracoId) : undefined}
+          temaId={fracoId}
+          objetivo={baralho.objetivo}
+          criarMais={criarMais}
+        />
       ) : (
         <>
           <div class="meta-cartao">
@@ -184,10 +198,10 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   )
 }
 
-/** Nome do tema com mais erros e chutes na sessão (ou nada, se não houve). */
-function temaFraco(b: Baralho, fracos: Record<string, number>): string | undefined {
+/** Id do tema com mais erros e chutes na sessão (ou nada, se não houve). */
+function temaFracoId(fracos: Record<string, number>): string | undefined {
   const [id] = Object.entries(fracos).sort((a, z) => z[1] - a[1])[0] ?? []
-  return id ? nomeTema(b, id) : undefined
+  return id
 }
 
 function Fim(props: {
@@ -198,11 +212,15 @@ function Fim(props: {
   tempo?: string
   bateuMeta?: boolean
   temaFraco?: string
+  temaId?: string
+  objetivo?: Objetivo
   outra: () => void
   sair: () => void
-  criarMais: (assunto?: string) => void
+  criarMais: (assunto?: string, temaId?: string) => void
 }) {
-  const { placar, vazio, modo, tempo, bateuMeta, temaFraco, outra, sair, criarMais } = props
+  const { placar, vazio, modo, tempo, bateuMeta, temaFraco, temaId, objetivo, outra, sair, criarMais } = props
+  // Sem tema fraco: se há foco no objetivo, a IA aprofunda nele; senão, o assunto fica em branco.
+  const assuntoSugerido = temaFraco ?? (objetivo?.foco?.length ? `Aprofundar: ${objetivo.foco.join(', ')}` : undefined)
   useEffect(() => evento('sessao_concluida', { motivo: props.fimMotivo, ...placar }), [])
   if (vazio)
     return (
@@ -232,9 +250,11 @@ function Fim(props: {
           <p>
             {temaFraco
               ? `Você teve mais dificuldade em “${temaFraco}”. A IA cria cartões novos sobre esse tema em poucos minutos.`
-              : 'Variar as perguntas ajuda a fixar. Use outra aula ou um resumo para a IA criar cartões novos.'}
+              : objetivo?.resumo
+                ? `Quer avançar em ${objetivo.resumo}? A IA cria mais cartões em poucos minutos.`
+                : 'Variar as perguntas ajuda a fixar. Use outra aula ou um resumo para a IA criar cartões novos.'}
           </p>
-          <button class="btn secundario" onClick={() => { evento('sugestao_mais_cartoes'); criarMais(temaFraco) }}>
+          <button class="btn secundario" onClick={() => { evento('sugestao_mais_cartoes'); criarMais(assuntoSugerido, temaId) }}>
             {temaFraco ? `Criar cartões sobre ${temaFraco}` : 'Criar mais cartões com IA'}
           </button>
         </div>

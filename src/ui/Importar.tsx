@@ -50,7 +50,7 @@ export function Importar({ plano, nav, fechar }: { plano: PlanoImportacao; nav: 
               {plano.soNoMeu > 0 && <li>Só no seu: {n(plano.soNoMeu, 'só seu: continua', 'só seus: continuam')} no baralho</li>}
               {plano.temasNovos.length > 0 && <li>Temas novos: {plano.temasNovos.map((t) => t.nome).join(', ')}</li>}
             </ul>
-            <p class="dica">Seu progresso, nome e data da prova não mudam.</p>
+            <p class="dica">Seu progresso, nome e objetivo não mudam.</p>
             <button class="btn principal" disabled={ocupado || !mudancas} onClick={() => concluir(() => aplicar(plano), '“{t}” atualizado.')}>
               {mudancas ? `Atualizar (${n(mudancas, 'mudança', 'mudanças')})` : 'Nada para atualizar'}
             </button>

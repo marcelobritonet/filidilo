@@ -9,6 +9,27 @@ export interface Tema {
   id: string
   nome: string
   prioritario?: boolean
+  /** Uma frase sobre o que o tema cobre (vem do plano da IA). */
+  descricao?: string
+}
+
+export type Nivel = 'iniciante' | 'intermediario' | 'avancado'
+
+/** Níveis para mostrar na tela, na ordem. */
+export const NIVEIS: { valor: Nivel; nome: string }[] = [
+  { valor: 'iniciante', nome: 'Iniciante' },
+  { valor: 'intermediario', nome: 'Intermediário' },
+  { valor: 'avancado', nome: 'Avançado' },
+]
+
+export interface Objetivo {
+  /** O que a pessoa digitou em "O que você quer aprender hoje?". */
+  pedido?: string
+  /** O objetivo em 1 frase, como a IA (ou a pessoa) definiu. */
+  resumo?: string
+  nivel?: Nivel
+  foco?: string[]
+  evitar?: string[]
 }
 
 interface CartaoBase {
@@ -83,8 +104,10 @@ export interface Baralho {
   id: string
   titulo: string
   versao: number
-  /** Data da prova (AAAA-MM-DD), opcional: mostra a contagem regressiva. */
+  /** Antigo: ignorado; mantido para arquivos e backups antigos continuarem válidos */
   prova?: string
+  /** Configuração do baralho (objetivo, nível, foco, evitar). Ausente nos baralhos antigos. */
+  objetivo?: Objetivo
   temas: Tema[]
   cartoes: Cartao[]
   criadoEm?: number

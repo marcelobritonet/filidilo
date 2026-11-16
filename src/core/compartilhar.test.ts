@@ -124,3 +124,41 @@ describe('enviar cartões soltos', () => {
     expect(() => lerRecebido('oi')).toThrow(/não é do tatino/)
   })
 })
+
+describe('objetivo do baralho', () => {
+  beforeEach(async () => {
+    await db.delete()
+    await db.open()
+  })
+
+  it('baralho e backup antigos (sem objetivo, com prova) continuam válidos', () => {
+    const antigo = { ...base(), prova: '2026-12-01' }
+    expect(lerBaralho(JSON.stringify(antigo))).toEqual(antigo)
+    expect(lerBaralho(arquivoDoBaralho(antigo).texto).prova).toBe('2026-12-01')
+  })
+
+  it('objetivo inválido é recusado pelo validador; objetivo válido passa', () => {
+    const com = (extra: Partial<Baralho>) => JSON.stringify({ ...base(), ...extra })
+    expect(lerBaralho(com({ objetivo: { resumo: 'Conversar no México', nivel: 'intermediario', foco: ['frases'], evitar: ['gramática'] } })).objetivo?.nivel).toBe('intermediario')
+    expect(() => lerBaralho(com({ objetivo: { nivel: 'expert' } as unknown as Baralho['objetivo'] }))).toThrow(/problema/)
+    expect(() => lerBaralho(com({ objetivo: { resumo: 'x'.repeat(161) } }))).toThrow(/problema/)
+    expect(() => lerBaralho(com({ objetivo: { foco: ['a', 'b', 'c', 'd', 'e', 'f'] } }))).toThrow(/problema/)
+    expect(() => lerBaralho(com({ objetivo: { evitar: ['x'.repeat(61)] } }))).toThrow(/problema/)
+    expect(() => lerBaralho(com({ objetivo: 'texto' as unknown as Baralho['objetivo'] }))).toThrow(/problema/)
+    expect(() => lerBaralho(com({ temas: [{ id: 'g', nome: 'Geral', descricao: 'd'.repeat(121) }] }))).toThrow(/problema/)
+  })
+
+  it('receber atualização mantém o objetivo de quem recebe', async () => {
+    await aplicar(await planejar({ ...base(), objetivo: { resumo: 'Do autor', nivel: 'iniciante' } }))
+    await salvar({ ...(await obter('fis'))!, objetivo: { resumo: 'Meu objetivo', nivel: 'avancado' } })
+
+    await aplicar(await planejar({ ...base(), objetivo: { resumo: 'Do autor, versão 2', nivel: 'iniciante' } }))
+    expect((await obter('fis'))!.objetivo).toEqual({ resumo: 'Meu objetivo', nivel: 'avancado' })
+  })
+
+  it('se quem recebe não tem objetivo, entra o recebido', async () => {
+    await aplicar(await planejar(base()))
+    await aplicar(await planejar({ ...base(), objetivo: { resumo: 'Do autor' } }))
+    expect((await obter('fis'))!.objetivo).toEqual({ resumo: 'Do autor' })
+  })
+})

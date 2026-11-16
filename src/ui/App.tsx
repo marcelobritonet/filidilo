@@ -3,6 +3,7 @@ import { useRegisterSW } from 'virtual:pwa-register/preact'
 import { pedirPersistencia } from '../core/db'
 import type { OpcoesFila } from '../core/fila'
 import { Aparencia } from './Aparencia'
+import { Aprender } from './Aprender'
 import { Backup } from './Backup'
 import { Baralhos } from './Baralhos'
 import { ColarLista } from './ColarLista'
@@ -24,7 +25,8 @@ export type Tela =
   | { nome: 'colar'; id: string }
   | { nome: 'backup' }
   | { nome: 'aparencia' }
-  | { nome: 'ia'; id: string; assunto?: string }
+  | { nome: 'aprender'; pedido?: string }
+  | { nome: 'ia'; id: string; assunto?: string; temaId?: string }
 
 export interface Aviso {
   texto: string
@@ -96,6 +98,7 @@ export function App() {
   else if (tela.nome === 'baralhos') conteudo = <Baralhos baralhos={baralhos} nav={nav} versao={versao} />
   else if (tela.nome === 'backup') conteudo = <Backup sair={nav.voltar} />
   else if (tela.nome === 'aparencia') conteudo = <Aparencia nav={nav} />
+  else if (tela.nome === 'aprender') conteudo = <Aprender pedido={tela.pedido} nav={nav} />
   else if (carregando || !baralho)
     // Logo depois de criar um baralho a lista ainda está recarregando.
     conteudo = (
@@ -105,8 +108,8 @@ export function App() {
       </main>
     )
   else if (tela.nome === 'baralho') conteudo = <Inicio baralho={baralho} nav={nav} versao={versao} />
-  else if (tela.nome === 'ia') conteudo = <CriarComIA baralho={baralho} assuntoInicial={tela.assunto} nav={nav} />
-  else if (tela.nome === 'sessao') conteudo = <Sessao baralho={baralho} modo={tela.modo} opcoes={tela.opcoes} limite={tela.limite} sair={nav.voltar} criarMais={(assunto) => nav.substituir({ nome: 'ia', id: baralho.id, assunto })} />
+  else if (tela.nome === 'ia') conteudo = <CriarComIA baralho={baralho} assuntoInicial={tela.assunto} temaId={tela.temaId} nav={nav} />
+  else if (tela.nome === 'sessao') conteudo = <Sessao baralho={baralho} modo={tela.modo} opcoes={tela.opcoes} limite={tela.limite} sair={nav.voltar} criarMais={(assunto, temaId) => nav.substituir({ nome: 'ia', id: baralho.id, assunto, temaId })} />
   else if (tela.nome === 'revisar') conteudo = <Revisar baralho={baralho} nav={nav} />
   else if (tela.nome === 'cartao') conteudo = <EditarCartao key={tela.cartaoId ?? 'novo'} baralho={baralho} cartaoId={tela.cartaoId} temaInicial={tela.tema} nav={nav} />
   else if (tela.nome === 'colar') conteudo = <ColarLista baralho={baralho} nav={nav} />

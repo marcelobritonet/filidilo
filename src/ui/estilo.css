@@ -92,7 +92,6 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
 .cabecalho { display: grid; gap: 10px; padding: 8px 0 20px; }
 .cabecalho-linha { display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 8px; }
 .cabecalho-linha .marca { justify-self: start; }
-.cabecalho .selo { justify-self: start; margin: 0; }
 
 .barra-sessao { display: grid; grid-template-columns: 44px 1fr 72px; align-items: center; gap: 8px; margin-bottom: 12px; }
 .titulo-barra { font-family: var(--font-display); font-size: clamp(18px, 5vw, 22px); font-weight: 700; line-height: 1.2; text-align: center; margin: 0; }
@@ -160,11 +159,6 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
 .rodape-versao {
   max-width: 640px; margin: 0 auto; padding: 8px 20px calc(24px + env(safe-area-inset-bottom));
   text-align: center; color: var(--text-muted); font-size: 14px;
-}
-
-.selo {
-  display: inline-block; font: 700 12px/1.2 var(--font-ui); letter-spacing: .04em;
-  background: var(--warning-soft); color: var(--warning); padding: 4px 10px; border-radius: 999px; white-space: nowrap;
 }
 
 .barra { display: block; height: 8px; background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }

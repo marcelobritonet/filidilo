@@ -1,7 +1,7 @@
 import { evento } from '../core/telemetria'
 import { useMemo, useRef, useState } from 'preact/hooks'
 import { salvar } from '../core/baralhos'
-import { EXEMPLOS, montarCorrecao, montarInstrucao, type Mistura, type Origem } from '../core/ia/instrucao'
+import { EXEMPLOS, VERSAO_INSTRUCAO, montarCorrecao, montarInstrucao, type Mistura, type Origem } from '../core/ia/instrucao'
 import { extrairJson, lerResposta, type RespostaLida } from '../core/ia/resposta'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
@@ -10,7 +10,7 @@ import { Conteudo } from './Revisar'
 
 
 /** Criar cartões com IA: copia a instrução, cola na IA, cola a resposta aqui, confere e salva. */
-export function CriarComIA({ baralho, assuntoInicial, nav }: { baralho: Baralho; assuntoInicial?: string; nav: Navegacao }) {
+export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: Baralho; assuntoInicial?: string; temaId?: string; nav: Navegacao }) {
   // Vindo do fim de uma sessão, já abre no tema em que houve mais dificuldade.
   const [origem, setOrigem] = useState<Origem>(assuntoInicial ? 'tema' : 'pdf')
   const [nomePdf, setNomePdf] = useState('')
@@ -29,16 +29,28 @@ export function CriarComIA({ baralho, assuntoInicial, nav }: { baralho: Baralho;
 
   const materialOk = origem === 'pdf' || (origem === 'texto' ? texto.trim().length > 40 : assunto.trim().length > 3)
   const instrucao = useMemo(
-    () => montarInstrucao({ origem, nomePdf, paginas, texto, assunto, quantidade, mistura, baralho: { titulo: baralho.titulo, temas: baralho.temas } }),
-    [origem, nomePdf, paginas, texto, assunto, quantidade, mistura, baralho],
+    () =>
+      montarInstrucao({
+        origem,
+        nomePdf,
+        paginas,
+        texto,
+        assunto,
+        quantidade,
+        mistura,
+        baralho: { titulo: baralho.titulo, temas: baralho.temas, objetivo: baralho.objetivo, cartoes: baralho.cartoes },
+        temaPrioritario: temaId,
+      }),
+    [origem, nomePdf, paginas, texto, assunto, quantidade, mistura, baralho, temaId],
   )
-  const fontePadrao = origem === 'pdf' ? nomePdf.trim() || undefined : origem === 'texto' ? 'Texto colado' : 'Gerado por IA'
+  const fontePadrao = origem === 'pdf' ? nomePdf.trim() || 'Gerado por IA' : origem === 'texto' ? 'Texto colado' : 'Gerado por IA'
+  const comObjetivo = !!baralho.objetivo
 
   const copiar = async (conteudo: string, qual: string) => {
     try {
       await navigator.clipboard.writeText(conteudo)
       setCopiado(qual)
-      evento('ia_copiado', { qual, origem })
+      evento('ia_copiado', { qual, origem, com_objetivo: comObjetivo, versao_instrucao: VERSAO_INSTRUCAO })
     } catch {
       setCopiado('erro')
     }
@@ -81,7 +93,7 @@ export function CriarComIA({ baralho, assuntoInicial, nav }: { baralho: Baralho;
   const adicionar = async () => {
     if (!lida || !escolhidos.length) return
     setSalvando(true)
-    evento('ia_cartoes_salvos', { cartoes: escolhidos.length, desmarcados: validos.length - escolhidos.length })
+    evento('ia_cartoes_salvos', { cartoes: escolhidos.length, desmarcados: validos.length - escolhidos.length, com_objetivo: comObjetivo, versao_instrucao: VERSAO_INSTRUCAO })
     const usados = new Set(escolhidos.map((c) => c.cartao.tema))
     const temasNovos = lida.temasNovos.filter((t) => usados.has(t.id) && !baralho.temas.some((x) => x.id === t.id))
     await salvar({ ...baralho, temas: [...baralho.temas, ...temasNovos], cartoes: [...baralho.cartoes, ...escolhidos.map((c) => c.cartao)] })
@@ -97,6 +109,14 @@ export function CriarComIA({ baralho, assuntoInicial, nav }: { baralho: Baralho;
         <h1 class="titulo-barra">Criar com IA</h1>
         <span />
       </header>
+
+      {!comObjetivo && (
+        <p class="dica centro">
+          <button class="link" onClick={() => nav.ir({ nome: 'config', id: baralho.id })}>
+            Definir objetivo
+          </button>
+        </p>
+      )}
 
       <section class="bloco passo">
         <h2><span class="num-passo">1</span> Material</h2>

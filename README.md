@@ -2,9 +2,11 @@
 
 No ar: https://marcelobritonet.github.io/tatino/
 
-Flashcards offline (PWA) para estudar qualquer disciplina. Funciona no celular e no computador, instalável pelo navegador, sem login.
+**Aprenda qualquer coisa.** Flashcards offline (PWA) para estudar o que você quiser. Funciona no celular e no computador, instalável pelo navegador, sem login.
 
-- **Cada um monta o seu**: novo baralho com disciplina, temas e data da prova; cartões criados com IA (copiar e colar no Gemini, ChatGPT, Claude ou Copilot), escritos à mão ou colados como lista.
+- **Aprender uma coisa nova hoje**: diga o que quer aprender; a IA (copiar e colar no Gemini, ChatGPT, Claude ou Copilot) monta o baralho com objetivo, nível, temas e cartões. Pode anexar um PDF ou texto de aula.
+- **Objetivo do baralho**: nível, foco e o que evitar, editáveis em Configurar baralho. A IA usa isso ao criar mais cartões e evita repetir o que já existe.
+- **Sem data da prova**: o app não é focado em provas. Não há criação manual de baralho; todo baralho novo nasce pelo fluxo com IA. Cartões podem ser escritos à mão ou colados como lista.
 - **Estudar** por tempo (o fio no topo encurta) ou até X acertos (o fio enche), escolhendo os temas. Ordem única: errados, vencidos hoje (FSRS, `ts-fsrs`), nunca vistos, difíceis e acertados.
 - **Respostas**: acertei fácil, com dificuldade, no chute (não conta acerto), não sabia, errei; "Não sei" em V/F e alternativas.
 - **Exercícios de cálculo**: números sorteados, resposta digitada, tolerância de ±2% e resolução passo a passo.

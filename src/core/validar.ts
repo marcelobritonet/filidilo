@@ -1,6 +1,26 @@
 import { preencher, sortear } from './calc'
 import { compilar } from './expr'
-import type { Baralho } from './types'
+import type { Baralho, Nivel, Objetivo } from './types'
+
+const NIVEIS_VALIDOS: Nivel[] = ['iniciante', 'intermediario', 'avancado']
+
+/** Lista os problemas do objetivo (opcional). Vazio = válido ou ausente. */
+export function validarObjetivo(o: unknown): string[] {
+  if (o === undefined) return []
+  if (!o || typeof o !== 'object' || Array.isArray(o)) return ['objetivo deve ser um objeto']
+  const d = o as Objetivo
+  const erros: string[] = []
+  if (d.pedido !== undefined && typeof d.pedido !== 'string') erros.push('objetivo: pedido deve ser texto')
+  if (d.resumo !== undefined && (typeof d.resumo !== 'string' || d.resumo.length > 160)) erros.push('objetivo: resumo deve ser texto de até 160 caracteres')
+  if (d.nivel !== undefined && !NIVEIS_VALIDOS.includes(d.nivel)) erros.push('objetivo: nível inválido')
+  for (const campo of ['foco', 'evitar'] as const) {
+    const lista = d[campo]
+    if (lista === undefined) continue
+    if (!Array.isArray(lista) || lista.length > 5) erros.push(`objetivo: ${campo} deve ser uma lista de até 5 itens`)
+    else if (lista.some((x) => typeof x !== 'string' || x.length > 60)) erros.push(`objetivo: itens de ${campo} devem ser texto de até 60 caracteres`)
+  }
+  return erros
+}
 
 /** Lista os problemas de um baralho. Vazio = válido. */
 export function validar(b: Baralho, sorteios = 60): string[] {
@@ -8,6 +28,10 @@ export function validar(b: Baralho, sorteios = 60): string[] {
   const temas = new Set(b.temas.map((t) => t.id))
   const ids = new Set<string>()
   if (!b.id || !b.titulo) erros.push('Baralho sem id ou título')
+  erros.push(...validarObjetivo(b.objetivo))
+  for (const t of b.temas) {
+    if (t.descricao !== undefined && (typeof t.descricao !== 'string' || t.descricao.length > 120)) erros.push(`tema "${t.id}": descrição de até 120 caracteres`)
+  }
   for (const c of b.cartoes) {
     const e = (m: string) => erros.push(`${c.id}: ${m}`)
     if (ids.has(c.id)) e('id repetido')

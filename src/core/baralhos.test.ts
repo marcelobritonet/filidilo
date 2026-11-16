@@ -1,7 +1,8 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { baralhosDeFabrica } from '../decks/carregar'
-import { criar, duplicar, excluir, listar, restaurar, salvar, semear } from './baralhos'
+import { importar } from './backup'
+import { criar, duplicar, excluir, listar, obter, restaurar, salvar, semear } from './baralhos'
 import { db } from './db'
 import { registrar } from './srs'
 
@@ -85,5 +86,15 @@ describe('baralhos no aparelho', () => {
     expect((await listar()).map((x) => x.id)).toEqual([d.id])
     await restaurar(removido!)
     expect(await listar()).toHaveLength(2)
+  })
+
+  it('backup antigo (baralho com prova e sem objetivo) continua sendo restaurado', async () => {
+    await importar(JSON.stringify({
+      app: 'tatino', formato: 1, data: '2026-01-01T00:00:00.000Z', estados: [], revisoes: [], reportes: [], marcas: [],
+      baralhos: [{ id: 'antigo', titulo: 'Antigo', versao: 1, prova: '2026-12-01', temas: [{ id: 'g', nome: 'Geral' }], cartoes: [] }],
+    }))
+    const b = await obter('antigo')
+    expect(b).toMatchObject({ titulo: 'Antigo', prova: '2026-12-01' })
+    expect(b?.objetivo).toBeUndefined()
   })
 })

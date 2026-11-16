@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { validar } from '../validar'
-import { EXEMPLOS, montarCorrecao, montarInstrucao } from './instrucao'
-import { extrairJson, lerResposta } from './resposta'
+import { EXEMPLOS, montarCorrecao, montarInstrucao, VERSAO_INSTRUCAO } from './instrucao'
+import { extrairJson, lerPlano, lerResposta, parecePerguntas } from './resposta'
 
 const destino = { id: 'fis', titulo: 'Física', versao: 1, temas: [{ id: 'dinamica', nome: 'Dinâmica' }] }
 
@@ -69,5 +69,122 @@ describe('lendo a resposta', () => {
     expect(lerResposta([{ tipo: 'conceito', tema: 'x', frente: 'a', verso: 'b' }], destino).cartoes).toHaveLength(1)
     expect(lerResposta({ cards: [{ tipo: 'conceito', tema: 'x', frente: 'a', verso: 'b' }] }, destino).cartoes).toHaveLength(1)
     expect(() => lerResposta({ temas: [] }, destino)).toThrow(/cartoes/)
+  })
+
+  it('guarda a descrição dos temas novos', () => {
+    const r = lerResposta({ temas: [{ id: 'ondas', nome: 'Ondas', descricao: 'Frequência e comprimento' }], cartoes: [{ tipo: 'conceito', tema: 'ondas', frente: 'a', verso: 'b' }] }, destino)
+    expect(r.temasNovos).toEqual([{ id: 'ondas', nome: 'Ondas', descricao: 'Frequência e comprimento' }])
+  })
+})
+
+describe('instrução v3 (objetivo e cobertos)', () => {
+  it('versão 3', () => {
+    expect(VERSAO_INSTRUCAO).toBe(3)
+  })
+
+  it('com objetivo: seção, nível, foco, evitar (spoilers), descrição do tema e prioridade', () => {
+    const t = montarInstrucao({
+      origem: 'tema',
+      assunto: 'Espanhol',
+      quantidade: 15,
+      mistura: 'misto',
+      temaPrioritario: 'verbos',
+      baralho: {
+        titulo: 'Espanhol',
+        temas: [{ id: 'verbos', nome: 'Verbos', descricao: 'Presente do indicativo' }],
+        objetivo: { resumo: 'Conversar no México', nivel: 'intermediario', foco: ['pedir comida'], evitar: ['gramática formal'] },
+      },
+    })
+    expect(t).toContain('## Objetivo do baralho\nObjetivo: Conversar no México\nEscreva para o nível intermediário.\nFoque em: pedir comida.\nNão crie nada sobre: gramática formal. Isso vale também para spoilers.')
+    expect(t).toContain('"verbos": Verbos — Presente do indicativo (prioridade: crie mais cartões deste tema)')
+    expect(t).toContain('Priorize o que mais serve ao objetivo.')
+    expect(t).toContain('"Gerado por IA"')
+    expect(t).not.toContain('Gemini')
+  })
+
+  it('sem objetivo: sem seção, prioridade do assunto e sem seção de cobertos sem cartões', () => {
+    const t = montarInstrucao({ origem: 'tema', assunto: 'Leis de Newton', quantidade: 10, mistura: 'teoria', baralho: { titulo: 'Física', temas: destino.temas } })
+    expect(t).not.toContain('## Objetivo do baralho')
+    expect(t).not.toContain('## Já cobertos')
+    expect(t).toContain('Priorize o que é mais importante do assunto.')
+  })
+
+  it('inclui os cartões já feitos em "Já cobertos"', () => {
+    const t = montarInstrucao({
+      origem: 'tema',
+      assunto: 'Física',
+      quantidade: 10,
+      mistura: 'misto',
+      baralho: {
+        titulo: 'Física',
+        temas: destino.temas,
+        cartoes: [{ id: 'c1', tipo: 'conceito', tema: 'dinamica', frente: 'Qual a unidade de força no **SI**?', verso: 'N' }],
+      },
+    })
+    expect(t).toContain('Já cobertos (não repita o mesmo assunto com a mesma pergunta; pode aprofundar):\nDinâmica: unidade força SI')
+  })
+})
+
+describe('plano: leitura da resposta (Aprender)', () => {
+  const plano = {
+    baralho: { titulo: 'Espanhol para viagem', objetivo: 'Conversar o básico no México', nivel: 'iniciante', foco: ['números', 'pedir comida'], evitar: ['gramática formal'] },
+    temas: [{ id: 'saudacoes', nome: 'Saudações', descricao: 'Cumprimentar e agradecer' }],
+    cartoes: [{ id: 'c1', tipo: 'conceito', tema: 'saudacoes', frente: 'Como se diz olá?', verso: 'Hola' }],
+  }
+
+  it('resposta completa: título, objetivo, tema com descrição e cartões', () => {
+    const r = lerPlano(plano, 'espanhol para viajar')
+    expect(r.baralho).toEqual({
+      titulo: 'Espanhol para viagem',
+      objetivo: { pedido: 'espanhol para viajar', resumo: 'Conversar o básico no México', nivel: 'iniciante', foco: ['números', 'pedir comida'], evitar: ['gramática formal'] },
+    })
+    expect(r.temasNovos).toEqual([{ id: 'saudacoes', nome: 'Saudações', descricao: 'Cumprimentar e agradecer' }])
+    expect(r.cartoes).toHaveLength(1)
+    expect(r.cartoes[0].erros).toEqual([])
+    expect(r.cartoes[0].cartao).toMatchObject({ origem: 'ia', fonte: { apostila: 'Gerado por IA' } })
+  })
+
+  it('sem bloco baralho: título é o pedido cortado em 40, sem objetivo', () => {
+    const r = lerPlano({ temas: plano.temas, cartoes: plano.cartoes }, 'a'.repeat(60))
+    expect(r.baralho).toEqual({ titulo: 'a'.repeat(40) })
+  })
+
+  it('nível inválido é ignorado', () => {
+    const r = lerPlano({ ...plano, baralho: { ...plano.baralho, nivel: 'expert' } }, 'x')
+    expect(r.baralho.objetivo?.nivel).toBeUndefined()
+    expect(r.baralho.objetivo?.resumo).toBe('Conversar o básico no México')
+  })
+
+  it('estoura os limites: título 40, resumo 160, 5 itens de 60, descrição 120', () => {
+    const r = lerPlano(
+      {
+        baralho: { titulo: 'T'.repeat(60), objetivo: 'o'.repeat(200), foco: Array.from({ length: 7 }, () => 'f'.repeat(80)), evitar: [] },
+        temas: [{ id: 'x', nome: 'X', descricao: 'd'.repeat(200) }],
+        cartoes: [{ id: 'c1', tipo: 'conceito', tema: 'x', frente: 'a', verso: 'b' }],
+      },
+      'pedido',
+    )
+    expect(r.baralho.titulo).toHaveLength(40)
+    expect(r.baralho.objetivo?.resumo).toHaveLength(160)
+    expect(r.baralho.objetivo?.foco).toHaveLength(5)
+    expect(r.baralho.objetivo?.foco?.[0]).toHaveLength(60)
+    expect(r.baralho.objetivo?.evitar).toBeUndefined()
+    expect(r.temasNovos[0].descricao).toHaveLength(120)
+  })
+
+  it('só perguntas: detectadas, sem JSON', () => {
+    const texto = 'Antes de montar:\nQual é o seu nível?\nPara quando você quer aprender?\nObrigado!'
+    expect(parecePerguntas(texto)).toBe(true)
+    expect(() => extrairJson(texto)).toThrow(/JSON válido/)
+  })
+
+  it('perguntas com JSON: não são perguntas, e o JSON é lido', () => {
+    const texto = 'Pode ser assim?\n```json\n' + JSON.stringify(plano) + '\n```'
+    expect(parecePerguntas(texto)).toBe(false)
+    expect(lerPlano(extrairJson(texto), 'pedido').cartoes).toHaveLength(1)
+  })
+
+  it('texto sem JSON e sem pergunta não é pergunta', () => {
+    expect(parecePerguntas('Não entendi o pedido.')).toBe(false)
   })
 })
