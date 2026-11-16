@@ -2,6 +2,17 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.1.0] — 2026-11-16
+
+**Instale o tatino. na tela inicial.** Abre em tela cheia e funciona sem internet.
+
+### Novo
+- **Convite para instalar**: um cartão discreto em Meus baralhos, a partir da 2ª abertura e no máximo uma vez por semana. Dá para responder **Agora não** (volta depois de uma semana) ou **Não perguntar mais**.
+- **Instalar o app** em **Aparência**, sempre disponível até o app estar instalado. No iPhone e em outros navegadores, mostra os passos para instalar pelo menu do navegador.
+
+### Mudou
+- Nada para quem já usa: baralhos, cartões e progresso continuam iguais.
+
 ## [3.0.0] — 2026-11-16
 
 **Aprenda qualquer coisa.** Em **Meus baralhos**, diga o que quer aprender hoje e a IA monta o baralho inteiro: objetivo, nível, temas e os primeiros cartões. O baralho nasce configurado para o que você quer, não só com a lista de cartões.
