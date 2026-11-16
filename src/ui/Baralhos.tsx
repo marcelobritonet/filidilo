@@ -8,10 +8,8 @@ import { useEstados } from './estado'
 import { Importar, ImportarCartoes } from './Importar'
 import { Marca } from './Marca'
 import { pegarRecebido } from './recebido'
-
-interface EventoInstalar extends Event {
-  prompt: () => Promise<void>
-}
+import { InstalarCard } from './InstalarCard'
+import { registrarAbertura } from './instalar'
 
 const SEM_INTERNET = 'Precisa de internet para falar com a IA.'
 
@@ -22,7 +20,6 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const estados = useEstados(versao)
   const [pedido, setPedido] = useState('')
   const [semInternet, setSemInternet] = useState<'' | 'campo' | 'botao'>('')
-  const [instalar, setInstalar] = useState<EventoInstalar | null>(null)
   const [plano, setPlano] = useState<PlanoImportacao | null>(null)
   const [cartoesRecebidos, setCartoesRecebidos] = useState<CartoesRecebidos | null>(null)
   const [erro, setErro] = useState('')
@@ -43,14 +40,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
     })
   }, [])
 
-  useEffect(() => {
-    const f = (e: Event) => {
-      e.preventDefault()
-      setInstalar(e as EventoInstalar)
-    }
-    window.addEventListener('beforeinstallprompt', f)
-    return () => window.removeEventListener('beforeinstallprompt', f)
-  }, [])
+  useEffect(() => registrarAbertura(), [])
 
   /** Abre o fluxo Aprender; sem internet, avisa e não abre. */
   const aprender = (de: 'campo' | 'botao') => {
@@ -83,11 +73,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         )}
       </section>
 
-      {instalar && (
-        <button class="btn secundario" onClick={() => instalar.prompt().then(() => setInstalar(null))}>
-          Instalar o app no celular
-        </button>
-      )}
+      <InstalarCard />
 
       <ul class="lista-baralhos">
         {baralhos.map((b) => {

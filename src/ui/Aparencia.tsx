@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks'
 import { evento, ligarTelemetria, telemetriaDisponivel, telemetriaLigada } from '../core/telemetria'
 import type { Navegacao } from './App'
+import { InstalarBloco } from './InstalarCard'
 import { lerPreferencia, salvarPreferencia, type PreferenciaTema } from './tema'
 
 const OPCOES: { valor: PreferenciaTema; nome: string; descricao: string; cores: [string, string, string] }[] = [
@@ -50,6 +51,7 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
           </label>
         ))}
       </fieldset>
+      <InstalarBloco />
       {telemetriaDisponivel() && (
         <label class="opcao-estatisticas">
           <input type="checkbox" checked={estatisticas} onChange={(e) => alternarEstatisticas((e.target as HTMLInputElement).checked)} />
