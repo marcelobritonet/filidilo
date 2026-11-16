@@ -1,0 +1,10 @@
+{
+  "id": "one-piece",
+  "titulo": "One Piece",
+  "versao": 1,
+  "temas": [
+    { "id": "tripulacao-going-merry", "nome": "Tripulação do Going Merry" },
+    { "id": "lore", "nome": "Lore" },
+    { "id": "marinha", "nome": "Marinha" }
+  ]
+}

@@ -1,12 +1,16 @@
 import type { Baralho, Cartao } from '../core/types'
-import meta from './hidrodinamica/baralho.json'
 
-// Os cartões ficam em um arquivo por tema (partes/*.json) e são juntados aqui num baralho só.
-const partes = import.meta.glob<{ cartoes: Cartao[] }>('./hidrodinamica/partes/*.json', { eager: true, import: 'default' })
+// Baralhos que vêm com o app: src/decks/<id>/baralho.json (temas) + partes/*.json (cartões, um arquivo por tema).
+const metas = import.meta.glob<Omit<Baralho, 'cartoes'>>('./*/baralho.json', { eager: true, import: 'default' })
+const partes = import.meta.glob<{ cartoes: Cartao[] }>('./*/partes/*.json', { eager: true, import: 'default' })
 
-export const hidrodinamica: Baralho = {
-  ...(meta as Omit<Baralho, 'cartoes'>),
-  cartoes: Object.keys(partes)
-    .sort()
-    .flatMap((k) => partes[k].cartoes),
-}
+export const baralhosDeFabrica: Baralho[] = Object.entries(metas).map(([caminho, meta]) => {
+  const pasta = caminho.slice(0, caminho.lastIndexOf('/'))
+  return {
+    ...meta,
+    cartoes: Object.keys(partes)
+      .filter((k) => k.startsWith(`${pasta}/partes/`))
+      .sort()
+      .flatMap((k) => partes[k].cartoes),
+  }
+})

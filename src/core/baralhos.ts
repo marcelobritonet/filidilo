@@ -4,21 +4,19 @@ import type { Baralho } from './types'
 /** Baralhos que vêm com o app e são instalados uma única vez, na primeira abertura. */
 export type Semente = () => Baralho
 
-const CHAVE_SEMEADO = 'semeado'
-
 /**
- * Instala os baralhos de fábrica só uma vez. Depois disso eles são baralhos comuns:
- * a estudante pode editar ou excluir, e o app não os recria.
- * O progresso não muda, porque as chaves dos estados são "<baralho>/<cartão>".
+ * Instala cada baralho de fábrica uma única vez (marca "semeado:<id>"). Depois disso
+ * ele é um baralho comum: a pessoa pode editar ou excluir, e o app não o recria.
  */
 export async function semear(sementes: Semente[]): Promise<void> {
   await db.transaction('rw', db.baralhos, db.meta, async () => {
-    if (await db.meta.get(CHAVE_SEMEADO)) return
     for (const s of sementes) {
       const b = s()
+      const marca = `semeado:${b.id}`
+      if (await db.meta.get(marca)) continue
       if (!(await db.baralhos.get(b.id))) await db.baralhos.put({ ...b, criadoEm: Date.now(), atualizadoEm: Date.now() })
+      await db.meta.put({ chave: marca, valor: '1' })
     }
-    await db.meta.put({ chave: CHAVE_SEMEADO, valor: '1' })
   })
 }
 

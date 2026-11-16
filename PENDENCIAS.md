@@ -32,3 +32,5 @@ Atualizado em 16/11/2026.
 | P30 | Central: cadastrar admin e criadora | ⏸ Futuro | Marcelo |
 | P32 | E7 (sincronização pelo Drive) substituída pela fase 3; sincronização de progresso adiada (C10) | Informativo | — |
 | P33 | **v2.0.0** — cada um monta o seu: criar baralho num passo, IA por copiar e colar (Gemini, ChatGPT, Claude, Copilot), enviar cartão/baralho, corrigir cartão com IA, Estudar por tempo ou até acertar, novas respostas e "Não sei", incentivo a criar mais cartões; Gemini direto, reportes e "cai na prova" removidos | ✅ Publicada (16/11) | — |
+| P34 | Baralho de exemplo One Piece (Going Merry, Lore, Marinha) no lugar do antigo | ✅ Publicada na v2.1.0 (16/11) | — |
+| P35 | Tirar de Meus baralhos o aviso "Recebeu um cartão ou baralho? No WhatsApp, segure o arquivo → Compartilhar → tatino." | Aberto: Claude recomenda tirar | Marcelo |

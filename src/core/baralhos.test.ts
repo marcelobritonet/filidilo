@@ -1,11 +1,12 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { hidrodinamica } from '../decks/carregar'
+import { baralhosDeFabrica } from '../decks/carregar'
 import { criar, duplicar, excluir, listar, restaurar, salvar, semear } from './baralhos'
 import { db } from './db'
 import { registrar } from './srs'
 
-const semente = () => structuredClone(hidrodinamica)
+const fabrica = baralhosDeFabrica[0]
+const semente = () => structuredClone(fabrica)
 
 describe('baralhos no aparelho', () => {
   beforeEach(async () => {
@@ -13,19 +14,26 @@ describe('baralhos no aparelho', () => {
     await db.open()
   })
 
-  it('semeia Hidrodinâmica uma única vez e mantém o progresso da fase 1', async () => {
-    // Progresso gravado antes da fase 2 (mesma chave "baralho/cartão").
-    await registrar('hidrodinamica/cc-001', 3, 'prova')
+  it('semeia o baralho de fábrica uma única vez e mantém o progresso', async () => {
+    await registrar(`${fabrica.id}/${fabrica.cartoes[0].id}`, 3, 'prova')
     await semear([semente])
     const l = await listar()
-    expect(l.map((b) => b.id)).toEqual(['hidrodinamica'])
-    expect(l[0].cartoes.length).toBe(hidrodinamica.cartoes.length)
-    expect((await db.estados.get('hidrodinamica/cc-001'))?.ultimaNota).toBe(3)
+    expect(l.map((b) => b.id)).toEqual([fabrica.id])
+    expect(l[0].cartoes.length).toBe(fabrica.cartoes.length)
+    expect((await db.estados.get(`${fabrica.id}/${fabrica.cartoes[0].id}`))?.ultimaNota).toBe(3)
 
-    // Se ela excluir, o app não recria.
-    await excluir('hidrodinamica')
+    // Se a pessoa excluir, o app não recria.
+    await excluir(fabrica.id)
     await semear([semente])
     expect(await listar()).toEqual([])
+  })
+
+  it('quem já usava o app recebe o baralho novo uma vez, sem perder os seus', async () => {
+    // Aparelho da versão anterior: marca antiga e um baralho próprio.
+    await db.meta.put({ chave: 'semeado', valor: '1' })
+    const meu = await criar('Meu baralho')
+    await semear([semente])
+    expect((await listar()).map((b) => b.id).sort()).toEqual([fabrica.id, meu.id].sort())
   })
 
   it('cria, duplica (sem progresso), exclui e restaura', async () => {
