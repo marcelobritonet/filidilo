@@ -1,49 +1,22 @@
-import { useEffect, useMemo, useState } from 'preact/hooks'
+import { useState } from 'preact/hooks'
 import { formatar, preencher, sortear } from '../core/calc'
-import { db, type Marca, type Reporte } from '../core/db'
-import { chave } from '../core/srs'
+import { arquivoDosCartoes } from '../core/compartilhar'
 import type { Baralho, Cartao } from '../core/types'
 import type { Navegacao } from './App'
+import { enviarArquivo, MENSAGEM_ENVIO } from './enviar'
 import { nomeTema } from './estado'
 import { Tex } from './Tex'
 
-type FiltroStatus = 'todos' | 'pendentes' | 'reportados' | 'erro' | 'ok'
-
+/** Lista dos cartões do baralho: escrever, colar lista, editar e enviar. */
 export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) {
-  const [tema, setTema] = useState(baralho.temas[0]?.id ?? '')
-  const [status, setStatus] = useState<FiltroStatus>('todos')
-  const [marcas, setMarcas] = useState<Map<string, Marca>>(new Map())
-  const [reportes, setReportes] = useState<Map<string, Reporte[]>>(new Map())
-  const [v, setV] = useState(0)
+  const [tema, setTema] = useState('')
+  const lista = baralho.cartoes.filter((c) => !tema || c.tema === tema)
 
-  useEffect(() => {
-    db.marcas.toArray().then((l) => setMarcas(new Map(l.map((m) => [m.cartao, m]))))
-    db.reportes.toArray().then((l) => {
-      const m = new Map<string, Reporte[]>()
-      for (const r of l) m.set(r.cartao, [...(m.get(r.cartao) ?? []), r])
-      setReportes(m)
-    })
-  }, [v])
-
-  const lista = useMemo(
-    () =>
-      baralho.cartoes.filter((c) => {
-        const k = chave(baralho.id, c.id)
-        if (tema && c.tema !== tema) return false
-        const m = marcas.get(k)
-        switch (status) {
-          case 'pendentes': return !m
-          case 'reportados': return reportes.has(k)
-          case 'erro': return m && m.status !== 'ok'
-          case 'ok': return m?.status === 'ok'
-          default: return true
-        }
-      }),
-    [baralho, tema, status, marcas, reportes],
-  )
-
-  const revisados = baralho.cartoes.filter((c) => c.tema === tema && marcas.has(chave(baralho.id, c.id))).length
-  const doTema = baralho.cartoes.filter((c) => c.tema === tema).length
+  const enviar = async (c: Cartao) => {
+    const { nome, texto } = arquivoDosCartoes(baralho, [c])
+    const r = await enviarArquivo(nome, texto, `Cartão do tatino. ${MENSAGEM_ENVIO}`)
+    if (r === 'baixado') nav.avisar({ texto: 'Arquivo salvo em Downloads.' })
+  }
 
   return (
     <main class="tela revisar">
@@ -56,100 +29,53 @@ export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) 
       </header>
       <div class="linha">
         <button class="btn principal" onClick={() => nav.ir({ nome: 'cartao', id: baralho.id, tema: tema || undefined })}>
-          + Novo cartão
+          Escrever
         </button>
         <button class="btn secundario" onClick={() => nav.ir({ nome: 'colar', id: baralho.id })}>
           Colar lista
         </button>
       </div>
-      <button class="btn secundario" onClick={() => nav.ir({ nome: 'ia', id: baralho.id })}>
-        Criar com IA (Gemini)
-      </button>
-      <p class="dica">Toque em Editar para mudar um cartão. Para revisar o conteúdo, confira cada cartão com a fonte e marque Certo, Errado ou Observação.</p>
-      <label class="campo">
-        Tema
-        <select value={tema} onChange={(e) => setTema((e.target as HTMLSelectElement).value)}>
-          {baralho.temas
-            .filter((t) => baralho.cartoes.some((c) => c.tema === t.id))
-            .map((t) => (
-              <option value={t.id}>{t.nome}</option>
-            ))}
-          <option value="">Todos os temas</option>
-        </select>
-      </label>
-      <div class="chips">
-        {(['todos', 'pendentes', 'reportados', 'erro', 'ok'] as FiltroStatus[]).map((s) => (
-          <button class={`chip ${s === status ? 'ativo' : ''}`} aria-pressed={s === status} onClick={() => setStatus(s)}>
-            {{ todos: 'Todos', pendentes: 'Não revisados', reportados: 'Reportados', erro: 'Com problema', ok: 'Certos' }[s]}
-          </button>
-        ))}
-      </div>
-      {tema && (
-        <p class="dica">
-          {revisados} de {doTema} revisados neste tema
-        </p>
+      {baralho.temas.length > 1 && (
+        <label class="campo">
+          Tema
+          <select value={tema} onChange={(e) => setTema((e.target as HTMLSelectElement).value)}>
+            <option value="">Todos ({baralho.cartoes.length})</option>
+            {baralho.temas
+              .filter((t) => baralho.cartoes.some((c) => c.tema === t.id))
+              .map((t) => (
+                <option value={t.id}>
+                  {t.nome} ({baralho.cartoes.filter((c) => c.tema === t.id).length})
+                </option>
+              ))}
+          </select>
+        </label>
       )}
       <ul class="lista-revisao">
         {lista.map((c) => (
-          <ItemRevisao key={c.id} baralho={baralho} c={c} editar={() => nav.ir({ nome: 'cartao', id: baralho.id, cartaoId: c.id })} marca={marcas.get(chave(baralho.id, c.id))} reps={reportes.get(chave(baralho.id, c.id)) ?? []} mudou={() => setV(v + 1)} />
+          <li class="item">
+            <div class="cab">
+              <span class="tema-chip">{nomeTema(baralho, c.tema)}</span>
+            </div>
+            <Conteudo c={c} />
+            {c.fonte && (
+              <p class="fonte">
+                Fonte: {c.fonte.apostila}
+                {c.fonte.pagina !== undefined && `, p. ${c.fonte.pagina}`}
+              </p>
+            )}
+            <div class="linha">
+              <button class="btn secundario compacto" onClick={() => nav.ir({ nome: 'cartao', id: baralho.id, cartaoId: c.id })}>
+                Editar
+              </button>
+              <button class="btn secundario compacto" onClick={() => enviar(c)}>
+                Enviar
+              </button>
+            </div>
+          </li>
         ))}
-        {!lista.length && <p class="dica centro">Nenhum cartão com esse filtro.</p>}
+        {!lista.length && <p class="dica centro">Nenhum cartão.</p>}
       </ul>
     </main>
-  )
-}
-
-function ItemRevisao({ baralho, c, marca, reps, mudou, editar }: { baralho: Baralho; c: Cartao; marca?: Marca; reps: Reporte[]; mudou: () => void; editar: () => void }) {
-  const [nota, setNota] = useState(marca?.nota ?? '')
-  const [editando, setEditando] = useState(false)
-  const k = chave(baralho.id, c.id)
-  const marcar = async (st: Marca['status']) => {
-    if (st !== 'ok' && !editando && !nota) {
-      setEditando(true)
-      if (st === 'nota') return
-    }
-    await db.marcas.put({ cartao: k, status: st, nota: nota.trim(), data: Date.now() })
-    if (st === 'ok') setEditando(false)
-    mudou()
-  }
-  return (
-    <li class={`item ${marca?.status ?? ''}`}>
-      <div class="cab">
-        <code>{c.id}</code>
-        <span class="tema-chip">{nomeTema(baralho, c.tema)}</span>
-        <span class="tipo">{{ conceito: 'conceito', vf: 'V/F', associacao: 'alternativas', calculo: 'cálculo' }[c.tipo]}</span>
-        {c.editado && <span class="tipo">editado</span>}
-        {marca && <span class={`status-marca ${marca.status}`}>{{ ok: '✓ Certo', erro: '✕ Com erro', nota: '✎ Com observação' }[marca.status]}</span>}
-        <button class="btn terciario compacto editar" onClick={editar}>Editar</button>
-      </div>
-      <Conteudo c={c} />
-      {c.fonte && (
-        <p class="fonte">
-          Fonte: {c.fonte.apostila}
-          {c.fonte.pagina !== undefined && `, p. ${c.fonte.pagina}`}
-        </p>
-      )}
-      {reps.map((r) => (
-        <p class="reporte">
-          ⚠ Reportado: {r.motivo}
-          {r.texto && ` — ${r.texto}`}
-        </p>
-      ))}
-      {(editando || marca?.nota) && (
-        <textarea rows={2} placeholder="Observação" value={nota} onInput={(e) => setNota((e.target as HTMLTextAreaElement).value)} onBlur={() => marca && marca.status !== 'ok' && marcar(marca.status)} />
-      )}
-      <div class="marcas">
-        <button class={`chip ${marca?.status === 'ok' ? 'ativo ok' : ''}`} aria-pressed={marca?.status === 'ok'} onClick={() => marcar('ok')}>
-          ✓ Certo
-        </button>
-        <button class={`chip ${marca?.status === 'erro' ? 'ativo erro' : ''}`} aria-pressed={marca?.status === 'erro'} onClick={() => marcar('erro')}>
-          ✕ Errado
-        </button>
-        <button class={`chip ${marca?.status === 'nota' ? 'ativo' : ''}`} aria-pressed={marca?.status === 'nota'} onClick={() => marcar('nota')}>
-          ✎ Observação
-        </button>
-      </div>
-    </li>
   )
 }
 

@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks'
 import { excluirCartao, gravarCartao, novoIdCartao, problemasDoCartao, reinserirCartao } from '../core/cartoes'
 import type { Baralho, Cartao } from '../core/types'
 import type { Navegacao } from './App'
+import { CorrigirCartao } from './CorrigirCartao'
 import { Tex } from './Tex'
 
 type TipoEditavel = 'conceito' | 'vf' | 'associacao'
@@ -29,6 +30,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
   const [fonte, setFonte] = useState(original?.fonte ? `${original.fonte.apostila}${original.fonte.pagina !== undefined ? `, p. ${original.fonte.pagina}` : ''}` : '')
   const [problemas, setProblemas] = useState<string[]>([])
   const [confirmar, setConfirmar] = useState(false)
+  const [corrigindo, setCorrigindo] = useState(false)
 
   const montar = (): Cartao => {
     const id = original?.id ?? novoIdCartao()
@@ -102,7 +104,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
           <p>
             <strong>{original.titulo}</strong>
           </p>
-          <p class="dica">Cartões de cálculo são criados pela IA (em breve). Aqui dá para mudar o tema ou excluir.</p>
+          <p class="dica">Cálculos são criados com IA. Aqui dá para mudar o tema ou excluir.</p>
         </section>
       ) : (
         <div class="segmentado" role="radiogroup" aria-label="Tipo de cartão">
@@ -226,6 +228,23 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
         )}
       </div>
 
+      {original && (
+        <button class="btn secundario" onClick={() => setCorrigindo(true)}>
+          Corrigir com IA
+        </button>
+      )}
+      {original && corrigindo && (
+        <CorrigirCartao
+          baralho={baralho}
+          cartao={original}
+          fechar={() => setCorrigindo(false)}
+          aoSalvar={() => {
+            nav.mudou()
+            nav.avisar({ texto: 'Cartão corrigido.' })
+            nav.voltar()
+          }}
+        />
+      )}
       {original && (
         <section class="bloco">
           {!confirmar ? (

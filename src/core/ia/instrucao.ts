@@ -27,7 +27,7 @@ export interface PedidoIA {
 export const EXEMPLOS: { temas: Tema[]; cartoes: Cartao[] } = {
   temas: [
     { id: 'cinematica', nome: 'Cinemática' },
-    { id: 'dinamica', nome: 'Dinâmica', prioritario: true },
+    { id: 'dinamica', nome: 'Dinâmica' },
   ],
   cartoes: [
     {
@@ -117,7 +117,7 @@ ${temasTexto(p)}
 
 ## Formato da resposta
 Um objeto JSON com "temas" e "cartoes":
-{ "temas": [ { "id": "...", "nome": "...", "prioritario": true|false } ], "cartoes": [ ... ] }
+{ "temas": [ { "id": "...", "nome": "..." } ], "cartoes": [ ... ] }
 
 Cada cartão tem "id" (curto e único, ex.: "c1"), "tipo", "tema" (o id de um tema), "explicacao" (curta, opcional) e ${fonte}. Por tipo:
 - "conceito": "frente" (pergunta) e "verso" (resposta).
@@ -135,7 +135,7 @@ Cada cartão tem "id" (curto e único, ex.: "c1"), "tipo", "tema" (o id de um te
 ## Regras
 - Português do Brasil. Uma ideia por cartão. Pergunta que se entende sozinha, sem "segundo o texto".
 - Fiel ao material: não invente dados, valores ou fórmulas que não estejam nele${p.origem === 'tema' ? ' (aqui, fiel ao conhecimento estabelecido)' : ''}.
-${p.origem === 'pdf' ? '- Em "fonte.pagina", ponha a página do PDF de onde saiu o cartão.\n' : ''}- Priorize o que é mais importante e mais cobrado em prova; marque "prioritario": true nesses temas.
+${p.origem === 'pdf' ? '- Em "fonte.pagina", ponha a página do PDF de onde saiu o cartão.\n' : ''}- Priorize o que é mais importante e mais cobrado em prova.
 - Fórmulas podem ir entre $...$ em LaTeX; dentro do JSON, escreva a barra invertida dobrada (\\\\Delta).
 - **Negrito** com dois asteriscos é permitido. Nada de HTML.
 - JSON válido: aspas duplas, sem vírgula sobrando, sem comentários.

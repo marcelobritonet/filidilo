@@ -4,11 +4,12 @@ No ar: https://marcelobritonet.github.io/tatino/
 
 Flashcards offline (PWA) para estudar qualquer disciplina; começou com Hidrodinâmica / Fenômenos de Transporte. Funciona no celular e no computador, instalável pelo navegador, sem login.
 
-- **Modo prova**: 20 cartões por rodada, começando pelos errados e pelos temas que mais caem.
-- **Revisão espaçada**: FSRS (`ts-fsrs`).
-- **Exercícios de cálculo**: números sorteados a cada vez, resposta digitada, correção com tolerância de ±2% e resolução passo a passo.
-- **Revisar conteúdo**: lista dos cartões com a fonte (apostila e página), para marcar ✓/⚠/📝.
-- **Backup e reportes**: o progresso fica só no aparelho; o backup salva um arquivo, e os reportes saem por WhatsApp/e-mail.
+- **Cada um monta o seu**: novo baralho com disciplina, temas e data da prova; cartões criados com IA (copiar e colar no Gemini, ChatGPT, Claude ou Copilot), escritos à mão ou colados como lista.
+- **Estudar** por tempo (o fio no topo encurta) ou até X acertos (o fio enche), escolhendo os temas. Ordem única: errados, vencidos hoje (FSRS, `ts-fsrs`), nunca vistos, difíceis e acertados.
+- **Respostas**: acertei fácil, com dificuldade, no chute (não conta acerto), não sabia, errei; "Não sei" em V/F e alternativas.
+- **Exercícios de cálculo**: números sorteados, resposta digitada, tolerância de ±2% e resolução passo a passo.
+- **Corrigir cartão com IA**, com antes e depois. **Enviar** cartão ou baralho pelo WhatsApp; receber pelo Compartilhar → tatino.
+- **Backup** em arquivo; tudo fica só no aparelho.
 
 ## Visual
 
@@ -39,4 +40,4 @@ Correções num baralho do repositório: `npm run exportar-baralho -- hidrodinam
 
 Push na `main` publica no GitHub Pages pelo workflow `.github/workflows/deploy.yml` (em *Settings → Pages*, a fonte deve ser **GitHub Actions**).
 
-Especificação e plano: `SPEC.md` e `PLANO.md` (fase 1), `SPEC-FASE2.md` e `PLANO-FASE2.md` (fase 2). Pendências: `PENDENCIAS.md`.
+Especificação e plano: `SPEC.md` e `PLANO.md` (fase 1), `SPEC-FASE2.md` e `PLANO-FASE2.md` (fase 2), central de baralhos (futuro) em `docs/futuro/central/`. Pendências: `PENDENCIAS.md`.

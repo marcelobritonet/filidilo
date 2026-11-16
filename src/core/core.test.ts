@@ -63,7 +63,7 @@ describe('calc', () => {
 describe('fila do modo prova', () => {
   const b: Baralho = {
     id: 'b', titulo: 'b', versao: 1,
-    temas: [{ id: 'p', nome: 'P', prioritario: true }, { id: 'o', nome: 'O' }],
+    temas: [{ id: 'p', nome: 'P' }, { id: 'o', nome: 'O' }],
     cartoes: [
       { id: 'p1', tipo: 'vf', tema: 'p', frente: 'x', resposta: true },
       { id: 'p2', tipo: 'vf', tema: 'p', frente: 'x', resposta: true },
@@ -71,11 +71,11 @@ describe('fila do modo prova', () => {
       { id: 'o2', tipo: 'vf', tema: 'o', frente: 'x', resposta: true },
     ],
   }
-  const est = (id: string, nota: 1 | 3): [string, Estado] => [`b/${id}`, { id: `b/${id}`, ultimaNota: nota, ultimaData: 1, acertos: 0, erros: 0, fsrs: {} as Estado['fsrs'] }]
-  it('errados primeiro, depois prioritários nunca vistos', () => {
-    const f = filaProva(b, new Map([est('o2', 1), est('p1', 3)]))
-    expect(f[0].id).toBe('o2')
-    expect(f[1].id).toBe('p2')
-    expect(f.length).toBe(4)
+  const futuro = new Date(Date.now() + 86400000)
+  const passado = new Date(Date.now() - 86400000)
+  const est = (id: string, nota: 1 | 3, due = futuro): [string, Estado] => [`b/${id}`, { id: `b/${id}`, ultimaNota: nota, ultimaData: 1, acertos: 0, erros: 0, fsrs: { due } as Estado['fsrs'] }]
+  it('ordem única: errados, vencidos hoje, nunca vistos e por último os acertados', () => {
+    const f = filaProva(b, new Map([est('o2', 1), est('p1', 3), est('o1', 3, passado)]))
+    expect(f.map((c) => c.id)).toEqual(['o2', 'o1', 'p2', 'p1'])
   })
 })

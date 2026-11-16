@@ -16,8 +16,81 @@ interface ArquivoBaralho {
  */
 export function arquivoDoBaralho(b: Baralho): { nome: string; texto: string } {
   const envelope: ArquivoBaralho = { app: 'tatino', tipo: 'baralho', formato: 2, baralho: b }
-  const titulo = b.titulo.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim() || 'baralho'
+  const titulo = nomeArquivo(b.titulo) || 'baralho'
   return { nome: `${titulo} (Tatino).txt`, texto: JSON.stringify(envelope) }
+}
+
+const nomeArquivo = (s: string) => s.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim()
+
+/** Envelope com alguns cartões soltos (enviar um cartão). */
+interface ArquivoCartoes {
+  app: 'tatino'
+  tipo: 'cartoes'
+  formato: 2
+  /** Baralho de onde vieram, para sugerir o destino e o nome. */
+  origem: { titulo: string }
+  temas: Baralho['temas']
+  cartoes: Cartao[]
+}
+
+export interface CartoesRecebidos {
+  origem: string
+  temas: Baralho['temas']
+  cartoes: Cartao[]
+}
+
+/** Arquivo para enviar um ou mais cartões de um baralho. */
+export function arquivoDosCartoes(b: Baralho, cartoes: Cartao[]): { nome: string; texto: string } {
+  const usados = new Set(cartoes.map((c) => c.tema))
+  const envelope: ArquivoCartoes = { app: 'tatino', tipo: 'cartoes', formato: 2, origem: { titulo: b.titulo }, temas: b.temas.filter((t) => usados.has(t.id)), cartoes }
+  const c = cartoes[0]
+  const resumo = nomeArquivo(('frente' in c ? c.frente : c.titulo).replace(/[$*]/g, '')).slice(0, 40)
+  return { nome: `${cartoes.length === 1 ? `Cartão - ${resumo}` : `${cartoes.length} cartões - ${nomeArquivo(b.titulo)}`} (Tatino).txt`, texto: JSON.stringify(envelope) }
+}
+
+/** Lê o que chegou: um baralho inteiro ou cartões soltos. */
+export function lerRecebido(texto: string): { tipo: 'baralho'; baralho: Baralho } | ({ tipo: 'cartoes' } & CartoesRecebidos) {
+  let d: Partial<ArquivoCartoes> | undefined
+  try {
+    d = JSON.parse(texto)
+  } catch {
+    throw new Error('Este arquivo não é do tatino.')
+  }
+  if (d?.app === 'tatino' && d.tipo === 'cartoes') {
+    if (!Array.isArray(d.cartoes) || !d.cartoes.length || !Array.isArray(d.temas)) throw new Error('Este arquivo não tem cartões.')
+    const teste: Baralho = { id: 'x', titulo: 'x', versao: 1, temas: d.temas, cartoes: d.cartoes }
+    const erros = validar(teste, 20)
+    if (erros.length) throw new Error(`O cartão tem problema: ${erros[0]}`)
+    return { tipo: 'cartoes', origem: d.origem?.titulo ?? 'Cartões recebidos', temas: d.temas, cartoes: d.cartoes }
+  }
+  return { tipo: 'baralho', baralho: lerBaralho(texto) }
+}
+
+/**
+ * Junta cartões recebidos a um baralho: temas casam pelo nome (os que faltam são criados),
+ * ids repetidos ganham id novo, e todos ficam marcados como importados.
+ */
+export async function adicionarCartoesRecebidos(destino: Baralho, r: CartoesRecebidos): Promise<Baralho> {
+  const temas = [...destino.temas]
+  const mapa = new Map<string, string>()
+  for (const t of r.temas) {
+    const igual = temas.find((x) => x.nome.trim().toLowerCase() === t.nome.trim().toLowerCase())
+    if (igual) mapa.set(t.id, igual.id)
+    else {
+      const novo = { id: temas.some((x) => x.id === t.id) ? novoId(t.nome) : t.id, nome: t.nome }
+      temas.push(novo)
+      mapa.set(t.id, novo.id)
+    }
+  }
+  const ids = new Set(destino.cartoes.map((c) => c.id))
+  const novos = r.cartoes.map((c) => ({
+    ...c,
+    id: ids.has(c.id) ? `${c.id}-${Math.random().toString(36).slice(2, 6)}` : c.id,
+    tema: mapa.get(c.tema) ?? temas[0]?.id ?? 'geral',
+    origem: 'importado' as const,
+    editado: undefined,
+  }))
+  return salvar({ ...destino, temas, cartoes: [...destino.cartoes, ...novos] })
 }
 
 /** Lê o arquivo recebido e valida. Lança erro com mensagem em português. */
@@ -26,12 +99,12 @@ export function lerBaralho(texto: string): Baralho {
   try {
     dados = JSON.parse(texto)
   } catch {
-    throw new Error('Este arquivo não é um baralho do Tatino.')
+    throw new Error('Este arquivo não é do tatino.')
   }
   const d = dados as Partial<ArquivoBaralho> & Partial<Baralho> & { estados?: unknown }
-  if (d.app === 'tatino' && d.estados) throw new Error('Este arquivo é um backup, não um baralho. Use “Backup e reportes” → Restaurar.')
+  if (d.app === 'tatino' && d.estados) throw new Error('Este arquivo é um backup. Use Backup → Restaurar.')
   const b = (d.tipo === 'baralho' ? d.baralho : d) as Baralho
-  if (!b || typeof b.id !== 'string' || !Array.isArray(b.cartoes) || !Array.isArray(b.temas)) throw new Error('Este arquivo não é um baralho do Tatino.')
+  if (!b || typeof b.id !== 'string' || !Array.isArray(b.cartoes) || !Array.isArray(b.temas)) throw new Error('Este arquivo não é do tatino.')
   const erros = validar(b, 20)
   if (erros.length) throw new Error(`O baralho tem ${erros.length} problema(s), por exemplo: ${erros[0]}`)
   return b

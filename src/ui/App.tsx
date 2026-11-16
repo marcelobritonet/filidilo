@@ -12,19 +12,19 @@ import { EditarCartao } from './EditarCartao'
 import { useBaralhos } from './estado'
 import { Inicio } from './Inicio'
 import { Revisar } from './Revisar'
-import { Sessao, type Modo } from './Sessao'
+import { Sessao, type Limite, type Modo } from './Sessao'
 
 export type Tela =
   | { nome: 'baralhos' }
   | { nome: 'baralho'; id: string }
-  | { nome: 'sessao'; id: string; modo: Modo; opcoes: OpcoesFila }
+  | { nome: 'sessao'; id: string; modo: Modo; opcoes: OpcoesFila; limite?: Limite }
   | { nome: 'revisar'; id: string }
   | { nome: 'config'; id: string }
   | { nome: 'cartao'; id: string; cartaoId?: string; tema?: string }
   | { nome: 'colar'; id: string }
   | { nome: 'backup' }
   | { nome: 'aparencia' }
-  | { nome: 'ia'; id?: string }
+  | { nome: 'ia'; id: string; assunto?: string }
 
 export interface Aviso {
   texto: string
@@ -94,9 +94,8 @@ export function App() {
   let conteudo
   if (!baralhos) conteudo = <main class="tela"><p>Carregando…</p></main>
   else if (tela.nome === 'baralhos') conteudo = <Baralhos baralhos={baralhos} nav={nav} versao={versao} />
-  else if (tela.nome === 'backup') conteudo = <Backup baralhos={baralhos} sair={nav.voltar} />
+  else if (tela.nome === 'backup') conteudo = <Backup sair={nav.voltar} />
   else if (tela.nome === 'aparencia') conteudo = <Aparencia nav={nav} />
-  else if (tela.nome === 'ia') conteudo = <CriarComIA baralhos={baralhos} baralhoId={tela.id} nav={nav} />
   else if (carregando || !baralho)
     // Logo depois de criar um baralho a lista ainda está recarregando.
     conteudo = (
@@ -106,7 +105,8 @@ export function App() {
       </main>
     )
   else if (tela.nome === 'baralho') conteudo = <Inicio baralho={baralho} nav={nav} versao={versao} />
-  else if (tela.nome === 'sessao') conteudo = <Sessao baralho={baralho} modo={tela.modo} opcoes={tela.opcoes} sair={nav.voltar} />
+  else if (tela.nome === 'ia') conteudo = <CriarComIA baralho={baralho} assuntoInicial={tela.assunto} nav={nav} />
+  else if (tela.nome === 'sessao') conteudo = <Sessao baralho={baralho} modo={tela.modo} opcoes={tela.opcoes} limite={tela.limite} sair={nav.voltar} criarMais={(assunto) => nav.substituir({ nome: 'ia', id: baralho.id, assunto })} />
   else if (tela.nome === 'revisar') conteudo = <Revisar baralho={baralho} nav={nav} />
   else if (tela.nome === 'cartao') conteudo = <EditarCartao key={tela.cartaoId ?? 'novo'} baralho={baralho} cartaoId={tela.cartaoId} temaInicial={tela.tema} nav={nav} />
   else if (tela.nome === 'colar') conteudo = <ColarLista baralho={baralho} nav={nav} />

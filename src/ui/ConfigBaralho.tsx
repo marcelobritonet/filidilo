@@ -1,10 +1,11 @@
 import { useState } from 'preact/hooks'
 import { duplicar, excluir, novoId, restaurar, salvar } from '../core/baralhos'
-import { arquivoDoBaralho } from '../core/compartilhar'
 import type { Baralho, Tema } from '../core/types'
+import { arquivoDoBaralho } from '../core/compartilhar'
 import type { Navegacao } from './App'
+import { enviarArquivo, MENSAGEM_ENVIO } from './enviar'
 
-/** Nome, data da prova e temas de um baralho; duplicar e excluir. */
+/** Cartões (criar, ver, enviar), nome, data da prova e temas de um baralho; duplicar e excluir. */
 export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) {
   const [titulo, setTitulo] = useState(baralho.titulo)
   const [prova, setProva] = useState(baralho.prova ?? '')
@@ -39,27 +40,6 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
     nav.avisar({ texto: `Criado “${c.titulo}”.` })
   }
 
-  const compartilhar = async () => {
-    const { nome, texto } = arquivoDoBaralho(baralho)
-    const arquivo = new File([texto], nome, { type: 'text/plain' })
-    if (navigator.canShare?.({ files: [arquivo] })) {
-      try {
-        await navigator.share({ files: [arquivo], title: baralho.titulo, text: `Baralho “${baralho.titulo}” do tatino. Para abrir: segure o arquivo → Compartilhar → tatino.` })
-        return
-      } catch (e) {
-        if ((e as Error).name === 'AbortError') return
-      }
-    }
-    // Sem compartilhamento de arquivos (ex.: computador): baixa o arquivo.
-    const url = URL.createObjectURL(arquivo)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = nome
-    a.click()
-    URL.revokeObjectURL(url)
-    nav.avisar({ texto: `Arquivo “${nome}” salvo em Downloads.` })
-  }
-
   const apagar = async () => {
     const removido = await excluir(baralho.id)
     nav.mudou()
@@ -73,6 +53,12 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
     history.go(-2) // sai da configuração e da tela do baralho excluído
   }
 
+  const enviarBaralho = async () => {
+    const { nome, texto } = arquivoDoBaralho(baralho)
+    const r = await enviarArquivo(nome, texto, `Baralho “${baralho.titulo}”. ${MENSAGEM_ENVIO}`)
+    if (r === 'baixado') nav.avisar({ texto: 'Arquivo salvo em Downloads.' })
+  }
+
   return (
     <main class="tela config">
       <header class="barra-sessao">
@@ -80,6 +66,19 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
         <h1 class="titulo-barra">Configurar baralho</h1>
         <span />
       </header>
+
+      <section class="bloco">
+        <h2>Cartões</h2>
+        <button class="btn secundario" onClick={() => nav.ir({ nome: 'ia', id: baralho.id })}>
+          Criar com IA
+        </button>
+        <button class="btn secundario" onClick={() => nav.ir({ nome: 'revisar', id: baralho.id })}>
+          Ver e editar ({baralho.cartoes.length})
+        </button>
+        <button class="btn secundario" disabled={!baralho.cartoes.length} onClick={enviarBaralho}>
+          Enviar baralho
+        </button>
+      </section>
 
       <section class="bloco">
         <label class="campo">
@@ -99,16 +98,11 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
 
       <section class="bloco">
         <h2>Temas</h2>
-        <p class="dica">Marque “cai na prova” nos temas mais importantes: o modo prova começa por eles.</p>
         <ul class="lista-temas">
           {temas.map((t) => (
             <li>
               <input class="texto" aria-label="Nome do tema" value={t.nome} onInput={(e) => mudarTema(t.id, { nome: (e.target as HTMLInputElement).value })} />
               <div class="tema-opcoes">
-                <label class="check">
-                  <input type="checkbox" checked={!!t.prioritario} onChange={(e) => mudarTema(t.id, { prioritario: (e.target as HTMLInputElement).checked })} />
-                  cai na prova
-                </label>
                 <span class="dica">{qtd(t.id)} cartões</span>
                 {qtd(t.id) === 0 && temas.length > 1 && (
                   <button class="link" onClick={() => setTemas((ts) => ts.filter((x) => x.id !== t.id))}>
@@ -132,10 +126,6 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
       </button>
 
       <section class="bloco">
-        <button class="btn secundario" onClick={compartilhar}>
-          Compartilhar baralho
-        </button>
-        <p class="dica">Envia um arquivo com os cartões (sem o seu progresso). Quem recebe segura o arquivo no WhatsApp → Compartilhar → tatino.</p>
         <button class="btn secundario" onClick={fazerCopia}>
           Duplicar baralho
         </button>

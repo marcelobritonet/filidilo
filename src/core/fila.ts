@@ -28,22 +28,22 @@ function candidatos(b: Baralho, o: OpcoesFila): Cartao[] {
 }
 
 /**
- * Modo prova: ignora datas. Ordem: errados por último, nunca vistos dos temas
- * prioritários, vistos dos prioritários (os mais fracos primeiro), depois o resto.
+ * Fila do "Estudar" (ordem única):
+ * 1. errados por último; 2. vencidos hoje (repetição espaçada); 3. nunca vistos;
+ * 4. difíceis; 5. acertados, os acertados há mais tempo primeiro.
  */
-export function filaProva(b: Baralho, estados: Map<string, Estado>, o: OpcoesFila = {}, rng = Math.random): Cartao[] {
-  const prio = new Set(b.temas.filter((t) => t.prioritario).map((t) => t.id))
+export function filaProva(b: Baralho, estados: Map<string, Estado>, o: OpcoesFila = {}, rng = Math.random, agora = Date.now()): Cartao[] {
   const grupo = (c: Cartao) => {
     const e = estados.get(chave(b.id, c.id))
-    if (e?.ultimaNota === 1) return 0
-    if (prio.has(c.tema)) return e ? (e.ultimaNota === 2 ? 2 : 3) : 1
-    return e ? (e.ultimaNota <= 2 ? 4 : 5) : 4
+    if (!e) return 2
+    if (e.ultimaNota === 1) return 0
+    if (vencido(e, agora)) return 1
+    return e.ultimaNota === 2 ? 3 : 4
   }
-  const grupos: Cartao[][] = [[], [], [], [], [], []]
+  const grupos: Cartao[][] = [[], [], [], [], []]
   for (const c of candidatos(b, o)) grupos[grupo(c)].push(c)
-  // Entre os já acertados, os acertados há mais tempo vêm antes.
   const antigo = (c: Cartao) => estados.get(chave(b.id, c.id))?.ultimaData ?? 0
-  const ordenados = grupos.map((g, i) => (i === 3 || i === 5 ? embaralhar(g, rng).sort((x, y) => antigo(x) - antigo(y)) : embaralhar(g, rng)))
+  const ordenados = grupos.map((g, i) => (i === 4 ? embaralhar(g, rng).sort((x, y) => antigo(x) - antigo(y)) : embaralhar(g, rng)))
   return misturarTemas(ordenados.flat()).slice(0, o.tamanho ?? 20)
 }
 

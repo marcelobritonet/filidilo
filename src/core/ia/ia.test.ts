@@ -39,7 +39,7 @@ describe('lendo a resposta', () => {
 
   it('reaproveita temas, cria os novos, dá ids novos e valida cartão a cartão', () => {
     const resposta = {
-      temas: [{ id: 'Dinâmica', nome: 'Dinâmica' }, { id: 'energia', nome: 'Energia', prioritario: true }],
+      temas: [{ id: 'Dinâmica', nome: 'Dinâmica' }, { id: 'energia', nome: 'Energia' }],
       cartoes: [
         { id: 'c1', tipo: 'conceito', tema: 'Dinâmica', frente: 'O que é força?', verso: 'Interação que muda o movimento.' },
         { id: 'c2', tipo: 'vf', tema: 'energia', frente: 'Energia se cria do nada.', resposta: 'false', explicacao: 'Conservação da energia.' },
@@ -48,7 +48,7 @@ describe('lendo a resposta', () => {
       ],
     }
     const r = lerResposta(resposta, destino, 'Aula 4.pdf')
-    expect(r.temasNovos).toEqual([{ id: 'energia', nome: 'Energia', prioritario: true }, { id: 'ondas', nome: 'ondas' }])
+    expect(r.temasNovos).toEqual([{ id: 'energia', nome: 'Energia' }, { id: 'ondas', nome: 'ondas' }])
     expect(r.cartoes.map((c) => c.cartao.tema)).toEqual(['dinamica', 'energia', 'energia', 'ondas'])
     expect(r.cartoes.map((c) => c.erros.length)).toEqual([0, 0, 1, 0])
     expect(r.cartoes[2]).toMatchObject({ idIA: 'c3', erros: ['índice "correta" fora das opções'] })

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'preact/hooks'
-import { criar } from '../core/baralhos'
-import { lerBaralho, planejar, type PlanoImportacao } from '../core/compartilhar'
+import { criar, novoId, salvar } from '../core/baralhos'
+import { lerRecebido, planejar, type CartoesRecebidos, type PlanoImportacao } from '../core/compartilhar'
 import { chave, dominado } from '../core/srs'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
 import { textoContagem, useEstados } from './estado'
-import { Importar } from './Importar'
+import { Importar, ImportarCartoes } from './Importar'
 import { Marca } from './Marca'
 import { pegarRecebido } from './recebido'
 
@@ -17,8 +17,11 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const estados = useEstados(versao)
   const [criando, setCriando] = useState(false)
   const [nome, setNome] = useState('')
+  const [prova, setProva] = useState('')
+  const [temasTexto, setTemasTexto] = useState('')
   const [instalar, setInstalar] = useState<EventoInstalar | null>(null)
   const [plano, setPlano] = useState<PlanoImportacao | null>(null)
+  const [cartoesRecebidos, setCartoesRecebidos] = useState<CartoesRecebidos | null>(null)
   const [erro, setErro] = useState('')
 
   // Chegou pelo "Compartilhar" do Android (WhatsApp → Compartilhar → tatino.)?
@@ -28,7 +31,9 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
       if ('erro' in r) return setErro(r.erro)
       try {
         setErro('')
-        setPlano(await planejar(lerBaralho(r.texto)))
+        const lido = lerRecebido(r.texto)
+        if (lido.tipo === 'cartoes') setCartoesRecebidos(lido)
+        else setPlano(await planejar(lido.baralho))
       } catch (err) {
         setErro((err as Error).message)
       }
@@ -46,13 +51,19 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
 
   const novo = async (e: Event) => {
     e.preventDefault()
-    const b = await criar(nome)
+    const nomes = [...new Set(temasTexto.split(/[\n,;]/).map((t) => t.trim()).filter(Boolean))]
+    const base = await criar(nome)
+    const b = await salvar({
+      ...base,
+      prova: prova || undefined,
+      temas: nomes.length ? nomes.map((t) => ({ id: novoId(t), nome: t })) : base.temas,
+    })
     setNome('')
+    setProva('')
+    setTemasTexto('')
     setCriando(false)
     nav.mudou()
-    // Abre o baralho e já a configuração: ao salvar, volta para a tela do baralho novo.
     nav.ir({ nome: 'baralho', id: b.id })
-    nav.ir({ nome: 'config', id: b.id })
   }
 
   return (
@@ -96,9 +107,18 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
 
       {criando ? (
         <form class="bloco" onSubmit={novo}>
+          <h2>Novo baralho</h2>
           <label class="campo">
-            Nome do baralho
-            <input class="texto" value={nome} placeholder="Ex.: Física 1" autoFocus onInput={(e) => setNome((e.target as HTMLInputElement).value)} />
+            Disciplina
+            <input class="texto" value={nome} placeholder="Física 1" autoFocus onInput={(e) => setNome((e.target as HTMLInputElement).value)} />
+          </label>
+          <label class="campo">
+            Temas (opcional, um por linha)
+            <textarea rows={3} value={temasTexto} placeholder={'Cinemática\nDinâmica'} onInput={(e) => setTemasTexto((e.target as HTMLTextAreaElement).value)} />
+          </label>
+          <label class="campo">
+            Data da prova (opcional)
+            <input class="texto" type="date" value={prova} onInput={(e) => setProva((e.target as HTMLInputElement).value)} />
           </label>
           <div class="linha">
             <button type="button" class="btn secundario" onClick={() => setCriando(false)}>
@@ -114,12 +134,8 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
           <button class="btn principal" onClick={() => setCriando(true)}>
             Novo baralho
           </button>
-          <button class="btn secundario" onClick={() => nav.ir({ nome: 'ia' })}>
-            Criar com IA
-            <small>o Gemini monta os cartões a partir de um PDF, texto ou assunto</small>
-          </button>
           <p class="dica">
-            Recebeu um baralho? No WhatsApp, segure o arquivo → <strong>Compartilhar</strong> → <strong>tatino.</strong> (com o app instalado no celular).
+            Recebeu um cartão ou baralho? No WhatsApp, segure o arquivo → <strong>Compartilhar</strong> → <strong>tatino.</strong>
           </p>
           {erro && (
             <p class="resultado erro" role="alert">
@@ -131,7 +147,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
 
       <nav class="rodape" aria-label="Mais opções">
         <button class="btn terciario" onClick={() => nav.ir({ nome: 'backup' })}>
-          Backup e reportes
+          Backup
         </button>
         <button class="btn terciario" onClick={() => nav.ir({ nome: 'aparencia' })}>
           Aparência
@@ -139,6 +155,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
       </nav>
       <p class="versao">Funciona sem internet · seus dados ficam neste aparelho</p>
       {plano && <Importar plano={plano} nav={nav} fechar={() => setPlano(null)} />}
+      {cartoesRecebidos && <ImportarCartoes recebido={cartoesRecebidos} baralhos={baralhos} nav={nav} fechar={() => setCartoesRecebidos(null)} />}
     </main>
   )
 }

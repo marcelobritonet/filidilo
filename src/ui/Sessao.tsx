@@ -5,51 +5,89 @@ import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../
 import { chave, registrar } from '../core/srs'
 import type { Baralho, Cartao, CartaoCalculo } from '../core/types'
 import { nomeTema } from './estado'
+import { CorrigirCartao } from './CorrigirCartao'
 import { Folha } from './Folha'
 import { Icone } from './Icone'
-import { Reportar } from './Reportar'
 import { Tex } from './Tex'
 
 export type Modo = 'prova' | 'espacada' | 'calculo'
+/** Até onde vai a sessão: N cartões ou X minutos. */
+export type Limite = { tipo: 'acertos'; n: number } | { tipo: 'tempo'; minutos: number }
 
-const TITULO: Record<Modo, string> = { prova: 'Modo prova', espacada: 'Revisão espaçada', calculo: 'Exercícios de cálculo' }
+const TODOS = 10000 // por tempo: a fila tem todos os cartões; o relógio decide o fim
+
+const relogio = (ms: number) => {
+  const s = Math.ceil(ms / 1000)
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+}
+
+const TITULO: Record<Modo, string> = { prova: 'Estudar', espacada: 'Estudar', calculo: 'Cálculo' }
 
 /** Ações que o cartão pode usar dentro da folha de resultado. */
 interface Acoes {
-  avaliar: (n: Nota) => void
-  reportar: () => void
+  /** `chute`: acertou chutando — registra como difícil, mas não conta como acerto. */
+  avaliar: (n: Nota, chute?: boolean) => void
+  corrigir: () => void
 }
 
-export function Sessao({ baralho, modo, opcoes, sair }: { baralho: Baralho; modo: Modo; opcoes: OpcoesFila; sair: () => void }) {
+export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais }: { baralho: Baralho; modo: Modo; opcoes: OpcoesFila; limite?: Limite; sair: () => void; criarMais: (assunto?: string) => void }) {
+  // Cópia local: correções feitas durante a sessão entram aqui sem reiniciar a sessão.
+  const [baralho, setBaralho] = useState(inicial)
+  const [corrigindo, setCorrigindo] = useState(false)
+  // Erros e chutes por tema, para sugerir onde criar mais cartões no fim.
+  const [fracos, setFracos] = useState<Record<string, number>>({})
   const [fila, setFila] = useState<Cartao[] | null>(null)
   const [pos, setPos] = useState(0)
-  const [placar, setPlacar] = useState({ certos: 0, errados: 0, pulados: 0 })
-  const [reportando, setReportando] = useState(false)
+  const [placar, setPlacar] = useState({ certos: 0, errados: 0, chutes: 0, pulados: 0 })
   const [rodada, setRodada] = useState(0)
   const [vez, setVez] = useState(0) // força remontar o cartão ao pular
+  const porTempo = limite?.tipo === 'tempo'
+  const totalMs = porTempo ? limite.minutos * 60000 : 0
+  const [fimEm, setFimEm] = useState(0)
+  const [agora, setAgora] = useState(Date.now())
+  const restante = porTempo && fimEm ? Math.max(0, fimEm - agora) : totalMs
+  const esgotou = porTempo && fimEm > 0 && restante === 0
+  const meta = limite?.tipo === 'acertos' ? limite.n : 0
+
+  // Relógio da sessão por tempo: atualiza a cada segundo até acabar.
+  useEffect(() => {
+    if (!porTempo || !fimEm || esgotou) return
+    const t = setInterval(() => setAgora(Date.now()), 1000)
+    return () => clearInterval(t)
+  }, [porTempo, fimEm, esgotou])
 
   useEffect(() => {
     db.estados.toArray().then((l) => {
       const m = new Map(l.map((e) => [e.id, e]))
-      const f = modo === 'espacada' ? filaEspacada(baralho, m, opcoes) : filaProva(baralho, m, { ...opcoes, tamanho: modo === 'calculo' ? 10 : 20 })
+      // Por tempo ou por acertos, a fila tem todos os cartões; o relógio ou a meta decidem o fim.
+      const tamanho = limite ? TODOS : modo === 'calculo' ? 10 : 20
+      const f = modo === 'espacada' ? filaEspacada(baralho, m, { ...opcoes, tamanho }, porTempo ? 100 : Math.min(tamanho, 15)) : filaProva(baralho, m, { ...opcoes, tamanho })
       setFila(f)
       setPos(0)
-      setPlacar({ certos: 0, errados: 0, pulados: 0 })
+      setPlacar({ certos: 0, errados: 0, chutes: 0, pulados: 0 })
+      setFracos({})
+      if (porTempo) {
+        setAgora(Date.now())
+        setFimEm(Date.now() + totalMs)
+      }
     })
   }, [rodada])
 
   if (!fila) return <main class="tela"><p>Carregando…</p></main>
 
-  const cartao = fila[pos]
-  const avaliar = async (nota: Nota) => {
+  const bateuMeta = meta > 0 && placar.certos >= meta
+  const cartao = esgotou || bateuMeta ? undefined : fila[pos]
+  const avaliar = async (nota: Nota, chute = false) => {
+    if (!cartao) return
     try {
       await registrar(chave(baralho.id, cartao.id), nota, modo)
     } catch (e) {
       console.error('Não foi possível salvar o progresso', e) // a sessão continua mesmo assim
     }
-    setPlacar((p) => (nota === 1 ? { ...p, errados: p.errados + 1 } : { ...p, certos: p.certos + 1 }))
-    if (nota === 1) {
-      // Errou: o cartão volta daqui a alguns cartões nesta mesma sessão.
+    setPlacar((p) => (nota === 1 ? { ...p, errados: p.errados + 1 } : chute ? { ...p, chutes: p.chutes + 1 } : { ...p, certos: p.certos + 1 }))
+    if (nota === 1 || chute) {
+      setFracos((f) => ({ ...f, [cartao.tema]: (f[cartao.tema] ?? 0) + 1 }))
+      // Errou ou chutou: o cartão volta daqui a alguns cartões nesta mesma sessão.
       const nova = [...fila]
       nova.splice(posicaoReinsercao(pos, nova.length), 0, cartao)
       setFila(nova)
@@ -70,7 +108,15 @@ export function Sessao({ baralho, modo, opcoes, sair }: { baralho: Baralho; modo
     window.scrollTo(0, 0)
   }
 
-  const acoes: Acoes = { avaliar, reportar: () => setReportando(true) }
+  const acoes: Acoes = { avaliar, corrigir: () => setCorrigindo(true) }
+
+  /** Cartão corrigido: troca na sessão e mostra de novo, para responder já com o conteúdo certo. */
+  const corrigido = (c: Cartao, b: Baralho) => {
+    setBaralho(b)
+    setFila(fila.map((x) => (x.id === c.id ? c : x)))
+    setVez((v) => v + 1)
+    setCorrigindo(false)
+  }
 
   return (
     <main class="tela sessao">
@@ -79,16 +125,28 @@ export function Sessao({ baralho, modo, opcoes, sair }: { baralho: Baralho; modo
           ←
         </button>
         <span class="titulo-barra">{TITULO[modo]}</span>
-        <span class="contador">{cartao ? `${pos + 1} de ${fila.length}` : ''}</span>
+        <span class="contador" aria-live="off">
+          {!cartao ? '' : porTempo ? relogio(restante) : meta ? `✓ ${placar.certos}/${meta}` : `${pos + 1} de ${fila.length}`}
+        </span>
       </header>
-      {fila.length > 0 && (
+      {porTempo && cartao && (
+        <div class="fio-tempo" role="timer" aria-label={`Tempo restante: ${relogio(restante)}`}>
+          <div style={{ width: `${(100 * restante) / totalMs}%` }} />
+        </div>
+      )}
+      {meta > 0 && cartao && (
+        <div class="fio-tempo" role="progressbar" aria-label={`${placar.certos} de ${meta} acertos`} aria-valuemin={0} aria-valuemax={meta} aria-valuenow={placar.certos}>
+          <div style={{ width: `${(100 * placar.certos) / meta}%` }} />
+        </div>
+      )}
+      {!porTempo && !meta && fila.length > 0 && (
         <div class="progresso" role="progressbar" aria-label="Progresso da sessão" aria-valuemin={0} aria-valuemax={fila.length} aria-valuenow={pos}>
           <div style={{ width: `${(100 * pos) / fila.length}%` }} />
         </div>
       )}
 
       {!cartao ? (
-        <Fim placar={placar} vazio={fila.length === 0} modo={modo} outra={() => setRodada((r) => r + 1)} sair={sair} />
+        <Fim placar={placar} vazio={fila.length === 0} modo={modo} tempo={porTempo ? (esgotou ? 'esgotado' : relogio(totalMs - restante)) : undefined} bateuMeta={bateuMeta} outra={() => setRodada((r) => r + 1)} sair={sair} temaFraco={temaFraco(baralho, fracos)} criarMais={criarMais} />
       ) : (
         <>
           <div class="meta-cartao">
@@ -98,38 +156,71 @@ export function Sessao({ baralho, modo, opcoes, sair }: { baralho: Baralho; modo
           <div class="acoes-cartao">
             <button class="btn terciario" onClick={pular}>
               Pular
-              <small>{pos < fila.length - 1 ? 'volta no fim da sessão' : 'termina a sessão'}</small>
             </button>
-            <button class="btn terciario" onClick={() => setReportando(true)}>
-              Reportar erro
+            <button class="btn terciario" onClick={() => setCorrigindo(true)}>
+              Corrigir cartão
             </button>
           </div>
-          {reportando && <Reportar baralho={baralho} cartao={cartao} fechar={() => setReportando(false)} />}
+          {corrigindo && <CorrigirCartao baralho={baralho} cartao={cartao} aoSalvar={corrigido} fechar={() => setCorrigindo(false)} />}
         </>
       )}
     </main>
   )
 }
 
-function Fim({ placar, vazio, modo, outra, sair }: { placar: { certos: number; errados: number; pulados: number }; vazio: boolean; modo: Modo; outra: () => void; sair: () => void }) {
+/** Nome do tema com mais erros e chutes na sessão (ou nada, se não houve). */
+function temaFraco(b: Baralho, fracos: Record<string, number>): string | undefined {
+  const [id] = Object.entries(fracos).sort((a, z) => z[1] - a[1])[0] ?? []
+  return id ? nomeTema(b, id) : undefined
+}
+
+function Fim(props: {
+  placar: { certos: number; errados: number; chutes: number; pulados: number }
+  vazio: boolean
+  modo: Modo
+  tempo?: string
+  bateuMeta?: boolean
+  temaFraco?: string
+  outra: () => void
+  sair: () => void
+  criarMais: (assunto?: string) => void
+}) {
+  const { placar, vazio, modo, tempo, bateuMeta, temaFraco, outra, sair, criarMais } = props
   if (vazio)
     return (
       <section class="fim">
         <span class="icone-fim"><Icone nome="avancar" tamanho={48} /></span>
-        <p>{modo === 'espacada' ? 'Nada para revisar agora. Volte mais tarde ou use o modo prova.' : 'Nenhum cartão com esse filtro.'}</p>
+        <p>{modo === 'espacada' ? 'Nada para revisar agora.' : 'Nenhum cartão nesses temas.'}</p>
         <button class="btn principal" onClick={sair}>Voltar ao início</button>
       </section>
     )
-  const total = placar.certos + placar.errados
+  const total = placar.certos + placar.errados + placar.chutes
   return (
     <section class="fim">
       <span class="icone-fim"><Icone nome="avancar" tamanho={48} /></span>
-      <h2>Sessão concluída</h2>
+      <h2>{bateuMeta ? 'Meta atingida!' : tempo === 'esgotado' ? 'Tempo esgotado' : 'Sessão concluída'}</h2>
       <p>
-        {placar.certos} acertos e {placar.errados} erros em {total} respostas
+        {placar.certos} {placar.certos === 1 ? 'acerto' : 'acertos'}, {placar.errados} {placar.errados === 1 ? 'erro' : 'erros'}
+        {placar.chutes > 0 && <> e {placar.chutes} {placar.chutes === 1 ? 'chute' : 'chutes'}</>} em {total} {total === 1 ? 'resposta' : 'respostas'}
         {placar.pulados > 0 && <>; {placar.pulados} {placar.pulados === 1 ? 'pulo' : 'pulos'}</>}.
       </p>
-      <p class="dica">Os cartões errados voltam primeiro na próxima rodada do modo prova.</p>
+      {total > 0 && <p class="placar-final">{Math.round((100 * placar.certos) / total)}% de acerto</p>}
+      {tempo && tempo !== 'esgotado' && <p class="dica">Terminou os cartões em {tempo}.</p>}
+      <p class="dica">Os cartões errados voltam primeiro na próxima rodada.</p>
+      <section class="incentivo-ia">
+        <Icone nome="entender" />
+        <div>
+          <strong>Que tal mais cartões?</strong>
+          <p>
+            {temaFraco
+              ? `Você teve mais dificuldade em “${temaFraco}”. A IA cria cartões novos sobre esse tema em poucos minutos.`
+              : 'Variar as perguntas ajuda a fixar. Use outra aula ou um resumo para a IA criar cartões novos.'}
+          </p>
+          <button class="btn secundario" onClick={() => criarMais(temaFraco)}>
+            {temaFraco ? `Criar cartões sobre ${temaFraco}` : 'Criar mais cartões com IA'}
+          </button>
+        </div>
+      </section>
       <button class="btn principal" onClick={outra}>
         <span class="com-icone"><Icone nome="praticar" /> Mais uma rodada</span>
       </button>
@@ -159,41 +250,45 @@ function Fonte({ c }: { c: Cartao }) {
   )
 }
 
-function BotoesNota({ avaliar, acertou }: { avaliar: (n: Nota) => void; acertou?: boolean }) {
+/**
+ * Como foi a resposta. Pergunta e resposta: as cinco opções.
+ * Alternativas, V/F e cálculo já sabem se acertou: se acertou, só como; se errou, só Continuar.
+ * Notas do agendamento: fácil = 3, com dificuldade = 2, no chute = 2 (não conta acerto), não sabia/errei = 1.
+ */
+function BotoesNota({ avaliar, acertou }: { avaliar: (n: Nota, chute?: boolean) => void; acertou?: boolean }) {
   if (acertou === false)
     return (
       <div class="notas">
-        <button class="btn nota n1 largo" onClick={() => avaliar(1)}>
+        <button class="btn nota n1" onClick={() => avaliar(1)}>
           Continuar
           <small>este cartão volta daqui a pouco</small>
         </button>
       </div>
     )
   return (
-    <div class={`notas ${acertou ? 'tres' : ''}`} role="group" aria-label="Como foi?">
+    <div class="notas" role="group" aria-label="Como foi?">
+      <button class="btn nota n4" onClick={() => avaliar(3)}>
+        Acertei, foi fácil
+      </button>
+      <button class="btn nota n3" onClick={() => avaliar(2)}>
+        Acertei, com dificuldade
+      </button>
+      <button class="btn nota n2" onClick={() => avaliar(2, true)}>
+        Acertei no chute
+      </button>
       {acertou === undefined && (
-        <button class="btn nota n1" onClick={() => avaliar(1)}>
-          Errei
-        </button>
+        <>
+          <button class="btn nota n1" onClick={() => avaliar(1)}>
+            Não sabia
+          </button>
+          <button class="btn nota n1" onClick={() => avaliar(1)}>
+            Errei
+          </button>
+        </>
       )}
-      <button class="btn nota n2" onClick={() => avaliar(2)}>
-        {acertou ? 'Chutei' : 'Difícil'}
-      </button>
-      <button class="btn nota n3" onClick={() => avaliar(3)}>
-        Acertei
-      </button>
-      <button class="btn nota n4" onClick={() => avaliar(4)}>
-        Fácil
-      </button>
     </div>
   )
 }
-
-const LinkReportar = ({ acoes }: { acoes: Acoes }) => (
-  <button class="btn terciario compacto reportar-folha" onClick={acoes.reportar}>
-    Reportar erro neste cartão
-  </button>
-)
 
 function CartaoView({ cartao, acoes }: { cartao: Cartao; acoes: Acoes }) {
   switch (cartao.tipo) {
@@ -224,7 +319,9 @@ function Conceito({ c, acoes }: { c: Extract<Cartao, { tipo: 'conceito' }>; acoe
           <Tex class="verso" texto={c.verso} />
           {c.explicacao && <Explicacao texto={c.explicacao} />}
           <Fonte c={c} />
-          <LinkReportar acoes={acoes} />
+          <button class="btn terciario compacto" onClick={acoes.corrigir}>
+            Cartão errado? Corrigir
+          </button>
         </Folha>
       )}
     </article>
@@ -238,9 +335,11 @@ function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta
     if (props.embaralhar) idx.sort(() => Math.random() - 0.5)
     return idx
   }, [c.id])
+  // -1 = "Não sei": mostra a resposta certa e conta como erro.
   const [escolhida, setEscolhida] = useState<number | null>(null)
   const respondeu = escolhida !== null
   const acertou = escolhida === correta
+  const naoSabia = escolhida === -1
   const certaTexto = opcoes[correta].replace(/[*$]/g, '')
   return (
     <article class="cartao">
@@ -258,8 +357,17 @@ function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta
           )
         })}
       </div>
+      {!respondeu && (
+        <button class="btn terciario nao-sei" onClick={() => setEscolhida(-1)}>
+          Não sei
+        </button>
+      )}
       {respondeu && (
-        <Folha titulo={acertou ? '✓ Certo!' : '✕ Não foi dessa vez'} tom={acertou ? 'ok' : 'erro'} rodape={<BotoesNota avaliar={acoes.avaliar} acertou={acertou} />}>
+        <Folha
+          titulo={acertou ? '✓ Certo!' : naoSabia ? 'Tudo bem, veja a resposta' : '✕ Não foi dessa vez'}
+          tom={acertou ? 'ok' : naoSabia ? 'neutro' : 'erro'}
+          rodape={<BotoesNota avaliar={acoes.avaliar} acertou={acertou} />}
+        >
           {!acertou && (
             <p class="resposta-certa">
               Resposta certa: <strong>{certaTexto}</strong>
@@ -267,7 +375,9 @@ function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta
           )}
           {c.explicacao && <Explicacao texto={c.explicacao} />}
           <Fonte c={c} />
-          <LinkReportar acoes={acoes} />
+          <button class="btn terciario compacto" onClick={acoes.corrigir}>
+            Cartão errado? Corrigir
+          </button>
         </Folha>
       )}
     </article>
@@ -413,7 +523,9 @@ function Calculo({ c, acoes }: { c: CartaoCalculo; acoes: Acoes }) {
               <button class="btn terciario compacto" onClick={novoSorteio}>
                 Treinar de novo com outros números (não conta)
               </button>
-              <LinkReportar acoes={acoes} />
+              <button class="btn terciario compacto" onClick={acoes.corrigir}>
+                Cartão errado? Corrigir
+              </button>
             </>
           )}
         </Folha>

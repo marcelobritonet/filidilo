@@ -20,7 +20,7 @@ Atualizado em 15/11/2026.
 | P25 | Testar o Compartilhar → tatino. no Android dela (app instalado) — agora é o único jeito de receber baralho | Aberto | Marcelo / estudante |
 | P26 | Botão "Abrir baralho recebido" removido a pedido do Marcelo | ✅ v1.6.1 (15/11) | Claude |
 | P23 | Fase 2 · E5 Gemini direto (chave no aparelho) | ✅ Publicada na v1.7.0 (15/11) | Claude |
-| P27 | Fase 2 · E6 Avaliação do harness com as apostilas (precisa de uma chave do Gemini no terminal do Marcelo) | Próxima | Claude + Marcelo |
+| P27 | E6 Avaliação da instrução com as apostilas (rodar no Gemini e medir % de cartões válidos) | Aberto | Claude + Marcelo |
 | P5 | Fase 2 · IA para gerar cartões | ✅ Decidido: Gemini (direto pela API com chave no aparelho, mais copiar e colar como alternativa) | — |
 | P6 | Fase 2 · Sincronização | ✅ Decidido: Google Drive, por último e opcional (E7) | — |
 | P7 | Fase 2 · Criar cartões por formulário e compartilhar por arquivo | ✅ Decidido (E2 e E3) | — |
@@ -29,5 +29,11 @@ Atualizado em 15/11/2026.
 | P10 | Revisar os cartões dos temas prioritários pelo app (tela "Revisar conteúdo") | Aberto | Marcelo e a estudante |
 | P11 | Cartões ma-026 a ma-029 (preamar, sizígia, quadratura) não vêm das apostilas: confirmar se ficam | Aberto | Marcelo |
 | P12 | Divergência: laminar em tubo < 2300 (apostila Regime) × < 2000 (planilha 1.13). O app usa 2300 e evita sortear números nessa faixa | Informativo | — |
-| P14 | Criar a chave gratuita do Gemini (aistudio.google.com/apikey) e colar em Criar com IA → Gerar com um toque | Aberto | Marcelo / estudante |
-| P15 | Projeto no Google Cloud para a sincronização (E7) | Aguarda a E7 | Marcelo |
+| P14 | Chave do Gemini no app | ⏸ Não se aplica: Gemini direto removido na v1.8 (copiar e colar não precisa de chave) | — |
+| P15 | Projeto no Google Cloud para a sincronização (E7) | ⏸ Substituída pelo projeto Firebase (P28) | — |
+| P31 | **Futuro — Central de baralhos** (Firebase, papéis, sugestões, despublicar): plano em `docs/futuro/central/SPEC-CENTRAL.md` e `PLANO-CENTRAL.md` | ⏸ Adiado (16/11) | Marcelo decide quando retomar |
+| P28 | Central: criar projeto Firebase (Spark), Auth e Firestore | ⏸ Futuro | Marcelo |
+| P29 | Central: segredo de publicação do Firebase no GitHub | ⏸ Futuro | Marcelo |
+| P30 | Central: cadastrar admin e criadora | ⏸ Futuro | Marcelo |
+| P32 | E7 (sincronização pelo Drive) substituída pela fase 3; sincronização de progresso adiada (C10) | Informativo | — |
+| P33 | **v2.0.0** — cada um monta o seu: criar baralho num passo, IA por copiar e colar (Gemini, ChatGPT, Claude, Copilot), enviar cartão/baralho, corrigir cartão com IA, Estudar por tempo ou até acertar, novas respostas e "Não sei", incentivo a criar mais cartões; Gemini direto, reportes e "cai na prova" removidos | ✅ Publicada (16/11) | — |

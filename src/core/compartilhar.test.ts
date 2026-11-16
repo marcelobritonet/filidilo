@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { listar, obter, salvar } from './baralhos'
 import { gravarCartao } from './cartoes'
-import { aplicar, arquivoDoBaralho, importarComoCopia, lerBaralho, planejar } from './compartilhar'
+import { adicionarCartoesRecebidos, aplicar, arquivoDoBaralho, arquivoDosCartoes, importarComoCopia, lerBaralho, lerRecebido, planejar } from './compartilhar'
 import { db } from './db'
 import type { Baralho, CartaoConceito } from './types'
 
@@ -30,7 +30,7 @@ describe('compartilhar baralho', () => {
     expect(lerBaralho(texto)).toEqual(base())
     expect(lerBaralho(JSON.stringify(base()))).toEqual(base()) // baralho "cru"
     expect(() => lerBaralho('{"app":"tatino","estados":[]}')).toThrow(/backup/)
-    expect(() => lerBaralho('olá')).toThrow(/não é um baralho/)
+    expect(() => lerBaralho('olá')).toThrow(/não é do tatino/)
     expect(() => lerBaralho(JSON.stringify({ ...base(), cartoes: [{ id: 'x', tipo: 'vf', tema: 'zz', frente: 'f', resposta: true }] }))).toThrow(/problema/)
   })
 
@@ -76,5 +76,51 @@ describe('compartilhar baralho', () => {
     const c = await importarComoCopia(base())
     expect(c.titulo).toBe('Física (recebido)')
     expect((await listar()).map((b) => b.id).sort()).toEqual(['fis', c.id].sort())
+  })
+})
+
+describe('enviar cartões soltos', () => {
+  beforeEach(async () => {
+    await db.delete()
+    await db.open()
+  })
+
+  it('vai e volta; casa temas pelo nome, cria os que faltam e evita id repetido', async () => {
+    const origem: Baralho = {
+      id: 'fis',
+      titulo: 'Física',
+      versao: 1,
+      temas: [{ id: 'g', nome: 'Geral' }, { id: 'din', nome: 'Dinâmica' }],
+      cartoes: [
+        { id: 'a', tipo: 'conceito', tema: 'din', frente: 'O que é força?', verso: 'Interação.' },
+        { id: 'b', tipo: 'conceito', tema: 'g', frente: 'B?', verso: 'b' },
+      ],
+    }
+    const { nome, texto } = arquivoDosCartoes(origem, [origem.cartoes[0]])
+    expect(nome).toBe('Cartão - O que é força (Tatino).txt')
+    const r = lerRecebido(texto)
+    expect(r.tipo).toBe('cartoes')
+    if (r.tipo !== 'cartoes') return
+    expect(r.origem).toBe('Física')
+    expect(r.temas).toEqual([{ id: 'din', nome: 'Dinâmica' }])
+
+    // Destino com tema "dinâmica" (outro id) e um cartão de id "a".
+    const destino = await salvar({ id: 'meu', titulo: 'Minha física', versao: 1, temas: [{ id: 'x1', nome: 'dinâmica' }], cartoes: [{ id: 'a', tipo: 'conceito', tema: 'x1', frente: 'outro', verso: 'v' }] })
+    const b = await adicionarCartoesRecebidos(destino, r)
+    expect(b.cartoes).toHaveLength(2)
+    expect(b.cartoes[1]).toMatchObject({ tema: 'x1', origem: 'importado', frente: 'O que é força?' })
+    expect(b.cartoes[1].id).not.toBe('a')
+    expect(b.temas).toHaveLength(1)
+
+    // Tema que não existe no destino é criado.
+    const vazio = await salvar({ id: 'v', titulo: 'V', versao: 1, temas: [{ id: 'geral', nome: 'Geral' }], cartoes: [] })
+    const b2 = await adicionarCartoesRecebidos(vazio, r)
+    expect(b2.temas.map((t) => t.nome)).toEqual(['Geral', 'Dinâmica'])
+    expect(b2.cartoes[0].tema).toBe('din')
+  })
+
+  it('baralho inteiro continua sendo lido como baralho', () => {
+    expect(lerRecebido(arquivoDoBaralho(base()).texto).tipo).toBe('baralho')
+    expect(() => lerRecebido('oi')).toThrow(/não é do tatino/)
   })
 })

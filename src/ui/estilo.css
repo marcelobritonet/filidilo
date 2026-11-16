@@ -320,7 +320,7 @@ textarea { line-height: 1.5; resize: vertical; }
 .item.erro { border-left-color: var(--danger); border-left-style: double; }
 .item.nota { border-left-color: var(--gold); border-left-style: dashed; }
 .item .cab { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--text-muted); }
-.item .cab .editar { margin-left: auto; }
+.item .linha .btn { width: 100%; }
 .item .frente { font-family: var(--font-ui); font-size: 17px; font-weight: 650; line-height: 1.45; }
 .item .verso { font-size: 16px; }
 .item .explicacao { margin-top: 0; font-size: 15px; }
@@ -351,7 +351,7 @@ textarea { line-height: 1.5; resize: vertical; }
 .textos small { color: var(--text-muted); font-size: 14px; line-height: 1.4; }
 
 /* ---------- Modal, aviso e toast ---------- */
-.modal-fundo { position: fixed; inset: 0; background: rgba(17, 20, 24, .55); display: flex; align-items: flex-end; justify-content: center; z-index: 10; }
+.modal-fundo { position: fixed; inset: 0; background: rgba(17, 20, 24, .55); display: flex; align-items: flex-end; justify-content: center; z-index: 50; }
 .modal {
   background: var(--surface); color: var(--text); width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0; border: 1px solid var(--border);
@@ -440,3 +440,51 @@ textarea.instrucao { font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monosp
 .config-gemini { display: grid; gap: 4px; }
 .copiar-colar { display: grid; gap: 4px; margin-top: 8px; }
 details.bloco > summary { font-weight: 650; }
+
+/* ---------- v1.8: tela do baralho simplificada ---------- */
+.grupo-cartoes { display: grid; gap: 10px; margin-top: 24px; }
+.grupo-cartoes h2 { margin: 0 0 2px; }
+.folha-corpo .campo { gap: 8px; }
+.folha-corpo .temas { margin-top: 0; }
+.folha-corpo small.dica { margin: 0; font-weight: 400; }
+.folha-alca { justify-self: center; }
+
+/* ---------- Corrigir cartão ---------- */
+.corrigir .comparar { display: grid; gap: 6px; }
+.corrigir .comparar .rotulo { margin: 4px 0 0; }
+.corrigir .linha .btn { min-height: 48px; }
+
+/* ---------- Sessão por tempo: fio que encurta no topo ---------- */
+.fio-tempo { position: fixed; top: 0; left: 0; right: 0; height: 4px; z-index: 30; background: var(--surface-subtle); }
+.fio-tempo > div { height: 100%; background: var(--accent); transition: width 1s linear; }
+.placar-final { font: 700 clamp(28px, 7vw, 34px)/1.1 var(--font-display); margin: 0; color: var(--text); }
+
+/* ---------- Abrir uma IA ---------- */
+.abrir-ia { display: grid; gap: 6px; }
+.abrir-ia .dica { margin: 0; }
+.abrir-ia-opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.abrir-ia-opcoes .btn { width: 100%; }
+.campo-titulo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+/* ---------- Rodapé discreto: Backup e Aparência lado a lado ---------- */
+.rodape { grid-template-columns: 1fr 1fr; gap: 0; margin-top: 32px; padding-top: 4px; border-top: 0; }
+.rodape .btn.terciario { color: var(--text-muted); font-size: 14px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--border); }
+.rodape .btn.terciario:hover { color: var(--text); }
+.cabecalho-linha .btn.compacto { white-space: nowrap; font-size: 14px; padding: 8px 6px; }
+
+/* ---------- Opções de resposta: uma por linha ---------- */
+.notas { grid-template-columns: 1fr; gap: 8px; }
+.notas .nota { min-height: 48px; font-size: 16px; }
+.notas .nota.n4 { background: var(--success-soft); color: var(--success); border-color: var(--success); }
+.notas .nota.n3 { background: var(--surface); color: var(--success); border-color: var(--success); }
+.btn.nao-sei { margin-top: 8px; color: var(--text-muted); font-size: 15px; font-weight: 600; }
+
+/* ---------- Fim da sessão: incentivo a criar mais cartões ---------- */
+.incentivo-ia {
+  display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%; max-width: 420px;
+  padding: 16px; border-radius: var(--radius-md); background: var(--accent-soft); border: 1px solid var(--accent);
+}
+.incentivo-ia > .icone-linha { flex: none; color: var(--accent-text); margin-top: 2px; }
+.incentivo-ia > div { display: grid; gap: 6px; }
+.incentivo-ia p { margin: 0; font-size: 15px; color: var(--text); }
+.incentivo-ia .btn { margin-top: 4px; }

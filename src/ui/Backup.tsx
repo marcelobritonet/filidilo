@@ -1,16 +1,12 @@
 import { useEffect, useState } from 'preact/hooks'
-import { exportar, importar, textoReportes } from '../core/backup'
+import { exportar, importar } from '../core/backup'
 import { db } from '../core/db'
-import type { Baralho } from '../core/types'
 
-export function Backup({ baralhos, sair }: { baralhos: Baralho[]; sair: () => void }) {
+export function Backup({ sair }: { sair: () => void }) {
   const [msg, setMsg] = useState('')
-  const [contagem, setContagem] = useState({ revisoes: 0, reportes: 0, novos: 0 })
+  const [respostas, setRespostas] = useState(0)
 
-  const contar = async () => {
-    const reps = await db.reportes.toArray()
-    setContagem({ revisoes: await db.revisoes.count(), reportes: reps.length, novos: reps.filter((r) => !r.enviado).length })
-  }
+  const contar = async () => setRespostas(await db.revisoes.count())
   useEffect(() => {
     contar()
   }, [])
@@ -50,52 +46,19 @@ export function Backup({ baralhos, sair }: { baralhos: Baralho[]; sair: () => vo
     }
   }
 
-  const enviar = async (apenasNovos: boolean) => {
-    const { texto, ids } = await textoReportes(baralhos, apenasNovos)
-    let ok = false
-    if (navigator.share) {
-      try {
-        await navigator.share({ text: texto, title: 'Reportes do Tatino' })
-        ok = true
-      } catch (e) {
-        if ((e as Error).name === 'AbortError') return
-      }
-    }
-    if (!ok) {
-      await navigator.clipboard.writeText(texto)
-      setMsg('✓ Texto copiado. Cole no WhatsApp ou e-mail.')
-    } else setMsg('✓ Reportes enviados.')
-    await db.reportes.where('id').anyOf(ids).modify({ enviado: true })
-    contar()
-  }
-
   return (
     <main class="tela backup">
       <header class="barra-sessao">
         <button class="fechar" aria-label="Voltar" onClick={sair}>
           ←
         </button>
-        <h1 class="titulo-barra">Backup e reportes</h1>
+        <h1 class="titulo-barra">Backup</h1>
         <span />
       </header>
 
       <section class="bloco">
-        <h2>Reportes</h2>
-        <p>
-          {contagem.reportes} reportes no total, {contagem.novos} ainda não enviados.
-        </p>
-        <button class="btn principal" onClick={() => enviar(true)} disabled={!contagem.novos}>
-          Enviar reportes novos
-        </button>
-        <button class="link" onClick={() => enviar(false)}>
-          Enviar todos de novo (inclui as marcações da revisão)
-        </button>
-      </section>
-
-      <section class="bloco">
-        <h2>Backup do progresso</h2>
-        <p>Seus baralhos e o progresso ficam guardados só neste aparelho ({contagem.revisoes} respostas até agora). Salve um backup de vez em quando, principalmente antes de trocar de celular.</p>
-        <button class="btn" onClick={salvar}>
+        <p>Seus baralhos e o progresso ficam só neste aparelho ({respostas} respostas). Salve um backup antes de trocar de celular.</p>
+        <button class="btn principal" onClick={salvar}>
           Salvar backup
         </button>
         <label class="btn secundario arquivo">

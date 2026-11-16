@@ -1,5 +1,7 @@
 import { useState } from 'preact/hooks'
-import { aplicar, importarComoCopia, type PlanoImportacao } from '../core/compartilhar'
+import { criar } from '../core/baralhos'
+import { adicionarCartoesRecebidos, aplicar, importarComoCopia, type CartoesRecebidos, type PlanoImportacao } from '../core/compartilhar'
+import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
 
 /** Resumo do baralho recebido e as opções de importar. */
@@ -55,6 +57,51 @@ export function Importar({ plano, nav, fechar }: { plano: PlanoImportacao; nav: 
             </button>
           </>
         )}
+        <button class="btn secundario" onClick={fechar}>
+          Cancelar
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/** Cartões soltos recebidos: escolher em qual baralho guardar. */
+export function ImportarCartoes({ recebido, baralhos, nav, fechar }: { recebido: CartoesRecebidos; baralhos: Baralho[]; nav: Navegacao; fechar: () => void }) {
+  const NOVO = '__novo__'
+  const padrao = baralhos.find((b) => b.titulo.trim().toLowerCase() === recebido.origem.trim().toLowerCase())?.id ?? baralhos[0]?.id ?? NOVO
+  const [destino, setDestino] = useState(padrao)
+  const [ocupado, setOcupado] = useState(false)
+  const n = recebido.cartoes.length
+  const primeiro = recebido.cartoes[0]
+
+  const guardar = async () => {
+    setOcupado(true)
+    let alvo = baralhos.find((b) => b.id === destino)
+    if (!alvo) alvo = { ...(await criar(recebido.origem)), temas: [] }
+    const b = await adicionarCartoesRecebidos(alvo, recebido)
+    nav.mudou()
+    nav.avisar({ texto: `${n === 1 ? 'Cartão guardado' : `${n} cartões guardados`} em “${b.titulo}”.` })
+    fechar()
+    nav.ir({ nome: 'baralho', id: b.id })
+  }
+
+  return (
+    <div class="modal-fundo" onClick={(e) => e.target === e.currentTarget && fechar()}>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-cartoes">
+        <h2 id="titulo-cartoes">{n === 1 ? 'Cartão recebido' : `${n} cartões recebidos`}</h2>
+        <p>{'frente' in primeiro ? primeiro.frente.replace(/[$*]/g, '') : primeiro.titulo}</p>
+        <label class="campo">
+          Guardar em
+          <select value={destino} onChange={(e) => setDestino((e.target as HTMLSelectElement).value)}>
+            {baralhos.map((b) => (
+              <option value={b.id}>{b.titulo}</option>
+            ))}
+            <option value={NOVO}>Novo baralho: {recebido.origem}</option>
+          </select>
+        </label>
+        <button class="btn principal" disabled={ocupado} onClick={guardar}>
+          Guardar
+        </button>
         <button class="btn secundario" onClick={fechar}>
           Cancelar
         </button>

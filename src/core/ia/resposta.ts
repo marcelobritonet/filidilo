@@ -75,12 +75,7 @@ export function lerResposta(dados: unknown, destino: Pick<Baralho, 'id' | 'titul
     for (const k of chaves) porChave.set(k, novo.id)
     return novo.id
   }
-  for (const t of temasIA) {
-    if (!t?.id && !t?.nome) continue
-    const id = resolverTema(t.id, t.nome)
-    const criado = temasNovos.find((x) => x.id === id)
-    if (criado && t.prioritario) criado.prioritario = true
-  }
+  for (const t of temasIA) if (t?.id || t?.nome) resolverTema(t.id, t.nome)
 
   const baralhoTeste: Baralho = { ...destino, temas, cartoes: [] }
   const cartoes: CartaoLido[] = (lista as Record<string, unknown>[]).map((bruto, i) => {
