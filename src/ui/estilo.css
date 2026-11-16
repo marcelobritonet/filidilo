@@ -386,6 +386,11 @@ textarea { line-height: 1.5; resize: vertical; }
 .opcao-nivel.ativo { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--surface-subtle); }
 .rotulo { margin: 4px 0 0; font-weight: 650; }
 
+/* ---------- Sugestão de nível (Criar com IA) ---------- */
+.sugestao-nivel { border-color: var(--accent); }
+.sugestao-titulo { margin: 0; font-weight: 700; }
+.acoes-sugestao { margin-top: 8px; }
+
 /* ---------- Instalar o app ---------- */
 .instalar-card, .instalar-bloco {
   display: grid; gap: 10px; margin: 16px 0; padding: 16px; border: 1px solid var(--border);

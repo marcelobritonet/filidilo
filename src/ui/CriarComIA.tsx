@@ -1,9 +1,10 @@
 import { evento } from '../core/telemetria'
-import { useMemo, useRef, useState } from 'preact/hooks'
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { salvar } from '../core/baralhos'
+import { avaliarBaralho, type Avaliacao } from '../core/desempenho'
 import { EXEMPLOS, VERSAO_INSTRUCAO, montarCorrecao, montarInstrucao, type Mistura, type Origem } from '../core/ia/instrucao'
 import { extrairJson, lerResposta, type RespostaLida } from '../core/ia/resposta'
-import type { Baralho } from '../core/types'
+import { infoNivel, normalizarNivel, type Baralho } from '../core/types'
 import type { Navegacao } from './App'
 import { AbrirIA } from './AbrirIA'
 import { Conteudo } from './Revisar'
@@ -26,6 +27,23 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
   const [desmarcados, setDesmarcados] = useState<Set<string>>(new Set())
   const [salvando, setSalvando] = useState(false)
   const previa = useRef<HTMLElement>(null)
+  // Desempenho recente: sugere subir ou descer o nível dos próximos cartões. A pessoa pode voltar atrás.
+  const [avaliacao, setAvaliacao] = useState<Avaliacao | null>(null)
+  const [usarSugestao, setUsarSugestao] = useState(true)
+
+  useEffect(() => {
+    let vivo = true
+    avaliarBaralho(baralho.id, baralho.objetivo?.nivel).then((a) => {
+      if (vivo) setAvaliacao(a)
+    })
+    return () => {
+      vivo = false
+    }
+  }, [baralho.id])
+
+  const nivelAtual = normalizarNivel(baralho.objetivo?.nivel)
+  const temSugestao = !!avaliacao && avaliacao.sugestao !== 'manter' && !!avaliacao.nivel
+  const nivelUsado = temSugestao && usarSugestao ? avaliacao!.nivel : nivelAtual
 
   const materialOk = origem === 'pdf' || (origem === 'texto' ? texto.trim().length > 40 : assunto.trim().length > 3)
   const instrucao = useMemo(
@@ -38,10 +56,15 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
         assunto,
         quantidade,
         mistura,
-        baralho: { titulo: baralho.titulo, temas: baralho.temas, objetivo: baralho.objetivo, cartoes: baralho.cartoes },
+        baralho: {
+          titulo: baralho.titulo,
+          temas: baralho.temas,
+          objetivo: baralho.objetivo && nivelUsado ? { ...baralho.objetivo, nivel: nivelUsado } : baralho.objetivo,
+          cartoes: baralho.cartoes,
+        },
         temaPrioritario: temaId,
       }),
-    [origem, nomePdf, paginas, texto, assunto, quantidade, mistura, baralho, temaId],
+    [origem, nomePdf, paginas, texto, assunto, quantidade, mistura, baralho, temaId, nivelUsado],
   )
   const fontePadrao = origem === 'pdf' ? nomePdf.trim() || 'Gerado por IA' : origem === 'texto' ? 'Texto colado' : 'Gerado por IA'
   const comObjetivo = !!baralho.objetivo
@@ -116,6 +139,30 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
             Definir objetivo
           </button>
         </p>
+      )}
+
+      {temSugestao && (
+        <section class="bloco sugestao-nivel" aria-live="polite">
+          <p class="sugestao-titulo">
+            {avaliacao!.sugestao === 'descer'
+              ? 'Vamos tentar algo mais fácil?'
+              : 'Você está indo bem. Vamos nos aprofundar e subir de nível?'}
+          </p>
+          <p class="dica">
+            Você acertou {Math.round(avaliacao!.taxaAcerto * 100)}% das últimas {avaliacao!.amostra} respostas. Os próximos cartões vão para{' '}
+            <strong>{infoNivel(avaliacao!.nivel)?.nome}</strong>
+            {usarSugestao ? '' : ` (em vez de ${infoNivel(nivelAtual)?.nome})`}.
+          </p>
+          <div class="acoes-sugestao">
+            <button class="btn principal" onClick={() => setUsarSugestao(!usarSugestao)}>
+              {usarSugestao
+                ? `Manter ${infoNivel(nivelAtual)?.nome ?? 'o nível atual'}`
+                : avaliacao!.sugestao === 'descer'
+                  ? 'Sim, mais fácil'
+                  : 'Sim, subir de nível'}
+            </button>
+          </div>
+        </section>
       )}
 
       <section class="bloco passo">

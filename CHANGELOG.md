@@ -2,6 +2,17 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.3.0] — 2026-11-16
+
+**O app acompanha o seu ritmo.** Ao criar cartões com IA, o tatino olha o desempenho recente do baralho e sugere o nível dos próximos cartões: um degrau mais fácil se você está errando muito, um degrau acima se está acertando quase tudo e achando fácil.
+
+### Novo
+- **Sugestão de nível em Criar com IA**: "Vamos tentar algo mais fácil?" ou "Você está indo bem. Vamos nos aprofundar e subir de nível?", com o motivo (quantas respostas acertou nas últimas 40). Os cartões já saem no nível sugerido.
+- Para voltar ao nível atual é só tocar no botão. Sem respostas suficientes (menos de 15), o app não sugere nada.
+
+### Mudou
+- Nada muda no estudo nem nos baralhos existentes. A sugestão só aparece ao criar cartões e pode ser desfeita.
+
 ## [3.2.0] — 2026-11-16
 
 **Você diz quanto já sabe.** Ao aprender uma coisa nova, a pessoa escolhe o próprio nível antes de pedir a instrução, e a IA ajusta a dificuldade e o tom dos cartões.

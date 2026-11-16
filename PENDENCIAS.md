@@ -54,4 +54,6 @@ Atualizado em 16/11/2026.
 | P54 | v3 · Sugerir o primeiro tema com poucos cartões depois da primeira sessão de um baralho novo (SPEC-V3 §6), ficou fora da v3.0.0 | A fazer | Claude |
 | P55 | Convite discreto para instalar o PWA (cartão em Meus baralhos a partir da 2ª abertura, 1 vez por semana, "Não perguntar mais"; bloco em Aparência com passos para iPhone) | ✅ Publicada na v3.1.0 (16/11) | Claude |
 | P56 | Nível no pedido de "Aprender": 6 opções (do zero ao extremo), obrigatório antes de copiar a instrução; a IA ajusta dificuldade e tom; níveis antigos convertidos na leitura | ✅ Publicada na v3.2.0 (16/11) | Claude |
+| P57 | Sugestão de nível pelo desempenho recente em Criar com IA (sobe ou desce um degrau; mínimo 15 respostas; botão para voltar ao nível atual) | ✅ Publicada na v3.3.0 (16/11) | Claude |
+| P58 | Teste no Gemini (anônimo) com as 6 instruções de nível: zero, iniciante, boas noções, bastante e expert rodaram e geraram 15 cartões válidos cada um; **extremo ficou por rodar**. Achado: um cartão do expert estava errado (limite de |x| em 0 apresentado como prova de derivabilidade) e o validador não pega erro de conteúdo | A fazer (extremo e revisão de conteúdo) | Claude / Marcelo |
 | P52 | v3 · E7 Testar o fluxo novo com gente de verdade (um baralho com PDF de aula e um de assunto livre) | A fazer, depois da publicação | Marcelo / estudante |
