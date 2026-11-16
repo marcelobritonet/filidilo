@@ -2,6 +2,12 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [2.0.1] — 2026-11-16
+
+### Mudou
+- Exemplos dos campos do editor de cartão agora são genéricos ("O que é fotossíntese?", "Aula 4, p. 7").
+- Documentação (README, planos e pendências) sem referências a um curso ou disciplina específicos.
+
 ## [2.0.0] — 2026-11-16
 
 **Cada um monta o seu.** O tatino. deixa de ser o app de um baralho e passa a ser o lugar onde cada pessoa cria, envia e estuda os próprios baralhos, com uma interface bem mais simples.
@@ -138,7 +144,7 @@ Fase 2 · E1: vários baralhos.
 - O backup inclui os baralhos.
 
 ### Mudou
-- Hidrodinâmica deixa de ser fixo no app: é instalado uma vez e vira um baralho comum. **O progresso da fase 1 é mantido.**
+- O baralho que vinha no app deixa de ser fixo: é instalado uma vez e vira um baralho comum. **O progresso da fase 1 é mantido.**
 
 ## [1.0.0] — 2026-11-15
 
@@ -146,11 +152,12 @@ Fase 1: primeira versão publicada.
 
 ### Novo
 - PWA instalável e **offline**: celular e computador, sem login.
-- Baralho de **Hidrodinâmica / Fenômenos de Transporte**: 190 cartões dos 6 temas prioritários da prova, cada um com apostila e página.
+- Um baralho de exemplo com 190 cartões, cada um com a fonte.
 - **Modo prova** (20 cartões, começando pelos errados e pelos temas prioritários), **revisão espaçada** (FSRS) e **exercícios de cálculo** com números sorteados, correção com ±2% e resolução passo a passo.
 - Reportar erro em qualquer cartão, revisão de conteúdo (✓/⚠/📝), backup e envio de reportes pelo WhatsApp.
 - Publicação automática no GitHub Pages.
 
+[2.0.1]: https://github.com/marcelobritonet/tatino/releases/tag/v2.0.1
 [2.0.0]: https://github.com/marcelobritonet/tatino/releases/tag/v2.0.0
 [1.7.0]: https://github.com/marcelobritonet/tatino/releases/tag/v1.7.0
 [1.6.1]: https://github.com/marcelobritonet/tatino/releases/tag/v1.6.1

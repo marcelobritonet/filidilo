@@ -2,7 +2,7 @@
 
 No ar: https://marcelobritonet.github.io/tatino/
 
-Flashcards offline (PWA) para estudar qualquer disciplina; começou com Hidrodinâmica / Fenômenos de Transporte. Funciona no celular e no computador, instalável pelo navegador, sem login.
+Flashcards offline (PWA) para estudar qualquer disciplina. Funciona no celular e no computador, instalável pelo navegador, sem login.
 
 - **Cada um monta o seu**: novo baralho com disciplina, temas e data da prova; cartões criados com IA (copiar e colar no Gemini, ChatGPT, Claude ou Copilot), escritos à mão ou colados como lista.
 - **Estudar** por tempo (o fio no topo encurta) ou até X acertos (o fio enche), escolhendo os temas. Ordem única: errados, vencidos hoje (FSRS, `ts-fsrs`), nunca vistos, difíceis e acertados.
@@ -26,7 +26,7 @@ npm run build      # gera dist/ (PWA)
 
 ## Baralhos
 
-Os baralhos ficam no aparelho (IndexedDB, tabela `baralhos`). Hidrodinâmica vem de fábrica e é instalado uma única vez na primeira abertura (`src/core/baralhos.ts`); depois é um baralho comum. A fonte dele é `src/decks/hidrodinamica/baralho.json` (temas) + `partes/*.json` (cartões, um arquivo por tema). Tipos: `conceito`, `vf`, `associacao`, `calculo`. Formato em `src/core/types.ts`; `npm test` recusa baralho inválido.
+Os baralhos ficam no aparelho (IndexedDB, tabela `baralhos`). Baralhos que vêm com o app ficam em `src/decks/<id>/`: `baralho.json` (temas) + `partes/*.json` (cartões, um arquivo por tema). Tipos: `conceito`, `vf`, `associacao`, `calculo`. Formato em `src/core/types.ts`; `npm test` recusa baralho inválido.
 
 Cartões de cálculo usam expressões avaliadas por um avaliador seguro (`src/core/expr.ts`, sem `eval`). Marcadores `{nome}` e `{nome:casas}` no texto são trocados pelos valores sorteados.
 
@@ -34,10 +34,10 @@ Cartões de cálculo usam expressões avaliadas por um avaliador seguro (`src/co
 
 Histórico em [CHANGELOG.md](CHANGELOG.md) e nas [releases](https://github.com/marcelobritonet/tatino/releases). A versão vem do `package.json` e aparece no rodapé do app. Para lançar: subir a versão no `package.json`, escrever a seção no changelog, fazer o commit, criar a tag `vX.Y.Z` e a release.
 
-Correções num baralho do repositório: `npm run exportar-baralho -- hidrodinamica` gera o arquivo em `dist-baralhos/`; ela segura o arquivo no WhatsApp → Compartilhar → tatino. → Atualizar (as edições dela são preservadas).
+Para gerar o arquivo de um baralho do repositório: `npm run exportar-baralho -- <id>` (sai em `dist-baralhos/`).
 
 ## Publicar
 
 Push na `main` publica no GitHub Pages pelo workflow `.github/workflows/deploy.yml` (em *Settings → Pages*, a fonte deve ser **GitHub Actions**).
 
-Especificação e plano: `SPEC.md` e `PLANO.md` (fase 1), `SPEC-FASE2.md` e `PLANO-FASE2.md` (fase 2), central de baralhos (futuro) em `docs/futuro/central/`. Pendências: `PENDENCIAS.md`.
+Especificação e plano: `SPEC-FASE2.md` e `PLANO-FASE2.md`, central de baralhos (futuro) em `docs/futuro/central/`. Pendências: `PENDENCIAS.md`.

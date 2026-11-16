@@ -130,7 +130,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
           <>
             <label class="campo">
               {tipo === 'vf' ? 'Afirmação' : 'Pergunta'}
-              <textarea rows={3} value={frente} onInput={(e) => setFrente((e.target as HTMLTextAreaElement).value)} placeholder={tipo === 'vf' ? 'Ex.: Coriolis é máxima nos polos.' : 'Ex.: O que é o efeito squat?'} />
+              <textarea rows={3} value={frente} onInput={(e) => setFrente((e.target as HTMLTextAreaElement).value)} placeholder={tipo === 'vf' ? 'Ex.: A água ferve a 100 °C ao nível do mar.' : 'Ex.: O que é fotossíntese?'} />
             </label>
 
             {tipo === 'conceito' && (
@@ -194,7 +194,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
             </label>
             <label class="campo">
               Fonte (opcional)
-              <input class="texto" value={fonte} onInput={(e) => setFonte((e.target as HTMLInputElement).value)} placeholder="Ex.: Apostila 2.6, p. 7" />
+              <input class="texto" value={fonte} onInput={(e) => setFonte((e.target as HTMLInputElement).value)} placeholder="Ex.: Aula 4, p. 7" />
             </label>
             <p class="dica">Dica: fórmulas podem ir entre $…$, como $V^2/R$, e **negrito** entre asteriscos.</p>
           </>
@@ -270,7 +270,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
   )
 }
 
-/** "Apostila 2.6, p. 7" → { apostila: "Apostila 2.6", pagina: "7" } */
+/** "Aula 4, p. 7" → { apostila: "Aula 4", pagina: 7 } */
 function lerFonte(txt: string) {
   const t = txt.trim()
   if (!t) return undefined

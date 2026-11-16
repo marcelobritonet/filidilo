@@ -13,7 +13,7 @@ Transformar o Tatino num app de estudo para **qualquer disciplina**, sem reescre
 | Item | Decisão |
 |---|---|
 | Onde ficam | No aparelho (IndexedDB). Não existe baralho "oficial": todos são dela e editáveis (G1). |
-| Hidrodinâmica | Pré-instalado na primeira abertura, como baralho comum. O progresso atual é mantido, porque as chaves já são `baralho/cartão`. |
+| Baralho de exemplo | Pré-instalado na primeira abertura, como baralho comum. O progresso atual é mantido, porque as chaves já são `baralho/cartão`. |
 | Vários baralhos | Tela **Meus baralhos**: lista com progresso e data da prova; botões **+ Novo baralho** e **Criar com IA**. |
 | Configurar | Nome, temas, tema prioritário ("cai na prova") e data da prova (G11). |
 | Duplicar e excluir | Duplicar copia os cartões, não o progresso. Excluir pede confirmação e permite desfazer por alguns segundos. |
@@ -49,7 +49,7 @@ Transformar o Tatino num app de estudo para **qualquer disciplina**, sem reescre
 | Instruções versionadas | `prompts/` com uma por objetivo (PDF, texto, tema, cálculo), regras de formato, exemplos bons e ruins e exigência de citar a página |
 | Esquema de resposta | No modo direto, a resposta estruturada do Gemini (JSON Schema) reduz erros de formato |
 | Extração tolerante | Aceita JSON dentro de blocos de código ou com texto em volta |
-| Avaliação | Script local que roda o harness nas apostilas do professor e mede o % de cartões válidos de primeira e quantos citam página. Usa a chave do Gemini por variável de ambiente, nunca no repositório. |
+| Avaliação | Script local que roda o harness em PDFs de aula reais e mede o % de cartões válidos de primeira e quantos citam página. Usa a chave do Gemini por variável de ambiente, nunca no repositório. |
 
 ### 4.3 Gemini direto
 
@@ -57,9 +57,9 @@ Transformar o Tatino num app de estudo para **qualquer disciplina**, sem reescre
 |---|---|
 | Chave | Chave **gratuita** do Google AI Studio, colada uma vez em **Configurações** e guardada **só no aparelho** (nunca no repositório nem no site) |
 | Chamada | Do navegador direto para a API do Gemini, sem servidor nosso |
-| PDF | Enviado ao Gemini, que lê texto e imagens (os slides só de imagem do professor funcionam) |
+| PDF | Enviado ao Gemini, que lê texto e imagens (slides só de imagem também funcionam) |
 | Cota | Limites do plano gratuito, a confirmar na implementação. Quando estoura, o app oferece o copiar e colar. |
-| Privacidade | No plano gratuito, o Google pode usar o conteúdo enviado para melhorar os produtos. Aceitável para apostilas; a tela avisa. |
+| Privacidade | No plano gratuito, o Google pode usar o conteúdo enviado para melhorar os produtos. Aceitável para material de aula; a tela avisa. |
 
 ## 5. Sincronização (por último, opcional — H3)
 
@@ -78,7 +78,7 @@ Contas e multiusuário, uso aberto, Cloudflare/servidor próprio, importação d
 ## 7. Pronto quando
 
 1. Ela cria um baralho de outra disciplina **sem ajuda**: do PDF à prévia e daí ao estudo.
-2. Hidrodinâmica continua com o progresso intacto depois da atualização.
+2. O baralho existente continua com o progresso intacto depois da atualização.
 3. Compartilhar e abrir um baralho pelo WhatsApp funciona, e a atualização preserva as edições dela.
-4. O harness atinge ≥ 90% de cartões válidos de primeira nas apostilas do professor.
+4. O harness atinge ≥ 90% de cartões válidos de primeira em PDFs de aula reais.
 5. (Opcional) O mesmo progresso aparece no celular e no notebook.

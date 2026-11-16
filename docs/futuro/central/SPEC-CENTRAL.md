@@ -15,7 +15,7 @@ Uma **central** pública, dentro do app, onde qualquer pessoa adiciona baralhos 
 | C4b | Quem já baixou | O baralho **some do aparelho na próxima abertura com internet**, com o aviso "removido da central". O progresso fica guardado, caso o baralho volte. |
 | C5 | Reportes | Vão **direto para a criadora**, pela central (não mais pelo WhatsApp) |
 | C7 | Direitos autorais | Todo baralho cita a fonte. Material de terceiros pode ser despublicado a qualquer momento. |
-| C8 | Hidrodinâmica | Entra na central como **não listado** (abre por link, não aparece no catálogo) até o professor autorizar |
+| C8 | Material de terceiros | Entra na central como **não listado** (abre por link, não aparece no catálogo) até o autor do material autorizar |
 | C9 | Chave do Gemini | Só a criadora tem, e só no aparelho dela: fluxo de criação no app (K3) e chave restrita no Google ao Gemini e ao endereço do app |
 | C10 | Sincronizar progresso entre aparelhos | **Depois** (Drive do próprio usuário). Fora desta fase. |
 | C11 | Conta para sugerir ou reportar | **Sem conta**: login anônimo invisível do Firebase. O spam é contido pela aprovação do admin e pelos limites das regras. |

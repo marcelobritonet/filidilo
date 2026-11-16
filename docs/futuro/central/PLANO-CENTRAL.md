@@ -13,7 +13,7 @@ Cada etapa termina com testes passando, conferência no navegador em tamanho de 
 | F4 | **Criadora** | Entrar com Google; publicar, nova versão, listado ou não listado, despublicar; reportes recebidos | F2 |
 | F5 | **Admin** | Administrar baralhos (despublicar, republicar, excluir); fila de sugestões (comparar, aprovar → nova versão, recusar); papéis | F4 |
 | F6 | **Estudante contribui** | "Sugerir para todos" e reportar para a central, com login anônimo e limites | F3, F5 |
-| F7 | **Lançamento** | Hidrodinâmica publicado como não listado; guia de mudança (backup → novo endereço → restaurar); chave da criadora restrita ao novo endereço | F1–F6 |
+| F7 | **Lançamento** | Baralhos de material de terceiros publicados como não listados; guia de mudança (backup → novo endereço → restaurar); chave da criadora restrita ao novo endereço | F1–F6 |
 
 ## O que o Marcelo faz (passo a passo será fornecido)
 
@@ -32,4 +32,4 @@ Cada etapa termina com testes passando, conferência no navegador em tamanho de 
 | Spam de sugestões anônimas | Nada fica público sem aprovação; uma sugestão pendente por cartão por aparelho |
 | A estudante perder dados na mudança de endereço | Backup antes; guia passo a passo; o endereço antigo continua funcionando até ela confirmar |
 | Cota grátis do Firestore | 50 mil leituras por dia: o catálogo é lido uma vez por abertura e as versões só ao adicionar ou atualizar |
-| Material de terceiros | Fonte obrigatória, não listado por padrão para conteúdo de apostila, despublicação com remoção dos aparelhos |
+| Material de terceiros | Fonte obrigatória, não listado por padrão para conteúdo de terceiros, despublicação com remoção dos aparelhos |
