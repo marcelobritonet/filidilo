@@ -139,8 +139,8 @@ describe('objetivo do baralho', () => {
 
   it('objetivo inválido é recusado pelo validador; objetivo válido passa', () => {
     const com = (extra: Partial<Baralho>) => JSON.stringify({ ...base(), ...extra })
-    expect(lerBaralho(com({ objetivo: { resumo: 'Conversar no México', nivel: 'intermediario', foco: ['frases'], evitar: ['gramática'] } })).objetivo?.nivel).toBe('intermediario')
-    expect(() => lerBaralho(com({ objetivo: { nivel: 'expert' } as unknown as Baralho['objetivo'] }))).toThrow(/problema/)
+    expect(lerBaralho(com({ objetivo: { resumo: 'Conversar no México', nivel: 'nocoes', foco: ['frases'], evitar: ['gramática'] } })).objetivo?.nivel).toBe('nocoes')
+    expect(() => lerBaralho(com({ objetivo: { nivel: 'mestre' } as unknown as Baralho['objetivo'] }))).toThrow(/problema/)
     expect(() => lerBaralho(com({ objetivo: { resumo: 'x'.repeat(161) } }))).toThrow(/problema/)
     expect(() => lerBaralho(com({ objetivo: { foco: ['a', 'b', 'c', 'd', 'e', 'f'] } }))).toThrow(/problema/)
     expect(() => lerBaralho(com({ objetivo: { evitar: ['x'.repeat(61)] } }))).toThrow(/problema/)
@@ -150,10 +150,10 @@ describe('objetivo do baralho', () => {
 
   it('receber atualização mantém o objetivo de quem recebe', async () => {
     await aplicar(await planejar({ ...base(), objetivo: { resumo: 'Do autor', nivel: 'iniciante' } }))
-    await salvar({ ...(await obter('fis'))!, objetivo: { resumo: 'Meu objetivo', nivel: 'avancado' } })
+    await salvar({ ...(await obter('fis'))!, objetivo: { resumo: 'Meu objetivo', nivel: 'bastante' } })
 
     await aplicar(await planejar({ ...base(), objetivo: { resumo: 'Do autor, versão 2', nivel: 'iniciante' } }))
-    expect((await obter('fis'))!.objetivo).toEqual({ resumo: 'Meu objetivo', nivel: 'avancado' })
+    expect((await obter('fis'))!.objetivo).toEqual({ resumo: 'Meu objetivo', nivel: 'bastante' })
   })
 
   it('se quem recebe não tem objetivo, entra o recebido', async () => {

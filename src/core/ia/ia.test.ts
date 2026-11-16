@@ -92,10 +92,10 @@ describe('instrução v3 (objetivo e cobertos)', () => {
       baralho: {
         titulo: 'Espanhol',
         temas: [{ id: 'verbos', nome: 'Verbos', descricao: 'Presente do indicativo' }],
-        objetivo: { resumo: 'Conversar no México', nivel: 'intermediario', foco: ['pedir comida'], evitar: ['gramática formal'] },
+        objetivo: { resumo: 'Conversar no México', nivel: 'nocoes', foco: ['pedir comida'], evitar: ['gramática formal'] },
       },
     })
-    expect(t).toContain('## Objetivo do baralho\nObjetivo: Conversar no México\nEscreva para o nível intermediário.\nFoque em: pedir comida.\nNão crie nada sobre: gramática formal. Isso vale também para spoilers.')
+    expect(t).toContain('## Objetivo do baralho\nObjetivo: Conversar no México\nNível de conhecimento: boas noções. Pessoa com boas noções: pergunte o porquê e o como, e as distinções que confundem quem está começando. Pode supor os termos básicos e não repita o óbvio.\nFoque em: pedir comida.\nNão crie nada sobre: gramática formal. Isso vale também para spoilers.')
     expect(t).toContain('"verbos": Verbos — Presente do indicativo (prioridade: crie mais cartões deste tema)')
     expect(t).toContain('Priorize o que mais serve ao objetivo.')
     expect(t).toContain('"Gerado por IA"')
@@ -150,7 +150,7 @@ describe('plano: leitura da resposta (Aprender)', () => {
   })
 
   it('nível inválido é ignorado', () => {
-    const r = lerPlano({ ...plano, baralho: { ...plano.baralho, nivel: 'expert' } }, 'x')
+    const r = lerPlano({ ...plano, baralho: { ...plano.baralho, nivel: 'mestre' } }, 'x')
     expect(r.baralho.objetivo?.nivel).toBeUndefined()
     expect(r.baralho.objetivo?.resumo).toBe('Conversar o básico no México')
   })

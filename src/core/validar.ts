@@ -1,8 +1,6 @@
 import { preencher, sortear } from './calc'
 import { compilar } from './expr'
-import type { Baralho, Nivel, Objetivo } from './types'
-
-const NIVEIS_VALIDOS: Nivel[] = ['iniciante', 'intermediario', 'avancado']
+import { normalizarNivel, type Baralho, type Objetivo } from './types'
 
 /** Lista os problemas do objetivo (opcional). Vazio = válido ou ausente. */
 export function validarObjetivo(o: unknown): string[] {
@@ -12,7 +10,7 @@ export function validarObjetivo(o: unknown): string[] {
   const erros: string[] = []
   if (d.pedido !== undefined && typeof d.pedido !== 'string') erros.push('objetivo: pedido deve ser texto')
   if (d.resumo !== undefined && (typeof d.resumo !== 'string' || d.resumo.length > 160)) erros.push('objetivo: resumo deve ser texto de até 160 caracteres')
-  if (d.nivel !== undefined && !NIVEIS_VALIDOS.includes(d.nivel)) erros.push('objetivo: nível inválido')
+  if (d.nivel !== undefined && !normalizarNivel(d.nivel)) erros.push('objetivo: nível inválido')
   for (const campo of ['foco', 'evitar'] as const) {
     const lista = d[campo]
     if (lista === undefined) continue

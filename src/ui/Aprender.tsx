@@ -31,6 +31,7 @@ interface Edicao {
  */
 export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string; nav: Navegacao }) {
   const [pedido, setPedido] = useState(pedidoInicial)
+  const [nivelPedido, setNivelPedido] = useState<Nivel | ''>('')
   const [materialAberto, setMaterialAberto] = useState(false)
   const [material, setMaterial] = useState<Material>('pdf')
   const [nomePdf, setNomePdf] = useState('')
@@ -56,10 +57,11 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
         ? 'texto'
         : undefined
   const instrucao = useMemo(
-    () => montarPlano({ pedido, origem: origemMaterial, nomePdf, paginas, texto }),
-    [pedido, origemMaterial, nomePdf, paginas, texto],
+    () => montarPlano({ pedido, nivel: nivelPedido || undefined, origem: origemMaterial, nomePdf, paginas, texto }),
+    [pedido, nivelPedido, origemMaterial, nomePdf, paginas, texto],
   )
-  const pedidoOk = pedido.trim().length >= 3
+  // Sem o nível escolhido a instrução não sai: é ele que define a dificuldade dos cartões.
+  const pedidoOk = pedido.trim().length >= 3 && !!nivelPedido
 
   const copiar = async (conteudo: string, qual: 'instrucao' | 'correcao') => {
     try {
@@ -100,7 +102,8 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
         com_baralho: !!r.baralho.objetivo,
       })
       if (!lido) {
-        const ini: Edicao = { titulo: r.baralho.titulo, resumo: r.baralho.objetivo?.resumo ?? '', nivel: r.baralho.objetivo?.nivel ?? '' }
+        // O nível é o que a pessoa escolheu, não o que a IA devolveu.
+        const ini: Edicao = { titulo: r.baralho.titulo, resumo: r.baralho.objetivo?.resumo ?? '', nivel: nivelPedido }
         setInicial(ini)
         setCfg(ini)
         setLido(r)
@@ -173,6 +176,22 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
       <section class="bloco passo">
         <h2><span class="num-passo">1</span> O que você quer aprender?</h2>
         <input class="texto" aria-label="O que você quer aprender" value={pedido} placeholder="Ex.: espanhol para viajar" onInput={(e) => setPedido((e.target as HTMLInputElement).value)} />
+        <p class="rotulo">Quanto você já sabe sobre isso?</p>
+        <div class="opcoes-nivel" role="radiogroup" aria-label="Quanto você já sabe">
+          {NIVEIS.map((n) => (
+            <button
+              role="radio"
+              aria-checked={nivelPedido === n.valor}
+              class={`opcao-nivel ${nivelPedido === n.valor ? 'ativo' : ''}`}
+              onClick={() => {
+                setNivelPedido(n.valor)
+                evento('aprender_nivel', { nivel: n.valor })
+              }}
+            >
+              {n.pedido}
+            </button>
+          ))}
+        </div>
         {!materialAberto ? (
           <button class="link" onClick={() => { setMaterialAberto(true); evento('aprender_material', { origem: material }) }}>
             Tenho um material (PDF ou texto)
@@ -210,6 +229,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
       <section class="bloco passo">
         <h2><span class="num-passo">2</span> Peça à IA</h2>
         <p class="dica">Copie a instrução e cole na IA{origemMaterial === 'pdf' ? ', junto com o PDF' : ''}.</p>
+        {!pedidoOk && <p class="dica">Escreva o que quer aprender e escolha quanto você já sabe, no passo 1.</p>}
         <button class="btn principal" disabled={!pedidoOk} onClick={() => copiar(instrucao, 'instrucao')}>
           {copiado === 'instrucao' ? '✓ Instrução copiada' : 'Copiar instrução'}
         </button>
@@ -258,7 +278,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
                 <input class="texto" maxLength={160} value={cfg.resumo} onInput={(e) => setCfg({ ...cfg, resumo: (e.target as HTMLInputElement).value })} />
               </label>
               <label class="campo">
-                Nível
+                Quanto você já sabe
                 <select value={cfg.nivel} onChange={(e) => setCfg({ ...cfg, nivel: (e.target as HTMLSelectElement).value as Nivel | '' })}>
                   <option value="">—</option>
                   {NIVEIS.map((n) => (

@@ -16,9 +16,9 @@ describe('corrigir um cartão com a IA', () => {
   })
 
   it('com objetivo e nível, o pedido mantém o recorte', () => {
-    const p = montarPedidoCorrecao(b, errado, undefined, { resumo: 'Estudar estequiometria', nivel: 'avancado', evitar: ['ácidos'] })
+    const p = montarPedidoCorrecao(b, errado, undefined, { resumo: 'Estudar estequiometria', nivel: 'bastante', evitar: ['ácidos'] })
     expect(p).toContain('Objetivo do baralho: Estudar estequiometria.')
-    expect(p).toContain('Nível: avançado.')
+    expect(p).toContain('Nível: já sei bastante.')
     expect(p).toContain('Não crie nada sobre: ácidos.')
     expect(montarPedidoCorrecao(b, errado)).not.toContain('Nível:')
   })

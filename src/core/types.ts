@@ -13,14 +13,73 @@ export interface Tema {
   descricao?: string
 }
 
-export type Nivel = 'iniciante' | 'intermediario' | 'avancado'
+/** Quanto a pessoa já sabe sobre o assunto. Ordem do menos para o mais. */
+export type Nivel = 'zero' | 'iniciante' | 'nocoes' | 'bastante' | 'expert' | 'extremo'
 
-/** Níveis para mostrar na tela, na ordem. */
-export const NIVEIS: { valor: Nivel; nome: string }[] = [
-  { valor: 'iniciante', nome: 'Iniciante' },
-  { valor: 'intermediario', nome: 'Intermediário' },
-  { valor: 'avancado', nome: 'Avançado' },
+export interface NivelInfo {
+  valor: Nivel
+  /** Nome curto, para botões e listas. */
+  nome: string
+  /** Frase que a pessoa escolhe ao montar o pedido. */
+  pedido: string
+  /** O que a IA deve fazer com cada nível (vai dentro da instrução). */
+  instrucao: string
+}
+
+/** Níveis na ordem. Os textos de `instrucao` são o que faz os cartões acertarem o tom. */
+export const NIVEIS: NivelInfo[] = [
+  {
+    valor: 'zero',
+    nome: 'Do zero',
+    pedido: 'Não sei absolutamente nada. Vou começar do zero.',
+    instrucao: 'Começa do zero absoluto: explique cada termo novo no próprio cartão, sem supor nada. Perguntas simples e diretas, com o básico primeiro. Nada de detalhe fino.',
+  },
+  {
+    valor: 'iniciante',
+    nome: 'Sei pouco',
+    pedido: 'Sei pouco. Sou iniciante.',
+    instrucao: 'Pessoa iniciante: use vocabulário básico e defina o termo técnico na primeira vez que ele aparecer. Foque no essencial, sem pegadinhas.',
+  },
+  {
+    valor: 'nocoes',
+    nome: 'Boas noções',
+    pedido: 'Tenho boas noções.',
+    instrucao: 'Pessoa com boas noções: pergunte o porquê e o como, e as distinções que confundem quem está começando. Pode supor os termos básicos e não repita o óbvio.',
+  },
+  {
+    valor: 'bastante',
+    nome: 'Já sei bastante',
+    pedido: 'Já sei bastante sobre o assunto.',
+    instrucao: 'Pessoa que já sabe bastante: faça perguntas de aplicação, comparações, exceções e erros comuns. Não repita o básico.',
+  },
+  {
+    valor: 'expert',
+    nome: 'Expert',
+    pedido: 'Nível expert. Quero me aperfeiçoar.',
+    instrucao: 'Pessoa expert que quer se aperfeiçoar: casos difíceis, detalhes finos, justificativas profundas e pegadinhas de prova. Nada de explicar o básico.',
+  },
+  {
+    valor: 'extremo',
+    nome: 'Extremo',
+    pedido: 'Nível extremo. Provavelmente vou errar todas.',
+    instrucao: 'Nível extremo: perguntas difíceis de verdade, do tipo que um especialista erra. Use casos-limite, sutilezas e consequências pouco óbvias. Difícil, mas sempre correto e verificável: nunca crie uma pegadinha sem resposta certa e clara.',
+  },
 ]
+
+/** Valores de baralhos criados antes da escala nova. */
+const NIVEIS_ANTIGOS: Record<string, Nivel> = { intermediario: 'nocoes', avancado: 'bastante' }
+
+/** Converte o nível salvo (inclusive os antigos) no valor atual; desconhecido vira undefined. */
+export function normalizarNivel(v: unknown): Nivel | undefined {
+  if (typeof v !== 'string') return undefined
+  if (NIVEIS.some((n) => n.valor === v)) return v as Nivel
+  return NIVEIS_ANTIGOS[v]
+}
+
+export const infoNivel = (v: unknown): NivelInfo | undefined => {
+  const valor = normalizarNivel(v)
+  return NIVEIS.find((n) => n.valor === valor)
+}
 
 export interface Objetivo {
   /** O que a pessoa digitou em "O que você quer aprender hoje?". */

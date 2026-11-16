@@ -1,7 +1,7 @@
 // Harness "Criar com IA": monta a instrução que a estudante cola na IA.
 // Versão da instrução: mude ao alterar regras, para comparar a qualidade entre versões (E6).
 import type { Baralho, Cartao, Objetivo, Tema } from '../types'
-import { NIVEIS } from '../types'
+import { infoNivel } from '../types'
 import { jaCobertos } from './cobertos'
 
 export const VERSAO_INSTRUCAO = 3
@@ -139,8 +139,8 @@ function objetivoTexto(obj?: Objetivo): string {
   const linhas: string[] = []
   const resumo = obj.resumo || obj.pedido
   if (resumo) linhas.push(`Objetivo: ${resumo}`)
-  const nivel = NIVEIS.find((n) => n.valor === obj.nivel)
-  if (nivel) linhas.push(`Escreva para o nível ${nivel.nome.toLowerCase()}.`)
+  const nivel = infoNivel(obj.nivel)
+  if (nivel) linhas.push(`Nível de conhecimento: ${nivel.nome.toLowerCase()}. ${nivel.instrucao}`)
   if (obj.foco?.length) linhas.push(`Foque em: ${obj.foco.join('; ')}.`)
   if (obj.evitar?.length) linhas.push(`Não crie nada sobre: ${obj.evitar.join('; ')}. Isso vale também para spoilers.`)
   return linhas.length ? `## Objetivo do baralho\n${linhas.join('\n')}\n\n` : ''

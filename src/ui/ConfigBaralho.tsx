@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks'
 import { duplicar, excluir, novoId, restaurar, salvar } from '../core/baralhos'
-import { NIVEIS, type Baralho, type Nivel, type Objetivo, type Tema } from '../core/types'
+import { NIVEIS, normalizarNivel, type Baralho, type Nivel, type Objetivo, type Tema } from '../core/types'
 import type { Navegacao } from './App'
 import { evento } from '../core/telemetria'
 import { enviarBaralho } from './enviar'
@@ -15,7 +15,7 @@ const normalizar = (o?: Objetivo) =>
 export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) {
   const [titulo, setTitulo] = useState(baralho.titulo)
   const [resumo, setResumo] = useState(baralho.objetivo?.resumo ?? '')
-  const [nivel, setNivel] = useState<Nivel | ''>(baralho.objetivo?.nivel ?? '')
+  const [nivel, setNivel] = useState<Nivel | ''>(normalizarNivel(baralho.objetivo?.nivel) ?? '')
   const [foco, setFoco] = useState((baralho.objetivo?.foco ?? []).join('\n'))
   const [evitar, setEvitar] = useState((baralho.objetivo?.evitar ?? []).join('\n'))
   const [temas, setTemas] = useState<Tema[]>(baralho.temas)
@@ -129,7 +129,7 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
           <input class="texto" maxLength={160} value={resumo} onInput={(e) => setResumo((e.target as HTMLInputElement).value)} />
         </label>
         <label class="campo">
-          Nível
+          Quanto você já sabe
           <select value={nivel} onChange={(e) => setNivel((e.target as HTMLSelectElement).value as Nivel | '')}>
             <option value="">—</option>
             {NIVEIS.map((n) => (

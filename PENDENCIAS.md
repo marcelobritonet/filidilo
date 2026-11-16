@@ -53,4 +53,5 @@ Atualizado em 16/11/2026.
 | P53 | v3 · E8 Tirar a data da prova de todo o app (campo, contagem "Faltam N dias", textos, instrução à IA); o campo `prova` de arquivos antigos é ignorado | ✅ Publicada na v3.0.0 (16/11): único lugar com a data era o formulário de criar baralho | Claude |
 | P54 | v3 · Sugerir o primeiro tema com poucos cartões depois da primeira sessão de um baralho novo (SPEC-V3 §6), ficou fora da v3.0.0 | A fazer | Claude |
 | P55 | Convite discreto para instalar o PWA (cartão em Meus baralhos a partir da 2ª abertura, 1 vez por semana, "Não perguntar mais"; bloco em Aparência com passos para iPhone) | ✅ Publicada na v3.1.0 (16/11) | Claude |
+| P56 | Nível no pedido de "Aprender": 6 opções (do zero ao extremo), obrigatório antes de copiar a instrução; a IA ajusta dificuldade e tom; níveis antigos convertidos na leitura | ✅ Publicada na v3.2.0 (16/11) | Claude |
 | P52 | v3 · E7 Testar o fluxo novo com gente de verdade (um baralho com PDF de aula e um de assunto livre) | A fazer, depois da publicação | Marcelo / estudante |

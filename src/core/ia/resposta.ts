@@ -1,6 +1,6 @@
 // Lê a resposta da IA: extrai o JSON, ajusta temas e ids e valida cartão a cartão.
 import { problemasDoCartao, novoIdCartao } from '../cartoes'
-import { NIVEIS, type Baralho, type Cartao, type Nivel, type Objetivo, type Tema } from '../types'
+import { normalizarNivel, type Baralho, type Cartao, type Objetivo, type Tema } from '../types'
 
 export interface CartaoLido {
   cartao: Cartao
@@ -105,7 +105,6 @@ export interface PlanoLido extends RespostaLida {
   baralho: { titulo: string; objetivo?: Objetivo }
 }
 
-const NIVEIS_VALIDOS = new Set<string>(NIVEIS.map((n) => n.valor))
 const aparar = (v: unknown, max: number): string => (typeof v === 'string' ? v.trim().slice(0, max) : '')
 const lista = (v: unknown): string[] =>
   Array.isArray(v)
@@ -128,7 +127,7 @@ export function lerPlano(dados: unknown, pedido: string): PlanoLido {
 
   let objetivo: Objetivo | undefined
   if (bruto) {
-    const nivel = typeof bruto.nivel === 'string' && NIVEIS_VALIDOS.has(bruto.nivel) ? (bruto.nivel as Nivel) : undefined
+    const nivel = normalizarNivel(bruto.nivel)
     const foco = lista(bruto.foco)
     const evitar = lista(bruto.evitar)
     objetivo = { pedido: pedidoLimpo }

@@ -1,13 +1,15 @@
 // Harness "Aprender uma coisa nova hoje": monta a instrução que a pessoa cola na IA para planejar um baralho.
 // Versão da instrução: mude ao alterar regras (como em VERSAO_INSTRUCAO).
-import type { Cartao, Nivel, Tema } from '../types'
+import { infoNivel, type Cartao, type Nivel, type Tema } from '../types'
 import { origemTexto, regrasTextoJson, regrasTipos } from './instrucao'
 
-export const VERSAO_PLANO = 1
+export const VERSAO_PLANO = 2
 
 export interface PedidoPlano {
   /** O que a pessoa digitou em "Aprender uma coisa nova hoje". */
   pedido: string
+  /** Quanto a pessoa já sabe (escolhido ao lado do pedido). */
+  nivel?: Nivel
   /** Material opcional: PDF (com nome e páginas) ou texto colado. */
   origem?: 'pdf' | 'texto'
   nomePdf?: string
@@ -63,6 +65,7 @@ export function montarPlano(p: PedidoPlano): string {
   const material = p.origem
     ? origemTexto({ origem: p.origem, nomePdf: p.nomePdf, paginas: p.paginas, texto: p.texto, quantidade: 15, mistura: 'misto' })
     : 'Não há material anexado: use conhecimento consolidado e correto, do que é ensinado em cursos regulares.'
+  const nivel = infoNivel(p.nivel)
   const fonte =
     p.origem === 'pdf'
       ? `"fonte": { "apostila": "${p.nomePdf?.trim() || 'nome do material'}", "pagina": número da página }`
@@ -77,22 +80,22 @@ ${p.pedido.trim()}
 
 ## Material
 ${material}
-
+${nivel ? `\n## Quanto a pessoa já sabe\nNível "${nivel.nome}" (${nivel.valor}). ${nivel.instrucao}\nEsse nível foi escolhido pela própria pessoa: não mude. Ele manda na dificuldade e no tom de todos os cartões.\n` : ''}
 ## Antes de responder
-Se o pedido for vago demais para montar um bom plano (não dá para saber o nível, o objetivo ou o recorte), faça até 3 perguntas curtas, numa mensagem só, e espere a resposta. Senão, responda direto.
+Se o pedido for vago demais para montar um bom plano (não dá para saber o objetivo ou o recorte), faça até 3 perguntas curtas, numa mensagem só, e espere a resposta. Senão, responda direto.
 
 ## Planejar
-- Interprete o objetivo da pessoa e escolha o nível: "iniciante", "intermediario" ou "avancado".
+- Interprete o objetivo da pessoa e escreva o objetivo em 1 frase.${nivel ? ` O nível é "${nivel.valor}".` : ' Escolha o nível entre "zero", "iniciante", "nocoes", "bastante", "expert" e "extremo".'}
 - Defina o foco (de 2 a 5 itens) e, se houver, o que evitar.
 - Crie de 3 a 8 temas, na ordem em que se aprende, cada um com uma frase de descrição.
 
 ## Cartões
-Crie 15 cartões, distribuídos pelos temas e começando pelos primeiros. Adeque a dificuldade ao nível. Os tipos devem combinar com o assunto: "calculo" só se houver contas; para idiomas, use "conceito" e "associacao".
+Crie 15 cartões, distribuídos pelos temas e começando pelos primeiros. Adeque a dificuldade ao nível da pessoa. Os tipos devem combinar com o assunto: "calculo" só se houver contas; para idiomas, use "conceito" e "associacao".
 
 ## Formato da resposta
 Um objeto JSON com "baralho", "temas" e "cartoes":
 { "baralho": { "titulo": "...", "objetivo": "...", "nivel": "...", "foco": [ ... ], "evitar": [ ... ] }, "temas": [ { "id": "...", "nome": "...", "descricao": "..." } ], "cartoes": [ ... ] }
-- "baralho.titulo": até 40 caracteres. "objetivo": 1 frase, até 160 caracteres. "nivel": "iniciante", "intermediario" ou "avancado". "foco" e "evitar": até 5 itens, de até 60 caracteres cada.
+- "baralho.titulo": até 40 caracteres. "objetivo": 1 frase, até 160 caracteres. "nivel": um de "zero", "iniciante", "nocoes", "bastante", "expert" ou "extremo"${nivel ? ` (use "${nivel.valor}")` : ''}. "foco" e "evitar": até 5 itens, de até 60 caracteres cada.
 - "temas[].descricao": até 120 caracteres.
 
 ${regrasTipos(fonte)}

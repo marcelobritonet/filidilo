@@ -5,7 +5,7 @@ import { extrairJson } from './resposta'
 
 describe('instrução de planejamento (Aprender)', () => {
   it('versão 1', () => {
-    expect(VERSAO_PLANO).toBe(1)
+    expect(VERSAO_PLANO).toBe(2)
   })
 
   it('o exemplo passa no validador do app', () => {
@@ -36,5 +36,21 @@ describe('instrução de planejamento (Aprender)', () => {
 
   it('o exemplo dentro da instrução é o JSON de EXEMPLO_PLANO', () => {
     expect(extrairJson(montarPlano({ pedido: 'xadrez' }))).toEqual(JSON.parse(JSON.stringify(EXEMPLO_PLANO)))
+  })
+})
+
+describe('nível de conhecimento no pedido', () => {
+  it('põe o nível escolhido e a instrução de tom na instrução', () => {
+    const t = montarPlano({ pedido: 'cálculo 1', nivel: 'extremo' })
+    expect(t).toContain('Nível "Extremo" (extremo)')
+    expect(t).toContain('perguntas difíceis de verdade')
+    expect(t).toContain('não mude')
+    expect(t).toContain('"nivel" é "extremo"'.replace('"nivel" é', 'O nível é'))
+  })
+
+  it('sem nível, a IA escolhe entre as seis opções', () => {
+    const t = montarPlano({ pedido: 'xadrez' })
+    expect(t).not.toContain('Quanto a pessoa já sabe')
+    expect(t).toContain('"zero", "iniciante", "nocoes", "bastante", "expert" e "extremo"')
   })
 })

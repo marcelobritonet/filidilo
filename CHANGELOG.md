@@ -2,6 +2,19 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.2.0] — 2026-11-16
+
+**Você diz quanto já sabe.** Ao aprender uma coisa nova, a pessoa escolhe o próprio nível antes de pedir a instrução, e a IA ajusta a dificuldade e o tom dos cartões.
+
+### Novo
+- **Quanto você já sabe sobre isso?** Seis opções, do zero ao extremo: "Não sei absolutamente nada. Vou começar do zero.", "Sei pouco. Sou iniciante.", "Tenho boas noções.", "Já sei bastante sobre o assunto.", "Nível expert. Quero me aperfeiçoar." e "Nível extremo. Provavelmente vou errar todas.". A instrução só sai depois de escolher uma.
+- A instrução explica para a IA o que cada nível pede: do zero explica cada termo; boas noções pergunta o porquê e o como; expert vai a casos difíceis e pegadinhas de prova; extremo vai a casos-limite, sempre com resposta certa.
+
+### Mudou
+- Os níveis antigos (iniciante, intermediário e avançado) viraram: iniciante continua iniciante, intermediário vira "Boas noções" e avançado vira "Já sei bastante". Baralhos, backups e arquivos compartilhados antigos continuam abrindo.
+- O nível é o que a pessoa escolheu, não o que a IA sugere.
+- Em **Configurar baralho** e na revisão, o campo se chama "Quanto você já sabe".
+
 ## [3.1.0] — 2026-11-16
 
 **Instale o tatino. na tela inicial.** Abre em tela cheia e funciona sem internet.

@@ -1,6 +1,6 @@
 // Corrigir um cartão com ajuda da IA: monta o pedido e lê o cartão corrigido.
 import { problemasDoCartao } from '../cartoes'
-import { NIVEIS, type Baralho, type Cartao, type Objetivo } from '../types'
+import { infoNivel, type Baralho, type Cartao, type Objetivo } from '../types'
 import { extrairJson } from './resposta'
 
 const REGRAS_TIPO: Record<Cartao['tipo'], string> = {
@@ -23,7 +23,7 @@ function paraIA(c: Cartao): Record<string, unknown> {
  */
 export function montarPedidoCorrecao(b: Pick<Baralho, 'titulo' | 'temas'>, c: Cartao, problema?: string, objetivo?: Objetivo): string {
   const tema = b.temas.find((t) => t.id === c.tema)?.nome ?? c.tema
-  const nivel = NIVEIS.find((n) => n.valor === objetivo?.nivel)?.nome.toLowerCase()
+  const nivel = infoNivel(objetivo?.nivel)?.nome.toLowerCase()
   const contexto = [
     objetivo?.resumo && `Objetivo do baralho: ${objetivo.resumo}.`,
     nivel && `Nível: ${nivel}.`,
