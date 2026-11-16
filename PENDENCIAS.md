@@ -36,3 +36,4 @@ Atualizado em 16/11/2026.
 | P35 | Tirar de Meus baralhos o aviso "Recebeu um cartão ou baralho? No WhatsApp, segure o arquivo → Compartilhar → tatino." | ✅ Removido na v2.1.2 (16/11) | — |
 | P36 | One Piece sem spoilers: baralho só com o começo da história (East Blue) e correção automática em quem já tem a v2.1.0 | ✅ Publicada na v2.1.1 (16/11) | — |
 | P37 | Ícone de enviar no cartão (estudo) e no baralho (ao lado do nome) | ✅ Publicada na v2.2.0 (16/11) | — |
+| P38 | Alternativas que mudam (C: 2 formas da certa + erradas sorteadas) e sem alternativas quando dominado (D); IA, editor e One Piece no formato novo | ✅ Publicada na v2.3.0 (16/11) | — |

@@ -38,8 +38,11 @@ export interface CartaoVF extends CartaoBase {
 export interface CartaoAssociacao extends CartaoBase {
   tipo: 'associacao'
   frente: string
+  /** A certa e as erradas. Com mais de 4, cada vez que o cartão aparece o app sorteia 3 erradas. */
   opcoes: string[]
   correta: number // índice em opcoes
+  /** Outras formas de dizer a resposta certa; o app alterna entre elas, para a certa não ficar sempre igual. */
+  outrasFormas?: string[]
 }
 
 /** Parâmetro sorteado: faixa numérica ou lista de opções com rótulo. */

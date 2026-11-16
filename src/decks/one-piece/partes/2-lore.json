@@ -1,20 +1,20 @@
 {
   "cartoes": [
     {"id": "op-l-01", "tipo": "conceito", "tema": "lore", "frente": "Quem foi Gol D. Roger?", "verso": "O **Rei dos Piratas**, o único a chegar ao fim da Grand Line. Sua execução em Loguetown deu início à **Grande Era dos Piratas**."},
-    {"id": "op-l-27", "tipo": "associacao", "tema": "lore", "frente": "Em que cidade Gol D. Roger foi executado?", "opcoes": ["Loguetown", "Vila Foosha", "Shells Town", "Vila Syrup"], "correta": 0},
+    {"id": "op-l-27", "tipo": "associacao", "tema": "lore", "frente": "Em que cidade Gol D. Roger foi executado?", "opcoes": ["Loguetown", "Vila Foosha", "Shells Town", "Vila Syrup", "Orange Town", "Porto Branco"], "correta": 0, "outrasFormas": ["Logue Town"]},
     {"id": "op-l-20", "tipo": "conceito", "tema": "lore", "frente": "O que é o One Piece?", "verso": "O tesouro deixado por **Gol D. Roger** no fim da Grand Line. Ninguém sabe ao certo o que ele é."},
     {"id": "op-l-22", "tipo": "vf", "tema": "lore", "frente": "Antes de ser executado, Roger disse que quem quisesse o seu tesouro teria que procurá-lo.", "resposta": true, "explicacao": "Essas palavras levaram muita gente ao mar e deram início à Grande Era dos Piratas."},
     {"id": "op-l-04", "tipo": "vf", "tema": "lore", "frente": "Quem come uma Akuma no Mi ganha poderes, mas perde a capacidade de nadar.", "resposta": true},
     {"id": "op-l-17", "tipo": "vf", "tema": "lore", "frente": "As Akuma no Mi têm um gosto horrível.", "resposta": true},
-    {"id": "op-l-23", "tipo": "associacao", "tema": "lore", "frente": "Qual é a moeda do mundo de One Piece?", "opcoes": ["Berry", "Ouro", "Doubloon", "Coroa"], "correta": 0},
+    {"id": "op-l-23", "tipo": "associacao", "tema": "lore", "frente": "Qual é a moeda do mundo de One Piece?", "opcoes": ["Berry", "Ouro", "Doubloon", "Coroa", "Dólar", "Peça de ouro"], "correta": 0, "outrasFormas": ["Berries"]},
     {"id": "op-l-21", "tipo": "conceito", "tema": "lore", "frente": "Quais são os quatro mares?", "verso": "**East Blue**, **West Blue**, **North Blue** e **South Blue**."},
     {"id": "op-l-08", "tipo": "associacao", "tema": "lore", "frente": "Em qual dos quatro mares Luffy nasceu?", "opcoes": ["East Blue", "West Blue", "North Blue", "South Blue"], "correta": 0, "explicacao": "Luffy é da Vila Foosha, no East Blue."},
-    {"id": "op-l-25", "tipo": "associacao", "tema": "lore", "frente": "Em que vila Luffy cresceu?", "opcoes": ["Vila Foosha", "Vila Syrup", "Orange Town", "Shells Town"], "correta": 0},
+    {"id": "op-l-25", "tipo": "associacao", "tema": "lore", "frente": "Em que vila Luffy cresceu?", "opcoes": ["Vila Foosha", "Vila Syrup", "Orange Town", "Shells Town", "Loguetown"], "correta": 0, "outrasFormas": ["Foosha"]},
     {"id": "op-l-26", "tipo": "conceito", "tema": "lore", "frente": "O que são os Reis do Mar?", "verso": "Monstros marinhos gigantes. Um deles quase devorou Luffy quando ele era criança."},
     {"id": "op-l-09", "tipo": "conceito", "tema": "lore", "frente": "O que são a Red Line e o Calm Belt?", "verso": "A **Red Line** é o continente que dá a volta no mundo. O **Calm Belt** são faixas de mar sem vento e cheias de Reis do Mar, que cercam a Grand Line."},
     {"id": "op-l-19", "tipo": "conceito", "tema": "lore", "frente": "Como se chega à Grand Line saindo do East Blue?", "verso": "Subindo a **Reverse Mountain**, uma montanha onde as correntes dos quatro mares sobem e descem até a Grand Line."},
-    {"id": "op-l-18", "tipo": "associacao", "tema": "lore", "frente": "Por qual apelido a Grand Line é conhecida?", "opcoes": ["Cemitério dos piratas", "Mar da calmaria", "Caminho do rei", "Mar dos sonhos"], "correta": 0},
-    {"id": "op-l-29", "tipo": "associacao", "tema": "lore", "frente": "Por que uma bússola comum não funciona na Grand Line?", "opcoes": ["Os campos magnéticos das ilhas confundem a bússola; usa-se o Log Pose", "Porque a Grand Line não tem norte", "Porque as ilhas mudam de lugar", "Porque só funciona de dia"], "correta": 0},
+    {"id": "op-l-18", "tipo": "associacao", "tema": "lore", "frente": "Por qual apelido a Grand Line é conhecida?", "opcoes": ["Cemitério dos piratas", "Mar da calmaria", "Caminho do rei", "Mar dos sonhos", "Mar do fim do mundo", "Rota dourada"], "correta": 0, "outrasFormas": ["Túmulo dos piratas"]},
+    {"id": "op-l-29", "tipo": "associacao", "tema": "lore", "frente": "Por que uma bússola comum não funciona na Grand Line?", "opcoes": ["Por causa do magnetismo das ilhas", "Porque a Grand Line não tem norte", "Porque as ilhas mudam de lugar", "Porque só funciona de dia", "Porque o sol confunde a agulha", "Porque o mar é salgado demais"], "correta": 0, "outrasFormas": ["Porque as ilhas desviam a agulha"], "explicacao": "Na Grand Line se usa o Log Pose, que aponta de uma ilha para a próxima."},
     {"id": "op-l-24", "tipo": "conceito", "tema": "lore", "frente": "O que são os Shichibukai?", "verso": "Os **Sete Senhores da Guerra do Mar**: piratas que têm permissão do Governo Mundial para agir, em troca de colaborar com ele."}
   ]
 }

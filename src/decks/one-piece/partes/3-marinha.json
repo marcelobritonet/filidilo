@@ -1,19 +1,19 @@
 {
   "cartoes": [
     {"id": "op-m-01", "tipo": "conceito", "tema": "marinha", "frente": "A quem a Marinha responde?", "verso": "Ao **Governo Mundial**. A Marinha é a força militar do governo nos mares."},
-    {"id": "op-m-16", "tipo": "associacao", "tema": "marinha", "frente": "Que palavra aparece nas costas dos casacos dos oficiais da Marinha?", "opcoes": ["Justiça", "Ordem", "Paz", "Honra"], "correta": 0},
-    {"id": "op-m-28", "tipo": "associacao", "tema": "marinha", "frente": "Que animal aparece no símbolo da Marinha?", "opcoes": ["Gaivota", "Águia", "Tubarão", "Leão"], "correta": 0},
+    {"id": "op-m-16", "tipo": "associacao", "tema": "marinha", "frente": "Que palavra aparece nas costas dos casacos dos oficiais da Marinha?", "opcoes": ["Justiça", "Ordem", "Paz", "Honra", "Coragem", "Lei"], "correta": 0},
+    {"id": "op-m-28", "tipo": "associacao", "tema": "marinha", "frente": "Que animal aparece no símbolo da Marinha?", "opcoes": ["Gaivota", "Águia", "Tubarão", "Leão", "Corvo", "Baleia"], "correta": 0},
     {"id": "op-m-24", "tipo": "vf", "tema": "marinha", "frente": "Na Marinha, almirante é um posto acima de capitão.", "resposta": true},
     {"id": "op-m-18", "tipo": "conceito", "tema": "marinha", "frente": "O que é um cartaz de procurado?", "verso": "Um cartaz com a foto de um criminoso e o valor da **recompensa** paga por sua captura."},
     {"id": "op-m-17", "tipo": "conceito", "tema": "marinha", "frente": "O que é um caçador de piratas?", "verso": "Alguém que captura piratas para receber a recompensa. Zoro era famoso como caçador de piratas antes de conhecer Luffy."},
     {"id": "op-m-27", "tipo": "conceito", "tema": "marinha", "frente": "Quem é Coby?", "verso": "Um garoto que trabalhava à força para a pirata Alvida. Depois de conhecer Luffy, criou coragem para entrar na Marinha."},
-    {"id": "op-m-19", "tipo": "associacao", "tema": "marinha", "frente": "Qual é o sonho de Coby?", "opcoes": ["Ser almirante da Marinha", "Ser Rei dos Piratas", "Ser o maior espadachim do mundo", "Ser médico"], "correta": 0},
+    {"id": "op-m-19", "tipo": "associacao", "tema": "marinha", "frente": "Qual é o sonho de Coby?", "opcoes": ["Ser almirante da Marinha", "Ser Rei dos Piratas", "Ser o maior espadachim do mundo", "Ser médico", "Ser cozinheiro", "Ser navegador"], "correta": 0, "outrasFormas": ["Chegar a almirante"]},
     {"id": "op-m-14", "tipo": "vf", "tema": "marinha", "frente": "O capitão Morgan \"Mão de Machado\" era o oficial da Marinha que mantinha Zoro preso em Shells Town.", "resposta": true},
     {"id": "op-m-20", "tipo": "conceito", "tema": "marinha", "frente": "Quem é Helmeppo?", "verso": "O filho mimado do capitão **Morgan**, que se aproveitava da posição do pai em Shells Town."},
     {"id": "op-m-25", "tipo": "conceito", "tema": "marinha", "frente": "Por que Zoro estava amarrado em Shells Town?", "verso": "Ele aceitou ficar amarrado por **um mês**, sem comida, em troca de Helmeppo deixar os moradores em paz."},
-    {"id": "op-m-21", "tipo": "associacao", "tema": "marinha", "frente": "Em que cidade fica a base da Marinha comandada por Smoker?", "opcoes": ["Loguetown", "Shells Town", "Vila Syrup", "Vila Foosha"], "correta": 0},
-    {"id": "op-m-26", "tipo": "associacao", "tema": "marinha", "frente": "Qual é a Akuma no Mi de Smoker?", "opcoes": ["Moku Moku no Mi (fumaça)", "Gomu Gomu no Mi (borracha)", "Bara Bara no Mi (separação)", "Nenhuma: ele não comeu Akuma no Mi"], "correta": 0, "explicacao": "Smoker vive com dois charutos acesos na boca."},
-    {"id": "op-m-22", "tipo": "associacao", "tema": "marinha", "frente": "Qual é o apelido de Smoker?", "opcoes": ["Caçador Branco", "Punho de Ferro", "Mão de Machado", "Olhos de Falcão"], "correta": 0},
+    {"id": "op-m-21", "tipo": "associacao", "tema": "marinha", "frente": "Em que cidade fica a base da Marinha comandada por Smoker?", "opcoes": ["Loguetown", "Shells Town", "Vila Syrup", "Vila Foosha", "Orange Town"], "correta": 0, "outrasFormas": ["Logue Town"]},
+    {"id": "op-m-26", "tipo": "associacao", "tema": "marinha", "frente": "Qual é a Akuma no Mi de Smoker?", "opcoes": ["Moku Moku no Mi (fumaça)", "Gomu Gomu no Mi (borracha)", "Bara Bara no Mi (separação)", "Nenhuma: ele não comeu Akuma no Mi"], "correta": 0, "explicacao": "Smoker vive com dois charutos acesos na boca.", "outrasFormas": ["Fruta da fumaça"]},
+    {"id": "op-m-22", "tipo": "associacao", "tema": "marinha", "frente": "Qual é o apelido de Smoker?", "opcoes": ["Caçador Branco", "Punho de Ferro", "Mão de Machado", "Olhos de Falcão", "Lobo Cinzento", "Capitão Nuvem"], "correta": 0},
     {"id": "op-m-23", "tipo": "conceito", "tema": "marinha", "frente": "Quem é Tashigi?", "verso": "Uma espadachim da Marinha que trabalha com Smoker. Quer tirar as espadas famosas das mãos de criminosos."}
   ]
 }

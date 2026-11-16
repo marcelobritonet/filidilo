@@ -2,6 +2,15 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [2.3.0] — 2026-11-16
+
+### Novo
+- **Alternativas que mudam**: cartões de alternativas podem ter mais de 4 opções e uma segunda forma de dizer a resposta certa. Cada vez que o cartão aparece, o app mostra 4: uma das formas da certa e 3 erradas sorteadas. Assim não dá para decorar a "cara" da resposta. Cartões antigos, com 4 opções, continuam funcionando como antes.
+- **Sem alternativas quando já domina**: um cartão de alternativas que você já domina aparece sem as opções. Você pensa na resposta, toca em Mostrar resposta e diz como foi.
+- O Criar com IA e o Corrigir com IA já pedem o formato novo: 1 certa, 5 ou 6 erradas e outra forma da certa, sem deixar a certa maior ou mais detalhada que as erradas.
+- No editor de cartão, campo "Outra forma de dizer a correta" e até 8 alternativas.
+- **One Piece atualizado** no formato novo. Quem já tem o baralho recebe a atualização sozinho, com o progresso mantido; cartões que você editou não são trocados.
+
 ## [2.2.0] — 2026-11-16
 
 ### Novo
@@ -184,6 +193,7 @@ Fase 1: primeira versão publicada.
 - Reportar erro em qualquer cartão, revisão de conteúdo (✓/⚠/📝), backup e envio de reportes pelo WhatsApp.
 - Publicação automática no GitHub Pages.
 
+[2.3.0]: https://github.com/marcelobritonet/tatino/releases/tag/v2.3.0
 [2.2.0]: https://github.com/marcelobritonet/tatino/releases/tag/v2.2.0
 [2.1.2]: https://github.com/marcelobritonet/tatino/releases/tag/v2.1.2
 [2.1.1]: https://github.com/marcelobritonet/tatino/releases/tag/v2.1.1

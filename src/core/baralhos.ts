@@ -7,8 +7,9 @@ export type Semente = () => { baralho: Baralho; retirados?: string[] }
 /**
  * Instala cada baralho de fábrica uma única vez (marca "semeado:<id>" com a versão). Depois disso
  * ele é um baralho comum: a pessoa pode editar ou excluir, e o app não o recria.
- * Quando a versão de fábrica sobe, o baralho instalado perde os cartões retirados e ganha os novos;
- * os cartões que a pessoa criou e o progresso ficam.
+ * Quando a versão de fábrica sobe, o baralho instalado perde os cartões retirados, ganha os novos
+ * e recebe o conteúdo novo dos que continuam (menos os que a pessoa editou).
+ * Os cartões que a pessoa criou e o progresso ficam.
  */
 export async function semear(sementes: Semente[]): Promise<void> {
   await db.transaction('rw', db.baralhos, db.meta, async () => {
@@ -21,7 +22,8 @@ export async function semear(sementes: Semente[]): Promise<void> {
       if (!semeado && !atual) await db.baralhos.put({ ...b, criadoEm: Date.now(), atualizadoEm: Date.now() })
       else if (semeado && atual) {
         const fora = new Set(retirados)
-        const mantidos = atual.cartoes.filter((c) => !fora.has(c.id))
+        const deFabrica = new Map(b.cartoes.map((c) => [c.id, c]))
+        const mantidos = atual.cartoes.filter((c) => !fora.has(c.id)).map((c) => (deFabrica.has(c.id) && !c.editado ? deFabrica.get(c.id)! : c))
         const tem = new Set(mantidos.map((c) => c.id))
         const temas = [...atual.temas, ...b.temas.filter((t) => !atual.temas.some((x) => x.id === t.id))]
         await db.baralhos.put({ ...atual, versao: b.versao, temas, cartoes: [...mantidos, ...b.cartoes.filter((c) => !tem.has(c.id))], atualizadoEm: Date.now() })

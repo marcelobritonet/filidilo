@@ -2,7 +2,7 @@
 // Versão da instrução: mude ao alterar regras, para comparar a qualidade entre versões (E6).
 import type { Baralho, Cartao, Tema } from '../types'
 
-export const VERSAO_INSTRUCAO = 1
+export const VERSAO_INSTRUCAO = 2
 
 export type Origem = 'pdf' | 'texto' | 'tema'
 export type Mistura = 'misto' | 'teoria' | 'calculo'
@@ -47,8 +47,9 @@ export const EXEMPLOS: { temas: Tema[]; cartoes: Cartao[] } = {
     {
       id: 'c3', tipo: 'associacao', tema: 'dinamica',
       frente: 'Qual a unidade de força no SI?',
-      opcoes: ['newton (N)', 'joule (J)', 'watt (W)', 'pascal (Pa)'],
+      opcoes: ['newton (N)', 'joule (J)', 'watt (W)', 'pascal (Pa)', 'dina (dyn)', 'quilograma (kg)'],
       correta: 0,
+      outrasFormas: ['N, que equivale a kg·m/s²'],
       explicacao: '1 N = 1 kg·m/s².',
       fonte: { apostila: 'Aula 3 - Dinâmica', pagina: 5 },
     },
@@ -122,7 +123,7 @@ Um objeto JSON com "temas" e "cartoes":
 Cada cartão tem "id" (curto e único, ex.: "c1"), "tipo", "tema" (o id de um tema), "explicacao" (curta, opcional) e ${fonte}. Por tipo:
 - "conceito": "frente" (pergunta) e "verso" (resposta).
 - "vf": "frente" (afirmação) e "resposta" (true ou false). Toda afirmação falsa precisa de "explicacao" dizendo o que está errado.
-- "associacao": "frente" (pergunta), "opcoes" (3 a 5 alternativas plausíveis, sem repetir) e "correta" (índice da certa, começando em 0). Varie a posição da correta.
+- "associacao": "frente" (pergunta), "opcoes" (1 certa e 5 ou 6 erradas plausíveis, sem repetir), "correta" (índice da certa, começando em 0) e "outrasFormas" (lista com 1 outra forma de dizer a resposta certa, com palavras diferentes e o mesmo sentido). O app mostra 4 de cada vez e alterna as formas da certa, então nenhuma errada pode ser obviamente absurda e a outra forma não pode ser maior nem mais detalhada que as erradas. Varie a posição da correta.
 - "calculo": exercício com números sorteados. Campos:
   - "titulo" e "enunciado"; no enunciado, {nome} mostra o valor sorteado.
   - "parametros": { "nome": { "min": n, "max": n, "passo": n, "unidade": "..." } }. Escolha faixas realistas.

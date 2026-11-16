@@ -107,6 +107,12 @@ export function Conteudo({ c }: { c: Cartao }) {
                 <Tex texto={o} />
               </li>
             ))}
+            {c.outrasFormas?.map((o) => (
+              <li class="certa">
+                {'✔ '}
+                <Tex texto={o} />
+              </li>
+            ))}
           </ul>
           {c.explicacao && <Tex class="explicacao" texto={c.explicacao} />}
         </>

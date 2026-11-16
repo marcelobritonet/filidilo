@@ -46,19 +46,30 @@ describe('baralhos no aparelho', () => {
     await salvar({ ...instalado, cartoes: [...instalado.cartoes, { id: 'meu', tipo: 'vf', tema: 'a', frente: 'meu', resposta: false }] })
     await registrar('x/fica', 3, 'prova')
 
-    const v2 = { ...v1, versao: 2, cartoes: [v1.cartoes[1], { id: 'novo', tipo: 'vf' as const, tema: 'a', frente: 'novo', resposta: true }] }
+    const v2 = { ...v1, versao: 2, cartoes: [{ ...v1.cartoes[1], frente: 'ok, revisado' }, { id: 'novo', tipo: 'vf' as const, tema: 'a', frente: 'novo', resposta: true }] }
     const s2 = () => ({ baralho: structuredClone(v2), retirados: ['velho'] })
     await semear([s2])
     await semear([s2])
     const b = (await listar())[0]
     expect(b.versao).toBe(2)
     expect(b.cartoes.map((c) => c.id)).toEqual(['fica', 'meu', 'novo'])
+    expect(b.cartoes[0].tipo === 'vf' && b.cartoes[0].frente).toBe('ok, revisado')
     expect((await db.estados.get('x/fica'))?.ultimaNota).toBe(3)
 
     // Excluído não volta, nem com versão nova.
     await excluir('x')
     await semear([() => ({ baralho: { ...structuredClone(v2), versao: 3 } })])
     expect(await listar()).toEqual([])
+  })
+
+  it('versão nova de fábrica não sobrescreve cartão editado pela pessoa', async () => {
+    const v1 = { id: 'y', titulo: 'Y', versao: 1, temas: [{ id: 'a', nome: 'A' }], cartoes: [{ id: 'c', tipo: 'vf' as const, tema: 'a', frente: 'original', resposta: true }] }
+    await semear([() => ({ baralho: structuredClone(v1) })])
+    const b1 = (await listar())[0]
+    await salvar({ ...b1, cartoes: [{ ...b1.cartoes[0], frente: 'minha versão', editado: true } as typeof b1.cartoes[0]] })
+    await semear([() => ({ baralho: { ...structuredClone(v1), versao: 2, cartoes: [{ ...v1.cartoes[0], frente: 'fábrica v2' }] } })])
+    const c = (await listar())[0].cartoes[0]
+    expect(c.tipo === 'vf' && c.frente).toBe('minha versão')
   })
 
   it('cria, duplica (sem progresso), exclui e restaura', async () => {

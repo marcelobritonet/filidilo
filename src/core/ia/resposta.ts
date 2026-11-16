@@ -88,6 +88,7 @@ export function lerResposta(dados: unknown, destino: Pick<Baralho, 'id' | 'titul
       origem: 'ia',
       fonte: bruto?.fonte ?? (fontePadrao ? { apostila: fontePadrao } : undefined),
     } as Cartao
+    if (c.tipo === 'associacao' && typeof c.outrasFormas === 'string') c.outrasFormas = [c.outrasFormas]
     if (c.tipo === 'vf' && typeof c.resposta === 'string') c.resposta = (c.resposta as string).toLowerCase() === 'true'
     baralhoTeste.temas = temas
     return { cartao: c, idIA, erros: problemasDoCartao(baralhoTeste, c) }

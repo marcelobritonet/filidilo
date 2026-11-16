@@ -26,6 +26,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
   const [resposta, setResposta] = useState<boolean | null>(original?.tipo === 'vf' ? original.resposta : null)
   const [opcoes, setOpcoes] = useState<string[]>(original?.tipo === 'associacao' ? original.opcoes : ['', '', ''])
   const [correta, setCorreta] = useState(original?.tipo === 'associacao' ? original.correta : 0)
+  const [outraForma, setOutraForma] = useState(original?.tipo === 'associacao' ? (original.outrasFormas?.[0] ?? '') : '')
   const [explicacao, setExplicacao] = useState(original?.explicacao ?? '')
   const [fonte, setFonte] = useState(original?.fonte ? `${original.fonte.apostila}${original.fonte.pagina !== undefined ? `, p. ${original.fonte.pagina}` : ''}` : '')
   const [problemas, setProblemas] = useState<string[]>([])
@@ -46,7 +47,9 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
     // Opções vazias saem; o índice da correta acompanha.
     const corretaTexto = ops[correta]
     const limpas = ops.filter(Boolean)
-    return { id, tipo, tema, frente: frente.trim(), opcoes: limpas, correta: Math.max(0, limpas.indexOf(corretaTexto)), ...extra }
+    // Edita a primeira outra forma; se a IA tiver mandado mais, as demais ficam.
+    const formas = [outraForma.trim(), ...(original?.tipo === 'associacao' ? (original.outrasFormas ?? []).slice(1) : [])].filter(Boolean)
+    return { id, tipo, tema, frente: frente.trim(), opcoes: limpas, correta: Math.max(0, limpas.indexOf(corretaTexto)), outrasFormas: formas.length ? formas : undefined, ...extra }
   }
 
   const verificar = (c: Cartao): string[] => {
@@ -180,12 +183,20 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
                     </li>
                   ))}
                 </ul>
-                {opcoes.length < 6 && (
+                {opcoes.length < 8 && (
                   <button class="link" onClick={() => setOpcoes((ops) => [...ops, ''])}>
                     + alternativa
                   </button>
                 )}
+                <p class="dica">Com mais de 4, cada vez aparecem 3 erradas diferentes.</p>
               </div>
+            )}
+
+            {tipo === 'associacao' && (
+              <label class="campo">
+                Outra forma de dizer a correta (opcional)
+                <input class="texto" value={outraForma} onInput={(e) => setOutraForma((e.target as HTMLInputElement).value)} placeholder="Mesma resposta, com outras palavras" />
+              </label>
             )}
 
             <label class="campo">

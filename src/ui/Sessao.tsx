@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from 'preact/hooks'
 import { confere, formatar, lerNumero, preencher, sortear, type Sorteio } from '../core/calc'
 import { db, type Nota } from '../core/db'
 import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../core/fila'
-import { chave, registrar } from '../core/srs'
-import type { Baralho, Cartao, CartaoCalculo } from '../core/types'
+import { formaDaCerta, sortearAlternativas } from '../core/alternativas'
+import { chave, dominado, registrar } from '../core/srs'
+import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo } from '../core/types'
 import { nomeTema } from './estado'
 import { CorrigirCartao } from './CorrigirCartao'
 import { enviarCartao } from './enviar'
@@ -38,6 +39,8 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   // Erros e chutes por tema, para sugerir onde criar mais cartões no fim.
   const [fracos, setFracos] = useState<Record<string, number>>({})
   const [fila, setFila] = useState<Cartao[] | null>(null)
+  // Cartões de alternativas já dominados no início da sessão: aparecem sem alternativas.
+  const [dominados, setDominados] = useState<Set<string>>(new Set())
   const [pos, setPos] = useState(0)
   const [placar, setPlacar] = useState({ certos: 0, errados: 0, chutes: 0, pulados: 0 })
   const [rodada, setRodada] = useState(0)
@@ -64,6 +67,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
       const tamanho = limite ? TODOS : modo === 'calculo' ? 10 : 20
       const f = modo === 'espacada' ? filaEspacada(baralho, m, { ...opcoes, tamanho }, porTempo ? 100 : Math.min(tamanho, 15)) : filaProva(baralho, m, { ...opcoes, tamanho })
       setFila(f)
+      setDominados(new Set(baralho.cartoes.filter((c) => dominado(m.get(chave(baralho.id, c.id)))).map((c) => c.id)))
       setPos(0)
       setPlacar({ certos: 0, errados: 0, chutes: 0, pulados: 0 })
       setFracos({})
@@ -156,7 +160,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
               <Icone nome="enviar" />
             </button>
           </div>
-          <CartaoView key={`${pos}-${vez}-${cartao.id}`} cartao={cartao} acoes={acoes} />
+          <CartaoView key={`${pos}-${vez}-${cartao.id}`} cartao={cartao} acoes={acoes} semAlternativas={dominados.has(cartao.id)} />
           <div class="acoes-cartao">
             <button class="btn terciario" onClick={pular}>
               Pular
@@ -294,24 +298,35 @@ function BotoesNota({ avaliar, acertou }: { avaliar: (n: Nota, chute?: boolean) 
   )
 }
 
-function CartaoView({ cartao, acoes }: { cartao: Cartao; acoes: Acoes }) {
+function CartaoView({ cartao, acoes, semAlternativas }: { cartao: Cartao; acoes: Acoes; semAlternativas?: boolean }) {
   switch (cartao.tipo) {
     case 'conceito':
       return <Conceito c={cartao} acoes={acoes} />
     case 'vf':
       return <Escolha c={cartao} pergunta={cartao.frente} opcoes={['Verdadeiro', 'Falso']} correta={cartao.resposta ? 0 : 1} acoes={acoes} rotulo="Verdadeiro ou falso" />
     case 'associacao':
-      return <Escolha c={cartao} pergunta={cartao.frente} opcoes={cartao.opcoes} correta={cartao.correta} acoes={acoes} embaralhar />
+      return <Associacao c={cartao} acoes={acoes} semAlternativas={semAlternativas} />
     case 'calculo':
       return <Calculo c={cartao} acoes={acoes} />
   }
 }
 
-function Conceito({ c, acoes }: { c: Extract<Cartao, { tipo: 'conceito' }>; acoes: Acoes }) {
+/**
+ * Alternativas: a cada vez, uma forma da certa e 3 erradas sorteadas.
+ * Se o cartão já está dominado, aparece sem alternativas: pensar na resposta e conferir.
+ */
+function Associacao({ c, acoes, semAlternativas }: { c: CartaoAssociacao; acoes: Acoes; semAlternativas?: boolean }) {
+  const sorteio = useMemo(() => sortearAlternativas(c), [c])
+  const resposta = useMemo(() => formaDaCerta(c), [c])
+  if (semAlternativas) return <Conceito c={c} verso={resposta} rotulo="Sem alternativas" acoes={acoes} />
+  return <Escolha c={c} pergunta={c.frente} opcoes={sorteio.opcoes} correta={sorteio.correta} acoes={acoes} />
+}
+
+function Conceito({ c, acoes, verso, rotulo = 'Pergunta' }: { c: Cartao & { frente: string }; acoes: Acoes; verso?: string; rotulo?: string }) {
   const [virado, setVirado] = useState(false)
   return (
     <article class="cartao">
-      <p class="rotulo">Pergunta</p>
+      <p class="rotulo">{rotulo}</p>
       <Tex class="frente" texto={c.frente} />
       {!virado && (
         <button class="btn principal virar" onClick={() => setVirado(true)}>
@@ -320,7 +335,7 @@ function Conceito({ c, acoes }: { c: Extract<Cartao, { tipo: 'conceito' }>; acoe
       )}
       {virado && (
         <Folha titulo="Resposta" rodape={<><p class="dica centro">Como foi?</p><BotoesNota avaliar={acoes.avaliar} /></>}>
-          <Tex class="verso" texto={c.verso} />
+          <Tex class="verso" texto={verso ?? (c.tipo === 'conceito' ? c.verso : '')} />
           {c.explicacao && <Explicacao texto={c.explicacao} />}
           <Fonte c={c} />
           <button class="btn terciario compacto" onClick={acoes.corrigir}>

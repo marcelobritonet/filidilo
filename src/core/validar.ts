@@ -27,6 +27,11 @@ export function validar(b: Baralho, sorteios = 60): string[] {
         if (!Array.isArray(c.opcoes) || c.opcoes.length < 2) e('precisa de 2 ou mais opções')
         else if (!Number.isInteger(c.correta) || c.correta < 0 || c.correta >= c.opcoes.length) e('índice "correta" fora das opções')
         else if (new Set(c.opcoes).size !== c.opcoes.length) e('opções repetidas')
+        else if (c.opcoes.length > 10) e('no máximo 10 opções')
+        if (c.outrasFormas !== undefined) {
+          if (!Array.isArray(c.outrasFormas) || c.outrasFormas.some((f) => typeof f !== 'string' || !f.trim())) e('outra forma da correta vazia ou inválida ("outrasFormas" deve ser uma lista de textos)')
+          else if (c.outrasFormas.some((f) => c.opcoes?.includes(f))) e('a outra forma da correta repete uma das alternativas ("outrasFormas")')
+        }
         break
       case 'calculo': {
         if (!c.etapas?.length) {
