@@ -19,7 +19,7 @@ Atualizado em 16/11/2026.
 | P25 | Testar o Compartilhar → tatino. no Android dela (app instalado) — agora é o único jeito de receber baralho | ✅ Funcionou, enviando e recebendo (16/11) | Marcelo / estudante |
 | P26 | Botão "Abrir baralho recebido" removido a pedido do Marcelo | ✅ v1.6.1 (15/11) | Claude |
 | P23 | Fase 2 · E5 Gemini direto (chave no aparelho) | ✅ Publicada na v1.7.0 (15/11) | Claude |
-| P27 | E6 Avaliação da instrução com PDFs de aula reais (rodar numa IA e medir % de cartões válidos) | Aberto: Marcelo testa depois | Claude + Marcelo |
+| P27 | E6 Avaliação da instrução com PDFs de aula reais (rodar numa IA e medir % de cartões válidos) | ✅ Feito (16/11) | Claude + Marcelo |
 | P5 | Fase 2 · IA para gerar cartões | ✅ Decidido: Gemini (direto pela API com chave no aparelho, mais copiar e colar como alternativa) | — |
 | P6 | Fase 2 · Sincronização | ✅ Decidido: Google Drive, por último e opcional (E7) | — |
 | P7 | Fase 2 · Criar cartões por formulário e compartilhar por arquivo | ✅ Decidido (E2 e E3) | — |
@@ -38,4 +38,6 @@ Atualizado em 16/11/2026.
 | P37 | Ícone de enviar no cartão (estudo) e no baralho (ao lado do nome) | ✅ Publicada na v2.2.0 (16/11) | — |
 | P38 | Alternativas que mudam (C: 2 formas da certa + erradas sorteadas) e sem alternativas quando dominado (D); IA, editor e One Piece no formato novo | ✅ Publicada na v2.3.0 (16/11) | — |
 | P39 | Telemetria com PostHog (anônima, sem cookies, fila offline, desligar em Aparência) | ✅ Pronto (projeto PostHog, região EUA; chave na variável VITE_POSTHOG_KEY do repositório); publicada na v2.4.0 (16/11) | — |
-| P40 | Atualizar o baralho de Hidrodinâmica dela com conteúdo novo, sem perder progresso nem edições | Arquivo pronto e validado (251 cartões: 190 antigos iguais + 61 novos); simulação de importação ok | Marcelo manda o arquivo para ela e ela toca em Atualizar |
+| P40 | Atualizar o baralho de Hidrodinâmica dela com conteúdo novo, sem perder progresso nem edições | ✅ Feito: ela atualizou (16/11) | — |
+| P41 | Observar se o modo "Sem alternativas" aparece cedo demais (hoje: 1 "Acertei, foi fácil" basta). Se sim, exigir 2 acertos fáceis seguidos | Observando | Marcelo avisa |
+| P42 | PostHog: depois de alguns dias de uso, montar gráficos (funções mais usadas, funil do Criar com IA, sessões abandonadas, retenção) | Aguardando dados | Marcelo / Claude |
