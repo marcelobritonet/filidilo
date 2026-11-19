@@ -2,8 +2,8 @@ import { useState } from 'preact/hooks'
 import { formatar, preencher, sortear } from '../core/calc'
 import type { Baralho, Cartao } from '../core/types'
 import type { Navegacao } from './App'
-import { evento } from '../core/telemetria'
-import { enviarCartao } from './enviar'
+import { conteudoCartao } from './enviar'
+import { EnviarModal } from './EnviarModal'
 import { nomeTema } from './estado'
 import { Tex } from './Tex'
 
@@ -12,10 +12,8 @@ export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) 
   const [tema, setTema] = useState('')
   const lista = baralho.cartoes.filter((c) => !tema || c.tema === tema)
 
-  const enviar = async (c: Cartao) => {
-    evento('enviar', { o_que: 'cartao', onde: 'lista' })
-    if ((await enviarCartao(baralho, c)) === 'baixado') nav.avisar({ texto: 'Arquivo salvo em Downloads.' })
-  }
+  const [enviando, setEnviando] = useState<Cartao | null>(null)
+  const enviar = (c: Cartao) => setEnviando(c)
 
   return (
     <main class="tela revisar">
@@ -74,6 +72,7 @@ export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) 
         ))}
         {!lista.length && <p class="dica centro">Nenhum cartão.</p>}
       </ul>
+      {enviando && <EnviarModal conteudo={conteudoCartao(baralho, enviando)} onde="lista" avisar={(texto) => nav.avisar({ texto })} fechar={() => setEnviando(null)} />}
     </main>
   )
 }

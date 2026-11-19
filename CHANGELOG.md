@@ -2,6 +2,18 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.4.0] — 2026-11-19
+
+**Envie por link ou QR code.** Enviar um baralho ou um cartão agora gera um link que vale 2 horas, com QR code para ler com a câmera de outro celular. Quem abre o link cai no tatino. com o resumo de sempre (adicionar, atualizar ou importar como baralho separado). Funciona no Android, no iPhone e no computador, com ou sem o app instalado.
+
+### Novo
+- **Enviar → link e QR code**: botões Compartilhar link (ou Copiar link no computador) e o horário em que o link deixa de valer.
+- **Abrir link** (`…/tatino/?b=<código>`): baixa o baralho ou o cartão e mostra o resumo de importação. Link vencido avisa "Este link expirou".
+- O conteúdo fica 2 horas num serviço do Cloudflare (pasta `worker/`) e some sozinho. Só quem tem o link abre; não há lista de links.
+
+### Mudou
+- **Enviar como arquivo** continua, embaixo do link, e é o caminho sem internet.
+
 ## [3.3.0] — 2026-11-16
 
 **O app acompanha o seu ritmo.** Ao criar cartões com IA, o tatino olha o desempenho recente do baralho e sugere o nível dos próximos cartões: um degrau mais fácil se você está errando muito, um degrau acima se está acertando quase tudo e achando fácil.

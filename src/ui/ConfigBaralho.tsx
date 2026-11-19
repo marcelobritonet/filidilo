@@ -3,7 +3,8 @@ import { duplicar, excluir, novoId, restaurar, salvar } from '../core/baralhos'
 import { NIVEIS, normalizarNivel, type Baralho, type Nivel, type Objetivo, type Tema } from '../core/types'
 import type { Navegacao } from './App'
 import { evento } from '../core/telemetria'
-import { enviarBaralho } from './enviar'
+import { conteudoBaralho } from './enviar'
+import { EnviarModal } from './EnviarModal'
 
 const linhas = (s: string) => s.split('\n').map((x) => x.trim()).filter(Boolean)
 
@@ -88,10 +89,8 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
     history.go(-2) // sai da configuração e da tela do baralho excluído
   }
 
-  const enviar = async () => {
-    evento('enviar', { o_que: 'baralho', onde: 'configurar' })
-    if ((await enviarBaralho(baralho)) === 'baixado') nav.avisar({ texto: 'Arquivo salvo em Downloads.' })
-  }
+  const [enviando, setEnviando] = useState(false)
+  const enviar = () => setEnviando(true)
 
   return (
     <main class="tela config">
@@ -205,6 +204,7 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
           </div>
         )}
       </section>
+      {enviando && <EnviarModal conteudo={conteudoBaralho(baralho)} onde="configurar" avisar={(texto) => nav.avisar({ texto })} fechar={() => setEnviando(false)} />}
     </main>
   )
 }

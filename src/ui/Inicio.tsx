@@ -4,7 +4,8 @@ import { chave, dominado, vencido } from '../core/srs'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
 import { evento } from '../core/telemetria'
-import { enviarBaralho } from './enviar'
+import { conteudoBaralho } from './enviar'
+import { EnviarModal } from './EnviarModal'
 import { useEstados } from './estado'
 import { Icone } from './Icone'
 import { Marca } from './Marca'
@@ -72,10 +73,8 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
   const alternarTema = (t: string) => setEscolha({ ...escolha, temas: escolha.temas.includes(t) ? escolha.temas.filter((x) => x !== t) : [...escolha.temas, t] })
   const todosMarcados = temasComCartoes.every((t) => escolha.temas.includes(t.id))
 
-  const enviar = async () => {
-    evento('enviar', { o_que: 'baralho', onde: 'baralho' })
-    if ((await enviarBaralho(baralho)) === 'baixado') nav.avisar({ texto: 'Arquivo salvo em Downloads.' })
-  }
+  const [enviando, setEnviando] = useState(false)
+  const enviar = () => setEnviando(true)
 
   const comecar = () => {
     try {
@@ -270,6 +269,7 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
           </div>
         </>
       )}
+      {enviando && <EnviarModal conteudo={conteudoBaralho(baralho)} onde="baralho" avisar={(texto) => nav.avisar({ texto })} fechar={() => setEnviando(false)} />}
     </main>
   )
 }

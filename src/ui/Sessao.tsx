@@ -8,7 +8,8 @@ import { evento } from '../core/telemetria'
 import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, Objetivo } from '../core/types'
 import { nomeTema } from './estado'
 import { CorrigirCartao } from './CorrigirCartao'
-import { enviarCartao } from './enviar'
+import { conteudoCartao } from './enviar'
+import { EnviarModal } from './EnviarModal'
 import { Folha } from './Folha'
 import { Icone } from './Icone'
 import { Tex } from './Tex'
@@ -37,6 +38,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   // Cópia local: correções feitas durante a sessão entram aqui sem reiniciar a sessão.
   const [baralho, setBaralho] = useState(inicial)
   const [corrigindo, setCorrigindo] = useState(false)
+  const [enviando, setEnviando] = useState<Cartao | null>(null)
   // Erros e chutes por tema, para sugerir onde criar mais cartões no fim.
   const [fracos, setFracos] = useState<Record<string, number>>({})
   const [fila, setFila] = useState<Cartao[] | null>(null)
@@ -178,7 +180,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
         <>
           <div class="meta-cartao">
             <span class="tema-chip">{nomeTema(baralho, cartao.tema)}</span>
-            <button class="icone-btn" aria-label="Enviar este cartão" title="Enviar este cartão" onClick={() => { evento('enviar', { o_que: 'cartao', onde: 'estudo' }); void enviarCartao(baralho, cartao) }}>
+            <button class="icone-btn" aria-label="Enviar este cartão" title="Enviar este cartão" onClick={() => setEnviando(cartao)}>
               <Icone nome="enviar" />
             </button>
           </div>
@@ -192,6 +194,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
             </button>
           </div>
           {corrigindo && <CorrigirCartao baralho={baralho} cartao={cartao} aoSalvar={corrigido} fechar={() => setCorrigindo(false)} />}
+          {enviando && <EnviarModal conteudo={conteudoCartao(baralho, enviando)} onde="estudo" fechar={() => setEnviando(null)} />}
         </>
       )}
     </main>

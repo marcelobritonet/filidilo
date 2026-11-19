@@ -10,7 +10,7 @@ No ar: https://marcelobritonet.github.io/tatino/
 - **Estudar** por tempo (o fio no topo encurta) ou até X acertos (o fio enche), escolhendo os temas. Ordem única: errados, vencidos hoje (FSRS, `ts-fsrs`), nunca vistos, difíceis e acertados.
 - **Respostas**: acertei fácil, com dificuldade, no chute (não conta acerto), não sabia, errei; "Não sei" em V/F e alternativas.
 - **Exercícios de cálculo**: números sorteados, resposta digitada, tolerância de ±2% e resolução passo a passo.
-- **Corrigir cartão com IA**, com antes e depois. **Enviar** cartão ou baralho pelo WhatsApp; receber pelo Compartilhar → tatino.
+- **Corrigir cartão com IA**, com antes e depois. **Enviar** cartão ou baralho por link e QR code (vale 2 horas) ou como arquivo pelo WhatsApp; receber abrindo o link ou pelo Compartilhar → tatino.
 - **Backup** em arquivo; tudo fica só no aparelho.
 
 ## Visual
@@ -35,6 +35,14 @@ Cartões de cálculo usam expressões avaliadas por um avaliador seguro (`src/co
 ## Estatísticas de uso
 
 O app manda eventos anônimos ao PostHog (projeto na região EUA): nome do evento e números, sem cookies, sem nome ou e-mail e nunca o texto dos cartões. Um id aleatório por aparelho; fila no aparelho para quando estiver sem internet. Código e lista de eventos em `src/core/telemetria.ts` e nas chamadas `evento(...)`. A pessoa desliga em Aparência. A chave pública vem da variável `VITE_POSTHOG_KEY` do repositório (GitHub → Settings → Secrets and variables → Actions → Variables), passada no build pelo `deploy.yml`. Sem ela (no computador ou em cópias do repositório), nada é enviado.
+
+## Envio por link
+
+Enviar um baralho ou cartão sobe o mesmo JSON do arquivo para um worker do Cloudflare (`worker/`, KV com validade de 2 horas) e gera o link `…/tatino/?b=<código>` com QR code (`src/ui/EnviarModal.tsx`, `src/core/link.ts`). O conteúdo some sozinho depois de 2 horas; só quem tem o código (10 caracteres aleatórios) abre, e não há listagem. Limite de 1 MB e de 20 links por minuto por IP.
+
+- **Publicar o worker**: push na `main` que mexe em `worker/` roda `.github/workflows/deploy-worker.yml`. Precisa dos segredos `CLOUDFLARE_API_TOKEN` (permissões Workers Scripts e Workers KV Storage: Edit) e `CLOUDFLARE_ACCOUNT_ID`. O namespace KV é criado no primeiro deploy.
+- **Ligar no app**: a variável `VITE_LINKS_URL` do repositório (ex.: `https://tatino-links.<sua-conta>.workers.dev`), passada no build pelo `deploy.yml`. Sem ela, só aparece "Enviar como arquivo".
+- **Rodar no computador**: `cd worker && npm install && npx wrangler dev --port 8787` e, noutro terminal, `VITE_LINKS_URL=http://127.0.0.1:8787 npm run dev`.
 
 ## Versões
 

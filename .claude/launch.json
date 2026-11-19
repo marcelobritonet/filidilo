@@ -2,6 +2,8 @@
   "version": "0.0.1",
   "configurations": [
     { "name": "tatino", "runtimeExecutable": "npx", "runtimeArgs": ["vite", "--port", "5173", "--strictPort"], "port": 5173 },
-    { "name": "tatino-prod", "runtimeExecutable": "npx", "runtimeArgs": ["vite", "preview", "--port", "4173", "--strictPort"], "port": 4173 }
+    { "name": "tatino-prod", "runtimeExecutable": "npx", "runtimeArgs": ["vite", "preview", "--port", "4173", "--strictPort"], "port": 4173 },
+    { "name": "links", "runtimeExecutable": "worker/node_modules/.bin/wrangler", "runtimeArgs": ["dev", "-c", "worker/wrangler.toml", "--port", "8787", "--ip", "127.0.0.1"], "port": 8787 },
+    { "name": "tatino-com-links", "runtimeExecutable": "npx", "runtimeArgs": ["vite", "--port", "5173", "--strictPort"], "port": 5173, "env": { "VITE_LINKS_URL": "http://127.0.0.1:8787" } }
   ]
 }

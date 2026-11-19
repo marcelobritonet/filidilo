@@ -1,6 +1,6 @@
 {
   "name": "tatino",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "Flashcards offline (PWA) para aprender qualquer coisa",
   "scripts": {
     "dev": "vite",
@@ -17,6 +17,7 @@
     "dexie": "^4.4.7",
     "katex": "^0.19.1",
     "preact": "^11.2.0",
+    "qrcode-generator": "^2.0.4",
     "ts-fsrs": "^6.0.0"
   },
   "devDependencies": {

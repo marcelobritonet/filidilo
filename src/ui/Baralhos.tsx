@@ -7,7 +7,7 @@ import type { Navegacao } from './App'
 import { useEstados } from './estado'
 import { Importar, ImportarCartoes } from './Importar'
 import { Marca } from './Marca'
-import { pegarRecebido } from './recebido'
+import { abriuPorLink, pegarRecebido } from './recebido'
 import { InstalarCard } from './InstalarCard'
 import { registrarAbertura } from './instalar'
 
@@ -23,18 +23,26 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const [plano, setPlano] = useState<PlanoImportacao | null>(null)
   const [cartoesRecebidos, setCartoesRecebidos] = useState<CartoesRecebidos | null>(null)
   const [erro, setErro] = useState('')
+  const [abrindoLink, setAbrindoLink] = useState(abriuPorLink)
 
-  // Chegou pelo "Compartilhar" do Android (WhatsApp → Compartilhar → tatino.)?
+  // Chegou pelo "Compartilhar" do Android (WhatsApp → Compartilhar → tatino.) ou por um link (?b=<codigo>)?
   useEffect(() => {
     pegarRecebido().then(async (r) => {
+      setAbrindoLink(false)
       if (!r) return
-      if ('erro' in r) return setErro(r.erro)
+      const avisarLink = (ok: boolean, tipo?: string) => r.via === 'link' && evento('link_aberto', { ok, tipo })
+      if ('erro' in r) {
+        avisarLink(false)
+        return setErro(r.erro)
+      }
       try {
         setErro('')
         const lido = lerRecebido(r.texto)
+        avisarLink(true, lido.tipo)
         if (lido.tipo === 'cartoes') setCartoesRecebidos(lido)
         else setPlano(await planejar(lido.baralho))
       } catch (err) {
+        avisarLink(false)
         setErro((err as Error).message)
       }
     })
@@ -106,6 +114,11 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         {semInternet === 'botao' && (
           <p class="resultado erro" role="alert">
             {SEM_INTERNET}
+          </p>
+        )}
+        {abrindoLink && (
+          <p class="resultado" role="status">
+            Abrindo o baralho do link…
           </p>
         )}
         {erro && (
