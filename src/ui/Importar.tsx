@@ -10,6 +10,8 @@ export function Importar({ plano, nav, fechar }: { plano: PlanoImportacao; nav: 
   const [ocupado, setOcupado] = useState(false)
   const { recebido, atual } = plano
   const mudancas = plano.novos.length + plano.atualizados.length
+  // Já tem o baralho igualzinho (ex.: o de exemplo que vem na primeira abertura): não há o que comparar.
+  const igual = !!atual && !mudancas && !plano.preservados.length && !plano.temasNovos.length
   const n = (q: number, um: string, varios: string) => `${q} ${q === 1 ? um : varios}`
 
   const concluir = async (fazer: () => Promise<{ id: string; titulo: string }>, msg: string) => {
@@ -25,12 +27,26 @@ export function Importar({ plano, nav, fechar }: { plano: PlanoImportacao; nav: 
   return (
     <div class="modal-fundo" onClick={(e) => e.target === e.currentTarget && fechar()}>
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-importar">
-        <h2 id="titulo-importar">{atual ? 'Atualizar baralho' : 'Baralho recebido'}</h2>
+        <h2 id="titulo-importar">{atual && !igual ? 'Atualizar baralho' : 'Baralho recebido'}</h2>
         <p>
           <strong>{recebido.titulo}</strong> · {n(recebido.cartoes.length, 'cartão', 'cartões')}
         </p>
 
-        {!atual ? (
+        {igual && atual ? (
+          <>
+            <p class="dica">Ele já está em Meus baralhos, pronto para estudar.</p>
+            <button
+              class="btn principal"
+              onClick={() => {
+                evento('recebido_baralho', { acao: 'ja_tinha', novos: 0, atualizados: 0 })
+                fechar()
+                nav.ir({ nome: 'baralho', id: atual.id })
+              }}
+            >
+              Abrir baralho
+            </button>
+          </>
+        ) : !atual ? (
           <>
             <p class="dica">Ele vai aparecer em Meus baralhos, pronto para estudar.</p>
             <button class="btn principal" disabled={ocupado} onClick={() => concluir(() => aplicar(plano), '“{t}” adicionado.')}>
