@@ -2,6 +2,7 @@
 import { problemasDoCartao } from '../cartoes'
 import { infoNivel, type Baralho, type Cartao, type Objetivo } from '../types'
 import { extrairJson } from './resposta'
+import { regraEntrega } from './instrucao'
 
 const REGRAS_TIPO: Record<Cartao['tipo'], string> = {
   conceito: '"frente" (pergunta) e "verso" (resposta).',
@@ -41,7 +42,8 @@ Confira o conteúdo com cuidado. Se houver erro, corrija; se estiver certo, devo
 Campos do tipo "${c.tipo}": ${REGRAS_TIPO[c.tipo]}
 Use "explicacao" curta para dizer por que a resposta é essa.
 
-Responda SOMENTE com um bloco de código JSON contendo o cartão corrigido, em português do Brasil.`
+Responda SOMENTE com um bloco de código JSON contendo o cartão corrigido, em português do Brasil.
+${regraEntrega()}`
 }
 
 /**

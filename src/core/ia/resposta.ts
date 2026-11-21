@@ -20,10 +20,13 @@ export function extrairJson(texto: string): unknown {
   if (!t) throw new Error('A resposta está vazia. Cole a resposta inteira da IA.')
   const blocos = [...t.matchAll(/```(?:json)?\s*([\s\S]*?)```/gi)].map((m) => m[1].trim())
   const candidatos = blocos.length ? blocos : [t]
+  let cortado = false
   for (const c of candidatos) {
     const ini = c.search(/[[{]/)
+    if (ini < 0) continue
+    if (faltaFechar(consertar(c.slice(ini)))) cortado = true
     const fim = Math.max(c.lastIndexOf('}'), c.lastIndexOf(']'))
-    if (ini < 0 || fim <= ini) continue
+    if (fim <= ini) continue
     const bruto = c.slice(ini, fim + 1)
     for (const tentativa of [bruto, consertar(bruto)]) {
       try {
@@ -33,12 +36,71 @@ export function extrairJson(texto: string): unknown {
       }
     }
   }
-  throw new Error('Não encontrei um JSON válido na resposta. Copie a resposta inteira da IA (o bloco de código).')
+  if (cortado) throw new Error('A resposta parece cortada no meio. Peça à IA para mandar o resto em outro bloco, ou menos cartões de cada vez.')
+  throw new Error('Não encontrei um JSON válido na resposta. Copie a resposta inteira da IA (o bloco de código, não o texto formatado).')
 }
 
-/** Consertos comuns: vírgula sobrando, aspas tipográficas. */
-function consertar(s: string): string {
-  return s.replace(/[“”]/g, '"').replace(/,\s*([}\]])/g, '$1')
+const ENTIDADES: Record<string, string> = { nbsp: ' ', quot: '"', amp: '&', lt: '<', gt: '>', apos: "'" }
+/** Pontuação que o Markdown escapa com barra (\_ \* \[ …) e que não é escape de JSON. */
+const ESCAPE_MD = '_*[]#-.()!+<>{}|~`$'
+
+/**
+ * Consertos para respostas que passaram por formatação (cópia do ChatGPT fora do bloco, por exemplo):
+ * entidades HTML (&#x20;), espaços especiais e invisíveis, aspas tipográficas, escapes de Markdown (\_),
+ * barra simples de LaTeX (\Delta), quebra de linha crua dentro de texto e vírgula sobrando.
+ * Só roda quando o JSON não abre direto, então uma resposta boa não muda.
+ */
+export function consertar(s: string): string {
+  const t = s
+    .replace(/&(?:#x([0-9a-f]+)|#(\d+)|([a-z]+));/gi, (m, hex, dec, nome) => {
+      if (hex || dec) {
+        const n = parseInt(hex ?? dec, hex ? 16 : 10)
+        return n > 0 && n <= 0x10ffff ? String.fromCodePoint(n) : m
+      }
+      return ENTIDADES[nome.toLowerCase()] ?? m
+    })
+    .replace(/[  ]/g, ' ')
+    .replace(/[​-‍﻿]/g, '')
+    .replace(/[“”]/g, '"')
+  let out = ''
+  let dentro = false
+  for (let i = 0; i < t.length; i++) {
+    const ch = t[i]
+    if (ch === '\\') {
+      const nx = t[i + 1]
+      if (nx === undefined) break
+      const valido = nx === '"' || nx === '\\' || nx === '/' || 'bfnrt'.includes(nx) || (nx === 'u' && /^[0-9a-f]{4}$/i.test(t.slice(i + 2, i + 6)))
+      if (dentro && valido) {
+        out += ch + nx
+        i++
+      } else if (ESCAPE_MD.includes(nx)) {
+        out += nx
+        i++
+      } else if (dentro) out += '\\\\' // barra solta (LaTeX \Delta): dobra; o caractere seguinte segue normal
+      continue
+    }
+    if (ch === '"') dentro = !dentro
+    if (dentro && ch === '\n') out += '\\n'
+    else if (dentro && ch === '\t') out += '\\t'
+    else if (!(dentro && ch === '\r')) out += ch
+  }
+  return out.replace(/,\s*([}\]])/g, '$1')
+}
+
+/** Abre mais chaves e colchetes do que fecha (fora dos textos)? Sinal de resposta cortada. */
+function faltaFechar(s: string): boolean {
+  let nivel = 0
+  let dentro = false
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i]
+    if (dentro) {
+      if (ch === '\\') i++
+      else if (ch === '"') dentro = false
+    } else if (ch === '"') dentro = true
+    else if (ch === '{' || ch === '[') nivel++
+    else if (ch === '}' || ch === ']') nivel--
+  }
+  return nivel > 0 || dentro
 }
 
 const slug = (s: string) =>

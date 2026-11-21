@@ -4,7 +4,7 @@ import type { Baralho, Cartao, Objetivo, Tema } from '../types'
 import { infoNivel } from '../types'
 import { jaCobertos } from './cobertos'
 
-export const VERSAO_INSTRUCAO = 5
+export const VERSAO_INSTRUCAO = 6
 
 export type Origem = 'pdf' | 'texto' | 'tema'
 export type Mistura = 'misto' | 'teoria' | 'calculo'
@@ -108,11 +108,21 @@ export function regrasTipos(fonte: string): string {
   - Nos textos, {nome:2} mostra o valor com 2 casas e {resultado} é a resposta da última etapa.`
 }
 
-/** Regras de formato do texto (LaTeX, negrito, JSON). Usadas pelas duas instruções. */
+/** Regras de formato do texto (LaTeX, negrito) e de entrega do JSON. Usadas pelas instruções de cartões e de plano. */
 export function regrasTextoJson(): string {
-  return `- Fórmulas podem ir entre $...$ em LaTeX; dentro do JSON, escreva a barra invertida dobrada (\\\\Delta).
-- **Negrito** com dois asteriscos é permitido. Nada de HTML.
-- JSON válido: aspas duplas, sem vírgula sobrando, sem comentários.`
+  return `- Fórmulas podem ir entre $...$ em LaTeX. **Negrito** com dois asteriscos é permitido. Nada de HTML.
+
+## Entrega
+${regraEntrega()}
+- Antes de responder, confira se o JSON abre num parser.
+- Se não couber numa resposta só, divida em blocos de até 25 cartões, cada bloco um JSON completo no mesmo formato (com "temas" e "cartoes"). Avise no fim que há mais blocos.`
+}
+
+/** Como entregar o JSON: bloco único na conversa, escapes certos. Também vai no pedido de correção e no Corrigir cartão. */
+export function regraEntrega(): string {
+  return `- Um único bloco de código JSON, escrito na conversa. Nada de Canvas, arquivo para download, tabela ou texto formatado fora do bloco.
+- JSON válido: aspas duplas, sem vírgula sobrando, sem comentários.
+- Dentro dos textos: barra invertida sempre dobrada (\\\\Delta, \\\\frac), aspas internas como \\", quebra de linha como \\n e nenhuma entidade HTML (&#x20;, &nbsp;).`
 }
 
 /** Material: PDF e texto usam o mesmo texto de sempre. */
@@ -156,7 +166,7 @@ export function montarInstrucao(p: PedidoIA): string {
     ? `## Já cobertos\nJá cobertos (não repita o mesmo assunto com a mesma pergunta; pode aprofundar):\n${cobertos}\n\n`
     : ''
   const prioridade = objetivo ? 'Priorize o que mais serve ao objetivo.' : 'Priorize o que é mais importante do assunto.'
-  return `Você vai criar flashcards de estudo para o app Tatino. Responda SOMENTE com um bloco de código JSON, sem texto antes ou depois.
+  return `Você vai criar flashcards de estudo para o app Tatino. Responda SOMENTE com um bloco de código JSON, sem texto antes ou depois (veja "Entrega").
 
 ## Material
 ${origemTexto(p)}
@@ -201,7 +211,7 @@ export function montarInstrucaoFormatacao(p: {
   const baralhoRegra = p.novo
     ? `Estas perguntas vão formar um baralho novo. Em "baralho", ${nomeDado ? `use o título "${nomeDado.slice(0, 40)}"` : 'dê um título curto (até 40 caracteres) que diga o assunto das perguntas'} e, em "objetivo", uma frase (até 160 caracteres) sobre o que o baralho ajuda a estudar.\n`
     : ''
-  return `Você vai converter perguntas e respostas que eu já tenho em flashcards para o app Tatino. Responda SOMENTE com um bloco de código JSON, sem texto antes ou depois.
+  return `Você vai converter perguntas e respostas que eu já tenho em flashcards para o app Tatino. Responda SOMENTE com um bloco de código JSON, sem texto antes ou depois (veja "Entrega").
 
 ## Material
 As perguntas e respostas estão abaixo, entre as linhas ===. Podem estar em qualquer formato (lista, "P:/R:", tabela, texto corrido).
@@ -237,6 +247,6 @@ export function montarCorrecao(problemas: { id: string; erros: string[] }[], err
   const linhas = ['Alguns cartões da sua resposta não passaram na validação do app Tatino.']
   if (erroGeral) linhas.push(`Problema geral: ${erroGeral}`)
   for (const p of problemas) linhas.push(`- Cartão "${p.id}": ${p.erros.join('; ')}`)
-  linhas.push('', 'Corrija e devolva SOMENTE um bloco JSON no mesmo formato ({"temas": [...], "cartoes": [...]}), apenas com os cartões corrigidos.')
+  linhas.push('', 'Corrija e devolva SOMENTE um bloco JSON no mesmo formato ({"temas": [...], "cartoes": [...]}), apenas com os cartões corrigidos.', regraEntrega())
   return linhas.join('\n')
 }

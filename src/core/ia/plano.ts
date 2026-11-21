@@ -3,7 +3,7 @@
 import { infoNivel, type Cartao, type Nivel, type Tema } from '../types'
 import { origemTexto, regrasTextoJson, regrasTipos } from './instrucao'
 
-export const VERSAO_PLANO = 2
+export const VERSAO_PLANO = 3
 
 export interface PedidoPlano {
   /** O que a pessoa digitou em "Aprender uma coisa nova hoje". */
@@ -71,7 +71,7 @@ export function montarPlano(p: PedidoPlano): string {
       ? `"fonte": { "apostila": "${p.nomePdf?.trim() || 'nome do material'}", "pagina": número da página }`
       : '"fonte": { "apostila": "Gerado por IA" }'
 
-  return `Você é um professor que monta um plano de estudo em flashcards para o app tatino. Responda SOMENTE com um bloco de código JSON, exceto quando precisar fazer perguntas (ver "Antes de responder").
+  return `Você é um professor que monta um plano de estudo em flashcards para o app tatino. Responda SOMENTE com um bloco de código JSON (veja "Entrega"), exceto quando precisar fazer perguntas (ver "Antes de responder").
 
 ## Pedido
 ===

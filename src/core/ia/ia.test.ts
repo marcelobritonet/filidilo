@@ -58,6 +58,30 @@ describe('lendo a resposta', () => {
     expect(() => extrairJson('só texto')).toThrow(/JSON válido/)
   })
 
+  it('conserta a cópia do ChatGPT fora do bloco: &#x20;, \\_, \\* e \\[', () => {
+    const t = '\\{"cartoes":&#x20;\\[{"frente":&#x20;"A lei de\\_Newton","verso":"\\*\\*F = m·a\\*\\*"}\\]\\}'
+    expect(extrairJson(t)).toEqual({ cartoes: [{ frente: 'A lei de_Newton', verso: '**F = m·a**' }] })
+  })
+
+  it('conserta NBSP, caracteres invisíveis e entidades', () => {
+    expect(extrairJson('{ "cartoes":​ [{"frente": "água &amp; sal"}]}')).toEqual({ cartoes: [{ frente: 'água & sal' }] })
+  })
+
+  it('dobra a barra simples de LaTeX e escapa a quebra de linha crua', () => {
+    expect(extrairJson('{"verso": "$\\Delta s$ e $\\sigma$"}')).toEqual({ verso: '$\\Delta s$ e $\\sigma$' })
+    expect(extrairJson('{"verso": "linha 1\nlinha 2"}')).toEqual({ verso: 'linha 1\nlinha 2' })
+  })
+
+  it('não estraga JSON que já é válido', () => {
+    const t = '{"verso": "$\\\\frac{a}{b}$\\nfim", "x": "aspas \\"internas\\""}'
+    expect(extrairJson(t)).toEqual(JSON.parse(t))
+  })
+
+  it('avisa quando a resposta veio cortada', () => {
+    expect(() => extrairJson('```json\n{"cartoes": [{"frente": "a"}, {"frente": "b"}, {"fre\n```')).toThrow(/cortada/)
+    expect(() => extrairJson('{"cartoes": [{"frente": "a"}, {"frente": "b"')).toThrow(/cortada/)
+  })
+
   it('reaproveita temas, cria os novos, dá ids novos e valida cartão a cartão', () => {
     const resposta = {
       temas: [{ id: 'Dinâmica', nome: 'Dinâmica' }, { id: 'energia', nome: 'Energia' }],
@@ -100,7 +124,7 @@ describe('lendo a resposta', () => {
 
 describe('instrução v3 (objetivo e cobertos)', () => {
   it('versão 3', () => {
-    expect(VERSAO_INSTRUCAO).toBe(5)
+    expect(VERSAO_INSTRUCAO).toBe(6)
   })
 
   it('com objetivo: seção, nível, foco, evitar (spoilers), descrição do tema e prioridade', () => {

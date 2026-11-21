@@ -2,6 +2,17 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.9.1] — 2026-11-21
+
+**O ChatGPT deixou de ser recusado na hora de colar a resposta.**
+
+### Corrigido
+- O Tatino recusava respostas do ChatGPT com "Não encontrei um JSON válido" quando o JSON vinha fora do bloco de código ou copiado pelo botão "Copiar" da mensagem. Agora ele conserta sozinho o que essa cópia estraga: `&#x20;` e outras entidades HTML, escapes de Markdown (`\_`, `\*`, `\[`), espaços especiais e invisíveis, barra simples de LaTeX (`\Delta`) e quebra de linha no meio de um texto. Uma resposta que já estava certa não muda.
+- Resposta cortada no meio agora dá uma mensagem própria, que pede à IA o resto em outro bloco.
+
+### Melhorado
+- As instruções para a IA (Criar com IA, Já tenho as perguntas, Aprender e Corrigir cartão) ganharam a seção "Entrega": um único bloco de código JSON na conversa, sem Canvas nem arquivo, barras dobradas, sem entidades HTML, conferir o JSON antes de responder e dividir em blocos de até 25 cartões quando não couber.
+
 ## [3.9.0] — 2026-11-21
 
 **Depois da primeira sessão, o app sugere o tema que ficou com poucos cartões.**
