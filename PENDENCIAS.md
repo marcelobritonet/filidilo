@@ -1,6 +1,6 @@
 # Tatino — Pendências (fonte da verdade)
 
-Atualizado em 19/11/2026.
+Atualizado em 21/11/2026.
 
 | # | Item | Status | Quem decide / faz |
 |---|---|---|---|
@@ -56,7 +56,7 @@ Atualizado em 19/11/2026.
 | P56 | Nível no pedido de "Aprender": 6 opções (do zero ao extremo), obrigatório antes de copiar a instrução; a IA ajusta dificuldade e tom; níveis antigos convertidos na leitura | ✅ Publicada na v3.2.0 (16/11) | Claude |
 | P57 | Sugestão de nível pelo desempenho recente em Criar com IA (sobe ou desce um degrau; mínimo 15 respostas; botão para voltar ao nível atual) | ✅ Publicada na v3.3.0 (16/11) | Claude |
 | P58 | Teste no Gemini (anônimo) com as 6 instruções de nível: zero, iniciante, boas noções, bastante e expert rodaram e geraram 15 cartões válidos cada um; **extremo ficou por rodar**. Achado: um cartão do expert estava errado (limite de |x| em 0 apresentado como prova de derivabilidade) e o validador não pega erro de conteúdo | A fazer (extremo e revisão de conteúdo) | Claude / Marcelo |
-| P59 | Enviar baralho ou cartão por link e QR code (vale 2 horas; Cloudflare Worker + KV em `worker/`); arquivo continua como alternativa | ✅ Pronto na v3.4.0 (19/11), commit local, ainda não publicado | Claude |
-| P60 | **Ligar o link em produção**: (1) criar conta grátis no Cloudflare; (2) criar token de API com Workers Scripts e Workers KV Storage: Edit; (3) no GitHub, segredos `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID`; (4) push → o worker publica; (5) variável `VITE_LINKS_URL` com o endereço `https://tatino-links.<conta>.workers.dev` e publicar o app de novo | A fazer | Marcelo |
+| P59 | Enviar baralho ou cartão por link e QR code (vale 2 horas; Cloudflare Worker + KV em `worker/`); arquivo continua como alternativa | ✅ Publicada na v3.4.0 (21/11) | Claude |
+| P60 | Ligar o link em produção: conta Cloudflare, token `tatino-github` (vence em 1 ano, 11/2027), segredos `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID`, worker em `https://tatino-links.britin.workers.dev` e variável `VITE_LINKS_URL` | ✅ Feito (21/11). Quando o token vencer, o deploy do worker falha: criar outro e trocar o segredo | — |
 | P61 | Testar envio e abertura por link e QR entre dois celulares (Android e iPhone) | A fazer, depois da P60 | Marcelo / estudante |
 | P52 | v3 · E7 Testar o fluxo novo com gente de verdade (um baralho com PDF de aula e um de assunto livre) | A fazer, depois da publicação | Marcelo / estudante |
