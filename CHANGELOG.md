@@ -2,6 +2,13 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.6.2] — 2026-11-21
+
+**"Não sei" nas lacunas.** No nível fácil, as lacunas ganharam o botão "Não sei", como as alternativas.
+
+### Corrigido
+- Nas lacunas com alternativas, "Não sei" mostra a frase completa e conta como erro; o cartão volta mais tarde na sessão.
+
 ## [3.6.1] — 2026-11-21
 
 **Sorteio mais justo.** A posição da alternativa certa já mudava a cada vez, mas nas lacunas algumas ordens saíam mais que outras.

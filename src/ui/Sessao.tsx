@@ -403,8 +403,10 @@ function Lacunas({ c, acoes, facil, distratores }: { c: CartaoLacunas; acoes: Ac
   const [virado, setVirado] = useState(false)
   const [escolhas, setEscolhas] = useState<(string | null)[]>(certas.map(() => null))
   const usaAlternativas = !!facil && distratores.length > 0
-  const respondeu = usaAlternativas && escolhas.every((e) => e !== null)
-  const acertou = respondeu && escolhas.every((e, i) => formasAceitas(c.respostas[i]).includes(e!))
+  // "Não sei": mostra a frase completa e conta como erro, como nas alternativas.
+  const [naoSabia, setNaoSabia] = useState(false)
+  const respondeu = usaAlternativas && (naoSabia || escolhas.every((e) => e !== null))
+  const acertou = respondeu && !naoSabia && escolhas.every((e, i) => formasAceitas(c.respostas[i]).includes(e!))
   const fraseComRespostas = (
     <Tex class="frente" texto={partes.reduce((acc, p, i) => acc + p + (i < certas.length ? `**${certas[i]}**` : ''), '')} />
   )
@@ -458,13 +460,16 @@ function Lacunas({ c, acoes, facil, distratores }: { c: CartaoLacunas; acoes: Ac
                 </button>
               ))}
             </div>
+            <button class="btn terciario nao-sei" onClick={() => { evento('nao_sei', { tipo: c.tipo }); setNaoSabia(true) }}>
+              Não sei
+            </button>
           </>
         )
       })()}
       {respondeu && (
         <Folha
-          titulo={acertou ? '✓ Certo!' : '✕ Não foi dessa vez'}
-          tom={acertou ? 'ok' : 'erro'}
+          titulo={acertou ? '✓ Certo!' : naoSabia ? 'Tudo bem, veja a resposta' : '✕ Não foi dessa vez'}
+          tom={acertou ? 'ok' : naoSabia ? 'neutro' : 'erro'}
           rodape={<BotoesNota avaliar={acoes.avaliar} acertou={acertou} />}
         >
           {fraseComRespostas}
