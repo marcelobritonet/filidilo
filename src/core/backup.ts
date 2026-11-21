@@ -1,4 +1,5 @@
 import { db, type Estado, type Marca, type Reporte, type Revisao } from './db'
+import { mesclarProgresso } from './progresso'
 import type { Baralho, Cartao } from './types'
 
 interface Backup {
@@ -42,25 +43,10 @@ export async function importar(texto: string): Promise<{ estados: number; reviso
         nBar++
       }
     }
-    for (const e of d.estados) {
-      const atual = await db.estados.get(e.id)
-      if (!atual || atual.ultimaData < e.ultimaData) {
-        e.fsrs.due = new Date(e.fsrs.due)
-        if (e.fsrs.last_review) e.fsrs.last_review = new Date(e.fsrs.last_review)
-        await db.estados.put(e)
-        nEst++
-      }
-    }
-    const existentes = new Set((await db.revisoes.toArray()).map((r) => r.id))
-    for (const r of d.revisoes ?? []) if (!existentes.has(r.id)) {
-      await db.revisoes.add(r)
-      nRev++
-    }
-    for (const r of d.reportes ?? []) await db.reportes.put(r)
-    for (const m of d.marcas ?? []) {
-      const atual = await db.marcas.get(m.cartao)
-      if (!atual || atual.data < m.data) await db.marcas.put(m)
-    }
+    const r = await mesclarProgresso({ estados: d.estados, revisoes: d.revisoes ?? [], marcas: d.marcas ?? [] })
+    nEst = r.estados
+    nRev = r.revisoes
+    for (const rep of d.reportes ?? []) await db.reportes.put(rep)
   })
   return { estados: nEst, revisoes: nRev, baralhos: nBar }
 }

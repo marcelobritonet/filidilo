@@ -3,7 +3,9 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { listar, obter, salvar } from './baralhos'
 import { gravarCartao } from './cartoes'
 import { adicionarCartoesRecebidos, aplicar, arquivoDoBaralho, arquivoDosCartoes, importarComoCopia, lerBaralho, lerRecebido, planejar } from './compartilhar'
-import { db } from './db'
+import { db, type Nota } from './db'
+import { progressoDoBaralho } from './progresso'
+import { registrar } from './srs'
 import type { Baralho, CartaoConceito } from './types'
 
 const base = (): Baralho => ({
@@ -160,5 +162,85 @@ describe('objetivo do baralho', () => {
     await aplicar(await planejar(base()))
     await aplicar(await planejar({ ...base(), objetivo: { resumo: 'Do autor' } }))
     expect((await obter('fis'))!.objetivo).toEqual({ resumo: 'Do autor' })
+  })
+})
+
+describe('enviar baralho com o progresso', () => {
+  beforeEach(async () => {
+    await Promise.all([db.baralhos.clear(), db.estados.clear(), db.revisoes.clear(), db.marcas.clear()])
+  })
+
+  const estudar = async (baralho: string, cartao: string, nota: Nota) => registrar(`${baralho}/${cartao}`, nota, 'espacada')
+
+  it('o progresso vai só se pedido, e só o do baralho', async () => {
+    await salvar(base())
+    await salvar({ ...base(), id: 'outro' })
+    await estudar('fis', 'a', 3)
+    await estudar('outro', 'a', 1)
+    await db.marcas.put({ cartao: 'fis/b', status: 'erro', nota: 'x', data: 1 })
+    const p = await progressoDoBaralho('fis')
+    expect(p.estados.map((e) => e.id)).toEqual(['fis/a'])
+    expect(p.revisoes).toHaveLength(1)
+    expect(p.revisoes[0]).not.toHaveProperty('seq')
+    expect(p.marcas.map((m) => m.cartao)).toEqual(['fis/b'])
+
+    expect(lerRecebido(arquivoDoBaralho(base()).texto)).toMatchObject({ tipo: 'baralho', progresso: undefined })
+    const com = arquivoDoBaralho(base(), p)
+    expect(com.nome).toContain('com progresso')
+    const lido = lerRecebido(com.texto)
+    expect(lido.tipo === 'baralho' && lido.progresso?.estados.map((e) => e.id)).toEqual(['fis/a'])
+  })
+
+  it('descarta progresso de outro baralho ou malformado', () => {
+    const texto = JSON.stringify({
+      app: 'tatino',
+      tipo: 'baralho',
+      formato: 2,
+      baralho: base(),
+      progresso: { estados: [{ id: 'outro/a', fsrs: {}, ultimaData: 1 }, { id: 'fis/a' }], revisoes: 'x', marcas: [] },
+    })
+    expect(lerRecebido(texto)).toMatchObject({ tipo: 'baralho', progresso: undefined })
+  })
+
+  it('noutro aparelho: baralho novo chega estudado; o mais recente vence; respostas não duplicam', async () => {
+    await salvar(base())
+    await estudar('fis', 'a', 3)
+    await estudar('fis', 'b', 1)
+    const texto = arquivoDoBaralho((await obter('fis'))!, await progressoDoBaralho('fis')).texto
+
+    // "Outro aparelho": banco limpo.
+    await Promise.all([db.baralhos.clear(), db.estados.clear(), db.revisoes.clear()])
+    const lido = lerRecebido(texto)
+    if (lido.tipo !== 'baralho') throw new Error('tipo')
+    const plano = await planejar(lido.baralho, lido.progresso)
+    expect(plano.estudados).toBe(2)
+    await aplicar(plano, { comProgresso: true })
+    const a = await db.estados.get('fis/a')
+    expect(a?.ultimaNota).toBe(3)
+    expect(a?.fsrs.due).toBeInstanceOf(Date)
+    expect(await db.revisoes.count()).toBe(2)
+
+    // Aqui ela estuda "b" de novo depois; receber o mesmo arquivo outra vez não volta atrás nem duplica.
+    await new Promise((r) => setTimeout(r, 2))
+    await estudar('fis', 'b', 4)
+    await aplicar(await planejar(lido.baralho, lido.progresso), { comProgresso: true })
+    expect((await db.estados.get('fis/b'))?.ultimaNota).toBe(4)
+    expect(await db.revisoes.count()).toBe(3)
+  })
+
+  it('sem marcar, o progresso não entra; como cópia, vai para o baralho novo', async () => {
+    await salvar(base())
+    await estudar('fis', 'a', 3)
+    const lido = lerRecebido(arquivoDoBaralho(base(), await progressoDoBaralho('fis')).texto)
+    if (lido.tipo !== 'baralho') throw new Error('tipo')
+    await Promise.all([db.baralhos.clear(), db.estados.clear(), db.revisoes.clear()])
+
+    await aplicar(await planejar(lido.baralho, lido.progresso), { comProgresso: false })
+    expect(await db.estados.count()).toBe(0)
+
+    const copia = await importarComoCopia(lido.baralho, lido.progresso)
+    expect(copia.id).not.toBe('fis')
+    expect((await db.estados.toArray()).map((e) => e.id)).toEqual([`${copia.id}/a`])
+    expect((await db.revisoes.toArray()).map((r) => r.cartao)).toEqual([`${copia.id}/a`])
   })
 })
