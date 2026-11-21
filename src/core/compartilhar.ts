@@ -1,5 +1,4 @@
 import { novoId, obter, salvar } from './baralhos'
-import { filtrarProgresso, mesclarProgresso, trocarBaralho, type Progresso } from './progresso'
 import type { Baralho, Cartao } from './types'
 import { validar } from './validar'
 
@@ -9,18 +8,16 @@ interface ArquivoBaralho {
   tipo: 'baralho'
   formato: 2
   baralho: Baralho
-  /** Opcional: o progresso de quem enviou, para levar o baralho a outro aparelho dela. */
-  progresso?: Progresso
 }
 
 /**
  * Nome e conteúdo do arquivo. Usa .txt porque o Chrome do Android só compartilha
  * alguns tipos de arquivo (JSON não está entre eles); o conteúdo continua JSON.
  */
-export function arquivoDoBaralho(b: Baralho, progresso?: Progresso): { nome: string; texto: string } {
-  const envelope: ArquivoBaralho = { app: 'tatino', tipo: 'baralho', formato: 2, baralho: b, ...(progresso && { progresso }) }
+export function arquivoDoBaralho(b: Baralho): { nome: string; texto: string } {
+  const envelope: ArquivoBaralho = { app: 'tatino', tipo: 'baralho', formato: 2, baralho: b }
   const titulo = nomeArquivo(b.titulo) || 'baralho'
-  return { nome: `${titulo}${progresso ? ' com progresso' : ''} (Tatino).txt`, texto: JSON.stringify(envelope) }
+  return { nome: `${titulo} (Tatino).txt`, texto: JSON.stringify(envelope) }
 }
 
 const nomeArquivo = (s: string) => s.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim()
@@ -52,7 +49,7 @@ export function arquivoDosCartoes(b: Baralho, cartoes: Cartao[]): { nome: string
 }
 
 /** Lê o que chegou: um baralho inteiro ou cartões soltos. */
-export function lerRecebido(texto: string): { tipo: 'baralho'; baralho: Baralho; progresso?: Progresso } | ({ tipo: 'cartoes' } & CartoesRecebidos) {
+export function lerRecebido(texto: string): { tipo: 'baralho'; baralho: Baralho } | ({ tipo: 'cartoes' } & CartoesRecebidos) {
   let d: Partial<ArquivoCartoes> | undefined
   try {
     d = JSON.parse(texto)
@@ -66,17 +63,7 @@ export function lerRecebido(texto: string): { tipo: 'baralho'; baralho: Baralho;
     if (erros.length) throw new Error(`O cartão tem problema: ${erros[0]}`)
     return { tipo: 'cartoes', origem: d.origem?.titulo ?? 'Cartões recebidos', temas: d.temas, cartoes: d.cartoes }
   }
-  const baralho = lerBaralho(texto)
-  return { tipo: 'baralho', baralho, progresso: lerProgresso(texto, baralho.id) }
-}
-
-/** O progresso que veio junto com o baralho, se veio (só o deste baralho). */
-export function lerProgresso(texto: string, baralhoId: string): Progresso | undefined {
-  try {
-    return filtrarProgresso((JSON.parse(texto) as Partial<ArquivoBaralho>).progresso, baralhoId)
-  } catch {
-    return undefined
-  }
+  return { tipo: 'baralho', baralho: lerBaralho(texto) }
 }
 
 /**
@@ -134,10 +121,6 @@ export interface PlanoImportacao {
   /** Cartões que só existem no dela: ficam (nada é apagado). */
   soNoMeu: number
   temasNovos: Baralho['temas']
-  /** Progresso que veio junto (quando ela leva o baralho para outro aparelho dela). */
-  progresso?: Progresso
-  /** Cartões com progresso no que veio. */
-  estudados: number
 }
 
 const semMeta = (c: Cartao) => {
@@ -145,9 +128,9 @@ const semMeta = (c: Cartao) => {
   return JSON.stringify(resto)
 }
 
-export async function planejar(recebido: Baralho, progresso?: Progresso): Promise<PlanoImportacao> {
+export async function planejar(recebido: Baralho): Promise<PlanoImportacao> {
   const atual = await obter(recebido.id)
-  const plano: PlanoImportacao = { recebido, atual, novos: [], atualizados: [], preservados: [], iguais: 0, soNoMeu: 0, temasNovos: [], progresso, estudados: progresso?.estados.length ?? 0 }
+  const plano: PlanoImportacao = { recebido, atual, novos: [], atualizados: [], preservados: [], iguais: 0, soNoMeu: 0, temasNovos: [] }
   if (!atual) {
     plano.novos = recebido.cartoes
     return plano
@@ -169,24 +152,8 @@ export async function planejar(recebido: Baralho, progresso?: Progresso): Promis
 
 const marcarImportado = (c: Cartao): Cartao => ({ ...c, origem: c.origem ?? 'importado', editado: undefined })
 
-export interface OpcoesImportacao {
-  /** Trazer também o progresso que veio junto. */
-  comProgresso?: boolean
-}
-
 /** Atualiza o baralho dela (ou cria, se não existir), preservando o que ela editou. */
-export async function aplicar(p: PlanoImportacao, o: OpcoesImportacao = {}): Promise<Baralho> {
-  const b = await aplicarCartoes(p)
-  if (o.comProgresso && p.progresso) await mesclarProgresso(p.progresso)
-  return b
-}
-
-/** Só o progresso (ela já tem o baralho igualzinho). */
-export async function aplicarSoProgresso(p: PlanoImportacao): Promise<void> {
-  if (p.progresso) await mesclarProgresso(p.progresso)
-}
-
-async function aplicarCartoes(p: PlanoImportacao): Promise<Baralho> {
+export async function aplicar(p: PlanoImportacao): Promise<Baralho> {
   if (!p.atual) return salvar({ ...p.recebido, cartoes: p.recebido.cartoes.map(marcarImportado), criadoEm: undefined })
   const trocar = new Map(p.atualizados.map((c) => [c.id, c]))
   const cartoes = [...p.atual.cartoes.map((c) => (trocar.has(c.id) ? marcarImportado(trocar.get(c.id)!) : c)), ...p.novos.map(marcarImportado)]
@@ -195,9 +162,7 @@ async function aplicarCartoes(p: PlanoImportacao): Promise<Baralho> {
 }
 
 /** Importa como um baralho separado, sem tocar no que ela já tem. */
-export async function importarComoCopia(recebido: Baralho, progresso?: Progresso): Promise<Baralho> {
+export async function importarComoCopia(recebido: Baralho): Promise<Baralho> {
   const titulo = `${recebido.titulo} (recebido)`
-  const b = await salvar({ ...recebido, id: novoId(titulo), titulo, cartoes: recebido.cartoes.map(marcarImportado), criadoEm: undefined })
-  if (progresso) await mesclarProgresso(trocarBaralho(progresso, recebido.id, b.id))
-  return b
+  return salvar({ ...recebido, id: novoId(titulo), titulo, cartoes: recebido.cartoes.map(marcarImportado), criadoEm: undefined })
 }

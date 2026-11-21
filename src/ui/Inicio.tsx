@@ -4,7 +4,7 @@ import { chave, dominado, vencido } from '../core/srs'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
 import { evento } from '../core/telemetria'
-import { conteudoBaralho, conteudoBaralhoComProgresso } from './enviar'
+import { conteudoBaralho } from './enviar'
 import { EnviarModal } from './EnviarModal'
 import { useEstados } from './estado'
 import { Icone } from './Icone'
@@ -269,7 +269,7 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
           </div>
         </>
       )}
-      {enviando && <EnviarModal conteudo={conteudoBaralho(baralho)} comProgresso={() => conteudoBaralhoComProgresso(baralho)} onde="baralho" avisar={(texto) => nav.avisar({ texto })} fechar={() => setEnviando(false)} />}
+      {enviando && <EnviarModal conteudo={conteudoBaralho(baralho)} onde="baralho" avisar={(texto) => nav.avisar({ texto })} fechar={() => setEnviando(false)} />}
     </main>
   )
 }
