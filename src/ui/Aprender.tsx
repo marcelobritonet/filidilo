@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'preact/hooks'
 import { novoId, salvar } from '../core/baralhos'
-import { montarCorrecao } from '../core/ia/instrucao'
+import { montarCorrecao, montarInstrucaoFormatacao } from '../core/ia/instrucao'
 import { EXEMPLO_PLANO, montarPlano } from '../core/ia/plano'
 import { extrairJson, lerPlano, parecePerguntas, type PlanoLido } from '../core/ia/resposta'
 import { evento } from '../core/telemetria'
@@ -31,6 +31,11 @@ interface Edicao {
  */
 export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string; nav: Navegacao }) {
   const [pedido, setPedido] = useState(pedidoInicial)
+  // Modo "formatar": a pessoa já tem perguntas e respostas e a IA só as converte num baralho novo.
+  const [formatar, setFormatar] = useState(false)
+  const [perguntas, setPerguntas] = useState('')
+  const [nome, setNome] = useState('')
+  const [naoConvertidos, setNaoConvertidos] = useState<string[]>([])
   const [nivelPedido, setNivelPedido] = useState<Nivel | ''>('')
   const [materialAberto, setMaterialAberto] = useState(false)
   const [material, setMaterial] = useState<Material>('pdf')
@@ -57,18 +62,29 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
         ? 'texto'
         : undefined
   const instrucao = useMemo(
-    () => montarPlano({ pedido, nivel: nivelPedido || undefined, origem: origemMaterial, nomePdf, paginas, texto }),
-    [pedido, nivelPedido, origemMaterial, nomePdf, paginas, texto],
+    () =>
+      formatar
+        ? montarInstrucaoFormatacao({ texto: perguntas, novo: { titulo: nome } })
+        : montarPlano({ pedido, nivel: nivelPedido || undefined, origem: origemMaterial, nomePdf, paginas, texto }),
+    [formatar, perguntas, nome, pedido, nivelPedido, origemMaterial, nomePdf, paginas, texto],
   )
+  const modo = formatar ? 'formatar' : 'aprender'
   // Sem o nível escolhido a instrução não sai: é ele que define a dificuldade dos cartões.
-  const pedidoOk = pedido.trim().length >= 3 && !!nivelPedido
+  // Com perguntas prontas o nível é opcional: não muda as perguntas, só como as lacunas aparecem.
+  const pedidoOk = formatar ? perguntas.trim().length > 20 : pedido.trim().length >= 3 && !!nivelPedido
+  const mudarModo = (f: boolean) => {
+    if (f === formatar) return
+    setFormatar(f)
+    setCopiado('')
+    evento('aprender_modo', { modo: f ? 'formatar' : 'aprender' })
+  }
 
   const copiar = async (conteudo: string, qual: 'instrucao' | 'correcao') => {
     try {
       await navigator.clipboard.writeText(conteudo)
       setFalha(null)
       setCopiado(qual)
-      evento('ia_copiado', { qual: qual === 'instrucao' ? 'plano' : 'correcao', origem: origemMaterial ?? 'tema' })
+      evento('ia_copiado', { qual: qual === 'instrucao' ? (formatar ? 'formatacao' : 'plano') : 'correcao', origem: formatar ? 'perguntas' : (origemMaterial ?? 'tema'), modo })
     } catch {
       setCopiado('')
       setFalha({ qual, texto: conteudo })
@@ -91,7 +107,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
       return
     }
     try {
-      const r = lerPlano(dados, pedido)
+      const r = formatar ? lerPlano(dados, nome.trim() || 'Minhas perguntas', 'Perguntas próprias') : lerPlano(dados, pedido)
       if (r.cartoes.length && r.cartoes.every((c) => DO_EXEMPLO.has(textoBase(c.cartao))))
         throw new Error('Você colou a instrução. Cole a resposta que a IA deu.')
       evento('aprender_resposta_lida', {
@@ -100,7 +116,10 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
         com_erro: r.cartoes.filter((c) => c.erros.length).length,
         nivel: r.baralho.objetivo?.nivel ?? 'nenhum',
         com_baralho: !!r.baralho.objetivo,
+        modo,
       })
+      const fora = (dados as { naoConvertidos?: unknown })?.naoConvertidos
+      if (formatar && Array.isArray(fora)) setNaoConvertidos((ant) => [...ant, ...fora.filter((x): x is string => typeof x === 'string')])
       if (!lido) {
         // O nível é o que a pessoa escolheu, não o que a IA devolveu.
         const ini: Edicao = { titulo: r.baralho.titulo, resumo: r.baralho.objetivo?.resumo ?? '', nivel: nivelPedido }
@@ -139,7 +158,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
     const campos = [cfg.titulo.trim() !== base.titulo, cfg.resumo.trim() !== base.resumo, cfg.nivel !== base.nivel].filter(Boolean).length
     const usados = temasDe(escolhidos)
     const objetivo: Objetivo = {
-      pedido: pedido.trim() || undefined,
+      pedido: formatar ? undefined : pedido.trim() || undefined,
       resumo: cfg.resumo.trim() || undefined,
       nivel: cfg.nivel || undefined,
       foco: lido.baralho.objetivo?.foco,
@@ -159,6 +178,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
       cartoes: b.cartoes.length,
       desmarcados: validos.length - escolhidos.length,
       nivel: cfg.nivel || 'nenhum',
+      modo,
     })
     await salvar(b)
     nav.mudou()
@@ -174,9 +194,35 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
       </header>
 
       <section class="bloco passo">
-        <h2><span class="num-passo">1</span> O que você quer aprender?</h2>
-        <input class="texto" aria-label="O que você quer aprender" value={pedido} placeholder="Ex.: espanhol para viajar" onInput={(e) => setPedido((e.target as HTMLInputElement).value)} />
-        <p class="rotulo">Quanto você já sabe sobre isso?</p>
+        <h2><span class="num-passo">1</span> {formatar ? 'Suas perguntas' : 'O que você quer aprender?'}</h2>
+        <div class="segmentado" role="radiogroup" aria-label="Modo">
+          <button role="radio" aria-checked={!formatar} class={!formatar ? 'ativo' : ''} onClick={() => mudarModo(false)}>
+            Quero aprender
+          </button>
+          <button role="radio" aria-checked={formatar} class={formatar ? 'ativo' : ''} onClick={() => mudarModo(true)}>
+            Já tenho as perguntas
+          </button>
+        </div>
+        {formatar ? (
+          <>
+            <label class="campo">
+              Nome do baralho (opcional)
+              <input class="texto" maxLength={40} value={nome} placeholder="Ex.: Física 1 · prova 2" onInput={(e) => setNome((e.target as HTMLInputElement).value)} />
+            </label>
+            <label class="campo">
+              Perguntas e respostas
+              <textarea
+                rows={8}
+                value={perguntas}
+                placeholder={'Cole aqui, em qualquer formato:\nQual a unidade de força? N\nP: O que é inércia? R: resistência à mudança de movimento'}
+                onInput={(e) => setPerguntas((e.target as HTMLTextAreaElement).value)}
+              />
+            </label>
+          </>
+        ) : (
+          <input class="texto" aria-label="O que você quer aprender" value={pedido} placeholder="Ex.: espanhol para viajar" onInput={(e) => setPedido((e.target as HTMLInputElement).value)} />
+        )}
+        <p class="rotulo">{formatar ? 'Quanto você já sabe sobre isso? (opcional)' : 'Quanto você já sabe sobre isso?'}</p>
         <div class="opcoes-nivel" role="radiogroup" aria-label="Quanto você já sabe">
           {NIVEIS.map((n) => (
             <button
@@ -184,7 +230,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
               aria-checked={nivelPedido === n.valor}
               class={`opcao-nivel ${nivelPedido === n.valor ? 'ativo' : ''}`}
               onClick={() => {
-                setNivelPedido(n.valor)
+                setNivelPedido(formatar && nivelPedido === n.valor ? '' : n.valor)
                 evento('aprender_nivel', { nivel: n.valor })
               }}
             >
@@ -192,7 +238,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
             </button>
           ))}
         </div>
-        {!materialAberto ? (
+        {formatar ? null : !materialAberto ? (
           <button class="link" onClick={() => { setMaterialAberto(true); evento('aprender_material', { origem: material }) }}>
             Tenho um material (PDF ou texto)
           </button>
@@ -228,8 +274,10 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
 
       <section class="bloco passo">
         <h2><span class="num-passo">2</span> Peça à IA</h2>
-        <p class="dica">Copie a instrução e cole na IA{origemMaterial === 'pdf' ? ', junto com o PDF' : ''}.</p>
-        {!pedidoOk && <p class="dica">Escreva o que quer aprender e escolha quanto você já sabe, no passo 1.</p>}
+        <p class="dica">Copie a instrução e cole na IA{origemMaterial === 'pdf' && !formatar ? ', junto com o PDF' : ''}.</p>
+        {!pedidoOk && (
+          <p class="dica">{formatar ? 'Cole suas perguntas e respostas no passo 1.' : 'Escreva o que quer aprender e escolha quanto você já sabe, no passo 1.'}</p>
+        )}
         <button class="btn principal" disabled={!pedidoOk} onClick={() => copiar(instrucao, 'instrucao')}>
           {copiado === 'instrucao' ? '✓ Instrução copiada' : 'Copiar instrução'}
         </button>
@@ -303,6 +351,17 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
               </button>
               {falha?.qual === 'correcao' && <textarea class="instrucao" rows={6} readOnly value={falha.texto} />}
               <p class="dica">Cole na mesma conversa com a IA e cole a nova resposta no passo 3.</p>
+            </div>
+          )}
+
+          {naoConvertidos.length > 0 && (
+            <div class="problemas-ia">
+              <p>{plural(naoConvertidos.length, 'item ficou de fora', 'itens ficaram de fora')}:</p>
+              <ul class="problemas">
+                {naoConvertidos.map((t) => (
+                  <li>✕ {t}</li>
+                ))}
+              </ul>
             </div>
           )}
 

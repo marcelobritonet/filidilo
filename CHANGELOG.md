@@ -2,6 +2,19 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.7.0] — 2026-11-21
+
+**Baralho novo com as suas perguntas.** Quem já tem perguntas e respostas prontas pode criar um baralho do zero com elas, sem passar por um baralho existente.
+
+### Novo
+- Em Novo baralho (tela Aprender), o passo 1 ganhou o seletor "Quero aprender" | "Já tenho as perguntas". Nesse modo: cole a lista em qualquer formato, dê um nome ao baralho se quiser, e a IA só formata, sem inventar. Ela também sugere título e objetivo.
+- O nível é opcional nesse modo; dá para ajustar depois em Configurar baralho.
+- Os itens que a IA não conseguiu converter aparecem na conferência como "ficaram de fora".
+
+### Melhorado
+- Depois de responder, a pergunta continua à vista: ela aparece no topo da folha de resultado, junto com a resposta e a explicação.
+- A alça da folha ganhou texto ("Ver o cartão" / "Ver o resultado"), para ficar claro que dá para recolher e ver o cartão inteiro.
+
 ## [3.6.3] — 2026-11-21
 
 **Temas novos não somem mais.** Depois de criar cartões com IA, a tela Configurar baralho abria com a lista de temas antiga, e "Salvar alterações" apagava os temas novos.

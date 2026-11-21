@@ -12,6 +12,17 @@ describe('instrução para o Gemini', () => {
     expect(t).toContain('Não invente')
     expect(t).toContain('naoConvertidos')
     expect(t).toContain('SOMENTE')
+    expect(t).not.toContain('"baralho"')
+  })
+
+  it('modo formatar para baralho novo: pede o bloco baralho e usa o nome dado', () => {
+    const sem = montarInstrucaoFormatacao({ texto: 'P: O que é inércia? R: resistência', novo: {} })
+    expect(sem).toContain('"baralho": { "titulo"')
+    expect(sem).toContain('baralho novo')
+    const com = montarInstrucaoFormatacao({ texto: 'P: O que é inércia? R: resistência', novo: { titulo: 'Física 1' } })
+    expect(com).toContain('use o título "Física 1"')
+    // Baralho novo não tem o que já está coberto.
+    expect(montarInstrucaoFormatacao({ texto: 'x', novo: {}, baralho: { titulo: 'F', temas: [], cartoes: [{ id: 'a', tipo: 'conceito', tema: 'g', frente: 'Pergunta antiga', verso: 'v' }] } })).not.toContain('Já cobertos')
   })
 
   it('os exemplos da instrução passam no validador do app', () => {
@@ -150,6 +161,11 @@ describe('plano: leitura da resposta (Aprender)', () => {
     expect(r.cartoes).toHaveLength(1)
     expect(r.cartoes[0].erros).toEqual([])
     expect(r.cartoes[0].cartao).toMatchObject({ origem: 'ia', fonte: { apostila: 'Gerado por IA' } })
+  })
+
+  it('perguntas próprias: fonte padrão trocada', () => {
+    const r = lerPlano({ temas: plano.temas, cartoes: plano.cartoes }, 'Minhas perguntas', 'Perguntas próprias')
+    expect(r.cartoes[0].cartao).toMatchObject({ fonte: { apostila: 'Perguntas próprias' } })
   })
 
   it('sem bloco baralho: título é o pedido cortado em 40, sem objetivo', () => {

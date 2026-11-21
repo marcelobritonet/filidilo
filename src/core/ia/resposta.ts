@@ -119,7 +119,7 @@ const lista = (v: unknown): string[] =>
  * Lê o plano da instrução "Aprender": bloco `baralho` (com limites), temas e cartões.
  * Sem o bloco `baralho`, o título é o pedido cortado em 40 caracteres e não há objetivo.
  */
-export function lerPlano(dados: unknown, pedido: string): PlanoLido {
+export function lerPlano(dados: unknown, pedido: string, fontePadrao = 'Gerado por IA'): PlanoLido {
   const d = (Array.isArray(dados) ? { cartoes: dados } : (dados ?? {})) as Record<string, unknown>
   const bruto = d.baralho && typeof d.baralho === 'object' ? (d.baralho as Record<string, unknown>) : undefined
   const pedidoLimpo = pedido.trim()
@@ -142,7 +142,7 @@ export function lerPlano(dados: unknown, pedido: string): PlanoLido {
     ? d.temas.map((t) => (t && typeof t === 'object' ? { ...(t as object), descricao: aparar((t as Record<string, unknown>).descricao, 120) || undefined } : t))
     : d.temas
   // O id só existe para o validador (que exige id e título); o baralho ainda não foi criado.
-  const r = lerResposta({ ...d, temas }, { id: 'novo', titulo, versao: 1, temas: [] }, 'Gerado por IA')
+  const r = lerResposta({ ...d, temas }, { id: 'novo', titulo, versao: 1, temas: [] }, fontePadrao)
   return { baralho: objetivo ? { titulo, objetivo } : { titulo }, temasNovos: r.temasNovos, cartoes: r.cartoes }
 }
 

@@ -187,10 +187,20 @@ ${JSON.stringify(EXEMPLOS, null, 1)}
 }
 
 /** Pedido de formatação: a pessoa já tem perguntas e respostas (em qualquer formato) e a IA só as converte. */
-export function montarInstrucaoFormatacao(p: { texto: string; baralho?: Pick<Baralho, 'titulo' | 'temas'> & Partial<Pick<Baralho, 'objetivo' | 'cartoes'>> }): string {
+export function montarInstrucaoFormatacao(p: {
+  texto: string
+  baralho?: Pick<Baralho, 'titulo' | 'temas'> & Partial<Pick<Baralho, 'objetivo' | 'cartoes'>>
+  /** Baralho novo: a IA também sugere título e objetivo (bloco "baralho"). */
+  novo?: { titulo?: string }
+}): string {
   const fonte = '"fonte": { "apostila": "Perguntas próprias" }'
-  const cobertos = jaCobertos({ temas: p.baralho?.temas ?? [], cartoes: p.baralho?.cartoes ?? [] })
+  const cobertos = p.novo ? '' : jaCobertos({ temas: p.baralho?.temas ?? [], cartoes: p.baralho?.cartoes ?? [] })
   const coberturaSecao = cobertos ? `## Já cobertos\nNão repita estes assuntos com a mesma pergunta:\n${cobertos}\n\n` : ''
+  const nomeDado = p.novo?.titulo?.trim()
+  const baralhoFormato = p.novo ? '"baralho": { "titulo": "...", "objetivo": "..." }, ' : ''
+  const baralhoRegra = p.novo
+    ? `Estas perguntas vão formar um baralho novo. Em "baralho", ${nomeDado ? `use o título "${nomeDado.slice(0, 40)}"` : 'dê um título curto (até 40 caracteres) que diga o assunto das perguntas'} e, em "objetivo", uma frase (até 160 caracteres) sobre o que o baralho ajuda a estudar.\n`
+    : ''
   return `Você vai converter perguntas e respostas que eu já tenho em flashcards para o app Tatino. Responda SOMENTE com um bloco de código JSON, sem texto antes ou depois.
 
 ## Material
@@ -206,8 +216,8 @@ ${p.texto.trim()}
 - Se o item tiver fonte (página, aula), mantenha; senão use "Perguntas próprias".
 
 ${coberturaSecao}## Formato da resposta
-{ "temas": [ { "id": "...", "nome": "..." } ], "cartoes": [ ... ], "naoConvertidos": [ "texto do item que ficou de fora" ] }
-Crie de 2 a 8 temas que organizem os itens (id em minúsculas, sem acento, com hífens).
+{ ${baralhoFormato}"temas": [ { "id": "...", "nome": "..." } ], "cartoes": [ ... ], "naoConvertidos": [ "texto do item que ficou de fora" ] }
+${baralhoRegra}Crie de 2 a 8 temas que organizem os itens (id em minúsculas, sem acento, com hífens).
 
 ${regrasTipos(fonte)}
 
