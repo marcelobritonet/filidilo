@@ -1,9 +1,9 @@
 // Harness "Aprender uma coisa nova hoje": monta a instrução que a pessoa cola na IA para planejar um baralho.
 // Versão da instrução: mude ao alterar regras (como em VERSAO_INSTRUCAO).
 import { infoNivel, type Cartao, type Nivel, type Tema } from '../types'
-import { origemTexto, regrasTextoJson, regrasTipos } from './instrucao'
+import { origemTexto, regraNaoEntregar, regrasTextoJson, regrasTipos } from './instrucao'
 
-export const VERSAO_PLANO = 5
+export const VERSAO_PLANO = 6
 
 export interface PedidoPlano {
   /** O que a pessoa digitou em "Aprender uma coisa nova hoje". */
@@ -99,6 +99,8 @@ Um objeto JSON com "baralho", "temas" e "cartoes":
 - "temas[].descricao": até 120 caracteres.
 
 ${regrasTipos(fonte)}
+
+${regraNaoEntregar()}
 
 ## Regras
 - Português do Brasil (menos o conteúdo do idioma estudado, se for o caso). Uma ideia por cartão. Pergunta que se entende sozinha.

@@ -2,6 +2,15 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.13.2] — 2026-11-21
+
+**Cartões da IA que não entregam a resposta na pergunta.**
+
+### Corrigido
+- Os cartões criados com IA às vezes traziam a resposta na própria pergunta: o termo pedido no enunciado, a palavra da lacuna repetida na frase, a sigla já por extenso. A instrução que você cola na IA agora pede para conferir cada cartão e reescrever a pergunta quando der para acertar sem saber o conteúdo.
+- Em "Já tenho as perguntas", se uma pergunta sua entrega a resposta, a IA reescreve só a pergunta. A resposta continua com as suas palavras.
+- "Corrigir cartão" também confere isso.
+
 ## [3.13.1] — 2026-11-21
 
 **Questões de prova com alternativas viram cartão de escolha.**

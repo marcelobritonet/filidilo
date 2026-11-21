@@ -124,7 +124,7 @@ describe('lendo a resposta', () => {
 
 describe('instrução v3 (objetivo e cobertos)', () => {
   it('versão 3', () => {
-    expect(VERSAO_INSTRUCAO).toBe(8)
+    expect(VERSAO_INSTRUCAO).toBe(9)
   })
 
   it('com objetivo: seção, nível, foco, evitar (spoilers), descrição do tema e prioridade', () => {
@@ -241,5 +241,19 @@ describe('plano: leitura da resposta (Aprender)', () => {
 
   it('texto sem JSON e sem pergunta não é pergunta', () => {
     expect(parecePerguntas('Não entendi o pedido.')).toBe(false)
+  })
+})
+
+describe('o enunciado não entrega a resposta (P89)', () => {
+  it('as instruções de cartões e de formatação trazem a regra', () => {
+    const gerar = montarInstrucao({ origem: 'tema', assunto: 'Fotossíntese', quantidade: 10, mistura: 'misto' })
+    const converter = montarInstrucaoFormatacao({ texto: 'P: O que é inércia? R: Tendência de manter o movimento.' })
+    for (const t of [gerar, converter]) {
+      expect(t).toContain('## Não entregue a resposta')
+      expect(t).toContain('dá para acertar sem saber o conteúdo?')
+      expect(t).toContain('O enunciado entrega a resposta?')
+    }
+    expect(converter).toContain('Única exceção ao "não corrija"')
+    expect(gerar).not.toContain('Única exceção')
   })
 })

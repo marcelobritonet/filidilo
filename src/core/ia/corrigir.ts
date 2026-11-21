@@ -49,7 +49,7 @@ Cartão atual (JSON):
 ${JSON.stringify(paraIA(c), null, 1)}
 \`\`\`
 
-Confira o conteúdo com cuidado. Se houver erro, corrija; se estiver certo, devolva igual. ${tipoTexto(c)}
+Confira o conteúdo com cuidado. Se houver erro, corrija; se estiver certo, devolva igual. Confira também se a pergunta entrega a resposta (o termo pedido, uma palavra da mesma família ou uma pista óbvia); se entregar, reescreva a pergunta. ${tipoTexto(c)}
 Use "explicacao" curta para dizer por que a resposta é essa.
 
 Responda SOMENTE com um bloco de código JSON contendo o cartão corrigido, em português do Brasil.

@@ -5,7 +5,7 @@ import { extrairJson } from './resposta'
 
 describe('instrução de planejamento (Aprender)', () => {
   it('versão 1', () => {
-    expect(VERSAO_PLANO).toBe(5)
+    expect(VERSAO_PLANO).toBe(6)
   })
 
   it('o exemplo passa no validador do app', () => {
@@ -62,5 +62,11 @@ describe('regras de conteúdo (P58)', () => {
     expect(t).toContain('Cada lacuna precisa ter uma resposta certa clara')
     expect(t).toContain('nunca a aplicação direta de uma fórmula')
     expect(t).toContain('revise cada cartão como um professor que corrige prova')
+  })
+})
+
+describe('o enunciado não entrega a resposta (P89)', () => {
+  it('o plano traz a regra', () => {
+    expect(montarPlano({ pedido: 'fotossíntese' })).toContain('## Não entregue a resposta')
   })
 })

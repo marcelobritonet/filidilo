@@ -4,7 +4,7 @@ import type { Baralho, Cartao, Objetivo, Tema } from '../types'
 import { infoNivel } from '../types'
 import { jaCobertos } from './cobertos'
 
-export const VERSAO_INSTRUCAO = 8
+export const VERSAO_INSTRUCAO = 9
 
 export type Origem = 'pdf' | 'texto' | 'tema'
 export type Mistura = 'misto' | 'teoria' | 'calculo'
@@ -109,10 +109,22 @@ export function regrasTipos(fonte: string): string {
   - Nos textos, {nome:2} mostra o valor com 2 casas e {resultado} é a resposta da última etapa.`
 }
 
+/** O enunciado não pode entregar a resposta. Vai nas instruções de cartões, de formatação e de plano. */
+export function regraNaoEntregar(): string {
+  return `## Não entregue a resposta
+O que a pessoa vê antes de responder ("frente", "titulo", "enunciado", a "pergunta" de cada etapa e as "opcoes") não pode trazer a resposta: nem ela inteira, nem parte dela, nem sinônimo, palavra da mesma família, sigla por extenso, tradução literal ou outra pista que a deixe óbvia. Erros comuns, por tipo:
+- "conceito": a pergunta já traz o termo pedido. Errado: "O que é a fotossíntese, processo em que a planta faz fotossíntese com luz?". Certo: "Como se chama o processo em que a planta usa luz para produzir glicose?" Se a resposta é um nome (de lei, teorema, processo, obra), a pergunta descreve a ideia, sem citar nenhuma palavra do nome. Errado: "Qual o nome do teorema de Pitágoras?". Certo: "Como se chama o teorema segundo o qual, no triângulo retângulo, $a^2 = b^2 + c^2$?"
+- "associacao": a certa é a única que repete palavras da pergunta, ou é a mais longa e detalhada. Todas as opções precisam parecer igualmente possíveis para quem não sabe.
+- "lacunas": a palavra da lacuna (ou da mesma família) aparece em outro ponto da frase ou numa outra lacuna. Errado: "O ____ bombeia o sangue; o coração tem quatro cavidades." com resposta "coração".
+- "vf": nada de pista como "(falso)", e não use "sempre", "nunca" ou "apenas" só nas afirmações falsas.
+- "calculo": o enunciado e as perguntas das etapas não trazem o valor que a etapa pede.
+Teste cada cartão: leia só o que a pessoa vê antes de responder e pergunte "dá para acertar sem saber o conteúdo?". Se der, reescreva a pergunta.`
+}
+
 /** Regras de formato do texto (LaTeX, negrito) e de entrega do JSON. Usadas pelas instruções de cartões e de plano. */
 export function regrasTextoJson(): string {
   return `- Fórmulas podem ir entre $...$ em LaTeX, sempre com os dois $. **Negrito** com dois asteriscos é permitido. Nada de HTML.
-- Antes de responder, revise cada cartão como um professor que corrige prova: a resposta marcada está certa? A pergunta parte de uma premissa possível? Se achar erro, corrija o cartão ou tire-o. Nunca deixe no texto dúvidas ou correções ("Espere", "vamos corrigir").
+- Antes de responder, revise cada cartão como um professor que corrige prova: a resposta marcada está certa? A pergunta parte de uma premissa possível? O enunciado entrega a resposta? Se achar erro, corrija o cartão ou tire-o. Nunca deixe no texto dúvidas ou correções ("Espere", "vamos corrigir").
 
 ## Entrega
 ${regraEntrega()}
@@ -185,6 +197,8 @@ Um objeto JSON com "temas" e "cartoes":
 
 ${regrasTipos(fonte)}
 
+${regraNaoEntregar()}
+
 ## Regras
 - Português do Brasil. Uma ideia por cartão. Pergunta que se entende sozinha, sem "segundo o texto".
 - Fiel ao material: não invente dados, valores ou fórmulas que não estejam nele${p.origem === 'tema' ? ' (aqui, fiel ao conhecimento estabelecido)' : ''}.
@@ -223,6 +237,7 @@ ${p.texto.trim()}
 
 ## Como converter
 - Converta cada item em um cartão, mantendo o sentido e as palavras da pessoa. Não invente, não complete e não corrija conteúdo. Se a resposta original estiver incompleta ou incorreta, mantenha como está.
+- Única exceção ao "não corrija": se a pergunta original entregar a resposta (veja "Não entregue a resposta"), reescreva só a pergunta, ou troque o tipo (por exemplo, de "lacunas" para "conceito"), para que ela não entregue. A resposta continua a da pessoa, com as palavras dela. As alternativas erradas que você criar seguem a mesma regra.
 - Um cartão por ideia. Escolha o tipo que melhor encaixa: "conceito" para pergunta aberta com resposta, "vf" para afirmação verdadeira ou falsa, "associacao" para pergunta com alternativas ou com resposta curta, "lacunas" para frase de completar (com ____ ou espaço em branco no original), "calculo" só se houver exercício com números.
 - Questão de múltipla escolha (alternativas marcadas com A) B) C), a., (a), 1) 2) ou parecido) vira SEMPRE "associacao", nunca "conceito":
   - "frente": só a pergunta, sem as alternativas e sem número ou cabeçalho da questão ("Questão 31 | BWM", "31."). A sigla ou assunto do cabeçalho pode virar o tema.
@@ -238,6 +253,8 @@ ${coberturaSecao}## Formato da resposta
 ${baralhoRegra}Crie de 2 a 8 temas que organizem os itens (id em minúsculas, sem acento, com hífens).
 
 ${regrasTipos(fonte)}
+
+${regraNaoEntregar()}
 
 ## Regras
 - Português do Brasil. Pergunta que se entende sozinha, sem "segundo o texto".

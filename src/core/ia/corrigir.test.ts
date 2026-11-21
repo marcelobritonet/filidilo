@@ -51,3 +51,9 @@ describe('corrigir questão com alternativas na pergunta (P90)', () => {
     expect(r.cartao).toMatchObject({ id: 'q31', tipo: 'associacao', frente: 'Qual a unidade de massa no SI?', opcoes: ['grama', 'quilograma', 'libra', 'tonelada'], correta: 1 })
   })
 })
+
+describe('o enunciado não entrega a resposta (P89)', () => {
+  it('o pedido de correção manda conferir', () => {
+    expect(montarPedidoCorrecao(b, errado)).toContain('se a pergunta entrega a resposta')
+  })
+})
