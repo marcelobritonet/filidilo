@@ -1,3 +1,4 @@
+import { formasAceitas } from '../core/lacunas'
 import { useState } from 'preact/hooks'
 import { formatar, preencher, sortear } from '../core/calc'
 import type { Baralho, Cartao } from '../core/types'
@@ -79,6 +80,14 @@ export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) 
 
 export function Conteudo({ c }: { c: Cartao }) {
   switch (c.tipo) {
+    case 'lacunas':
+      return (
+        <>
+          <Tex class="frente" texto={c.frente.replace(/____/g, '______')} />
+          <Tex class="verso" texto={`→ ${c.respostas.map((r) => formasAceitas(r)[0]).join(', ')}`} />
+          {c.explicacao && <Tex class="explicacao" texto={c.explicacao} />}
+        </>
+      )
     case 'conceito':
       return (
         <>

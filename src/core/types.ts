@@ -157,7 +157,14 @@ export interface CartaoCalculo extends CartaoBase {
   tolerancia?: number // relativa; padrão 0,02
 }
 
-export type Cartao = CartaoConceito | CartaoVF | CartaoAssociacao | CartaoCalculo
+/** Frase com lacunas: cada `____` no texto recebe uma resposta, na ordem. "a/b" aceita sinônimos. */
+export interface CartaoLacunas extends CartaoBase {
+  tipo: 'lacunas'
+  frente: string
+  respostas: string[]
+}
+
+export type Cartao = CartaoConceito | CartaoVF | CartaoAssociacao | CartaoCalculo | CartaoLacunas
 
 export interface Baralho {
   id: string

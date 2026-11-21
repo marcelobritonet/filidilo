@@ -1,5 +1,6 @@
 import { preencher, sortear } from './calc'
 import { compilar } from './expr'
+import { contarLacunas } from './lacunas'
 import { normalizarNivel, type Baralho, type Objetivo } from './types'
 
 /** Lista os problemas do objetivo (opcional). Vazio = válido ou ausente. */
@@ -55,6 +56,14 @@ export function validar(b: Baralho, sorteios = 60): string[] {
           else if (c.outrasFormas.some((f) => c.opcoes?.includes(f))) e('a outra forma da correta repete uma das alternativas ("outrasFormas")')
         }
         break
+      case 'lacunas': {
+        const n = contarLacunas(c.frente ?? '')
+        if (!c.frente?.trim()) e('frente vazia')
+        else if (n === 0) e('sem lacuna: use ____ no texto')
+        else if (!Array.isArray(c.respostas) || c.respostas.length !== n) e(`${n} lacuna(s) pedem ${n} resposta(s)`)
+        else if (c.respostas.some((r) => typeof r !== 'string' || !r.trim())) e('resposta de lacuna vazia')
+        break
+      }
       case 'calculo': {
         if (!c.etapas?.length) {
           e('cálculo sem etapas')

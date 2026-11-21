@@ -5,9 +5,11 @@ import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../
 import { formaDaCerta, sortearAlternativas } from '../core/alternativas'
 import { chave, dominado, registrar } from '../core/srs'
 import { evento } from '../core/telemetria'
-import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, Objetivo } from '../core/types'
+import { formasAceitas, NIVEIS_COM_ALTERNATIVAS, partesDaFrente } from '../core/lacunas'
+import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, CartaoLacunas, Objetivo } from '../core/types'
 import { nomeTema } from './estado'
 import { CorrigirCartao } from './CorrigirCartao'
+import { EditarCartao } from './EditarCartao'
 import { conteudoCartao } from './enviar'
 import { EnviarModal } from './EnviarModal'
 import { Folha } from './Folha'
@@ -38,6 +40,23 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   // Cópia local: correções feitas durante a sessão entram aqui sem reiniciar a sessão.
   const [baralho, setBaralho] = useState(inicial)
   const [corrigindo, setCorrigindo] = useState(false)
+  // Correção manual: o editor ocupa a tela, mas a sessão fica montada por baixo.
+  // Ganha uma entrada no histórico para o "voltar" do Android fechar o editor, não a sessão.
+  const [editando, setEditando] = useState(false)
+  useEffect(() => {
+    if (!editando) return
+    const aoVoltar = () => setEditando(false)
+    window.addEventListener('popstate', aoVoltar)
+    return () => window.removeEventListener('popstate', aoVoltar)
+  }, [editando])
+  const abrirEditor = () => {
+    evento('corrigir_manual_aberto', { onde: 'estudo' })
+    history.pushState({ n: history.state?.n ?? 0 }, '')
+    setCorrigindo(false)
+    setEditando(true)
+    window.scrollTo(0, 0)
+  }
+  const fecharEditor = () => history.back()
   const [enviando, setEnviando] = useState<Cartao | null>(null)
   // Erros e chutes por tema, para sugerir onde criar mais cartões no fim.
   const [fracos, setFracos] = useState<Record<string, number>>({})
@@ -134,6 +153,21 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
     setCorrigindo(false)
   }
 
+  if (editando && cartao)
+    return (
+      <EditarCartao
+        baralho={baralho}
+        cartaoId={cartao.id}
+        naSessao={{
+          aoSalvar: (c, b) => {
+            corrigido(c, b)
+            fecharEditor()
+          },
+          fechar: fecharEditor,
+        }}
+      />
+    )
+
   return (
     <main class="tela sessao">
       <header class="barra-sessao">
@@ -184,7 +218,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
               <Icone nome="enviar" />
             </button>
           </div>
-          <CartaoView key={`${pos}-${vez}-${cartao.id}`} cartao={cartao} acoes={acoes} semAlternativas={dominados.has(cartao.id)} />
+          <CartaoView key={`${pos}-${vez}-${cartao.id}`} cartao={cartao} acoes={acoes} semAlternativas={dominados.has(cartao.id)} facil={!!baralho.objetivo?.nivel && (NIVEIS_COM_ALTERNATIVAS as readonly string[]).includes(baralho.objetivo.nivel)} distratores={respostasDoBaralho(baralho)} />
           <div class="acoes-cartao">
             <button class="btn terciario" onClick={pular}>
               Pular
@@ -193,7 +227,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
               Corrigir cartão
             </button>
           </div>
-          {corrigindo && <CorrigirCartao baralho={baralho} cartao={cartao} aoSalvar={corrigido} fechar={() => setCorrigindo(false)} />}
+          {corrigindo && <CorrigirCartao baralho={baralho} cartao={cartao} aoSalvar={corrigido} fechar={() => setCorrigindo(false)} corrigirEuMesmo={abrirEditor} />}
           {enviando && <EnviarModal conteudo={conteudoCartao(baralho, enviando)} onde="estudo" fechar={() => setEnviando(null)} />}
         </>
       )}
@@ -331,7 +365,12 @@ function BotoesNota({ avaliar, acertou }: { avaliar: (n: Nota, chute?: boolean) 
   )
 }
 
-function CartaoView({ cartao, acoes, semAlternativas }: { cartao: Cartao; acoes: Acoes; semAlternativas?: boolean }) {
+/** Respostas de outras lacunas do baralho: alternativas erradas plausíveis no nível fácil. */
+function respostasDoBaralho(b: Baralho): string[] {
+  return b.cartoes.flatMap((c) => (c.tipo === 'lacunas' ? c.respostas.map((r) => formasAceitas(r)[0]) : []))
+}
+
+function CartaoView({ cartao, acoes, semAlternativas, facil, distratores }: { cartao: Cartao; acoes: Acoes; semAlternativas?: boolean; facil?: boolean; distratores?: string[] }) {
   switch (cartao.tipo) {
     case 'conceito':
       return <Conceito c={cartao} acoes={acoes} />
@@ -341,7 +380,102 @@ function CartaoView({ cartao, acoes, semAlternativas }: { cartao: Cartao; acoes:
       return <Associacao c={cartao} acoes={acoes} semAlternativas={semAlternativas} />
     case 'calculo':
       return <Calculo c={cartao} acoes={acoes} />
+    case 'lacunas':
+      return <Lacunas c={cartao} acoes={acoes} facil={facil} distratores={distratores ?? []} />
   }
+}
+
+/**
+ * Frase com lacunas. Nível fácil: uma lista de alternativas por lacuna. Nível difícil: só revelar a frase.
+ */
+function Lacunas({ c, acoes, facil, distratores }: { c: CartaoLacunas; acoes: Acoes; facil?: boolean; distratores: string[] }) {
+  const partes = partesDaFrente(c.frente)
+  const certas = c.respostas.map((r) => formasAceitas(r)[0] ?? '')
+  const opcoesPorLacuna = useMemo(
+    () =>
+      certas.map((certa, i) => {
+        const outras = [...new Set(distratores.filter((d) => d && d !== certa))].sort(() => Math.random() - 0.5).slice(0, 3)
+        return { certa, opcoes: [certa, ...outras].sort(() => Math.random() - 0.5), i }
+      }),
+    [c.id],
+  )
+  const [virado, setVirado] = useState(false)
+  const [escolhas, setEscolhas] = useState<(string | null)[]>(certas.map(() => null))
+  const usaAlternativas = !!facil && distratores.length > 0
+  const respondeu = usaAlternativas && escolhas.every((e) => e !== null)
+  const acertou = respondeu && escolhas.every((e, i) => formasAceitas(c.respostas[i]).includes(e!))
+  const fraseComRespostas = (
+    <Tex class="frente" texto={partes.reduce((acc, p, i) => acc + p + (i < certas.length ? `**${certas[i]}**` : ''), '')} />
+  )
+  const mostrar = () => setVirado(true)
+  const lacunas = (
+    <p class="frente lacunas">
+      {partes.map((p, i) => (
+        <>
+          <Tex texto={p} />
+          {i < certas.length && <span class="lacuna">{escolhas[i] ?? '____'}</span>}
+        </>
+      ))}
+    </p>
+  )
+  if (!usaAlternativas)
+    return (
+      <article class="cartao">
+        <p class="rotulo">Complete a lacuna</p>
+        {lacunas}
+        {!virado && (
+          <button class="btn principal virar" onClick={mostrar}>
+            Mostrar resposta
+          </button>
+        )}
+        {virado && (
+          <Folha titulo="Resposta" rodape={<><p class="dica centro">Como foi?</p><BotoesNota avaliar={acoes.avaliar} /></>}>
+            {fraseComRespostas}
+            {c.explicacao && <Explicacao texto={c.explicacao} />}
+            <Fonte c={c} />
+            <button class="btn terciario compacto" onClick={acoes.corrigir}>
+              Cartão errado? Corrigir
+            </button>
+          </Folha>
+        )}
+      </article>
+    )
+  return (
+    <article class="cartao">
+      <p class="rotulo">Escolha a palavra que completa</p>
+      {lacunas}
+      {!respondeu && (() => {
+        // Uma lacuna por vez, na ordem.
+        const l = opcoesPorLacuna[escolhas.indexOf(null)]
+        return (
+          <>
+            {certas.length > 1 && <p class="dica">Lacuna {l.i + 1} de {certas.length}</p>}
+            <div class="opcoes">
+              {l.opcoes.map((o) => (
+                <button key={o} class="opcao" onClick={() => setEscolhas(escolhas.map((e, k) => (k === l.i ? o : e)))}>
+                  <Tex texto={o} />
+                </button>
+              ))}
+            </div>
+          </>
+        )
+      })()}
+      {respondeu && (
+        <Folha
+          titulo={acertou ? '✓ Certo!' : '✕ Não foi dessa vez'}
+          tom={acertou ? 'ok' : 'erro'}
+          rodape={<BotoesNota avaliar={acoes.avaliar} acertou={acertou} />}
+        >
+          {fraseComRespostas}
+          {c.explicacao && <Explicacao texto={c.explicacao} />}
+          <Fonte c={c} />
+          <button class="btn terciario compacto" onClick={acoes.corrigir}>
+            Cartão errado? Corrigir
+          </button>
+        </Folha>
+      )}
+    </article>
+  )
 }
 
 /**

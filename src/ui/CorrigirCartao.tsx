@@ -7,8 +7,11 @@ import { AbrirIA } from './AbrirIA'
 import { Conteudo } from './Revisar'
 
 
-/** Janela para corrigir um cartão com ajuda da IA: pedir, colar a resposta, comparar e salvar. */
-export function CorrigirCartao({ baralho, cartao, aoSalvar, fechar }: { baralho: Baralho; cartao: Cartao; aoSalvar: (c: Cartao, b: Baralho) => void; fechar: () => void }) {
+/**
+ * Janela para corrigir um cartão com ajuda da IA: pedir, colar a resposta, comparar e salvar.
+ * Com `corrigirEuMesmo`, oferece antes o caminho sem IA (abrir o editor do cartão).
+ */
+export function CorrigirCartao({ baralho, cartao, aoSalvar, fechar, corrigirEuMesmo }: { baralho: Baralho; cartao: Cartao; aoSalvar: (c: Cartao, b: Baralho) => void; fechar: () => void; corrigirEuMesmo?: () => void }) {
   const [problema, setProblema] = useState('')
   const [copiado, setCopiado] = useState<'' | 'ok' | 'erro'>('')
   const [resposta, setResposta] = useState('')
@@ -50,12 +53,20 @@ export function CorrigirCartao({ baralho, cartao, aoSalvar, fechar }: { baralho:
 
         {!lido ? (
           <>
+            {corrigirEuMesmo && (
+              <>
+                <button class="btn principal" onClick={corrigirEuMesmo}>
+                  Corrigir eu mesmo
+                </button>
+                <p class="rotulo">Ou com a IA</p>
+              </>
+            )}
             <label class="campo">
               O que está errado? (opcional)
               <textarea rows={2} value={problema} placeholder="A resposta certa é…" onInput={(e) => setProblema((e.target as HTMLTextAreaElement).value)} />
             </label>
             <p class="dica">Copie o pedido e cole na IA. Depois cole a resposta abaixo.</p>
-            <button class="btn principal" onClick={copiar}>
+            <button class={`btn ${corrigirEuMesmo ? 'secundario' : 'principal'}`} onClick={copiar}>
               {copiado === 'ok' ? '✓ Copiado' : 'Copiar pedido'}
             </button>
             <AbrirIA />

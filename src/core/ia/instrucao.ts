@@ -86,8 +86,8 @@ export const EXEMPLOS: { temas: Tema[]; cartoes: Cartao[] } = {
 }
 
 const PROPORCAO: Record<Mistura, string> = {
-  misto: 'Misture os tipos: cerca de 30% "conceito", 30% "vf", 25% "associacao" e, se o material tiver fórmulas e contas, 15% "calculo". Sem contas no material, não crie "calculo".',
-  teoria: 'Use só os tipos "conceito", "vf" e "associacao", em proporções parecidas. Não crie "calculo".',
+  misto: 'Misture os tipos: cerca de 25% "conceito", 25% "vf", 20% "associacao", 10% "lacunas" e, se o material tiver fórmulas e contas, 15% "calculo". Sem contas no material, não crie "calculo".',
+  teoria: 'Use só os tipos "conceito", "vf", "associacao" e "lacunas", em proporções parecidas. Não crie "calculo".',
   calculo: 'Crie só cartões do tipo "calculo", cobrindo as fórmulas e os tipos de problema do material.',
 }
 
@@ -97,6 +97,7 @@ export function regrasTipos(fonte: string): string {
 - "conceito": "frente" (pergunta) e "verso" (resposta).
 - "vf": "frente" (afirmação) e "resposta" (true ou false). Toda afirmação falsa precisa de "explicacao" dizendo o que está errado.
 - "associacao": "frente" (pergunta), "opcoes" (1 certa e 5 ou 6 erradas plausíveis, sem repetir), "correta" (índice da certa, começando em 0) e "outrasFormas" (lista com 1 outra forma de dizer a resposta certa, com palavras diferentes e o mesmo sentido). O app mostra 4 de cada vez e alterna as formas da certa, então nenhuma errada pode ser obviamente absurda e a outra forma não pode ser maior nem mais detalhada que as erradas. Varie a posição da correta.
+- "lacunas": "frente" com ____ no lugar de cada palavra a completar (ex.: "A Terra gira em torno do ____.") e "respostas", uma por lacuna, na ordem. Use "/" para sinônimos aceitos ("Sol/astro-rei"). A frase precisa fazer sentido completa.
 - "calculo": exercício com números sorteados. Campos:
   - "titulo" e "enunciado"; no enunciado, {nome} mostra o valor sorteado.
   - "parametros": { "nome": { "min": n, "max": n, "passo": n, "unidade": "..." } }. Escolha faixas realistas.

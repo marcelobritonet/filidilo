@@ -7,6 +7,7 @@ const REGRAS_TIPO: Record<Cartao['tipo'], string> = {
   conceito: '"frente" (pergunta) e "verso" (resposta).',
   vf: '"frente" (afirmação) e "resposta" (true ou false). Se for falsa, "explicacao" diz o que está errado.',
   associacao: '"frente", "opcoes" (1 certa e 5 ou 6 erradas plausíveis, sem repetir), "correta" (índice da certa, começando em 0) e "outrasFormas" (1 outra forma de dizer a certa).',
+  lacunas: '"frente" com ____ em cada lacuna e "respostas" (uma por lacuna, na ordem; use / para sinônimos).',
   calculo:
     '"titulo", "enunciado" com {variavel}, "parametros" { nome: { min, max, passo, unidade } }, "derivados" opcional, e "etapas" com "pergunta", "expr", "unidade", "casas" e "resolucao". Expressões só com números, + - * / ^, parênteses e as funções sqrt, abs, sin, cos, tan, sind, cosd, tand, asin, log10, ln, exp, min, max, round, floor, ceil, se(cond, a, b), pi e e.',
 }

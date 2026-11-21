@@ -1,21 +1,32 @@
 import { evento } from '../core/telemetria'
 import { useState } from 'preact/hooks'
 import { excluirCartao, gravarCartao, novoIdCartao, problemasDoCartao, reinserirCartao } from '../core/cartoes'
+import { contarLacunas, MARCADOR } from '../core/lacunas'
 import type { Baralho, Cartao } from '../core/types'
 import type { Navegacao } from './App'
 import { CorrigirCartao } from './CorrigirCartao'
 import { Tex } from './Tex'
 
-type TipoEditavel = 'conceito' | 'vf' | 'associacao'
+type TipoEditavel = 'conceito' | 'vf' | 'associacao' | 'lacunas'
 
 const TIPOS: { tipo: TipoEditavel; nome: string }[] = [
   { tipo: 'conceito', nome: 'Pergunta e resposta' },
   { tipo: 'vf', nome: 'Verdadeiro ou falso' },
   { tipo: 'associacao', nome: 'Alternativas' },
+  { tipo: 'lacunas', nome: 'Lacunas' },
 ]
 
-/** Criar ou editar um cartão de conceito, V/F ou alternativas. Cálculo: só tema e exclusão. */
-export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho: Baralho; cartaoId?: string; temaInicial?: string; nav: Navegacao }) {
+/** Corrigir à mão no meio do estudo: a sessão continua aberta por baixo. */
+export interface EdicaoNaSessao {
+  aoSalvar: (c: Cartao, b: Baralho) => void
+  fechar: () => void
+}
+
+/**
+ * Criar ou editar um cartão de conceito, V/F ou alternativas. Cálculo: só tema e exclusão.
+ * Com `naSessao`, é a correção manual durante o estudo: sem excluir, sem IA e sem navegar.
+ */
+export function EditarCartao({ baralho, cartaoId, temaInicial, nav, naSessao }: { baralho: Baralho; cartaoId?: string; temaInicial?: string; nav?: Navegacao; naSessao?: EdicaoNaSessao }) {
   const original = cartaoId ? baralho.cartoes.find((c) => c.id === cartaoId) : undefined
   const ehCalculo = original?.tipo === 'calculo'
   const temaPadrao = temaInicial ?? original?.tema ?? baralho.temas[0]?.id ?? 'geral'
@@ -28,6 +39,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
   const [opcoes, setOpcoes] = useState<string[]>(original?.tipo === 'associacao' ? original.opcoes : ['', '', ''])
   const [correta, setCorreta] = useState(original?.tipo === 'associacao' ? original.correta : 0)
   const [outraForma, setOutraForma] = useState(original?.tipo === 'associacao' ? (original.outrasFormas?.[0] ?? '') : '')
+  const [respostasLacunas, setRespostasLacunas] = useState<string[]>(original?.tipo === 'lacunas' ? original.respostas : [])
   const [explicacao, setExplicacao] = useState(original?.explicacao ?? '')
   const [fonte, setFonte] = useState(original?.fonte ? `${original.fonte.apostila}${original.fonte.pagina !== undefined ? `, p. ${original.fonte.pagina}` : ''}` : '')
   const [problemas, setProblemas] = useState<string[]>([])
@@ -44,6 +56,10 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
     if (ehCalculo) return { ...original!, tema }
     if (tipo === 'conceito') return { id, tipo, tema, frente: frente.trim(), verso: verso.trim(), ...extra }
     if (tipo === 'vf') return { id, tipo, tema, frente: frente.trim(), resposta: resposta as boolean, ...extra }
+    if (tipo === 'lacunas') {
+      const n = contarLacunas(frente)
+      return { id, tipo, tema, frente: frente.trim(), respostas: Array.from({ length: n }, (_, i) => (respostasLacunas[i] ?? '').trim()), ...extra }
+    }
     const ops = opcoes.map((o) => o.trim())
     // Opções vazias saem; o índice da correta acompanha.
     const corretaTexto = ops[correta]
@@ -57,6 +73,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
     const p: string[] = []
     if (c.tipo === 'vf' && resposta === null) p.push('Escolha se a afirmação é verdadeira ou falsa.')
     if (c.tipo === 'associacao' && !opcoes[correta]?.trim()) p.push('Marque qual alternativa é a correta.')
+    if (c.tipo === 'lacunas' && contarLacunas(frente) === 0) p.push(`Escreva ${MARCADOR} no lugar da palavra que falta.`)
     return [...p, ...problemasDoCartao(baralho, c).filter((m) => !m.startsWith('resposta deve ser') && !m.startsWith('V/F falso'))]
   }
 
@@ -65,8 +82,10 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
     const p = verificar(c)
     setProblemas(p)
     if (p.length) return
-    evento('cartao_salvo', { tipo: c.tipo, novo: !original })
-    await gravarCartao(baralho, c)
+    evento('cartao_salvo', { tipo: c.tipo, novo: !original, onde: naSessao ? 'estudo' : 'editor' })
+    const b = await gravarCartao(baralho, c)
+    if (naSessao) return naSessao.aoSalvar(c, b)
+    if (!nav) return
     nav.mudou()
     if (eOutro) {
       nav.avisar({ texto: 'Cartão salvo. Pode escrever o próximo.' })
@@ -74,6 +93,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
       setVerso('')
       setResposta(null)
       setOpcoes(['', '', ''])
+      setRespostasLacunas([])
       setCorreta(0)
       setExplicacao('')
       window.scrollTo(0, 0)
@@ -84,6 +104,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
   }
 
   const apagar = async () => {
+    if (!nav) return
     const r = await excluirCartao(baralho, original!.id)
     nav.mudou()
     nav.avisar({
@@ -99,8 +120,8 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
   return (
     <main class="tela editar">
       <header class="barra-sessao">
-        <button class="fechar" aria-label="Voltar sem salvar" onClick={nav.voltar}>←</button>
-        <h1 class="titulo-barra">{original ? 'Editar cartão' : 'Novo cartão'}</h1>
+        <button class="fechar" aria-label="Voltar sem salvar" onClick={naSessao ? naSessao.fechar : nav?.voltar}>←</button>
+        <h1 class="titulo-barra">{naSessao ? 'Corrigir cartão' : original ? 'Editar cartão' : 'Novo cartão'}</h1>
         <span />
       </header>
 
@@ -143,6 +164,18 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
                 Resposta
                 <textarea rows={4} value={verso} onInput={(e) => setVerso((e.target as HTMLTextAreaElement).value)} />
               </label>
+            )}
+
+            {tipo === 'lacunas' && (
+              <div class="campo">
+                <p class="dica">Escreva {MARCADOR} no lugar de cada palavra a completar. Ex.: A Terra gira em torno do {MARCADOR}.</p>
+                {Array.from({ length: contarLacunas(frente) }, (_, i) => (
+                  <label class="campo">
+                    Resposta da lacuna {i + 1} (use / para sinônimos)
+                    <input class="texto" value={respostasLacunas[i] ?? ''} onInput={(e) => { const v = (e.target as HTMLInputElement).value; setRespostasLacunas((prev) => { const a = [...prev]; while (a.length <= i) a.push(''); a[i] = v; return a }) }} />
+                  </label>
+                ))}
+              </div>
             )}
 
             {tipo === 'vf' && (
@@ -219,6 +252,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
           <p class="rotulo">Prévia</p>
           <Tex class="frente" texto={frente} />
           {tipo === 'conceito' && verso.trim() && <Tex class="verso" texto={verso} />}
+          {tipo === 'lacunas' && respostasLacunas.some((r) => r.trim()) && <Tex class="verso" texto={respostasLacunas.filter((r) => r.trim()).join(', ')} />}
         </section>
       )}
 
@@ -232,16 +266,21 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
 
       <div class="acoes">
         <button class="btn principal" onClick={() => gravar(false)}>
-          Salvar
+          {naSessao ? 'Salvar e voltar ao estudo' : 'Salvar'}
         </button>
-        {!original && (
+        {naSessao && (
+          <button class="btn terciario" onClick={naSessao.fechar}>
+            Cancelar
+          </button>
+        )}
+        {!original && !naSessao && (
           <button class="btn secundario" onClick={() => gravar(true)}>
             Salvar e criar outro
           </button>
         )}
       </div>
 
-      {original && (
+      {original && !naSessao && (
         <button class="btn secundario" onClick={() => setCorrigindo(true)}>
           Corrigir com IA
         </button>
@@ -252,13 +291,13 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav }: { baralho:
           cartao={original}
           fechar={() => setCorrigindo(false)}
           aoSalvar={() => {
-            nav.mudou()
-            nav.avisar({ texto: 'Cartão corrigido.' })
-            nav.voltar()
+            nav?.mudou()
+            nav?.avisar({ texto: 'Cartão corrigido.' })
+            nav?.voltar()
           }}
         />
       )}
-      {original && (
+      {original && !naSessao && (
         <section class="bloco">
           {!confirmar ? (
             <button class="btn secundario perigo" onClick={() => setConfirmar(true)}>
