@@ -14,6 +14,7 @@ const HOST = 'https://us.i.posthog.com'
 const K_ID = 'tatino-tel-id'
 const K_FILA = 'tatino-tel-fila'
 const K_DESLIGADA = 'tatino-telemetria'
+const K_TESTE = 'tatino-teste'
 const MAX_FILA = 500
 
 interface Evento {
@@ -40,6 +41,25 @@ const gravar = (k: string, v: string | null) => {
 
 export const telemetriaDisponivel = () => !!CHAVE_POSTHOG
 export const telemetriaLigada = () => telemetriaDisponivel() && ler(K_DESLIGADA) !== 'off'
+
+/** Aparelho de teste (do Marcelo): os eventos vão com `teste: true`, para ficarem fora das contas. */
+export const aparelhoDeTeste = () => ler(K_TESTE) === '1'
+
+/**
+ * Lê `?teste=1` (marca este aparelho como de teste) ou `?teste=0` (desmarca) no endereço e tira o
+ * parâmetro do endereço. Manda o evento `aparelho_teste`, para dar para tirar também os eventos
+ * antigos desse aparelho. Devolve se mudou algo.
+ */
+export function marcarTesteDaUrl(): boolean {
+  const url = new URL(window.location.href)
+  const v = url.searchParams.get('teste')
+  if (v !== '1' && v !== '0') return false
+  url.searchParams.delete('teste')
+  history.replaceState(history.state, '', url.pathname + url.search + url.hash)
+  gravar(K_TESTE, v === '1' ? '1' : null)
+  evento('aparelho_teste', { ligado: v === '1' })
+  return true
+}
 
 export function ligarTelemetria(ligar: boolean): void {
   gravar(K_DESLIGADA, ligar ? null : 'off')
@@ -74,7 +94,9 @@ let enviando = false
 export function evento(nome: string, props: Evento['properties'] = {}): void {
   if (!telemetriaLigada()) return
   const fila = lerFila()
-  fila.push({ event: nome, timestamp: new Date().toISOString(), properties: props })
+  // A versão vai na hora do evento: um evento que esperou na fila não ganha a versão nova.
+  const properties = { ...props, versao: __VERSAO__, ...(aparelhoDeTeste() ? { teste: true } : {}) }
+  fila.push({ event: nome, timestamp: new Date().toISOString(), properties })
   gravar(K_FILA, JSON.stringify(fila.slice(-MAX_FILA)))
   clearTimeout(agendado)
   agendado = setTimeout(() => void enviar(), 5000)
@@ -97,7 +119,7 @@ export async function enviar(saindo = false): Promise<void> {
         api_key: CHAVE_POSTHOG,
         batch: lote.map((e) => ({
           ...e,
-          properties: { ...e.properties, distinct_id, versao: __VERSAO__, $lib: 'tatino', $process_person_profile: false },
+          properties: { versao: __VERSAO__, ...e.properties, distinct_id, $lib: 'tatino', $process_person_profile: false },
         })),
       }),
     })

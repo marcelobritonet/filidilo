@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'preact/hooks'
 import { useRegisterSW } from 'virtual:pwa-register/preact'
 import { pedirPersistencia } from '../core/db'
+import { aparelhoDeTeste } from '../core/telemetria'
 import type { OpcoesFila } from '../core/fila'
 import { Aparencia } from './Aparencia'
 import { Aprender } from './Aprender'
@@ -148,7 +149,7 @@ export function App() {
         </div>
       )}
       {conteudo}
-      <footer class="rodape-versao">tatino. v{__VERSAO__}</footer>
+      <footer class="rodape-versao">tatino. v{__VERSAO__}{aparelhoDeTeste() && ' · aparelho de teste'}</footer>
       {aviso && (
         <div class="toast" role="status" aria-live="polite">
           <span>{aviso.texto}</span>

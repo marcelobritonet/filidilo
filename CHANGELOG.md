@@ -2,6 +2,14 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.10.4] — 2026-11-21
+
+**Estatísticas mais limpas: aparelho de teste e versão certa em cada evento.**
+
+### Melhorado
+- Abrir o app com `?teste=1` no fim do endereço marca o aparelho como de teste: as estatísticas desse aparelho ficam marcadas para sair das contas, e o rodapé mostra "aparelho de teste". `?teste=0` desmarca.
+- Cada evento das estatísticas leva a versão do app do momento em que aconteceu (antes ia a versão do momento do envio).
+
 ## [3.10.3] — 2026-11-21
 
 **Os cartões criados pela IA aparecem numa tela própria para conferir.**

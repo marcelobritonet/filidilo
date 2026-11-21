@@ -42,4 +42,30 @@ describe('telemetria', () => {
     expect(armazenamento.has('tatino-tel-id')).toBe(false)
     expect(t.telemetriaLigada()).toBe(false)
   })
+
+  it('versão vai em cada evento, e a marca de teste também, quando ligada', async () => {
+    const t = await import('./telemetria')
+    if (!t.CHAVE_POSTHOG) return
+    t.evento('resposta')
+    armazenamento.set('tatino-teste', '1')
+    t.evento('resposta')
+    const fila = JSON.parse(armazenamento.get('tatino-tel-fila') ?? '[]')
+    expect(fila[0].properties).toEqual({ versao: 'teste' })
+    expect(fila[1].properties).toEqual({ versao: 'teste', teste: true })
+  })
+
+  it('?teste=1 marca o aparelho, ?teste=0 desmarca, e o parâmetro sai do endereço', async () => {
+    const enderecos: string[] = []
+    vi.stubGlobal('window', { location: { href: 'https://x.dev/tatino/?teste=1#a' } })
+    vi.stubGlobal('history', { state: null, replaceState: (_s: unknown, _t: string, u: string) => enderecos.push(u) })
+    const t = await import('./telemetria')
+    expect(t.marcarTesteDaUrl()).toBe(true)
+    expect(t.aparelhoDeTeste()).toBe(true)
+    expect(enderecos).toEqual(['/tatino/#a'])
+    vi.stubGlobal('window', { location: { href: 'https://x.dev/tatino/?teste=0' } })
+    expect(t.marcarTesteDaUrl()).toBe(true)
+    expect(t.aparelhoDeTeste()).toBe(false)
+    vi.stubGlobal('window', { location: { href: 'https://x.dev/tatino/' } })
+    expect(t.marcarTesteDaUrl()).toBe(false)
+  })
 })
