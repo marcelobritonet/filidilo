@@ -2,6 +2,15 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.10.3] — 2026-11-21
+
+**Os cartões criados pela IA aparecem numa tela própria para conferir.**
+
+### Corrigido
+- Depois de colar a resposta da IA (Aprender e Criar com IA), os cartões apareciam embaixo dos passos e era preciso rolar a tela para achá-los. Agora abre a tela "Confira os cartões", já no topo, com o botão de salvar preso no rodapé.
+- O ← e o voltar do Android levam de volta aos passos sem perder os cartões lidos; "Ver N cartões lidos" reabre a conferência.
+- Cartões com problema: a nova resposta da IA é colada ali mesmo, no campo abaixo de "Copiar pedido de correção".
+
 ## [3.10.2] — 2026-11-21
 
 **Aviso para conferir os cartões nos níveis mais difíceis.**

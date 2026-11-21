@@ -1,5 +1,5 @@
 import { evento } from '../core/telemetria'
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
+import { useEffect, useMemo, useState } from 'preact/hooks'
 import { salvar } from '../core/baralhos'
 import { avaliarBaralho, type Avaliacao } from '../core/desempenho'
 import { EXEMPLOS, VERSAO_INSTRUCAO, montarCorrecao, montarInstrucao, montarInstrucaoFormatacao, type Mistura, type Origem } from '../core/ia/instrucao'
@@ -7,7 +7,7 @@ import { extrairJson, lerResposta, type RespostaLida } from '../core/ia/resposta
 import { infoNivel, normalizarNivel, type Baralho } from '../core/types'
 import type { Navegacao } from './App'
 import { AbrirIA } from './AbrirIA'
-import { AvisoNivelAlto, Conteudo } from './Revisar'
+import { Conferencia, useConferencia } from './Conferencia'
 
 
 /** Criar cartões com IA: copia a instrução, cola na IA, cola a resposta aqui, confere e salva. */
@@ -30,7 +30,7 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
   const [erroLeitura, setErroLeitura] = useState('')
   const [desmarcados, setDesmarcados] = useState<Set<string>>(new Set())
   const [salvando, setSalvando] = useState(false)
-  const previa = useRef<HTMLElement>(null)
+  const conf = useConferencia()
   // Desempenho recente: sugere subir ou descer o nível dos próximos cartões. A pessoa pode voltar atrás.
   const [avaliacao, setAvaliacao] = useState<Avaliacao | null>(null)
   const [usarSugestao, setUsarSugestao] = useState(true)
@@ -89,16 +89,16 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
     }
   }
 
-  const ler = () => {
-    setErroLeitura('')
+  /** Lê uma resposta da IA (a primeira ou uma correção). Devolve o erro, se houver. */
+  const lerTexto = (texto: string): string | null => {
     try {
-      const dados = extrairJson(resposta)
+      const dados = extrairJson(texto)
       const r = lerResposta(dados, baralho, fontePadrao)
-      const fora = (dados as { naoConvertidos?: unknown })?.naoConvertidos
-      if (Array.isArray(fora)) setNaoConvertidos((ant) => [...ant, ...fora.filter((x): x is string => typeof x === 'string')])
       const exemplo = new Set(EXEMPLOS.cartoes.map((c) => ('frente' in c ? c.frente : c.titulo)))
       if (r.cartoes.every((c) => exemplo.has('frente' in c.cartao ? c.cartao.frente : c.cartao.titulo)))
         throw new Error('Você colou a instrução. Cole a resposta que a IA deu.')
+      const fora = (dados as { naoConvertidos?: unknown })?.naoConvertidos
+      if (Array.isArray(fora)) setNaoConvertidos((ant) => [...ant, ...fora.filter((x): x is string => typeof x === 'string')])
       // Uma resposta de correção soma-se aos cartões já lidos.
       setLida((ant) => {
         if (!ant) return r
@@ -107,12 +107,19 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
         return { temasNovos: temas, cartoes: [...ant.cartoes.filter((c) => !c.erros.length), ...r.cartoes] }
       })
       evento('ia_resposta_lida', { cartoes: r.cartoes.length, com_erro: r.cartoes.filter((c) => c.erros.length).length })
-      setResposta('')
-      setTimeout(() => previa.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
+      return null
     } catch (e) {
-      setErroLeitura((e as Error).message)
       evento('ia_resposta_invalida')
+      return (e as Error).message
     }
+  }
+
+  const ler = () => {
+    const erro = lerTexto(resposta)
+    setErroLeitura(erro ?? '')
+    if (erro) return
+    setResposta('')
+    conf.abrir()
   }
 
   const validos = lida?.cartoes.filter((c) => !c.erros.length) ?? []
@@ -135,16 +142,35 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
     await salvar({ ...baralho, temas: [...baralho.temas, ...temasNovos], cartoes: [...baralho.cartoes, ...escolhidos.map((c) => c.cartao)] })
     nav.mudou()
     nav.avisar({ texto: `${escolhidos.length} ${escolhidos.length === 1 ? 'cartão criado' : 'cartões criados'}.` })
-    nav.voltar()
+    conf.fechar(nav.voltar)
   }
 
   return (
     <main class="tela ia">
       <header class="barra-sessao">
-        <button class="fechar" aria-label="Voltar" onClick={nav.voltar}>←</button>
-        <h1 class="titulo-barra">Criar com IA</h1>
+        <button class="fechar" aria-label="Voltar" onClick={() => (conf.conferindo ? conf.fechar() : nav.voltar())}>←</button>
+        <h1 class="titulo-barra">{conf.conferindo ? 'Confira os cartões' : 'Criar com IA'}</h1>
         <span />
       </header>
+
+      {conf.conferindo && lida ? (
+        <Conferencia
+          validos={validos}
+          comErro={comErro}
+          naoConvertidos={naoConvertidos}
+          desmarcados={desmarcados}
+          alternar={alternar}
+          nivel={formatar ? undefined : nivelUsado}
+          copiarCorrecao={() => copiar(montarCorrecao(comErro.map((c) => ({ id: c.idIA, erros: c.erros }))), 'correcao')}
+          correcaoCopiada={copiado === 'correcao'}
+          lerCorrecao={lerTexto}
+          rotuloSalvar={`Salvar ${escolhidos.length} ${escolhidos.length === 1 ? 'cartão' : 'cartões'}`}
+          podeSalvar={!!escolhidos.length && !salvando}
+          salvar={adicionar}
+          descartar={() => conf.fechar(() => { setLida(null); setNaoConvertidos([]); setDesmarcados(new Set()) })}
+        />
+      ) : (
+        <>
 
       {!comObjetivo && (
         <p class="dica centro">
@@ -285,63 +311,12 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
         )}
       </section>
 
-      {lida && (
-        <section class="bloco passo" aria-live="polite" ref={previa}>
-          <h2><span class="num-passo">4</span> Confira</h2>
-          <p>
-            {validos.length} {validos.length === 1 ? 'cartão pronto' : 'cartões prontos'}
-            {comErro.length > 0 && <>, {comErro.length} com problema</>}.
-          </p>
-
-          {comErro.length > 0 && (
-            <div class="problemas-ia">
-              <ul class="problemas">
-                {comErro.map((c) => (
-                  <li>
-                    ✕ {c.idIA}: {c.erros.join('; ')}
-                  </li>
-                ))}
-              </ul>
-              <button class="btn secundario" onClick={() => copiar(montarCorrecao(comErro.map((c) => ({ id: c.idIA, erros: c.erros }))), 'correcao')}>
-                {copiado === 'correcao' ? '✓ Pedido de correção copiado' : 'Copiar pedido de correção'}
-              </button>
-              <p class="dica">Cole na mesma conversa com a IA e cole a nova resposta no passo 3.</p>
-            </div>
-          )}
-
-          {naoConvertidos.length > 0 && (
-            <div class="problemas-ia">
-              <p>{naoConvertidos.length} {naoConvertidos.length === 1 ? 'item ficou de fora' : 'itens ficaram de fora'}:</p>
-              <ul class="problemas">
-                {naoConvertidos.map((t) => (
-                  <li>✕ {t}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {!formatar && <AvisoNivelAlto nivel={nivelUsado} />}
-          <ul class="lista-revisao">
-            {validos.map((c) => {
-              const marcado = !desmarcados.has(c.cartao.id)
-              return (
-                <li class={`item ${marcado ? 'ok' : ''}`}>
-                  <label class="check">
-                    <input type="checkbox" checked={marcado} onChange={() => alternar(c.cartao.id)} />
-                    Incluir
-                  </label>
-                  <Conteudo c={c.cartao} />
-                </li>
-              )
-            })}
-          </ul>
-          <button class="btn principal" disabled={!escolhidos.length || salvando} onClick={adicionar}>
-            Salvar {escolhidos.length} {escolhidos.length === 1 ? 'cartão' : 'cartões'}
+        {lida && (
+          <button class="btn secundario" onClick={conf.abrir}>
+            Ver {validos.length} {validos.length === 1 ? 'cartão lido' : 'cartões lidos'}
           </button>
-          <button class="btn terciario" onClick={() => { setLida(null); setNaoConvertidos([]) }}>
-            Descartar
-          </button>
-        </section>
+        )}
+        </>
       )}
     </main>
   )

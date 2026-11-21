@@ -547,3 +547,12 @@ details.bloco > summary { font-weight: 650; }
 .folha-pergunta p { margin: 0; }
 .folha-alca { width: auto; min-width: 120px; height: auto; min-height: 44px; gap: 4px; align-content: center; color: var(--text-muted); cursor: pointer; }
 .folha-alca small { font-size: 13px; }
+
+/* ---------- Conferência dos cartões da IA ---------- */
+/* O botão de salvar fica preso no rodapé: aparece sem rolar a lista de cartões. */
+.rodape-fixo {
+  position: sticky; bottom: 0; z-index: 10; display: grid; gap: 4px;
+  margin: 0 -20px -20px; padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+  background: var(--surface); border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}

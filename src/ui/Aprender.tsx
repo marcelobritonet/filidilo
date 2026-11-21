@@ -7,7 +7,7 @@ import { evento } from '../core/telemetria'
 import { NIVEIS, type Baralho, type Cartao, type Nivel, type Objetivo } from '../core/types'
 import type { Navegacao } from './App'
 import { AbrirIA } from './AbrirIA'
-import { AvisoNivelAlto, Conteudo } from './Revisar'
+import { Conferencia, useConferencia } from './Conferencia'
 
 type Material = 'pdf' | 'texto'
 
@@ -91,20 +91,20 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
     }
   }
 
-  const montar = () => {
-    setAviso(null)
+  const conf = useConferencia()
+
+  /** Lê uma resposta da IA (a primeira ou uma correção). Devolve o aviso, se a leitura não deu certo. */
+  const lerTexto = (texto: string): { texto: string; erro: boolean } | null => {
     let dados: unknown
     try {
-      dados = extrairJson(resposta)
+      dados = extrairJson(texto)
     } catch (e) {
-      if (parecePerguntas(resposta)) {
+      if (parecePerguntas(texto)) {
         evento('aprender_perguntas')
-        setAviso({ texto: 'A IA fez perguntas. Responda lá e cole aqui a resposta final.', erro: false })
-      } else {
-        evento('aprender_resposta_invalida')
-        setAviso({ texto: (e as Error).message, erro: true })
+        return { texto: 'A IA fez perguntas. Responda lá e cole aqui a resposta final.', erro: false }
       }
-      return
+      evento('aprender_resposta_invalida')
+      return { texto: (e as Error).message, erro: true }
     }
     try {
       const r = formatar ? lerPlano(dados, nome.trim() || 'Minhas perguntas', 'Perguntas próprias') : lerPlano(dados, pedido)
@@ -132,11 +132,19 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
         for (const t of r.temasNovos) if (!temas.some((x) => x.id === t.id)) temas.push(t)
         setLido({ ...lido, temasNovos: temas, cartoes: [...lido.cartoes.filter((c) => !c.erros.length), ...r.cartoes] })
       }
-      setResposta('')
+      return null
     } catch (e) {
       evento('aprender_resposta_invalida')
-      setAviso({ texto: (e as Error).message, erro: true })
+      return { texto: (e as Error).message, erro: true }
     }
+  }
+
+  const montar = () => {
+    const a = lerTexto(resposta)
+    setAviso(a)
+    if (a) return
+    setResposta('')
+    conf.abrir()
   }
 
   const validos = lido?.cartoes.filter((c) => !c.erros.length) ?? []
@@ -182,16 +190,69 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
     })
     await salvar(b)
     nav.mudou()
-    nav.substituir({ nome: 'baralho', id: b.id })
+    conf.fechar(() => nav.substituir({ nome: 'baralho', id: b.id }))
   }
 
   return (
     <main class="tela ia">
       <header class="barra-sessao">
-        <button class="fechar" aria-label="Voltar" onClick={nav.voltar}>←</button>
-        <h1 class="titulo-barra">Aprender</h1>
+        <button class="fechar" aria-label="Voltar" onClick={() => (conf.conferindo ? conf.fechar() : nav.voltar())}>←</button>
+        <h1 class="titulo-barra">{conf.conferindo ? 'Confira os cartões' : 'Aprender'}</h1>
         <span />
       </header>
+
+      {conf.conferindo && lido ? (
+        <Conferencia
+          topo={
+            <>
+              <p>
+                <strong>{cfg.titulo || 'Sem título'}</strong> · {plural(temasDe(validos).size, 'tema', 'temas')}
+              </p>
+              <p class="dica">
+                Objetivo: {cfg.resumo || '—'} · Nível: {nivelNome ?? '—'}
+              </p>
+              <button class="btn terciario compacto" onClick={() => setEditando(!editando)}>
+                {editando ? 'Fechar edição' : 'Editar'}
+              </button>
+              {editando && (
+                <>
+                  <label class="campo">
+                    Título
+                    <input class="texto" maxLength={40} value={cfg.titulo} onInput={(e) => setCfg({ ...cfg, titulo: (e.target as HTMLInputElement).value })} />
+                  </label>
+                  <label class="campo">
+                    Objetivo
+                    <input class="texto" maxLength={160} value={cfg.resumo} onInput={(e) => setCfg({ ...cfg, resumo: (e.target as HTMLInputElement).value })} />
+                  </label>
+                  <label class="campo">
+                    Quanto você já sabe
+                    <select value={cfg.nivel} onChange={(e) => setCfg({ ...cfg, nivel: (e.target as HTMLSelectElement).value as Nivel | '' })}>
+                      <option value="">—</option>
+                      {NIVEIS.map((n) => (
+                        <option value={n.valor}>{n.nome}</option>
+                      ))}
+                    </select>
+                  </label>
+                </>
+              )}
+            </>
+          }
+          validos={validos}
+          comErro={comErro}
+          naoConvertidos={naoConvertidos}
+          desmarcados={desmarcados}
+          alternar={alternar}
+          nivel={cfg.nivel}
+          copiarCorrecao={() => copiar(montarCorrecao(comErro.map((c) => ({ id: c.idIA, erros: c.erros }))), 'correcao')}
+          correcaoCopiada={copiado === 'correcao'}
+          falhaCorrecao={falha?.qual === 'correcao' ? falha.texto : undefined}
+          lerCorrecao={(t) => lerTexto(t)?.texto ?? null}
+          rotuloSalvar={`Criar baralho com ${plural(escolhidos.length, 'cartão', 'cartões')}`}
+          podeSalvar={!!escolhidos.length && !!cfg.titulo.trim() && !salvando}
+          salvar={criar}
+        />
+      ) : (
+        <>
 
       <section class="bloco passo">
         <h2><span class="num-passo">1</span> {formatar ? 'Suas perguntas' : 'O que você quer aprender?'}</h2>
@@ -307,88 +368,12 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
         )}
       </section>
 
-      {lido && (
-        <section class="bloco passo" aria-live="polite">
-          <h2><span class="num-passo">4</span> Confira</h2>
-          <p>
-            <strong>{cfg.titulo || 'Sem título'}</strong> · {plural(temasDe(validos).size, 'tema', 'temas')} · {plural(validos.length, 'cartão pronto', 'cartões prontos')}
-          </p>
-          <p class="dica">
-            Objetivo: {cfg.resumo || '—'} · Nível: {nivelNome ?? '—'}
-          </p>
-          <button class="btn terciario compacto" onClick={() => setEditando(!editando)}>
-            {editando ? 'Fechar edição' : 'Editar'}
+        {lido && (
+          <button class="btn secundario" onClick={conf.abrir}>
+            Ver {plural(validos.length, 'cartão lido', 'cartões lidos')}
           </button>
-          {editando && (
-            <>
-              <label class="campo">
-                Título
-                <input class="texto" maxLength={40} value={cfg.titulo} onInput={(e) => setCfg({ ...cfg, titulo: (e.target as HTMLInputElement).value })} />
-              </label>
-              <label class="campo">
-                Objetivo
-                <input class="texto" maxLength={160} value={cfg.resumo} onInput={(e) => setCfg({ ...cfg, resumo: (e.target as HTMLInputElement).value })} />
-              </label>
-              <label class="campo">
-                Quanto você já sabe
-                <select value={cfg.nivel} onChange={(e) => setCfg({ ...cfg, nivel: (e.target as HTMLSelectElement).value as Nivel | '' })}>
-                  <option value="">—</option>
-                  {NIVEIS.map((n) => (
-                    <option value={n.valor}>{n.nome}</option>
-                  ))}
-                </select>
-              </label>
-            </>
-          )}
-
-          {comErro.length > 0 && (
-            <div class="problemas-ia">
-              <ul class="problemas">
-                {comErro.map((c) => (
-                  <li>
-                    ✕ {c.idIA}: {c.erros.join('; ')}
-                  </li>
-                ))}
-              </ul>
-              <button class="btn secundario" onClick={() => copiar(montarCorrecao(comErro.map((c) => ({ id: c.idIA, erros: c.erros }))), 'correcao')}>
-                {copiado === 'correcao' ? '✓ Pedido de correção copiado' : 'Copiar pedido de correção'}
-              </button>
-              {falha?.qual === 'correcao' && <textarea class="instrucao" rows={6} readOnly value={falha.texto} />}
-              <p class="dica">Cole na mesma conversa com a IA e cole a nova resposta no passo 3.</p>
-            </div>
-          )}
-
-          {naoConvertidos.length > 0 && (
-            <div class="problemas-ia">
-              <p>{plural(naoConvertidos.length, 'item ficou de fora', 'itens ficaram de fora')}:</p>
-              <ul class="problemas">
-                {naoConvertidos.map((t) => (
-                  <li>✕ {t}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <AvisoNivelAlto nivel={cfg.nivel} />
-          <ul class="lista-revisao">
-            {validos.map((c) => {
-              const marcado = !desmarcados.has(c.cartao.id)
-              return (
-                <li class={`item ${marcado ? 'ok' : ''}`}>
-                  <label class="check">
-                    <input type="checkbox" checked={marcado} onChange={() => alternar(c.cartao.id)} />
-                    Incluir
-                  </label>
-                  <Conteudo c={c.cartao} />
-                </li>
-              )
-            })}
-          </ul>
-
-          <button class="btn principal" disabled={!escolhidos.length || !cfg.titulo.trim() || salvando} onClick={criar}>
-            Criar baralho com {plural(escolhidos.length, 'cartão', 'cartões')}
-          </button>
-        </section>
+        )}
+        </>
       )}
     </main>
   )
