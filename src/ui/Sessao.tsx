@@ -507,7 +507,7 @@ function Conceito({ c, acoes, verso, rotulo = 'Pergunta' }: { c: Cartao & { fren
         </button>
       )}
       {virado && (
-        <Folha titulo="Resposta" rodape={<><p class="dica centro">Como foi?</p><BotoesNota avaliar={acoes.avaliar} /></>}>
+        <Folha titulo="Resposta" pergunta={<Tex texto={c.frente} />} rodape={<><p class="dica centro">Como foi?</p><BotoesNota avaliar={acoes.avaliar} /></>}>
           <Tex class="verso" texto={verso ?? (c.tipo === 'conceito' ? c.verso : '')} />
           {c.explicacao && <Explicacao texto={c.explicacao} />}
           <Fonte c={c} />
@@ -557,6 +557,7 @@ function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta
         <Folha
           titulo={acertou ? '✓ Certo!' : naoSabia ? 'Tudo bem, veja a resposta' : '✕ Não foi dessa vez'}
           tom={acertou ? 'ok' : naoSabia ? 'neutro' : 'erro'}
+          pergunta={<Tex texto={pergunta} />}
           rodape={<BotoesNota avaliar={acoes.avaliar} acertou={acertou} />}
         >
           {!acertou && (
@@ -688,6 +689,7 @@ function Calculo({ c, acoes }: { c: CartaoCalculo; acoes: Acoes }) {
           key={mostrando}
           titulo={r.ok ? '✓ Resposta dentro da tolerância' : r.desistiu ? 'Resolução' : '✕ Ainda não: veja a resolução'}
           tom={r.ok ? 'ok' : r.desistiu ? 'neutro' : 'erro'}
+          pergunta={<Tex texto={preencher(c.etapas[mostrando].pergunta, s)} />}
           rodape={
             ultima ? (
               <BotoesNota avaliar={acoes.avaliar} acertou={acertouTudo} />

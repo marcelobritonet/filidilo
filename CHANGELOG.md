@@ -2,6 +2,14 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.8.1] — 2026-11-21
+
+**A pergunta continua à vista.** Depois de responder, a folha de resultado cobria o cartão e não dava mais para ler a pergunta.
+
+### Melhorado
+- A pergunta aparece no topo da folha de resultado, junto com a resposta e a explicação (pergunta e resposta, alternativas, verdadeiro ou falso e cada etapa do cálculo; nas lacunas a frase completa já mostra a pergunta).
+- A alça da folha ganhou texto ("Ver o cartão" / "Ver o resultado"), para ficar claro que dá para recolher e ver o cartão inteiro.
+
 ## [3.8.0] — 2026-11-21
 
 **Leve o baralho com o progresso.** Quem estuda em mais de um aparelho pode enviar o baralho junto com o que já estudou.
@@ -26,10 +34,6 @@ Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [Sem
 - Em Novo baralho (tela Aprender), o passo 1 ganhou o seletor "Quero aprender" | "Já tenho as perguntas". Nesse modo: cole a lista em qualquer formato, dê um nome ao baralho se quiser, e a IA só formata, sem inventar. Ela também sugere título e objetivo.
 - O nível é opcional nesse modo; dá para ajustar depois em Configurar baralho.
 - Os itens que a IA não conseguiu converter aparecem na conferência como "ficaram de fora".
-
-### Melhorado
-- Depois de responder, a pergunta continua à vista: ela aparece no topo da folha de resultado, junto com a resposta e a explicação.
-- A alça da folha ganhou texto ("Ver o cartão" / "Ver o resultado"), para ficar claro que dá para recolher e ver o cartão inteiro.
 
 ## [3.6.3] — 2026-11-21
 
