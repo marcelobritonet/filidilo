@@ -35,10 +35,22 @@ Todo evento traz `versao` (a versão do app na hora do evento). Eventos de antes
 
 ## Testar as instruções da IA
 
-- Gemini anônimo (gemini.google.com) aceita a instrução sem login. Uma conversa nova por pedido.
-- A instrução usada no teste precisa ser idêntica à do app: gere com `montarPlano` / `montarInstrucao` (`src/core/ia/`), não reescreva à mão.
-- Confira o formato com as regras de `src/core/validar.ts` e revise o conteúdo cartão a cartão: o validador não pega erro de conteúdo.
-- Registre o resultado em `docs/v3/AVALIACAO-PLANO.md` (ou num arquivo ao lado) e na `PENDENCIAS.md`.
+Toda mudança em `src/core/ia/` que altere uma instrução (`montarInstrucao`, `montarInstrucaoFormatacao`, `montarPlano`, `montarPedidoCorrecao`) é testada **nas duas IAs** antes de ficar pronta:
+
+| IA | Onde | Como |
+|---|---|---|
+| Gemini | gemini.google.com, anônimo (sem login) | Uma conversa nova por pedido |
+| ChatGPT | chatgpt.com, sem login | Uma conversa nova por pedido; se aparecer a opção, use o chat temporário |
+
+**Se a IA pedir login ou verificação (CAPTCHA):** pare nessa IA, registre "não testado no ChatGPT: pediu login/verificação" (ou "no Gemini") na tabela do teste e na `PENDENCIAS.md`, e avise o Marcelo. O agente nunca resolve CAPTCHA nem entra com senha; o Marcelo roda esse teste ou libera o acesso. Teste na outra IA normalmente.
+
+| Passo | O quê |
+|---|---|
+| 1. Gerar a instrução | Idêntica à do app: gere com `montarInstrucao` / `montarInstrucaoFormatacao` / `montarPlano` / `montarPedidoCorrecao` (`src/core/ia/`), não reescreva à mão |
+| 2. Colar no navegador do agente | A área de transferência do sistema não chega ao painel do navegador. Funciona assim: um teste do vitest (descartável, fora do repositório ou não commitado) chama a função e grava o texto num arquivo do scratchpad; depois, no campo de mensagem da IA, insira o texto com `javascript_tool`: foque o campo e rode `document.execCommand('insertText', false, texto)`. Digitar com o teclado simulado é lento e quebra as linhas |
+| 3. Conferir o formato | Regras de `src/core/validar.ts` (ou `lerPlano` / leitura do app com a resposta colada) |
+| 4. Revisar o conteúdo | Cartão a cartão: o validador não pega erro de conteúdo |
+| 5. Registrar | Um arquivo em `docs/v3/testes/` (modelo: `T-P90-multipla-escolha.md`), com uma tabela por IA ou uma coluna por IA, e o resultado das duas IAs na linha da `PENDENCIAS.md`. Avaliações maiores, como a do plano, ficam em `docs/v3/AVALIACAO-*.md` |
 
 ## Publicar uma versão
 

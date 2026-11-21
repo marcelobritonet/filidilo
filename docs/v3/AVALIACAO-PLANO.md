@@ -32,8 +32,8 @@ Cada pedido foi rodado numa conversa nova, com a instrução idêntica à do app
 
 | IA | Quem roda |
 |---|---|
-| ChatGPT | Marcelo |
+| ChatGPT | Claude, em chatgpt.com sem login (processo no `AGENTS.md`); se pedir login ou verificação, Marcelo |
 | Claude | Marcelo |
 | Copilot | Marcelo |
 
-Para rodar: no app, "Aprender" → digitar o pedido → escolher o nível da tabela → "Copiar instrução" → colar numa conversa nova da IA → colar a resposta no passo 3. Use um aparelho marcado como teste (`?teste=1`, P79) ou o app no computador (`npm run dev`), para não sujar as estatísticas.
+Para rodar: no app, "Aprender" → digitar o pedido → escolher o nível da tabela → "Copiar instrução" → colar numa conversa nova da IA → colar a resposta no passo 3. O agente segue "Testar as instruções da IA" no `AGENTS.md`. Use um aparelho marcado como teste (`?teste=1`, P79) ou o app no computador (`npm run dev`), para não sujar as estatísticas.
