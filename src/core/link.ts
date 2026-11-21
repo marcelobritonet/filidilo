@@ -23,12 +23,15 @@ export function urlDoApp(codigo: string, origem = location.origin, base = import
   return `${origem}${base}?b=${codigo}`
 }
 
+/** Quanto o link vale: 2 horas (enviar) ou 7 dias (desafio, que vai para story e grupo). */
+export type Validade = '2h' | '7d'
+
 /** Sobe o conteúdo e devolve o link do app. Lança erro com mensagem em português. */
-export async function criarLink(texto: string, f: typeof fetch = fetch): Promise<LinkCriado> {
+export async function criarLink(texto: string, f: typeof fetch = fetch, validade: Validade = '2h'): Promise<LinkCriado> {
   if (!URL_LINKS) throw new Error('O envio por link não está disponível.')
   let r: Response
   try {
-    r = await f(`${URL_LINKS}/l`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: texto })
+    r = await f(`${URL_LINKS}/l${validade === '2h' ? '' : `?validade=${validade}`}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: texto })
   } catch {
     throw new Error('Sem internet para gerar o link.')
   }
@@ -49,7 +52,7 @@ export async function abrirLink(codigo: string, f: typeof fetch = fetch): Promis
   } catch {
     throw new Error('Sem internet para abrir o link.')
   }
-  if (r.status === 404) throw new Error('Este link expirou (vale 2 horas). Peça um novo a quem enviou.')
+  if (r.status === 404) throw new Error('Este link expirou. Peça um novo a quem enviou.')
   if (!r.ok) throw new Error('Não consegui abrir o link agora. Tente de novo.')
   return r.text()
 }

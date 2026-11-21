@@ -2,6 +2,19 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.11.0] — 2026-11-21
+
+**Comemorar e compartilhar o estudo: imagem para WhatsApp e story, sequência de dias, conquistas e desafio com um cartão.**
+
+### Novo
+- **Comemoração no fim da sessão**: quando bate a meta, acerta 80% ou mais (com 10 respostas ou mais) ou ganha uma conquista, aparece confete (sem confete com "reduzir movimento") e o título comemora.
+- **Compartilhar resultado**: no fim da sessão, uma imagem com a porcentagem de acerto, os acertos, o tempo e a sequência de dias, nos formatos Story (9:16) e Quadrado. A caixa "Mostrar o nome do baralho" tira o nome da imagem e do texto. No celular abre o Compartilhar (WhatsApp, Instagram…) com a imagem e o texto com o link do app; no computador, baixa a imagem e copia o texto. A imagem é desenhada no aparelho.
+- **Sequência de dias**: "🔥 N dias" em Meus baralhos e no fim da sessão. Se ainda não estudou hoje, a sequência de ontem continua valendo.
+- **Conquistas**: primeira sessão, primeira meta, 3/7/14/30/60/100 dias seguidos, 100/500/1.000/5.000 cartões respondidos e baralho dominado (5 cartões ou mais). Cada uma comemora uma vez; quem já estudava antes desta versão não recebe as que já tinha.
+- **Desafiar amigos**: no Enviar de um cartão (no estudo e na lista), uma imagem com a pergunta, sem a resposta, e QR code. Junto vai só o cartão ou o baralho inteiro (sem o progresso). O link do desafio vale 7 dias, para durar mais que o story. Quem abre responde o cartão primeiro e depois escolhe se salva. Cartões de cálculo ficam de fora, porque sorteiam números a cada vez.
+- **Sua semana**: de domingo a terça, Meus baralhos mostra os 7 dias da semana, quantos cartões foram respondidos e o botão "Compartilhar minha semana" (o selo de dias abre a qualquer hora).
+- **Indicar o tatino.**: em Meus baralhos e em Aparência, uma imagem de convite com o link e o QR code do app.
+
 ## [3.10.4] — 2026-11-21
 
 **Estatísticas mais limpas: aparelho de teste e versão certa em cada evento.**

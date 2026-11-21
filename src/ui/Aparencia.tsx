@@ -2,6 +2,8 @@ import { useState } from 'preact/hooks'
 import { evento, ligarTelemetria, telemetriaDisponivel, telemetriaLigada } from '../core/telemetria'
 import type { Navegacao } from './App'
 import { InstalarBloco } from './InstalarCard'
+import { pecaConvite } from '../core/artes'
+import { CompartilharImagem, urlApp } from './CompartilharImagem'
 import { lerPreferencia, salvarPreferencia, type PreferenciaTema } from './tema'
 
 const OPCOES: { valor: PreferenciaTema; nome: string; descricao: string; cores: [string, string, string] }[] = [
@@ -14,6 +16,7 @@ const OPCOES: { valor: PreferenciaTema; nome: string; descricao: string; cores: 
 export function Aparencia({ nav }: { nav: Navegacao }) {
   const [pref, setPref] = useState<PreferenciaTema>(lerPreferencia)
   const [estatisticas, setEstatisticas] = useState(telemetriaLigada)
+  const [convidando, setConvidando] = useState(false)
 
   const escolher = (p: PreferenciaTema) => {
     setPref(p)
@@ -61,6 +64,14 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
           </span>
         </label>
       )}
+      <section class="bloco">
+        <strong>Indicar o tatino.</strong>
+        <p class="dica">Mande para quem também estuda: uma imagem com o link e o QR code do app.</p>
+        <button class="btn secundario" onClick={() => { evento('convite_aberto', { onde: 'aparencia' }); setConvidando(true) }}>
+          Indicar o tatino.
+        </button>
+      </section>
+      {convidando && <CompartilharImagem opcoes={[{ rotulo: 'Convite', peca: () => pecaConvite({ urlApp: urlApp() }) }]} onde="convite" avisar={(texto) => nav.avisar({ texto })} fechar={() => setConvidando(false)} />}
     </main>
   )
 }

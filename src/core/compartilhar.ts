@@ -11,16 +11,18 @@ interface ArquivoBaralho {
   baralho: Baralho
   /** Opcional: o progresso de quem enviou, para levar o baralho a outro aparelho dela. */
   progresso?: Progresso
+  /** Desafio: id do cartão que quem recebe responde antes de salvar. */
+  desafio?: string
 }
 
 /**
  * Nome e conteúdo do arquivo. Usa .txt porque o Chrome do Android só compartilha
  * alguns tipos de arquivo (JSON não está entre eles); o conteúdo continua JSON.
  */
-export function arquivoDoBaralho(b: Baralho, progresso?: Progresso): { nome: string; texto: string } {
+export function arquivoDoBaralho(b: Baralho, progresso?: Progresso, desafio?: string): { nome: string; texto: string } {
   // Arquivar é só deste aparelho: quem recebe ganha o baralho na lista principal.
   const { arquivadoEm: _arq, ...baralho } = b
-  const envelope: ArquivoBaralho = { app: 'tatino', tipo: 'baralho', formato: 2, baralho, ...(progresso && { progresso }) }
+  const envelope: ArquivoBaralho = { app: 'tatino', tipo: 'baralho', formato: 2, baralho, ...(progresso && { progresso }), ...(desafio && { desafio }) }
   const titulo = nomeArquivo(b.titulo) || 'baralho'
   return { nome: `${titulo}${progresso ? ' com progresso' : ''} (Tatino).txt`, texto: JSON.stringify(envelope) }
 }
@@ -36,6 +38,7 @@ interface ArquivoCartoes {
   origem: { titulo: string }
   temas: Baralho['temas']
   cartoes: Cartao[]
+  desafio?: string
 }
 
 export interface CartoesRecebidos {
@@ -45,16 +48,29 @@ export interface CartoesRecebidos {
 }
 
 /** Arquivo para enviar um ou mais cartões de um baralho. */
-export function arquivoDosCartoes(b: Baralho, cartoes: Cartao[]): { nome: string; texto: string } {
+export function arquivoDosCartoes(b: Baralho, cartoes: Cartao[], desafio?: string): { nome: string; texto: string } {
   const usados = new Set(cartoes.map((c) => c.tema))
-  const envelope: ArquivoCartoes = { app: 'tatino', tipo: 'cartoes', formato: 2, origem: { titulo: b.titulo }, temas: b.temas.filter((t) => usados.has(t.id)), cartoes }
+  const envelope: ArquivoCartoes = { app: 'tatino', tipo: 'cartoes', formato: 2, origem: { titulo: b.titulo }, temas: b.temas.filter((t) => usados.has(t.id)), cartoes, ...(desafio && { desafio }) }
   const c = cartoes[0]
   const resumo = nomeArquivo(('frente' in c ? c.frente : c.titulo).replace(/[$*]/g, '')).slice(0, 40)
   return { nome: `${cartoes.length === 1 ? `Cartão - ${resumo}` : `${cartoes.length} cartões - ${nomeArquivo(b.titulo)}`} (Tatino).txt`, texto: JSON.stringify(envelope) }
 }
 
-/** Lê o que chegou: um baralho inteiro ou cartões soltos. */
-export function lerRecebido(texto: string): { tipo: 'baralho'; baralho: Baralho; progresso?: Progresso } | ({ tipo: 'cartoes' } & CartoesRecebidos) {
+/** Lê o que chegou: um baralho inteiro ou cartões soltos. `desafio` é o cartão a responder primeiro, se existir. */
+export function lerRecebido(texto: string): ({ tipo: 'baralho'; baralho: Baralho; progresso?: Progresso } | ({ tipo: 'cartoes' } & CartoesRecebidos)) & { desafio?: Cartao } {
+  const r = lerRecebidoSemDesafio(texto)
+  let id: unknown
+  try {
+    id = (JSON.parse(texto) as { desafio?: unknown }).desafio
+  } catch {
+    /* já validado acima */
+  }
+  const cartoes = r.tipo === 'baralho' ? r.baralho.cartoes : r.cartoes
+  const desafio = typeof id === 'string' ? cartoes.find((c) => c.id === id) : undefined
+  return desafio ? { ...r, desafio } : r
+}
+
+function lerRecebidoSemDesafio(texto: string): { tipo: 'baralho'; baralho: Baralho; progresso?: Progresso } | ({ tipo: 'cartoes' } & CartoesRecebidos) {
   let d: Partial<ArquivoCartoes> | undefined
   try {
     d = JSON.parse(texto)

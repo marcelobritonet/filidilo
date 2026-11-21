@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MAX_BYTES, VALIDADE_S, novoCodigo, worker, type Env } from './links'
+import { MAX_BYTES, VALIDADE_S, VALIDADES, novoCodigo, worker, type Env } from './links'
 
 function ambiente(limiteOk = true) {
   const guardado = new Map<string, { valor: string; ttl: number }>()
@@ -16,7 +16,7 @@ function ambiente(limiteOk = true) {
 
 const ORIGEM = 'https://marcelobritonet.github.io'
 const baralho = JSON.stringify({ app: 'tatino', tipo: 'baralho', formato: 2, baralho: { id: 'a', titulo: 'A', versao: 1, temas: [], cartoes: [] } })
-const post = (corpo: string, origem = ORIGEM) => new Request('https://w.dev/l', { method: 'POST', body: corpo, headers: { origin: origem, 'content-type': 'application/json' } })
+const post = (corpo: string, origem = ORIGEM, busca = '') => new Request(`https://w.dev/l${busca}`, { method: 'POST', body: corpo, headers: { origin: origem, 'content-type': 'application/json' } })
 const get = (codigo: string) => new Request(`https://w.dev/l/${codigo}`, { headers: { origin: ORIGEM } })
 
 describe('worker de links', () => {
@@ -32,6 +32,16 @@ describe('worker de links', () => {
     const lido = await worker.fetch(get(codigo), env)
     expect(lido.status).toBe(200)
     expect(await lido.text()).toBe(baralho)
+  })
+
+  it('desafio: guarda por 7 dias com ?validade=7d e recusa outras validades', async () => {
+    const { env, guardado } = ambiente()
+    const r = await worker.fetch(post(baralho, ORIGEM, '?validade=7d'), env)
+    expect(r.status).toBe(201)
+    const { codigo, expiraEm } = (await r.json()) as { codigo: string; expiraEm: string }
+    expect(guardado.get(codigo)?.ttl).toBe(VALIDADES['7d'])
+    expect(new Date(expiraEm).getTime() - Date.now()).toBeGreaterThan(6.9 * 24 * 3600 * 1000)
+    expect((await worker.fetch(post(baralho, ORIGEM, '?validade=30d'), env)).status).toBe(400)
   })
 
   it('aceita cartões soltos', async () => {

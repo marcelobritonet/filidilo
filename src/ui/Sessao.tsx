@@ -9,6 +9,12 @@ import { evento } from '../core/telemetria'
 import { temaComPoucosCartoes } from '../core/sugestao'
 import { formasAceitas, NIVEIS_COM_ALTERNATIVAS, partesDaFrente } from '../core/lacunas'
 import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, CartaoLacunas, Objetivo } from '../core/types'
+import { pecaMarco, pecaResultado } from '../core/artes'
+import { fecharSessao, type Marco } from '../core/conquistas'
+import { CompartilharImagem, urlApp, type OpcaoImagem } from './CompartilharImagem'
+import { Confete } from './Confete'
+import { DesafiarModal } from './Desafio'
+import { podeDesafiar } from '../core/artes'
 import { nomeTema } from './estado'
 import { CorrigirCartao } from './CorrigirCartao'
 import { EditarCartao } from './EditarCartao'
@@ -32,10 +38,20 @@ const relogio = (ms: number) => {
 const TITULO: Record<Modo, string> = { prova: 'Estudar', espacada: 'Estudar', calculo: 'Cálculo' }
 
 /** Ações que o cartão pode usar dentro da folha de resultado. */
-interface Acoes {
+export interface Acoes {
   /** `chute`: acertou chutando — registra como difícil, mas não conta como acerto. */
   avaliar: (n: Nota, chute?: boolean) => void
-  corrigir: () => void
+  /** Sem ela (no desafio recebido), o botão "Corrigir" não aparece. */
+  corrigir?: () => void
+}
+
+function BotaoCorrigir({ acoes }: { acoes: Acoes }) {
+  if (!acoes.corrigir) return null
+  return (
+    <button class="btn terciario compacto" onClick={acoes.corrigir}>
+      Cartão errado? Corrigir
+    </button>
+  )
 }
 
 export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais }: { baralho: Baralho; modo: Modo; opcoes: OpcoesFila; limite?: Limite; sair: () => void; criarMais: (assunto?: string, temaId?: string) => void }) {
@@ -60,6 +76,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   }
   const fecharEditor = () => history.back()
   const [enviando, setEnviando] = useState<Cartao | null>(null)
+  const [desafiando, setDesafiando] = useState<Cartao | null>(null)
   // Erros e chutes por tema, para sugerir onde criar mais cartões no fim.
   const [fracos, setFracos] = useState<Record<string, number>>({})
   // Primeira sessão do baralho (nenhum cartão estudado antes): no fim, sugere o tema com poucos cartões.
@@ -217,6 +234,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
           temaPoucos={poucos}
           objetivo={baralho.objetivo}
           criarMais={criarMais}
+          baralho={baralho}
         />
       ) : (
         <>
@@ -236,7 +254,8 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
             </button>
           </div>
           {corrigindo && <CorrigirCartao baralho={baralho} cartao={cartao} aoSalvar={corrigido} fechar={() => setCorrigindo(false)} corrigirEuMesmo={abrirEditor} />}
-          {enviando && <EnviarModal conteudo={conteudoCartao(baralho, enviando)} onde="estudo" fechar={() => setEnviando(null)} />}
+          {enviando && <EnviarModal conteudo={conteudoCartao(baralho, enviando)} onde="estudo" fechar={() => setEnviando(null)} desafiar={podeDesafiar(enviando) ? () => { setDesafiando(enviando); setEnviando(null) } : undefined} />}
+          {desafiando && <DesafiarModal baralho={baralho} cartao={desafiando} fechar={() => setDesafiando(null)} />}
         </>
       )}
     </main>
@@ -261,16 +280,38 @@ function Fim(props: {
   temaPoucos?: { id: string; nome: string }
   temaId?: string
   objetivo?: Objetivo
+  baralho: Baralho
   outra: () => void
   sair: () => void
   criarMais: (assunto?: string, temaId?: string) => void
 }) {
-  const { placar, vazio, modo, tempo, bateuMeta, temaFraco, temaPoucos, objetivo, outra, sair, criarMais } = props
+  const { placar, vazio, modo, tempo, bateuMeta, temaFraco, temaPoucos, objetivo, outra, sair, criarMais, baralho } = props
   const temaId = temaPoucos?.id ?? props.temaId
   const tema = temaPoucos?.nome ?? temaFraco
   // Sem tema sugerido: se há foco no objetivo, a IA aprofunda nele; senão, o assunto fica em branco.
   const assuntoSugerido = tema ?? (objetivo?.foco?.length ? `Aprofundar: ${objetivo.foco.join(', ')}` : undefined)
   useEffect(() => evento('sessao_concluida', { motivo: props.fimMotivo, ...placar }), [])
+  const total = placar.certos + placar.errados + placar.chutes
+  const pct = total ? Math.round((100 * placar.certos) / total) : 0
+  // Sequência de dias e marco novo (cada marco comemora uma vez só).
+  const [conquista, setConquista] = useState<{ sequencia: number; marco?: Marco } | null>(null)
+  const [compartilhando, setCompartilhando] = useState(false)
+  useEffect(() => {
+    if (vazio || !total) return
+    fecharSessao([baralho], !!bateuMeta)
+      .then((r) => {
+        setConquista(r)
+        if (r.marco) evento('marco', { tipo: r.marco.tipo })
+      })
+      .catch(() => setConquista({ sequencia: 0 }))
+  }, [])
+  const motivo = conquista?.marco ? 'marco' : bateuMeta ? 'meta' : total >= 10 && pct >= 80 ? 'acerto' : ''
+  useEffect(() => {
+    if (!motivo) return
+    evento('comemoracao', { motivo })
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) navigator.vibrate?.(30)
+  }, [motivo])
+
   if (vazio)
     return (
       <section class="fim">
@@ -279,11 +320,21 @@ function Fim(props: {
         <button class="btn principal" onClick={sair}>Voltar ao início</button>
       </section>
     )
-  const total = placar.certos + placar.errados + placar.chutes
+  const sequencia = conquista?.sequencia ?? 0
+  const marco = conquista?.marco
+  const opcoesImagem: OpcaoImagem[] = [
+    {
+      rotulo: 'Resultado',
+      usaNome: true,
+      peca: (comNome) => pecaResultado({ ...placar, baralho: baralho.titulo, comNome, bateuMeta, tempo: tempo && tempo !== 'esgotado' ? tempo : undefined, sequencia, urlApp: urlApp() }),
+    },
+    ...(marco ? [{ rotulo: 'Conquista', usaNome: marco.tipo === 'dominado', peca: (comNome: boolean) => pecaMarco(marco, { comNome, urlApp: urlApp() }) }] : []),
+  ]
   return (
-    <section class="fim">
+    <section class={`fim ${motivo ? 'comemorando' : ''}`}>
+      {motivo && <Confete />}
       <span class="icone-fim"><Icone nome="avancar" tamanho={48} /></span>
-      <h2>{bateuMeta ? 'Meta atingida!' : tempo === 'esgotado' ? 'Tempo esgotado' : 'Sessão concluída'}</h2>
+      <h2>{bateuMeta ? 'Meta atingida!' : motivo === 'acerto' ? 'Mandou bem!' : tempo === 'esgotado' ? 'Tempo esgotado' : 'Sessão concluída'}</h2>
       <p>
         {placar.certos} {placar.certos === 1 ? 'acerto' : 'acertos'}, {placar.errados} {placar.errados === 1 ? 'erro' : 'erros'}
         {placar.chutes > 0 && <> e {placar.chutes} {placar.chutes === 1 ? 'chute' : 'chutes'}</>} em {total} {total === 1 ? 'resposta' : 'respostas'}
@@ -291,6 +342,19 @@ function Fim(props: {
       </p>
       {total > 0 && <p class="placar-final">{Math.round((100 * placar.certos) / total)}% de acerto</p>}
       {tempo && tempo !== 'esgotado' && <p class="dica">Terminou os cartões em {tempo}.</p>}
+      {sequencia >= 2 && <p class="sequencia">🔥 {sequencia} dias seguidos</p>}
+      {marco && (
+        <section class="conquista" role="status">
+          <span class="selo-conquista">Conquista!</span>
+          <strong class="destaque">{marco.destaque}</strong>
+          <span>{marco.legenda}</span>
+        </section>
+      )}
+      {total > 0 && (
+        <button class="btn secundario" onClick={() => setCompartilhando(true)}>
+          <span class="com-icone"><Icone nome="enviar" /> Compartilhar {marco ? 'conquista' : 'resultado'}</span>
+        </button>
+      )}
       <p class="dica">Os cartões errados voltam primeiro na próxima rodada.</p>
       <section class="incentivo-ia">
         <Icone nome="entender" />
@@ -314,9 +378,11 @@ function Fim(props: {
         <span class="com-icone"><Icone nome="praticar" /> Mais uma rodada</span>
       </button>
       <button class="btn secundario" onClick={sair}>Voltar ao início</button>
+      {compartilhando && <CompartilharImagem opcoes={marco ? [opcoesImagem[1], opcoesImagem[0]] : opcoesImagem} onde="fim_sessao" fechar={() => setCompartilhando(false)} />}
     </section>
   )
 }
+
 
 function Explicacao({ texto }: { texto: string }) {
   return (
@@ -380,11 +446,11 @@ function BotoesNota({ avaliar, acertou }: { avaliar: (n: Nota, chute?: boolean) 
 }
 
 /** Respostas de outras lacunas do baralho: alternativas erradas plausíveis no nível fácil. */
-function respostasDoBaralho(b: Baralho): string[] {
+export function respostasDoBaralho(b: Baralho): string[] {
   return b.cartoes.flatMap((c) => (c.tipo === 'lacunas' ? c.respostas.map((r) => formasAceitas(r)[0]) : []))
 }
 
-function CartaoView({ cartao, acoes, semAlternativas, facil, distratores }: { cartao: Cartao; acoes: Acoes; semAlternativas?: boolean; facil?: boolean; distratores?: string[] }) {
+export function CartaoView({ cartao, acoes, semAlternativas, facil, distratores }: { cartao: Cartao; acoes: Acoes; semAlternativas?: boolean; facil?: boolean; distratores?: string[] }) {
   switch (cartao.tipo) {
     case 'conceito':
       return <Conceito c={cartao} acoes={acoes} />
@@ -449,9 +515,7 @@ function Lacunas({ c, acoes, facil, distratores }: { c: CartaoLacunas; acoes: Ac
             {fraseComRespostas}
             {c.explicacao && <Explicacao texto={c.explicacao} />}
             <Fonte c={c} />
-            <button class="btn terciario compacto" onClick={acoes.corrigir}>
-              Cartão errado? Corrigir
-            </button>
+            <BotaoCorrigir acoes={acoes} />
           </Folha>
         )}
       </article>
@@ -488,9 +552,7 @@ function Lacunas({ c, acoes, facil, distratores }: { c: CartaoLacunas; acoes: Ac
           {fraseComRespostas}
           {c.explicacao && <Explicacao texto={c.explicacao} />}
           <Fonte c={c} />
-          <button class="btn terciario compacto" onClick={acoes.corrigir}>
-            Cartão errado? Corrigir
-          </button>
+          <BotaoCorrigir acoes={acoes} />
         </Folha>
       )}
     </article>
@@ -524,9 +586,7 @@ function Conceito({ c, acoes, verso, rotulo = 'Pergunta' }: { c: Cartao & { fren
           <Tex class="verso" texto={verso ?? (c.tipo === 'conceito' ? c.verso : '')} />
           {c.explicacao && <Explicacao texto={c.explicacao} />}
           <Fonte c={c} />
-          <button class="btn terciario compacto" onClick={acoes.corrigir}>
-            Cartão errado? Corrigir
-          </button>
+          <BotaoCorrigir acoes={acoes} />
         </Folha>
       )}
     </article>
@@ -580,9 +640,7 @@ function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta
           )}
           {c.explicacao && <Explicacao texto={c.explicacao} />}
           <Fonte c={c} />
-          <button class="btn terciario compacto" onClick={acoes.corrigir}>
-            Cartão errado? Corrigir
-          </button>
+          <BotaoCorrigir acoes={acoes} />
         </Folha>
       )}
     </article>
@@ -729,9 +787,7 @@ function Calculo({ c, acoes }: { c: CartaoCalculo; acoes: Acoes }) {
               <button class="btn terciario compacto" onClick={novoSorteio}>
                 Treinar de novo com outros números (não conta)
               </button>
-              <button class="btn terciario compacto" onClick={acoes.corrigir}>
-                Cartão errado? Corrigir
-              </button>
+              <BotaoCorrigir acoes={acoes} />
             </>
           )}
         </Folha>

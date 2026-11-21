@@ -556,3 +556,37 @@ details.bloco > summary { font-weight: 650; }
   background: var(--surface); border-top: 1px solid var(--border);
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
+
+/* ---------- Comemorar e compartilhar ---------- */
+.fim { position: relative; }
+.fim.comemorando .icone-fim { color: var(--gold); animation: pulo .6s ease-out 1; }
+.sequencia { margin: 0; font-weight: 700; color: var(--accent-text); }
+.conquista { display: grid; justify-items: center; gap: 2px; padding: 16px 32px; border-radius: var(--radius-md); background: var(--surface); border: 2px solid var(--gold); box-shadow: var(--shadow-card); }
+.conquista .selo-conquista { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-text); }
+.conquista .destaque { font: 700 44px/1.05 var(--font-display); color: var(--text); }
+.confete { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 40; }
+.confete span { position: absolute; top: -20px; width: 10px; height: 14px; border-radius: 2px; animation: confete-cair 2.4s ease-in forwards; }
+.confete .c0 { background: var(--gold); }
+.confete .c1 { background: var(--accent); }
+.confete .c2 { background: var(--success); }
+.confete .c3 { background: var(--text); opacity: .5; border-radius: 50%; width: 9px; height: 9px; }
+@keyframes confete-cair { 0% { translate: 0 0; opacity: 1; } 85% { opacity: 1; } 100% { translate: 30px 105vh; rotate: 540deg; opacity: 0; } }
+@keyframes pulo { 0% { transform: scale(.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .confete { display: none; }
+  .fim.comemorando .icone-fim { animation: none; }
+}
+.compartilhar-imagem .previa { justify-self: center; display: block; border-radius: var(--radius-sm); box-shadow: var(--shadow-card); background: #263F31; }
+.compartilhar-imagem .previa.story { height: min(46vh, 420px); width: auto; aspect-ratio: 9 / 16; }
+.compartilhar-imagem .previa.quadrado { height: min(40vh, 320px); width: auto; aspect-ratio: 1; }
+.compartilhar-imagem .segmentado { margin-bottom: 0; }
+.selo-sequencia { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--accent-text); font-weight: 700; font-size: 15px; }
+.semana { display: grid; gap: 10px; }
+.semana .dias { display: flex; gap: 6px; }
+.semana .dias span { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: var(--surface-subtle); color: var(--text-muted); }
+.semana .dias span.estudou { background: var(--gold); color: #1D3226; }
+.cabecalho .selo-sequencia { justify-self: start; }
+.modal.enviar .desafiar { display: grid; gap: 4px; text-align: left; padding: 14px 16px; border-radius: var(--radius-md); border: 2px solid var(--accent); background: var(--accent-soft); color: var(--text); }
+.modal.enviar .desafiar small { color: var(--text-muted); font-size: 14px; }
+.opcoes-desafio { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
+.opcoes-desafio legend { font-weight: 650; margin-bottom: 6px; }

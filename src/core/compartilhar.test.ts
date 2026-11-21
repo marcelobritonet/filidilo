@@ -254,3 +254,19 @@ describe('enviar baralho com o progresso', () => {
     expect((await db.revisoes.toArray()).map((r) => r.cartao)).toEqual([`${copia.id}/a`])
   })
 })
+
+describe('desafio', () => {
+  it('o baralho leva o cartão do desafio e quem recebe sabe qual responder', () => {
+    const r = lerRecebido(arquivoDoBaralho(base(), undefined, 'b').texto)
+    expect(r.tipo).toBe('baralho')
+    expect(r.desafio?.id).toBe('b')
+  })
+  it('cartão solto também', () => {
+    const b = base()
+    expect(lerRecebido(arquivoDosCartoes(b, [b.cartoes[2]], 'c').texto).desafio).toMatchObject({ id: 'c', frente: 'C?' })
+  })
+  it('sem desafio, ou com id que não existe, abre como antes', () => {
+    expect(lerRecebido(arquivoDoBaralho(base()).texto).desafio).toBeUndefined()
+    expect(lerRecebido(arquivoDoBaralho(base(), undefined, 'zz').texto).desafio).toBeUndefined()
+  })
+})

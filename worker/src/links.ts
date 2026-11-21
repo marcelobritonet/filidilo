@@ -1,5 +1,6 @@
-// Worker do Cloudflare que guarda, por 2 horas, o conteúdo de um baralho ou de cartões enviados por link.
+// Worker do Cloudflare que guarda, por 2 horas (ou 7 dias, nos desafios), o conteúdo de um baralho ou de cartões enviados por link.
 // POST /l          corpo = o mesmo JSON do arquivo (src/core/compartilhar.ts) → { codigo, expiraEm }
+// POST /l?validade=7d  o mesmo, valendo 7 dias (desafio no story ou no grupo); só 2h e 7d são aceitos
 // GET  /l/<codigo> → o JSON, ou 404 quando expirou ou nunca existiu
 // Sem listagem e sem login: só quem tem o código (10 caracteres aleatórios) abre.
 
@@ -20,6 +21,7 @@ export interface Env {
 }
 
 export const VALIDADE_S = 2 * 60 * 60
+export const VALIDADES: Record<string, number> = { '2h': VALIDADE_S, '7d': 7 * 24 * 60 * 60 }
 export const MAX_BYTES = 1024 * 1024
 const ALFABETO = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 const TAM_CODIGO = 10
@@ -64,7 +66,7 @@ function conteudoValido(texto: string): boolean {
 export const worker = {
   async fetch(req: Request, env: Env): Promise<Response> {
     const h = cabecalhos(req, env)
-    const { pathname } = new URL(req.url)
+    const { pathname, searchParams } = new URL(req.url)
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: h })
 
     if (req.method === 'POST' && pathname === '/l') {
@@ -76,10 +78,12 @@ export const worker = {
       if (tamanho > MAX_BYTES) return json({ erro: 'grande_demais' }, 413, h)
       const texto = await req.text()
       if (new TextEncoder().encode(texto).length > MAX_BYTES) return json({ erro: 'grande_demais' }, 413, h)
+      const validade = VALIDADES[searchParams.get('validade') ?? '2h']
+      if (!validade) return json({ erro: 'validade' }, 400, h)
       if (!conteudoValido(texto)) return json({ erro: 'invalido' }, 400, h)
       const codigo = novoCodigo()
-      await env.LINKS.put(codigo, texto, { expirationTtl: VALIDADE_S })
-      return json({ codigo, expiraEm: new Date(Date.now() + VALIDADE_S * 1000).toISOString() }, 201, h)
+      await env.LINKS.put(codigo, texto, { expirationTtl: validade })
+      return json({ codigo, expiraEm: new Date(Date.now() + validade * 1000).toISOString() }, 201, h)
     }
 
     const m = /^\/l\/([^/]+)$/.exec(pathname)

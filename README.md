@@ -11,6 +11,7 @@ No ar: https://marcelobritonet.github.io/tatino/
 - **Respostas**: acertei fácil, com dificuldade, no chute (não conta acerto), não sabia, errei; "Não sei" em V/F e alternativas.
 - **Exercícios de cálculo**: números sorteados, resposta digitada, tolerância de ±2% e resolução passo a passo.
 - **Corrigir cartão com IA**, com antes e depois. **Enviar** cartão ou baralho por link e QR code (vale 2 horas) ou como arquivo pelo WhatsApp; receber abrindo o link ou pelo Compartilhar → tatino.
+- **Comemorar e compartilhar**: no fim da sessão, comemoração e imagem do resultado (Story 9:16 ou Quadrado, desenhada no aparelho em `src/ui/desenho.ts`, conteúdo em `src/core/artes.ts`) para WhatsApp e story; sequência de dias, conquistas e "Sua semana" (`src/core/conquistas.ts`, conquistas comemoradas guardadas em `meta`, chave `marcos`); "Desafiar amigos" com um cartão (link de 7 dias) e "Indicar o tatino.".
 - **Backup** em arquivo; tudo fica só no aparelho.
 
 ## Visual
@@ -38,7 +39,7 @@ O app manda eventos anônimos ao PostHog (projeto na região EUA): nome do event
 
 ## Envio por link
 
-Enviar um baralho ou cartão sobe o mesmo JSON do arquivo para um worker do Cloudflare (`worker/`, KV com validade de 2 horas) e gera o link `…/tatino/?b=<código>` com QR code (`src/ui/EnviarModal.tsx`, `src/core/link.ts`). O conteúdo some sozinho depois de 2 horas; só quem tem o código (10 caracteres aleatórios) abre, e não há listagem. Limite de 1 MB e de 20 links por minuto por IP.
+Enviar um baralho ou cartão sobe o mesmo JSON do arquivo para um worker do Cloudflare (`worker/`, KV com validade de 2 horas; 7 dias no desafio, com `?validade=7d`) e gera o link `…/tatino/?b=<código>` com QR code (`src/ui/EnviarModal.tsx`, `src/core/link.ts`). O conteúdo some sozinho depois de 2 horas; só quem tem o código (10 caracteres aleatórios) abre, e não há listagem. Limite de 1 MB e de 20 links por minuto por IP.
 
 - **Publicar o worker**: push na `main` que mexe em `worker/` roda `.github/workflows/deploy-worker.yml`. Precisa dos segredos `CLOUDFLARE_API_TOKEN` (permissões Workers Scripts e Workers KV Storage: Edit) e `CLOUDFLARE_ACCOUNT_ID`. O namespace KV é criado no primeiro deploy.
 - **Ligar no app**: a variável `VITE_LINKS_URL` do repositório (ex.: `https://tatino-links.<sua-conta>.workers.dev`), passada no build pelo `deploy.yml`. Sem ela, só aparece "Enviar como arquivo".

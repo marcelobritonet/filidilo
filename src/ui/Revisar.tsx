@@ -5,6 +5,8 @@ import type { Baralho, Cartao } from '../core/types'
 import type { Navegacao } from './App'
 import { conteudoCartao } from './enviar'
 import { EnviarModal } from './EnviarModal'
+import { DesafiarModal } from './Desafio'
+import { podeDesafiar } from '../core/artes'
 import { nomeTema } from './estado'
 import { Tex } from './Tex'
 
@@ -15,6 +17,7 @@ export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) 
 
   const [enviando, setEnviando] = useState<Cartao | null>(null)
   const enviar = (c: Cartao) => setEnviando(c)
+  const [desafiando, setDesafiando] = useState<Cartao | null>(null)
 
   return (
     <main class="tela revisar">
@@ -73,7 +76,8 @@ export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) 
         ))}
         {!lista.length && <p class="dica centro">Nenhum cartão.</p>}
       </ul>
-      {enviando && <EnviarModal conteudo={conteudoCartao(baralho, enviando)} onde="lista" avisar={(texto) => nav.avisar({ texto })} fechar={() => setEnviando(null)} />}
+      {enviando && <EnviarModal conteudo={conteudoCartao(baralho, enviando)} onde="lista" avisar={(texto) => nav.avisar({ texto })} fechar={() => setEnviando(null)} desafiar={podeDesafiar(enviando) ? () => { setDesafiando(enviando); setEnviando(null) } : undefined} />}
+      {desafiando && <DesafiarModal baralho={baralho} cartao={desafiando} avisar={(texto) => nav.avisar({ texto })} fechar={() => setDesafiando(null)} />}
     </main>
   )
 }

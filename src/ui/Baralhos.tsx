@@ -1,8 +1,9 @@
 import { evento } from '../core/telemetria'
 import { useEffect, useState } from 'preact/hooks'
 import { lerRecebido, planejar, type CartoesRecebidos, type PlanoImportacao } from '../core/compartilhar'
+import { DesafioRecebido } from './Desafio'
 import { chave, dominado } from '../core/srs'
-import type { Baralho } from '../core/types'
+import type { Baralho, Cartao } from '../core/types'
 import type { Navegacao } from './App'
 import { useEstados } from './estado'
 import { Importar, ImportarCartoes } from './Importar'
@@ -10,6 +11,9 @@ import { Marca } from './Marca'
 import { abriuPorLink, pegarRecebido } from './recebido'
 import { InstalarCard } from './InstalarCard'
 import { registrarAbertura } from './instalar'
+import { iniciarMarcos, painel, type Semana } from '../core/conquistas'
+import { pecaConvite, pecaSemana } from '../core/artes'
+import { CompartilharImagem, urlApp, type OpcaoImagem } from './CompartilharImagem'
 
 const SEM_INTERNET = 'Precisa de internet para falar com a IA.'
 
@@ -23,8 +27,12 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const [plano, setPlano] = useState<PlanoImportacao | null>(null)
   const [cartoesRecebidos, setCartoesRecebidos] = useState<CartoesRecebidos | null>(null)
   const [erro, setErro] = useState('')
+  // Desafio recebido: responde o cartão primeiro; "Salvar" segue para a importação de sempre.
+  const [desafio, setDesafio] = useState<{ cartao: Cartao; baralho: Baralho; origem: string; salvar: () => void; rotulo: string } | null>(null)
   const [abrindoLink, setAbrindoLink] = useState(abriuPorLink)
   const [verArquivados, setVerArquivados] = useState(false)
+  const [resumo, setResumo] = useState<{ sequencia: number; semana: Semana } | null>(null)
+  const [compartilhar, setCompartilhar] = useState<{ opcoes: OpcaoImagem[]; onde: string } | null>(null)
   const ativos = baralhos.filter((b) => !b.arquivadoEm)
   const arquivados = baralhos.filter((b) => b.arquivadoEm)
 
@@ -42,7 +50,17 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         setErro('')
         const lido = lerRecebido(r.texto)
         avisarLink(true, lido.tipo)
-        if (lido.tipo === 'cartoes') setCartoesRecebidos(lido)
+        if (lido.desafio) {
+          evento('desafio_aberto', { junto: lido.tipo === 'baralho' ? 'baralho' : 'cartao', tipo: lido.desafio.tipo })
+          if (lido.tipo === 'cartoes') {
+            const solto: Baralho = { id: 'desafio', titulo: lido.origem, versao: 1, temas: lido.temas, cartoes: lido.cartoes }
+            setDesafio({ cartao: lido.desafio, baralho: solto, origem: lido.origem, rotulo: lido.cartoes.length === 1 ? 'Salvar este cartão' : 'Salvar os cartões', salvar: () => setCartoesRecebidos(lido) })
+          } else {
+            const p = await planejar(lido.baralho, lido.progresso)
+            const n = lido.baralho.cartoes.length
+            setDesafio({ cartao: lido.desafio, baralho: lido.baralho, origem: lido.baralho.titulo, rotulo: `Salvar o baralho (${n} ${n === 1 ? 'cartão' : 'cartões'})`, salvar: () => setPlano(p) })
+          }
+        } else if (lido.tipo === 'cartoes') setCartoesRecebidos(lido)
         else setPlano(await planejar(lido.baralho, lido.progresso))
       } catch (err) {
         avisarLink(false)
@@ -53,6 +71,29 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
 
   useEffect(() => registrarAbertura(), [])
 
+  // Marcos: o que já foi atingido antes desta versão fica comemorado em silêncio. Depois, sequência e semana.
+  useEffect(() => {
+    iniciarMarcos(baralhos)
+      .catch(() => undefined)
+      .then(() => painel())
+      .then(setResumo)
+      .catch(() => undefined)
+  }, [versao])
+
+  const semana = resumo?.semana
+  // "Sua semana" aparece de domingo a terça, para fechar a semana que passou; o selo de dias abre a qualquer hora.
+  const diaDaSemana = new Date().getDay()
+  const mostrarSemana = !!semana && semana.diasEstudados >= 2 && diaDaSemana <= 2
+  const abrirSemana = () => {
+    if (!semana || !semana.respostas) return
+    evento('semana_aberta')
+    setCompartilhar({ onde: 'semana', opcoes: [{ rotulo: 'Minha semana', peca: () => pecaSemana(semana, { urlApp: urlApp(), sequencia: resumo?.sequencia ?? 0 }) }] })
+  }
+  const convidar = () => {
+    evento('convite_aberto', { onde: 'baralhos' })
+    setCompartilhar({ onde: 'convite', opcoes: [{ rotulo: 'Convite', peca: () => pecaConvite({ urlApp: urlApp() }) }] })
+  }
+
   /** Abre o fluxo Aprender; sem internet, avisa e não abre. */
   const aprender = (de: 'campo' | 'botao') => {
     const texto = de === 'campo' ? pedido.trim() : ''
@@ -62,11 +103,31 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
     nav.ir(texto ? { nome: 'aprender', pedido: texto } : { nome: 'aprender' })
   }
 
+  if (desafio)
+    return (
+      <DesafioRecebido
+        cartao={desafio.cartao}
+        baralho={desafio.baralho}
+        origem={desafio.origem}
+        salvarRotulo={desafio.rotulo}
+        salvar={() => {
+          desafio.salvar()
+          setDesafio(null)
+        }}
+        fechar={() => setDesafio(null)}
+      />
+    )
+
   return (
     <main class="tela inicio">
       <header class="cabecalho">
         <Marca />
         <h1>Meus baralhos</h1>
+        {!!resumo && resumo.sequencia >= 2 && (
+          <button class="selo-sequencia" aria-label={`${resumo.sequencia} dias seguidos estudando. Ver sua semana`} onClick={abrirSemana}>
+            🔥 {resumo.sequencia} dias
+          </button>
+        )}
       </header>
 
       <section class="bloco aprender">
@@ -85,6 +146,25 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
       </section>
 
       <InstalarCard />
+
+      {mostrarSemana && semana && (
+        <section class="bloco semana">
+          <strong>Sua semana</strong>
+          <div class="dias" aria-label={`Estudou ${semana.diasEstudados} de 7 dias`}>
+            {semana.dias.map((d) => (
+              <span class={d.estudou ? 'estudou' : ''} aria-hidden="true">
+                {d.rotulo}
+              </span>
+            ))}
+          </div>
+          <p class="dica">
+            {semana.diasEstudados} de 7 dias · {semana.respostas} {semana.respostas === 1 ? 'cartão respondido' : 'cartões respondidos'}
+          </p>
+          <button class="btn secundario" onClick={abrirSemana}>
+            Compartilhar minha semana
+          </button>
+        </section>
+      )}
 
       <ul class="lista-baralhos">
         {ativos.map((b) => {
@@ -160,9 +240,13 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         <button class="btn terciario" onClick={() => nav.ir({ nome: 'aparencia' })}>
           Aparência
         </button>
+        <button class="btn terciario" onClick={convidar}>
+          Indicar o tatino.
+        </button>
       </nav>
       <p class="versao">Funciona sem internet · seus cartões ficam neste aparelho</p>
       {plano && <Importar plano={plano} nav={nav} fechar={() => setPlano(null)} />}
+      {compartilhar && <CompartilharImagem opcoes={compartilhar.opcoes} onde={compartilhar.onde} avisar={(texto) => nav.avisar({ texto })} fechar={() => setCompartilhar(null)} />}
       {cartoesRecebidos && <ImportarCartoes recebido={cartoesRecebidos} baralhos={baralhos} nav={nav} fechar={() => setCartoesRecebidos(null)} />}
     </main>
   )

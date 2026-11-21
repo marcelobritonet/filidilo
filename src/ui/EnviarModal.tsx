@@ -18,11 +18,11 @@ const hora = (d: Date) => d.toLocaleTimeString('pt-BR', { hour: '2-digit', minut
 export type ComProgresso = () => Promise<{ conteudo: ConteudoEnvio; estudados: number } | null>
 
 /**
- * Enviar baralho ou cartão: gera um link que vale 2 horas (com QR code para ler noutro celular)
+ * Enviar baralho ou cartão: gera um link que vale 2 horas (o desafio, em Desafio.tsx, vale 7 dias) (com QR code para ler noutro celular)
  * e, embaixo, a opção de enviar como arquivo, que funciona sem internet.
  * Para baralho, uma caixa (desmarcada) inclui o progresso, para levar a outro aparelho dela.
  */
-export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar, fechar }: { conteudo: ConteudoEnvio; comProgresso?: ComProgresso; onde: string; avisar?: (texto: string) => void; fechar: () => void }) {
+export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar, fechar, desafiar }: { conteudo: ConteudoEnvio; comProgresso?: ComProgresso; onde: string; avisar?: (texto: string) => void; fechar: () => void; /** Cartão: abre o "Desafiar amigos" (imagem para story ou grupo, link de 7 dias). */ desafiar?: () => void }) {
   const [opcaoProgresso, setOpcaoProgresso] = useState<{ conteudo: ConteudoEnvio; estudados: number } | null>(null)
   const [incluir, setIncluir] = useState(false)
   const conteudo = incluir && opcaoProgresso ? opcaoProgresso.conteudo : semProgresso
@@ -96,6 +96,13 @@ export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar
     <div class="modal-fundo" onClick={(e) => e.target === e.currentTarget && fechar()}>
       <div class="modal enviar" role="dialog" aria-modal="true" aria-labelledby="titulo-enviar">
         <h2 id="titulo-enviar">Enviar {conteudo.o_que === 'baralho' ? 'baralho' : 'cartão'}</h2>
+
+        {desafiar && linkLigado() && (
+          <button class="cartao-acao desafiar" onClick={desafiar}>
+            <strong>Desafiar amigos</strong>
+            <small>Imagem com a pergunta para o story ou o grupo; quem abrir responde no tatino.</small>
+          </button>
+        )}
 
         {opcaoProgresso && (
           <label class="opcao-check">
