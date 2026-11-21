@@ -2,6 +2,13 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.9.0] — 2026-11-21
+
+**Depois da primeira sessão, o app sugere o tema que ficou com poucos cartões.**
+
+### Novo
+- Num baralho criado em "Aprender", o fim da primeira sessão sugere o primeiro tema do plano que ainda tem poucos cartões (abaixo da média do baralho e menos de 8). O botão abre o Criar com IA já com esse tema. Nas sessões seguintes, volta a sugerir o tema em que você mais errou ou o objetivo do baralho.
+
 ## [3.8.3] — 2026-11-21
 
 **Menos uma pergunta para quem já tem as perguntas.**

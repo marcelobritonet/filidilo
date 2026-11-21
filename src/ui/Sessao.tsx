@@ -6,6 +6,7 @@ import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../
 import { formaDaCerta, sortearAlternativas } from '../core/alternativas'
 import { chave, dominado, registrar } from '../core/srs'
 import { evento } from '../core/telemetria'
+import { temaComPoucosCartoes } from '../core/sugestao'
 import { formasAceitas, NIVEIS_COM_ALTERNATIVAS, partesDaFrente } from '../core/lacunas'
 import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, CartaoLacunas, Objetivo } from '../core/types'
 import { nomeTema } from './estado'
@@ -61,6 +62,8 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   const [enviando, setEnviando] = useState<Cartao | null>(null)
   // Erros e chutes por tema, para sugerir onde criar mais cartões no fim.
   const [fracos, setFracos] = useState<Record<string, number>>({})
+  // Primeira sessão do baralho (nenhum cartão estudado antes): no fim, sugere o tema com poucos cartões.
+  const [primeira, setPrimeira] = useState(false)
   const [fila, setFila] = useState<Cartao[] | null>(null)
   // Cartões de alternativas já dominados no início da sessão: aparecem sem alternativas.
   const [dominados, setDominados] = useState<Set<string>>(new Set())
@@ -86,6 +89,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   useEffect(() => {
     db.estados.toArray().then((l) => {
       const m = new Map(l.map((e) => [e.id, e]))
+      if (rodada === 0) setPrimeira(!baralho.cartoes.some((c) => m.has(chave(baralho.id, c.id))))
       // Por tempo ou por acertos, a fila tem todos os cartões; o relógio ou a meta decidem o fim.
       const tamanho = limite ? TODOS : modo === 'calculo' ? 10 : 20
       const f = modo === 'espacada' ? filaEspacada(baralho, m, { ...opcoes, tamanho }, porTempo ? 100 : Math.min(tamanho, 15)) : filaProva(baralho, m, { ...opcoes, tamanho })
@@ -103,6 +107,8 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
 
   if (!fila) return <main class="tela"><p>Carregando…</p></main>
   const fracoId = temaFracoId(fracos)
+  // Só em baralho com objetivo (criado pelo fluxo "Aprender"), para não mudar o fim da sessão dos antigos.
+  const poucos = primeira && baralho.objetivo ? temaComPoucosCartoes(baralho) : undefined
 
   const bateuMeta = meta > 0 && placar.certos >= meta
   const cartao = esgotou || bateuMeta ? undefined : fila[pos]
@@ -208,6 +214,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
           sair={sair}
           temaFraco={fracoId ? nomeTema(baralho, fracoId) : undefined}
           temaId={fracoId}
+          temaPoucos={poucos}
           objetivo={baralho.objetivo}
           criarMais={criarMais}
         />
@@ -250,15 +257,19 @@ function Fim(props: {
   tempo?: string
   bateuMeta?: boolean
   temaFraco?: string
+  /** Tema com poucos cartões, sugerido depois da primeira sessão de um baralho novo (tem prioridade). */
+  temaPoucos?: { id: string; nome: string }
   temaId?: string
   objetivo?: Objetivo
   outra: () => void
   sair: () => void
   criarMais: (assunto?: string, temaId?: string) => void
 }) {
-  const { placar, vazio, modo, tempo, bateuMeta, temaFraco, temaId, objetivo, outra, sair, criarMais } = props
-  // Sem tema fraco: se há foco no objetivo, a IA aprofunda nele; senão, o assunto fica em branco.
-  const assuntoSugerido = temaFraco ?? (objetivo?.foco?.length ? `Aprofundar: ${objetivo.foco.join(', ')}` : undefined)
+  const { placar, vazio, modo, tempo, bateuMeta, temaFraco, temaPoucos, objetivo, outra, sair, criarMais } = props
+  const temaId = temaPoucos?.id ?? props.temaId
+  const tema = temaPoucos?.nome ?? temaFraco
+  // Sem tema sugerido: se há foco no objetivo, a IA aprofunda nele; senão, o assunto fica em branco.
+  const assuntoSugerido = tema ?? (objetivo?.foco?.length ? `Aprofundar: ${objetivo.foco.join(', ')}` : undefined)
   useEffect(() => evento('sessao_concluida', { motivo: props.fimMotivo, ...placar }), [])
   if (vazio)
     return (
@@ -286,14 +297,16 @@ function Fim(props: {
         <div>
           <strong>Que tal mais cartões?</strong>
           <p>
-            {temaFraco
+            {temaPoucos
+              ? `Seu baralho ainda tem poucos cartões sobre “${temaPoucos.nome}”. A IA cria mais cartões sobre esse tema em poucos minutos.`
+              : temaFraco
               ? `Você teve mais dificuldade em “${temaFraco}”. A IA cria cartões novos sobre esse tema em poucos minutos.`
               : objetivo?.resumo
                 ? `Quer avançar em ${objetivo.resumo}? A IA cria mais cartões em poucos minutos.`
                 : 'Variar as perguntas ajuda a fixar. Use outra aula ou um resumo para a IA criar cartões novos.'}
           </p>
-          <button class="btn secundario" onClick={() => { evento('sugestao_mais_cartoes'); criarMais(assuntoSugerido, temaId) }}>
-            {temaFraco ? `Criar cartões sobre ${temaFraco}` : 'Criar mais cartões com IA'}
+          <button class="btn secundario" onClick={() => { evento('sugestao_mais_cartoes', { motivo: temaPoucos ? 'poucos' : temaFraco ? 'fraco' : 'objetivo' }); criarMais(assuntoSugerido, temaId) }}>
+            {tema ? `Criar cartões sobre ${tema}` : 'Criar mais cartões com IA'}
           </button>
         </div>
       </section>
