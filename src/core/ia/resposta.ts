@@ -1,6 +1,7 @@
 // Lê a resposta da IA: extrai o JSON, ajusta temas e ids e valida cartão a cartão.
 import { problemasDoCartao, novoIdCartao } from '../cartoes'
 import { normalizarNivel, type Baralho, type Cartao, type Objetivo, type Tema } from '../types'
+import { consertarMultipla } from './multipla'
 
 export interface CartaoLido {
   cartao: Cartao
@@ -110,6 +111,7 @@ const slug = (s: string) =>
  * Converte o JSON da IA em cartões do baralho de destino:
  * - temas: reaproveita os existentes (por id ou nome) e cria os novos;
  * - ids novos e únicos; `origem: "ia"`; fonte padrão quando faltar;
+ * - pergunta com as alternativas no texto vira "associacao" (ou é recusada com o motivo);
  * - cada cartão validado separadamente (um cartão ruim não derruba os outros).
  */
 export function lerResposta(dados: unknown, destino: Pick<Baralho, 'id' | 'titulo' | 'versao' | 'temas'>, fontePadrao?: string): RespostaLida {
@@ -157,8 +159,11 @@ export function lerResposta(dados: unknown, destino: Pick<Baralho, 'id' | 'titul
     } as Cartao
     if (c.tipo === 'associacao' && typeof c.outrasFormas === 'string') c.outrasFormas = [c.outrasFormas]
     if (c.tipo === 'vf' && typeof c.resposta === 'string') c.resposta = (c.resposta as string).toLowerCase() === 'true'
+    // Alternativas (A, B, C…) dentro da pergunta: vira "associacao" ou volta no pedido de correção.
+    const multipla = consertarMultipla(c)
     baralhoTeste.temas = temas
-    return { cartao: c, idIA, erros: problemasDoCartao(baralhoTeste, c) }
+    const erros = problemasDoCartao(baralhoTeste, multipla.cartao)
+    return { cartao: multipla.cartao, idIA, erros: multipla.erro ? [multipla.erro, ...erros] : erros }
   })
   return { temasNovos, cartoes }
 }

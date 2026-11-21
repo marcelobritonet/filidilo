@@ -3,6 +3,7 @@ import { problemasDoCartao } from '../cartoes'
 import { infoNivel, type Baralho, type Cartao, type Objetivo } from '../types'
 import { extrairJson } from './resposta'
 import { regraEntrega } from './instrucao'
+import { consertarMultipla, separarAlternativas } from './multipla'
 
 const REGRAS_TIPO: Record<Cartao['tipo'], string> = {
   conceito: '"frente" (pergunta) e "verso" (resposta).',
@@ -11,6 +12,16 @@ const REGRAS_TIPO: Record<Cartao['tipo'], string> = {
   lacunas: '"frente" com ____ em cada lacuna e "respostas" (uma por lacuna, na ordem; use / para sinônimos).',
   calculo:
     '"titulo", "enunciado" com {variavel}, "parametros" { nome: { min, max, passo, unidade } }, "derivados" opcional, e "etapas" com "pergunta", "expr", "unidade", "casas" e "resolucao". Expressões só com números, + - * / ^, parênteses e as funções sqrt, abs, sin, cos, tan, sind, cosd, tand, asin, log10, ln, exp, min, max, round, floor, ceil, se(cond, a, b), pi e e.',
+}
+
+/** Campos a manter e regras do tipo. Pergunta com as alternativas no texto passa a ser "associacao" (P90). */
+function tipoTexto(c: Cartao): string {
+  if (c.tipo !== 'calculo' && separarAlternativas(c.frente)) {
+    return `As alternativas estão dentro da pergunta: troque o tipo para "associacao", com só a pergunta em "frente" (sem as alternativas e sem número ou cabeçalho da questão), cada alternativa em "opcoes" (sem a letra, na ordem original) e "correta" com o índice da certa. Mantenha o mesmo "id" e o mesmo "tema".
+Campos do tipo "associacao": "frente", "opcoes", "correta" (índice da certa, começando em 0) e "explicacao" dizendo por que ela é a certa.`
+  }
+  return `Mantenha o mesmo "id", o mesmo "tipo" e o mesmo "tema".
+Campos do tipo "${c.tipo}": ${REGRAS_TIPO[c.tipo]}`
 }
 
 /** Sem campos internos do app, para a IA ver só o conteúdo. */
@@ -38,8 +49,7 @@ Cartão atual (JSON):
 ${JSON.stringify(paraIA(c), null, 1)}
 \`\`\`
 
-Confira o conteúdo com cuidado. Se houver erro, corrija; se estiver certo, devolva igual. Mantenha o mesmo "id", o mesmo "tipo" e o mesmo "tema".
-Campos do tipo "${c.tipo}": ${REGRAS_TIPO[c.tipo]}
+Confira o conteúdo com cuidado. Se houver erro, corrija; se estiver certo, devolva igual. ${tipoTexto(c)}
 Use "explicacao" curta para dizer por que a resposta é essa.
 
 Responda SOMENTE com um bloco de código JSON contendo o cartão corrigido, em português do Brasil.
@@ -63,5 +73,7 @@ export function lerCartaoCorrigido(texto: string, b: Baralho, original: Cartao):
     fonte: bruto.fonte ?? original.fonte,
   } as Cartao
   if (cartao.tipo === 'vf' && typeof cartao.resposta === 'string') cartao.resposta = (cartao.resposta as string).toLowerCase() === 'true'
-  return { cartao, erros: problemasDoCartao(b, cartao) }
+  const multipla = consertarMultipla(cartao)
+  const erros = problemasDoCartao(b, multipla.cartao)
+  return { cartao: multipla.cartao, erros: multipla.erro ? [multipla.erro, ...erros] : erros }
 }

@@ -2,6 +2,15 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.13.1] — 2026-11-21
+
+**Questões de prova com alternativas viram cartão de escolha.**
+
+### Corrigido
+- Em "Já tenho as perguntas", questões com alternativas (A, B, C, D) às vezes viravam um cartão de pergunta e resposta com as alternativas e o "Questão 31 | …" no meio do texto. Agora viram cartão de "Escolha a alternativa correta": só a pergunta em cima e cada alternativa num botão. Se a IA errar o formato mesmo assim, o app arruma sozinho ao ler a resposta.
+- Questões sem gabarito também entram: a IA marca a certa e explica por quê.
+- Um cartão que já ficou assim pode ser consertado em "Corrigir cartão": o pedido para a IA agora transforma em cartão de escolha.
+
 ## [3.13.0] — 2026-11-21
 
 **Ofensiva diária: um motivo para estudar todo dia, sem pressão.**

@@ -36,3 +36,18 @@ describe('corrigir um cartão com a IA', () => {
     expect(() => lerCartaoCorrigido('{"oi": 1}', b, errado)).toThrow(/Não encontrei um cartão/)
   })
 })
+
+describe('corrigir questão com alternativas na pergunta (P90)', () => {
+  const quebrado: Cartao = { id: 'q31', tipo: 'conceito', tema: 'est', frente: 'Questão 31\nQual a unidade de massa no SI?\nA) grama\nB) quilograma\nC) libra\nD) tonelada', verso: 'B' }
+  it('o pedido manda trocar o tipo para "associacao"', () => {
+    const p = montarPedidoCorrecao(b, quebrado)
+    expect(p).toContain('troque o tipo para "associacao"')
+    expect(p).not.toContain('o mesmo "tipo"')
+    expect(montarPedidoCorrecao(b, errado)).toContain('o mesmo "tipo"')
+  })
+  it('a resposta que ainda vem como conceito é convertida', () => {
+    const r = lerCartaoCorrigido(JSON.stringify(quebrado), b, quebrado)
+    expect(r.erros).toEqual([])
+    expect(r.cartao).toMatchObject({ id: 'q31', tipo: 'associacao', frente: 'Qual a unidade de massa no SI?', opcoes: ['grama', 'quilograma', 'libra', 'tonelada'], correta: 1 })
+  })
+})
