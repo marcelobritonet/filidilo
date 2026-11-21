@@ -42,7 +42,7 @@ Todo evento traz `versao` (a versão do app na hora do evento). Eventos de antes
 
 ## Publicar uma versão
 
-Cada correção ou novidade entregue vira versão publicada:
+**Novidade só é publicada depois de o Marcelo testar.** Entregue pronta e testada em localhost, deixe a pendência como "Aguardando o Marcelo testar" e publique só com o ok dele. Correção de bug pequena, ou quando ele pedir para publicar, segue direto:
 
 | Passo | Comando ou arquivo |
 |---|---|
