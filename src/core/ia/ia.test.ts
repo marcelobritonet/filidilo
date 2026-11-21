@@ -13,6 +13,8 @@ describe('instrução para o Gemini', () => {
     expect(t).toContain('naoConvertidos')
     expect(t).toContain('SOMENTE')
     expect(t).not.toContain('"baralho"')
+    // A lista de tipos a escolher cita as lacunas (P70).
+    expect(t).toMatch(/Escolha o tipo[^\n]*"lacunas"/)
   })
 
   it('modo formatar para baralho novo: pede o bloco baralho e usa o nome dado', () => {
@@ -98,7 +100,7 @@ describe('lendo a resposta', () => {
 
 describe('instrução v3 (objetivo e cobertos)', () => {
   it('versão 3', () => {
-    expect(VERSAO_INSTRUCAO).toBe(4)
+    expect(VERSAO_INSTRUCAO).toBe(5)
   })
 
   it('com objetivo: seção, nível, foco, evitar (spoilers), descrição do tema e prioridade', () => {

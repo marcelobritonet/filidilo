@@ -4,7 +4,7 @@ import type { Baralho, Cartao, Objetivo, Tema } from '../types'
 import { infoNivel } from '../types'
 import { jaCobertos } from './cobertos'
 
-export const VERSAO_INSTRUCAO = 4
+export const VERSAO_INSTRUCAO = 5
 
 export type Origem = 'pdf' | 'texto' | 'tema'
 export type Mistura = 'misto' | 'teoria' | 'calculo'
@@ -211,7 +211,7 @@ ${p.texto.trim()}
 
 ## Como converter
 - Converta cada item em um cartão, mantendo o sentido e as palavras da pessoa. Não invente, não complete e não corrija conteúdo. Se a resposta original estiver incompleta ou incorreta, mantenha como está.
-- Um cartão por ideia. Escolha o tipo que melhor encaixa: "conceito" para pergunta aberta com resposta, "vf" para afirmação verdadeira ou falsa, "associacao" para pergunta com resposta curta (crie 5 ou 6 alternativas erradas plausíveis), "calculo" só se houver exercício com números.
+- Um cartão por ideia. Escolha o tipo que melhor encaixa: "conceito" para pergunta aberta com resposta, "vf" para afirmação verdadeira ou falsa, "associacao" para pergunta com resposta curta (crie 5 ou 6 alternativas erradas plausíveis), "lacunas" para frase de completar (com ____ ou espaço em branco no original), "calculo" só se houver exercício com números.
 - Se um item não couber em nenhum tipo ou não tiver resposta, não crie cartão para ele: liste o texto dele em "naoConvertidos".
 - Se o item tiver fonte (página, aula), mantenha; senão use "Perguntas próprias".
 
