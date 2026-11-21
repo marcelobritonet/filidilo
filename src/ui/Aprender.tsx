@@ -7,7 +7,7 @@ import { evento } from '../core/telemetria'
 import { NIVEIS, type Baralho, type Cartao, type Nivel, type Objetivo } from '../core/types'
 import type { Navegacao } from './App'
 import { AbrirIA } from './AbrirIA'
-import { Conteudo } from './Revisar'
+import { AvisoNivelAlto, Conteudo } from './Revisar'
 
 type Material = 'pdf' | 'texto'
 
@@ -369,6 +369,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
             </div>
           )}
 
+          <AvisoNivelAlto nivel={cfg.nivel} />
           <ul class="lista-revisao">
             {validos.map((c) => {
               const marcado = !desmarcados.has(c.cartao.id)

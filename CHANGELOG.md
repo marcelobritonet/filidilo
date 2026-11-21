@@ -2,6 +2,13 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.10.2] — 2026-11-21
+
+**Aviso para conferir os cartões nos níveis mais difíceis.**
+
+### Melhorado
+- Na conferência dos cartões criados pela IA (Aprender e Criar com IA), os níveis "expert" e "extremo" mostram: "Nesse nível a IA erra mais. Confira cada cartão e desmarque o que parecer errado. Se achar um erro depois, use “Corrigir cartão” durante o estudo."
+
 ## [3.10.1] — 2026-11-21
 
 **A IA erra menos nos níveis altos.**

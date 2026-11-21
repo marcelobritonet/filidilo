@@ -78,6 +78,16 @@ export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) 
   )
 }
 
+/** Nos níveis expert e extremo a IA erra mais: lembra de conferir os cartões antes de salvar. */
+export function AvisoNivelAlto({ nivel }: { nivel?: string }) {
+  if (nivel !== 'expert' && nivel !== 'extremo') return null
+  return (
+    <p class="aviso-nivel" role="note">
+      Nesse nível a IA erra mais. Confira cada cartão e desmarque o que parecer errado. Se achar um erro depois, use “Corrigir cartão” durante o estudo.
+    </p>
+  )
+}
+
 export function Conteudo({ c }: { c: Cartao }) {
   switch (c.tipo) {
     case 'lacunas':

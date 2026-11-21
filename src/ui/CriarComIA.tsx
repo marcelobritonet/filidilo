@@ -7,7 +7,7 @@ import { extrairJson, lerResposta, type RespostaLida } from '../core/ia/resposta
 import { infoNivel, normalizarNivel, type Baralho } from '../core/types'
 import type { Navegacao } from './App'
 import { AbrirIA } from './AbrirIA'
-import { Conteudo } from './Revisar'
+import { AvisoNivelAlto, Conteudo } from './Revisar'
 
 
 /** Criar cartões com IA: copia a instrução, cola na IA, cola a resposta aqui, confere e salva. */
@@ -320,6 +320,7 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
             </div>
           )}
 
+          {!formatar && <AvisoNivelAlto nivel={nivelUsado} />}
           <ul class="lista-revisao">
             {validos.map((c) => {
               const marcado = !desmarcados.has(c.cartao.id)
