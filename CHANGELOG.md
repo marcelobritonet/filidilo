@@ -2,6 +2,13 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.6.1] — 2026-11-21
+
+**Sorteio mais justo.** A posição da alternativa certa já mudava a cada vez, mas nas lacunas algumas ordens saíam mais que outras.
+
+### Corrigido
+- Todo sorteio do app (ordem das alternativas, opções das lacunas, ordem dos cartões, valores dos cálculos) usa o mesmo embaralhamento, em que todas as ordens têm a mesma chance, e o gerador aleatório do navegador, mais uniforme que o comum.
+
 ## [3.6.0] — 2026-11-21
 
 **Complete a frase.** Novo tipo de cartão com lacunas, como "A Terra gira em torno do ____." E, no estudo, dá para corrigir um cartão você mesmo, sem IA.

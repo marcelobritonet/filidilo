@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import { confere, formatar, lerNumero, preencher, sortear, type Sorteio } from '../core/calc'
+import { embaralhar } from '../core/aleatorio'
 import { db, type Nota } from '../core/db'
 import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../core/fila'
 import { formaDaCerta, sortearAlternativas } from '../core/alternativas'
@@ -394,8 +395,8 @@ function Lacunas({ c, acoes, facil, distratores }: { c: CartaoLacunas; acoes: Ac
   const opcoesPorLacuna = useMemo(
     () =>
       certas.map((certa, i) => {
-        const outras = [...new Set(distratores.filter((d) => d && d !== certa))].sort(() => Math.random() - 0.5).slice(0, 3)
-        return { certa, opcoes: [certa, ...outras].sort(() => Math.random() - 0.5), i }
+        const outras = embaralhar([...new Set(distratores.filter((d) => d && d !== certa))]).slice(0, 3)
+        return { certa, opcoes: embaralhar([certa, ...outras]), i }
       }),
     [c.id],
   )
@@ -518,8 +519,7 @@ function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta
   const { c, pergunta, opcoes, correta, acoes } = props
   const ordem = useMemo(() => {
     const idx = opcoes.map((_, i) => i)
-    if (props.embaralhar) idx.sort(() => Math.random() - 0.5)
-    return idx
+    return props.embaralhar ? embaralhar(idx) : idx
   }, [c.id])
   // -1 = "Não sei": mostra a resposta certa e conta como erro.
   const [escolhida, setEscolhida] = useState<number | null>(null)

@@ -1,6 +1,7 @@
 import type { Estado } from './db'
 import type { Baralho, Cartao } from './types'
 import { chave, vencido } from './srs'
+import { aleatorio, embaralhar } from './aleatorio'
 
 export type Filtro = 'tudo' | 'teoria' | 'calculo'
 
@@ -10,14 +11,6 @@ export interface OpcoesFila {
   tamanho?: number
 }
 
-function embaralhar<T>(a: T[], rng = Math.random): T[] {
-  const b = [...a]
-  for (let i = b.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1))
-    ;[b[i], b[j]] = [b[j], b[i]]
-  }
-  return b
-}
 
 function candidatos(b: Baralho, o: OpcoesFila): Cartao[] {
   return b.cartoes.filter(
@@ -32,7 +25,7 @@ function candidatos(b: Baralho, o: OpcoesFila): Cartao[] {
  * 1. errados por último; 2. vencidos hoje (repetição espaçada); 3. nunca vistos;
  * 4. difíceis; 5. acertados, os acertados há mais tempo primeiro.
  */
-export function filaProva(b: Baralho, estados: Map<string, Estado>, o: OpcoesFila = {}, rng = Math.random, agora = Date.now()): Cartao[] {
+export function filaProva(b: Baralho, estados: Map<string, Estado>, o: OpcoesFila = {}, rng = aleatorio, agora = Date.now()): Cartao[] {
   const grupo = (c: Cartao) => {
     const e = estados.get(chave(b.id, c.id))
     if (!e) return 2
@@ -75,5 +68,5 @@ function misturarTemas(cs: Cartao[]): Cartao[] {
 }
 
 /** Próxima posição de um cartão errado na sessão: volta depois de 3 a 5 cartões. */
-export const posicaoReinsercao = (atual: number, total: number, rng = Math.random) =>
+export const posicaoReinsercao = (atual: number, total: number, rng = aleatorio) =>
   Math.min(total, atual + 3 + Math.floor(rng() * 3))

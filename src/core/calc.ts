@@ -1,4 +1,5 @@
 import { avaliar, type Vars } from './expr'
+import { aleatorio } from './aleatorio'
 import type { CartaoCalculo, Parametro } from './types'
 
 export interface Sorteio {
@@ -37,7 +38,7 @@ export function resolver(card: CartaoCalculo, vars: Vars): number[] {
   return respostas
 }
 
-export function sortear(card: CartaoCalculo, rng: () => number = Math.random): Sorteio {
+export function sortear(card: CartaoCalculo, rng: () => number = aleatorio): Sorteio {
   for (let tentativa = 0; tentativa < 200; tentativa++) {
     const vars: Vars = {}
     const rotulos: Record<string, string> = {}
