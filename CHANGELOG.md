@@ -2,6 +2,15 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.6.3] — 2026-11-21
+
+**Temas novos não somem mais.** Depois de criar cartões com IA, a tela Configurar baralho abria com a lista de temas antiga, e "Salvar alterações" apagava os temas novos.
+
+### Corrigido
+- Configurar baralho mostra os temas e as contagens atualizados logo depois de criar cartões com IA, e "Salvar alterações" só fica ativo quando algo muda.
+- Em "Já tenho as perguntas", o passo 2 não pede mais para mandar o PDF junto.
+- Contagem de tema com um cartão: "1 cartão", não "1 cartões".
+
 ## [3.6.2] — 2026-11-21
 
 **"Não sei" nas lacunas.** No nível fácil, as lacunas ganharam o botão "Não sei", como as alternativas.

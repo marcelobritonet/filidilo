@@ -65,4 +65,5 @@ Atualizado em 21/11/2026.
 | P65 | Corrigir cartão sem IA: no estudo, "Corrigir cartão" → "Corrigir eu mesmo" abre o editor do cartão; ao salvar volta à sessão com o cartão já corrigido (o voltar do Android fecha só o editor). Fora do estudo, o editor do baralho já era manual | ✅ Publicada na v3.6.0 (21/11) | Claude |
 | P66 | Sorteio mais justo: um só embaralhamento (Fisher–Yates) com gerador criptográfico em alternativas, lacunas, fila e cálculos; as lacunas usavam `sort(() => Math.random() - 0.5)`, que favorece algumas ordens | ✅ Publicada na v3.6.1 (21/11) | Claude |
 | P67 | Botão "Não sei" nas lacunas do nível fácil (mostra a frase completa e conta como erro) | ✅ Publicada na v3.6.2 (21/11) | Claude |
+| P68 | Bugs achados testando "Já tenho as perguntas": temas novos sumiam ao salvar Configurar baralho logo depois de criar cartões com IA; passo 2 citava PDF nesse modo; "1 cartões" | ✅ Publicada na v3.6.3 (21/11) | Claude |
 | P52 | v3 · E7 Testar o fluxo novo com gente de verdade (um baralho com PDF de aula e um de assunto livre) | A fazer, depois da publicação | Marcelo / estudante |

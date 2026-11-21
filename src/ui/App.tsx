@@ -133,7 +133,9 @@ export function App() {
   else if (tela.nome === 'revisar') conteudo = <Revisar baralho={baralho} nav={nav} />
   else if (tela.nome === 'cartao') conteudo = <EditarCartao key={tela.cartaoId ?? 'novo'} baralho={baralho} cartaoId={tela.cartaoId} temaInicial={tela.tema} nav={nav} />
   else if (tela.nome === 'colar') conteudo = <ColarLista baralho={baralho} nav={nav} />
-  else conteudo = <ConfigBaralho baralho={baralho} nav={nav} />
+  // A chave remonta o formulário quando o baralho muda (ex.: cartões e temas criados com IA);
+  // sem ela, a tela abre com os temas antigos e "Salvar alterações" apagaria os novos.
+  else conteudo = <ConfigBaralho key={`${baralho.id}-${baralho.atualizadoEm ?? 0}`} baralho={baralho} nav={nav} />
 
   return (
     <>

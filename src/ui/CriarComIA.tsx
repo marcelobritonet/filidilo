@@ -256,7 +256,7 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
       <section class="bloco passo">
         <h2><span class="num-passo">2</span> Peça à IA</h2>
         <p class="dica">
-          Copie a instrução e cole na IA{origem === 'pdf' ? ', junto com o PDF' : ''}.
+          Copie a instrução e cole na IA{origem === 'pdf' && !formatar ? ', junto com o PDF' : ''}.
         </p>
         <button class="btn principal" disabled={!materialOk} onClick={() => copiar(instrucao, 'instrucao')}>
           {copiado === 'instrucao' ? '✓ Instrução copiada' : 'Copiar instrução'}

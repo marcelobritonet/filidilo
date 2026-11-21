@@ -158,7 +158,7 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
             <li>
               <input class="texto" aria-label="Nome do tema" value={t.nome} onInput={(e) => mudarTema(t.id, { nome: (e.target as HTMLInputElement).value })} />
               <div class="tema-opcoes">
-                <span class="dica">{qtd(t.id)} cartões</span>
+                <span class="dica">{qtd(t.id)} {qtd(t.id) === 1 ? 'cartão' : 'cartões'}</span>
                 {qtd(t.id) === 0 && temas.length > 1 && (
                   <button class="link" onClick={() => setTemas((ts) => ts.filter((x) => x.id !== t.id))}>
                     remover
