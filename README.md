@@ -58,4 +58,4 @@ Para gerar o arquivo de um baralho do repositório: `npm run exportar-baralho --
 
 Push na `main` publica no GitHub Pages pelo workflow `.github/workflows/deploy.yml` (em *Settings → Pages*, a fonte deve ser **GitHub Actions**).
 
-Especificação e plano: `SPEC-FASE2.md` e `PLANO-FASE2.md`, central de baralhos (futuro) em `docs/futuro/central/`. Pendências: `PENDENCIAS.md`.
+Especificação e plano: `SPEC-FASE2.md` e `PLANO-FASE2.md`; a central de baralhos foi descartada (plano antigo em `docs/futuro/central/`, só histórico). Pendências: `PENDENCIAS.md`.

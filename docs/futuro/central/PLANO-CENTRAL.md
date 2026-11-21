@@ -1,6 +1,6 @@
 # tatino. — Plano de implementação da Fase 3
 
-> **Plano futuro (adiado em 16/11/2026).** Por ora não haverá central, papéis nem Firebase: cada pessoa cria os próprios baralhos (copiar e colar com uma IA) e envia cartões ou baralhos pelo WhatsApp. Este documento fica como plano para quando a central voltar à pauta.
+> **Descartado em 21/11/2026.** O tatino não vai ter central de baralhos, papéis nem Firebase: cada pessoa cria os próprios baralhos com uma IA e envia cartões ou baralhos por link ou arquivo. Este documento fica só como histórico.
 
 Cada etapa termina com testes passando, conferência no navegador em tamanho de celular, changelog e release. F0 não depende do Firebase e pode começar já.
 

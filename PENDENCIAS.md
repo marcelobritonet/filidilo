@@ -59,10 +59,10 @@ Atualizado em 21/11/2026. Ordem: mais recente em cima (número maior primeiro); 
 | P34 | Baralho de exemplo One Piece (Going Merry, Lore, Marinha) no lugar do antigo | ✅ Publicada na v2.1.0 (16/11) | — |
 | P33 | **v2.0.0** — cada um monta o seu: criar baralho num passo, IA por copiar e colar (Gemini, ChatGPT, Claude, Copilot), enviar cartão/baralho, corrigir cartão com IA, Estudar por tempo ou até acertar, novas respostas e "Não sei", incentivo a criar mais cartões; Gemini direto, reportes e "cai na prova" removidos | ✅ Publicada (16/11) | — |
 | P32 | E7 (sincronização pelo Drive) substituída pela fase 3; sincronização de progresso adiada (C10) | Informativo | — |
-| P31 | **Futuro — Central de baralhos** (Firebase, papéis, sugestões, despublicar): plano em `docs/futuro/central/SPEC-CENTRAL.md` e `PLANO-CENTRAL.md` | ⏸ Adiado (16/11) | Marcelo decide quando retomar |
-| P30 | Central: cadastrar admin e criadora | ⏸ Futuro | Marcelo |
-| P29 | Central: segredo de publicação do Firebase no GitHub | ⏸ Futuro | Marcelo |
-| P28 | Central: criar projeto Firebase (Spark), Auth e Firestore | ⏸ Futuro | Marcelo |
+| P31 | ~~Central de baralhos~~ (Firebase, papéis, sugestões, despublicar) | ❌ Descartada (21/11): o tatino não vai ter central de baralhos. Baralhos continuam só no aparelho, compartilhados por link ou arquivo. Plano antigo guardado em `docs/futuro/central/` só como histórico | — |
+| P30 | ~~Central: cadastrar admin e criadora~~ | ❌ Descartada com a central (P31, 21/11) | — |
+| P29 | ~~Central: segredo de publicação do Firebase no GitHub~~ | ❌ Descartada com a central (P31, 21/11) | — |
+| P28 | ~~Central: criar projeto Firebase (Spark), Auth e Firestore~~ | ❌ Descartada com a central (P31, 21/11) | — |
 | P27 | E6 Avaliação da instrução com PDFs de aula reais (rodar numa IA e medir % de cartões válidos) | ✅ Feito (16/11) | Claude + Marcelo |
 | P26 | Botão "Abrir baralho recebido" removido a pedido do Marcelo | ✅ v1.6.1 (15/11) | Claude |
 | P25 | Testar o Compartilhar → tatino. no Android dela (app instalado) — agora é o único jeito de receber baralho | ✅ Funcionou, enviando e recebendo (16/11) | Marcelo / estudante |
@@ -75,7 +75,7 @@ Atualizado em 21/11/2026. Ordem: mais recente em cima (número maior primeiro); 
 | P18 | Fase 2 · E3 Compartilhar e atualizar baralho por arquivo | ✅ Publicada na v1.3.0 (15/11) | Claude |
 | P17 | Fase 2 · E2 Editor de cartões + colar lista | ✅ Publicada (15/11) | Claude |
 | P16 | Fase 2 · E1 Vários baralhos | ✅ Publicada (15/11) | Claude |
-| P15 | Projeto no Google Cloud para a sincronização (E7) | ⏸ Substituída pelo projeto Firebase (P28) | — |
+| P15 | Projeto no Google Cloud para a sincronização (E7) | ❌ Não se aplica: substituída pelo Firebase da central, que foi descartada (P31) | — |
 | P14 | Chave do Gemini no app | ⏸ Não se aplica: Gemini direto removido na v1.8 (copiar e colar não precisa de chave) | — |
 | P13 | Fase 2: aprovar SPEC-FASE2.md e PLANO-FASE2.md | ✅ Aprovado (15/11) | Marcelo |
 | P8 | Entrega 1: app + baralho de exemplo | ✅ Publicada | Claude |

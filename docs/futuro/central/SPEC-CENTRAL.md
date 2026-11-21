@@ -1,6 +1,6 @@
 # tatino. — Especificação da Fase 3: a central de baralhos
 
-> **Plano futuro (adiado em 16/11/2026).** Por ora não haverá central, papéis nem Firebase: cada pessoa cria os próprios baralhos (copiar e colar com uma IA) e envia cartões ou baralhos pelo WhatsApp. Este documento fica como plano para quando a central voltar à pauta.
+> **Descartado em 21/11/2026.** O tatino não vai ter central de baralhos, papéis nem Firebase: cada pessoa cria os próprios baralhos com uma IA e envia cartões ou baralhos por link ou arquivo. Este documento fica só como histórico.
 
 Uma **central** pública, dentro do app, onde qualquer pessoa adiciona baralhos ao aparelho sem criar conta. A criadora (esposa do Marcelo) gera os baralhos com o Gemini e publica. O Marcelo administra: despublica, exclui e aprova as sugestões dos estudantes.
 
