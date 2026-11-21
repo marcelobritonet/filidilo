@@ -52,7 +52,27 @@ export function App() {
   const {
     needRefresh: [atualizar],
     updateServiceWorker,
-  } = useRegisterSW()
+  } = useRegisterSW({
+    // O app instalado fica aberto em segundo plano e não navega de novo, então o navegador
+    // não procura versão nova sozinho. Procura ao voltar para o app e a cada hora.
+    onRegisteredSW(_url, registro) {
+      if (!registro) return
+      const procurar = () => {
+        if (navigator.onLine) registro.update().catch(() => {})
+      }
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') procurar()
+      })
+      setInterval(procurar, 60 * 60 * 1000)
+    },
+  })
+
+  // Na tela inicial não há nada a perder: aplica a versão nova sem esperar o toque em "Atualizar".
+  // Nas outras telas (sessão, editor…) o aviso continua, para não recarregar no meio do uso.
+  const naInicial = pilha.length === 1 && pilha[0].nome === 'baralhos'
+  useEffect(() => {
+    if (atualizar && naInicial) updateServiceWorker(true)
+  }, [atualizar, naInicial])
 
   useEffect(() => {
     history.replaceState({ n: 0 }, '')

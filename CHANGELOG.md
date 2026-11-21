@@ -2,6 +2,14 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.5.1] — 2026-11-21
+
+**A versão nova chega sozinha.** Quem já tinha o app aberto continuava na versão antiga até tocar em "Atualizar".
+
+### Corrigido
+- O app procura versão nova ao voltar para ele e a cada hora, sem precisar recarregar.
+- Na tela inicial, a versão nova entra sozinha. Nas outras telas (sessão, editor…) aparece o aviso "Atualizar", para não recarregar no meio do uso.
+
 ## [3.5.0] — 2026-11-21
 
 **Já tem as perguntas? Só falta formatar.** Quem já tem perguntas e respostas, em qualquer formato, pode colá-las em Criar com IA e pedir à IA que só as converta nos cartões do tatino, sem inventar conteúdo.

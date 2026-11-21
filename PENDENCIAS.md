@@ -60,4 +60,5 @@ Atualizado em 21/11/2026.
 | P60 | Ligar o link em produção: conta Cloudflare, token `tatino-github` (vence em 1 ano, 11/2027), segredos `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID`, worker em `https://tatino-links.britin.workers.dev` e variável `VITE_LINKS_URL` | ✅ Feito (21/11). Quando o token vencer, o deploy do worker falha: criar outro e trocar o segredo | — |
 | P61 | Testar envio e abertura por link e QR entre dois celulares | ✅ Funcionou (21/11) | — |
 | P62 | Criar com IA · Modo "Já tenho as perguntas" (a IA só formata perguntas e respostas prontas, em qualquer formato) | ✅ Publicada na v3.5.0 (21/11) | Claude |
+| P64 | Versão nova não aparecia para quem já tinha o app aberto (service worker esperando o toque em "Atualizar"). Correção: procura versão ao voltar para o app e a cada hora, e aplica sozinha na tela inicial | ✅ Publicada na v3.5.1 (21/11). Quem está na 3.4 precisa tocar "Atualizar" uma última vez | Claude |
 | P52 | v3 · E7 Testar o fluxo novo com gente de verdade (um baralho com PDF de aula e um de assunto livre) | A fazer, depois da publicação | Marcelo / estudante |
