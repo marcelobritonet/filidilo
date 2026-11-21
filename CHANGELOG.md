@@ -2,6 +2,13 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.8.2] — 2026-11-21
+
+**A folha de resultado com a cara certa.** A v3.8.1 saiu sem os estilos novos.
+
+### Corrigido
+- A pergunta na folha de resultado aparece num bloco discreto, separado da resposta, e a alça mostra o texto "Ver o cartão" / "Ver o resultado" num tamanho fácil de tocar.
+
 ## [3.8.1] — 2026-11-21
 
 **A pergunta continua à vista.** Depois de responder, a folha de resultado cobria o cartão e não dava mais para ler a pergunta.
