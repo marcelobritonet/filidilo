@@ -2,6 +2,18 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.6.0] — 2026-11-21
+
+**Complete a frase.** Novo tipo de cartão com lacunas, como "A Terra gira em torno do ____." E, no estudo, dá para corrigir um cartão você mesmo, sem IA.
+
+### Novo
+- **Cartão de lacunas**: escreva `____` onde a palavra falta e a resposta de cada lacuna (com `/` para sinônimos, ex.: "Sol/astro-rei"). Nos níveis do zero a boas noções, você escolhe a palavra entre alternativas, uma lacuna por vez. Do bastante ao extremo, pensa na resposta e revela.
+- A IA também cria cartões de lacunas (cerca de 10% no modo misto e também no modo teoria), e o editor de cartão ganhou o tipo "Lacunas".
+- **Corrigir eu mesmo**: no estudo, "Corrigir cartão" abre o editor; ao salvar, você volta à sessão com o cartão já corrigido.
+
+### Corrigido
+- Ao receber um baralho igual ao que você já tem, o app mostra "Baralho recebido · Ele já está em Meus baralhos" com o botão "Abrir baralho", em vez de um resumo vazio.
+
 ## [3.5.1] — 2026-11-21
 
 **A versão nova chega sozinha.** Quem já tinha o app aberto continuava na versão antiga até tocar em "Atualizar".
