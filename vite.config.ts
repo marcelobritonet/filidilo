@@ -15,7 +15,7 @@ export default defineConfig({
     preact(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['icon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['icon.svg', 'apple-touch-icon.png', 'favicon-32.png', 'favicon-16.png', 'favicon.ico'],
       manifest: {
         name: 'tatino. — flashcards',
         short_name: 'tatino.',
@@ -46,7 +46,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2,json}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,json}'],
         navigateFallback: `${base}index.html`,
         importScripts: ['sw-receber.js'],
       },

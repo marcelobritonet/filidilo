@@ -2,6 +2,13 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.11.2] — 2026-11-21
+
+**O ícone do tatino. aparece na aba de todos os navegadores.**
+
+### Corrigido
+- O Safari e alguns leitores de link não usam ícone em SVG e mostravam uma letra ou um globo na aba. Agora o app também tem o ícone em PNG (16 e 32 px) e em `favicon.ico`, e o endereço dos ícones mudou para o navegador não reaproveitar o ícone antigo guardado.
+
 ## [3.11.1] — 2026-11-21
 
 **O app reconhece quando a IA faz perguntas com exemplos.**

@@ -4,7 +4,7 @@ Atualizado em 21/11/2026. Ordem: mais recente em cima (número maior primeiro); 
 
 | # | Item | Status | Quem decide / faz |
 |---|---|---|---|
-| P86 | Favicon com o ícone do tatino. em todos os navegadores (PNG 16/32 e `favicon.ico`, além do SVG); kit `marketing/` antigo (onda azul-marinho) descartado | ✅ Feito na v3.11.2 (21/11), falta publicar | Claude |
+| P86 | Favicon com o ícone do tatino. em todos os navegadores (PNG 16/32 e `favicon.ico`, além do SVG); kit `marketing/` antigo (onda azul-marinho) descartado | ✅ Publicada na v3.11.2 (21/11) | Claude |
 | P85 | Testar num Android de verdade: compartilhar o resultado no WhatsApp (imagem + texto com link) e no story do Instagram (imagem e adesivo de link); mandar um desafio para outra pessoa abrir sem ter o app | A fazer, depois de publicar a v3.11.0 | Marcelo |
 | P84 | Indicar o tatino. (Meus baralhos e Aparência) e "Sua semana" em Meus baralhos (domingo a terça; o selo de dias abre a qualquer hora), com imagem para compartilhar | ✅ Testada no navegador e publicada na v3.11.0 (21/11) | Claude |
 | P83 | Desafiar amigos com um cartão: imagem com a pergunta e QR; junto vai o cartão ou o baralho; link de 7 dias (worker aceita `?validade=7d`, o envio normal continua 2h); quem abre responde antes de salvar. Cálculo fica de fora. Ao publicar, o push em `worker/` reimplanta o worker | ✅ Testada no navegador com o worker local (gerar, abrir o link, responder, salvar) e publicada na v3.11.0 (21/11) | Claude |
