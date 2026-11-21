@@ -134,7 +134,10 @@ export function ImportarCartoes({ recebido, baralhos, nav, fechar }: { recebido:
           Guardar em
           <select value={destino} onChange={(e) => setDestino((e.target as HTMLSelectElement).value)}>
             {baralhos.map((b) => (
-              <option value={b.id}>{b.titulo}</option>
+              <option value={b.id}>
+                {b.titulo}
+                {b.arquivadoEm ? ' (arquivado)' : ''}
+              </option>
             ))}
             <option value={NOVO}>Novo baralho: {recebido.origem}</option>
           </select>

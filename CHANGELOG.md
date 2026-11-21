@@ -2,6 +2,15 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.10.0] — 2026-11-21
+
+**Arquivar baralho: terminou de estudar, tira da lista sem perder nada.**
+
+### Novo
+- Em Configurar baralho, "Arquivar baralho" (acima de "Excluir baralho"), com Desfazer no aviso. O baralho sai de Meus baralhos, mas os cartões e o progresso ficam guardados.
+- Em Meus baralhos, os arquivados ficam numa linha discreta no fim, "Arquivados (N)", que abre uma lista compacta. Um baralho arquivado abre e estuda normalmente, e mostra "Baralho arquivado · Desarquivar".
+- Arquivar vale só para este aparelho: ao enviar o baralho, quem recebe ganha ele na lista principal. O backup guarda quais estão arquivados.
+
 ## [3.9.1] — 2026-11-21
 
 **O ChatGPT deixou de ser recusado na hora de colar a resposta.**

@@ -18,7 +18,9 @@ interface ArquivoBaralho {
  * alguns tipos de arquivo (JSON não está entre eles); o conteúdo continua JSON.
  */
 export function arquivoDoBaralho(b: Baralho, progresso?: Progresso): { nome: string; texto: string } {
-  const envelope: ArquivoBaralho = { app: 'tatino', tipo: 'baralho', formato: 2, baralho: b, ...(progresso && { progresso }) }
+  // Arquivar é só deste aparelho: quem recebe ganha o baralho na lista principal.
+  const { arquivadoEm: _arq, ...baralho } = b
+  const envelope: ArquivoBaralho = { app: 'tatino', tipo: 'baralho', formato: 2, baralho, ...(progresso && { progresso }) }
   const titulo = nomeArquivo(b.titulo) || 'baralho'
   return { nome: `${titulo}${progresso ? ' com progresso' : ''} (Tatino).txt`, texto: JSON.stringify(envelope) }
 }

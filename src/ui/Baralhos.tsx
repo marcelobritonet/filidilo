@@ -24,6 +24,9 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const [cartoesRecebidos, setCartoesRecebidos] = useState<CartoesRecebidos | null>(null)
   const [erro, setErro] = useState('')
   const [abrindoLink, setAbrindoLink] = useState(abriuPorLink)
+  const [verArquivados, setVerArquivados] = useState(false)
+  const ativos = baralhos.filter((b) => !b.arquivadoEm)
+  const arquivados = baralhos.filter((b) => b.arquivadoEm)
 
   // Chegou pelo "Compartilhar" do Android (WhatsApp → Compartilhar → tatino.) ou por um link (?b=<codigo>)?
   useEffect(() => {
@@ -84,7 +87,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
       <InstalarCard />
 
       <ul class="lista-baralhos">
-        {baralhos.map((b) => {
+        {ativos.map((b) => {
           const total = b.cartoes.length
           const dom = estados ? b.cartoes.filter((c) => dominado(estados.get(chave(b.id, c.id)))).length : 0
           return (
@@ -106,6 +109,28 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         })}
         {!baralhos.length && <p class="dica centro">Nenhum baralho ainda. Comece acima ou crie o primeiro abaixo.</p>}
       </ul>
+
+      {arquivados.length > 0 && (
+        <section class="arquivados">
+          <button class="link" aria-expanded={verArquivados} onClick={() => setVerArquivados((v) => !v)}>
+            Arquivados ({arquivados.length}) {verArquivados ? '▾' : '▸'}
+          </button>
+          {verArquivados && (
+            <ul>
+              {arquivados.map((b) => (
+                <li>
+                  <button class="link" onClick={() => nav.ir({ nome: 'baralho', id: b.id })}>
+                    {b.titulo}
+                  </button>
+                  <span class="dica">
+                    {b.cartoes.length} {b.cartoes.length === 1 ? 'cartão' : 'cartões'}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       <section class="acoes">
         <button class="btn secundario" onClick={() => aprender('botao')}>

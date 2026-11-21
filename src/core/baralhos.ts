@@ -75,6 +75,11 @@ export async function excluir(id: string): Promise<Baralho | undefined> {
   return b
 }
 
+/** Tira o baralho da lista principal sem apagar nada (cartões e progresso ficam). */
+export const arquivar = (b: Baralho) => salvar({ ...b, arquivadoEm: Date.now() })
+
+export const desarquivar = (b: Baralho) => salvar({ ...b, arquivadoEm: undefined })
+
 export async function restaurar(b: Baralho): Promise<void> {
   await db.baralhos.put(b)
 }

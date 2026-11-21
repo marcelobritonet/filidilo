@@ -178,4 +178,6 @@ export interface Baralho {
   cartoes: Cartao[]
   criadoEm?: number
   atualizadoEm?: number
+  /** Quando foi arquivado: some de Meus baralhos (fica no grupo Arquivados), com cartões e progresso guardados. */
+  arquivadoEm?: number
 }

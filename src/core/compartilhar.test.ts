@@ -36,6 +36,16 @@ describe('compartilhar baralho', () => {
     expect(() => lerBaralho(JSON.stringify({ ...base(), cartoes: [{ id: 'x', tipo: 'vf', tema: 'zz', frente: 'f', resposta: true }] }))).toThrow(/problema/)
   })
 
+  it('arquivado não vai no arquivo; receber atualização de um baralho arquivado aqui mantém arquivado', async () => {
+    const lido = lerBaralho(arquivoDoBaralho({ ...base(), arquivadoEm: 123 }).texto)
+    expect(lido.arquivadoEm).toBeUndefined()
+    await salvar({ ...base(), arquivadoEm: 123 })
+    const novo = { ...base(), cartoes: [...base().cartoes, { id: 'd', tipo: 'conceito' as const, tema: 'g', frente: 'D?', verso: 'd' }] }
+    const b = await aplicar(await planejar(novo))
+    expect(b.arquivadoEm).toBe(123)
+    expect(b.cartoes.length).toBe(4)
+  })
+
   it('baralho novo entra inteiro, marcado como importado', async () => {
     const p = await planejar(base())
     expect(p.atual).toBeUndefined()

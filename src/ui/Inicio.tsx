@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'preact/hooks'
+import { desarquivar } from '../core/baralhos'
 import type { Filtro } from '../core/fila'
 import { chave, dominado, vencido } from '../core/srs'
 import type { Baralho } from '../core/types'
@@ -94,6 +95,12 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
     })
   }
 
+  const desarquivarAqui = async () => {
+    evento('baralho_desarquivado', { cartoes: total })
+    await desarquivar(baralho)
+    nav.mudou()
+    nav.avisar({ texto: `“${baralho.titulo}” voltou para Meus baralhos.` })
+  }
 
   return (
     <main class="tela inicio">
@@ -115,6 +122,14 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
             </button>
           )}
         </div>
+        {baralho.arquivadoEm && (
+          <p class="dica arquivado-aviso">
+            Baralho arquivado ·{' '}
+            <button class="link" onClick={desarquivarAqui}>
+              Desarquivar
+            </button>
+          </p>
+        )}
       </header>
 
       {total === 0 ? (

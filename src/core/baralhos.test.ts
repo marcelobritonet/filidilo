@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { baralhosDeFabrica } from '../decks/carregar'
 import { importar } from './backup'
-import { criar, duplicar, excluir, listar, obter, restaurar, salvar, semear } from './baralhos'
+import { arquivar, criar, desarquivar, duplicar, excluir, listar, obter, restaurar, salvar, semear } from './baralhos'
 import { db } from './db'
 import { registrar } from './srs'
 
@@ -27,6 +27,22 @@ describe('baralhos no aparelho', () => {
     await excluir(fabrica.id)
     await semear([semente])
     expect(await listar()).toEqual([])
+  })
+
+  it('arquivar guarda o baralho sem apagar nada; desarquivar devolve; versão de fábrica nova não desarquiva', async () => {
+    await semear([semente])
+    await registrar(`${fabrica.id}/${fabrica.cartoes[0].id}`, 3, 'prova')
+    await arquivar((await obter(fabrica.id))!)
+    const arq = (await obter(fabrica.id))!
+    expect(arq.arquivadoEm).toBeGreaterThan(0)
+    expect(arq.cartoes.length).toBe(fabrica.cartoes.length)
+    expect((await db.estados.get(`${fabrica.id}/${fabrica.cartoes[0].id}`))?.ultimaNota).toBe(3)
+
+    await semear([() => ({ baralho: { ...structuredClone(fabrica), versao: fabrica.versao + 1 } })])
+    expect((await obter(fabrica.id))!.arquivadoEm).toBe(arq.arquivadoEm)
+
+    await desarquivar((await obter(fabrica.id))!)
+    expect((await obter(fabrica.id))!.arquivadoEm).toBeUndefined()
   })
 
   it('quem já usava o app recebe o baralho novo uma vez, sem perder os seus', async () => {

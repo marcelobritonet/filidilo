@@ -1,5 +1,5 @@
 import { useState } from 'preact/hooks'
-import { duplicar, excluir, novoId, restaurar, salvar } from '../core/baralhos'
+import { arquivar, desarquivar, duplicar, excluir, novoId, restaurar, salvar } from '../core/baralhos'
 import { NIVEIS, normalizarNivel, type Baralho, type Nivel, type Objetivo, type Tema } from '../core/types'
 import type { Navegacao } from './App'
 import { evento } from '../core/telemetria'
@@ -87,6 +87,29 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
       },
     })
     history.go(-2) // sai da configuração e da tela do baralho excluído
+  }
+
+  /** Arquivar volta para Meus baralhos (o baralho sai da lista); desarquivar fica aqui. */
+  const alternarArquivo = async () => {
+    const cartoes = baralho.cartoes.length
+    if (baralho.arquivadoEm) {
+      evento('baralho_desarquivado', { cartoes })
+      await desarquivar(baralho)
+      nav.mudou()
+      nav.avisar({ texto: `“${baralho.titulo}” voltou para Meus baralhos.` })
+      return
+    }
+    evento('baralho_arquivado', { cartoes })
+    await arquivar(baralho)
+    nav.mudou()
+    nav.avisar({
+      texto: `“${baralho.titulo}” foi arquivado.`,
+      desfazer: async () => {
+        await desarquivar(baralho)
+        nav.mudou()
+      },
+    })
+    history.go(-2) // sai da configuração e da tela do baralho
   }
 
   const [enviando, setEnviando] = useState(false)
@@ -184,6 +207,10 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
         <button class="btn secundario" onClick={fazerCopia}>
           Duplicar baralho
         </button>
+        <button class="btn secundario" onClick={alternarArquivo}>
+          {baralho.arquivadoEm ? 'Desarquivar baralho' : 'Arquivar baralho'}
+        </button>
+        {!baralho.arquivadoEm && <p class="dica">Arquivar tira o baralho de Meus baralhos sem apagar os cartões nem o progresso.</p>}
         {!confirmarExclusao ? (
           <button class="btn secundario perigo" onClick={() => setConfirmarExclusao(true)}>
             Excluir baralho

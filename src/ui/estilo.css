@@ -188,6 +188,13 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
 .baralho-item .titulo { font-family: var(--font-display); font-size: 22px; font-weight: 700; line-height: 1.25; }
 .baralho-item .detalhe { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; color: var(--text-muted); font-size: 15px; }
 .baralho-item .num { color: var(--text-muted); font-size: 14px; }
+/* Arquivados: uma linha discreta no fim da lista; abre uma lista compacta */
+.arquivados { margin: 6px 0 0; font-size: 14px; }
+.arquivados > .link { font-size: 14px; color: var(--text-muted); }
+.arquivados ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
+.arquivados li { display: flex; gap: 8px; align-items: baseline; justify-content: space-between; }
+.arquivados li .link { font-size: 15px; text-align: left; }
+.arquivados li .dica, .arquivado-aviso { margin: 0; font-size: 14px; }
 
 .rodape { display: grid; gap: 4px; margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--border); }
 
