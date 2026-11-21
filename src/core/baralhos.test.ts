@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { baralhosDeFabrica } from '../decks/carregar'
 import { importar } from './backup'
-import { arquivar, criar, desarquivar, duplicar, excluir, listar, obter, restaurar, salvar, semear } from './baralhos'
+import { arquivar, criar, desarquivar, duplicar, excluir, listar, obter, ordenar, restaurar, salvar, semear } from './baralhos'
 import { db } from './db'
 import { registrar } from './srs'
 
@@ -112,5 +112,31 @@ describe('baralhos no aparelho', () => {
     const b = await obter('antigo')
     expect(b).toMatchObject({ titulo: 'Antigo', prova: '2026-12-01' })
     expect(b?.objetivo).toBeUndefined()
+  })
+
+  it('ordem escolhida: alfabética até a pessoa organizar; novos no topo; desfazer volta ao lugar', async () => {
+    const a = await criar('Alemão')
+    const b = await criar('Biologia')
+    const c = await criar('Cálculo')
+    expect((await listar()).map((x) => x.titulo)).toEqual(['Alemão', 'Biologia', 'Cálculo'])
+
+    await ordenar([c.id, 'nao-existe', a.id, b.id])
+    expect((await listar()).map((x) => x.titulo)).toEqual(['Cálculo', 'Alemão', 'Biologia'])
+    expect(JSON.parse((await db.meta.get('ordem-baralhos'))!.valor)).toEqual([c.id, a.id, b.id])
+
+    await criar('Zoologia')
+    expect((await listar()).map((x) => x.titulo)).toEqual(['Zoologia', 'Cálculo', 'Alemão', 'Biologia'])
+
+    const removido = await excluir(a.id)
+    await restaurar(removido!)
+    expect((await listar()).map((x) => x.titulo)).toEqual(['Zoologia', 'Cálculo', 'Alemão', 'Biologia'])
+  })
+
+  it('ordenar sem citar um baralho (ex.: arquivado) o manda para o fim, não para o topo', async () => {
+    const a = await criar('Alemão')
+    const b = await criar('Biologia')
+    const arq = await arquivar(await criar('Arquivado'))
+    await ordenar([b.id, a.id])
+    expect((await listar()).map((x) => x.id)).toEqual([b.id, a.id, arq.id])
   })
 })

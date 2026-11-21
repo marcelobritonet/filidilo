@@ -33,7 +33,41 @@ export async function semear(sementes: Semente[]): Promise<void> {
   })
 }
 
-export const listar = async () => (await db.baralhos.toArray()).sort((a, z) => a.titulo.localeCompare(z.titulo, 'pt-BR'))
+const CHAVE_ORDEM = 'ordem-baralhos'
+
+/**
+ * Ordem da lista. Sem ordem salva, alfabética. Com ordem, os baralhos que não estão nela
+ * (criados, recebidos ou duplicados depois) vêm no topo, os mais novos primeiro; depois os da ordem.
+ */
+export function aplicarOrdem(baralhos: Baralho[], ordem: string[] | null): Baralho[] {
+  const alfabetica = [...baralhos].sort((a, z) => a.titulo.localeCompare(z.titulo, 'pt-BR'))
+  if (!ordem) return alfabetica
+  const pos = new Map(ordem.map((id, i) => [id, i]))
+  const novos = alfabetica.filter((b) => !pos.has(b.id)).sort((a, z) => (z.criadoEm ?? 0) - (a.criadoEm ?? 0))
+  const ordenados = alfabetica.filter((b) => pos.has(b.id)).sort((a, z) => pos.get(a.id)! - pos.get(z.id)!)
+  return [...novos, ...ordenados]
+}
+
+async function lerOrdem(): Promise<string[] | null> {
+  const m = await db.meta.get(CHAVE_ORDEM)
+  try {
+    const v = m && JSON.parse(m.valor)
+    return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : null
+  } catch {
+    return null
+  }
+}
+
+export const listar = async () => aplicarOrdem(await db.baralhos.toArray(), await lerOrdem())
+
+/** Grava a ordem escolhida pela pessoa (só deste aparelho). Ids que não existem ficam de fora. */
+export async function ordenar(ids: string[]): Promise<void> {
+  const existem = new Set(await db.baralhos.toCollection().primaryKeys())
+  const ordem = [...new Set(ids)].filter((id) => existem.has(id))
+  // Quem não foi citado (ex.: arquivados) vai para o fim, para não voltar ao topo como novo.
+  const resto = (await db.baralhos.toArray()).filter((b) => !ordem.includes(b.id)).sort((a, z) => a.titulo.localeCompare(z.titulo, 'pt-BR'))
+  await db.meta.put({ chave: CHAVE_ORDEM, valor: JSON.stringify([...ordem, ...resto.map((b) => b.id)]) })
+}
 
 export const obter = (id: string) => db.baralhos.get(id)
 

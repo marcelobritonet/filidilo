@@ -15,6 +15,8 @@ import { iniciarMarcos, painel, type Semana } from '../core/conquistas'
 import { pecaConvite, pecaSemana } from '../core/artes'
 import { CompartilharImagem, urlApp, type OpcaoImagem } from './CompartilharImagem'
 
+import { ordenar } from '../core/baralhos'
+import { OrdenarBaralhos } from './OrdenarBaralhos'
 const SEM_INTERNET = 'Precisa de internet para falar com a IA.'
 
 /** Faixa do texto digitado, só para o evento: curto, médio ou longo. */
@@ -33,7 +35,10 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const [verArquivados, setVerArquivados] = useState(false)
   const [resumo, setResumo] = useState<{ sequencia: number; semana: Semana } | null>(null)
   const [compartilhar, setCompartilhar] = useState<{ opcoes: OpcaoImagem[]; onde: string } | null>(null)
-  const ativos = baralhos.filter((b) => !b.arquivadoEm)
+  // Modo Organizar: a lista local muda na hora; cada toque já grava a ordem.
+  const [organizando, setOrganizando] = useState<Baralho[] | null>(null)
+  const [mexeu, setMexeu] = useState(false)
+  const ativos = organizando ?? baralhos.filter((b) => !b.arquivadoEm)
   const arquivados = baralhos.filter((b) => b.arquivadoEm)
 
   // Chegou pelo "Compartilhar" do Android (WhatsApp → Compartilhar → tatino.) ou por um link (?b=<codigo>)?
@@ -92,6 +97,23 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const convidar = () => {
     evento('convite_aberto', { onde: 'baralhos' })
     setCompartilhar({ onde: 'convite', opcoes: [{ rotulo: 'Convite', peca: () => pecaConvite({ urlApp: urlApp() }) }] })
+  }
+
+  const mudarOrdem = (lista: Baralho[]) => {
+    setOrganizando(lista)
+    setMexeu(true)
+    ordenar(lista.map((b) => b.id)).catch(() => undefined)
+  }
+  const alternarOrganizar = () => {
+    if (!organizando) {
+      setMexeu(false)
+      return setOrganizando(ativos)
+    }
+    if (mexeu) {
+      evento('baralhos_ordenados', { total: organizando.length })
+      nav.mudou()
+    }
+    setOrganizando(null)
   }
 
   /** Abre o fluxo Aprender; sem internet, avisa e não abre. */
@@ -166,29 +188,41 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         </section>
       )}
 
-      <ul class="lista-baralhos">
-        {ativos.map((b) => {
-          const total = b.cartoes.length
-          const dom = estados ? b.cartoes.filter((c) => dominado(estados.get(chave(b.id, c.id)))).length : 0
-          return (
-            <li>
-              <button class="baralho-item cartao-acao" onClick={() => nav.ir({ nome: 'baralho', id: b.id })}>
-                <span class="titulo">{b.titulo}</span>
-                <span class="detalhe">
-                  {total} {total === 1 ? 'cartão' : 'cartões'}
-                </span>
-                <span class="barra" aria-hidden="true">
-                  <span style={{ width: `${total ? (100 * dom) / total : 0}%` }} />
-                </span>
-                <span class="num">
-                  {dom} de {total} dominados
-                </span>
-              </button>
-            </li>
-          )
-        })}
-        {!baralhos.length && <p class="dica centro">Nenhum baralho ainda. Comece acima ou crie o primeiro abaixo.</p>}
-      </ul>
+      {ativos.length >= 2 && (
+        <div class="organizar">
+          <button class="link" aria-pressed={!!organizando} onClick={alternarOrganizar}>
+            {organizando ? 'Pronto' : 'Organizar'}
+          </button>
+        </div>
+      )}
+
+      {organizando ? (
+        <OrdenarBaralhos baralhos={organizando} mudar={mudarOrdem} />
+      ) : (
+        <ul class="lista-baralhos">
+          {ativos.map((b) => {
+            const total = b.cartoes.length
+            const dom = estados ? b.cartoes.filter((c) => dominado(estados.get(chave(b.id, c.id)))).length : 0
+            return (
+              <li>
+                <button class="baralho-item cartao-acao" onClick={() => nav.ir({ nome: 'baralho', id: b.id })}>
+                  <span class="titulo">{b.titulo}</span>
+                  <span class="detalhe">
+                    {total} {total === 1 ? 'cartão' : 'cartões'}
+                  </span>
+                  <span class="barra" aria-hidden="true">
+                    <span style={{ width: `${total ? (100 * dom) / total : 0}%` }} />
+                  </span>
+                  <span class="num">
+                    {dom} de {total} dominados
+                  </span>
+                </button>
+              </li>
+            )
+          })}
+          {!baralhos.length && <p class="dica centro">Nenhum baralho ainda. Comece acima ou crie o primeiro abaixo.</p>}
+        </ul>
+      )}
 
       {arquivados.length > 0 && (
         <section class="arquivados">

@@ -2,6 +2,14 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.12.0] — 2026-11-21
+
+**Você escolhe a ordem dos baralhos.**
+
+### Novo
+- Em Meus baralhos, toque em "Organizar" (acima da lista) e arraste cada baralho pela alça ⠿ para pôr na frente os que mais usa. "Pronto" fecha. A ordem fica guardada neste aparelho. Com teclado, a alça sobe e desce com as setas.
+- Depois de organizar, baralho novo (criado, recebido ou duplicado) aparece no topo da lista. Quem nunca organizou continua vendo a lista em ordem alfabética.
+
 ## [3.11.2] — 2026-11-21
 
 **O ícone do tatino. aparece na aba de todos os navegadores.**

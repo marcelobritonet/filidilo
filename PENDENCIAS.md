@@ -4,6 +4,7 @@ Atualizado em 21/11/2026. Ordem: mais recente em cima (número maior primeiro); 
 
 | # | Item | Status | Quem decide / faz |
 |---|---|---|---|
+| P87 | Mudar a ordem de Meus baralhos: link discreto "Organizar" acima da lista (com 2+ baralhos) liga o arrasto: cada baralho ganha uma alça ⠿ para arrastar (com teclado, setas na alça); as setas ↑ ↓ da primeira versão saíram a pedido do Marcelo; "Pronto" fecha. A ordem fica só neste aparelho (não vai no backup nem no envio). Sem ordem escolhida, continua alfabética; baralho novo (criado, recebido, duplicado) entra no topo | ✅ Testada pelo Marcelo e publicada na v3.12.0 (21/11) | Claude |
 | P86 | Favicon com o ícone do tatino. em todos os navegadores (PNG 16/32 e `favicon.ico`, além do SVG); kit `marketing/` antigo (onda azul-marinho) descartado | ✅ Publicada na v3.11.2 (21/11) | Claude |
 | P85 | Testar num Android de verdade: compartilhar o resultado no WhatsApp (imagem + texto com link) e no story do Instagram (imagem e adesivo de link); mandar um desafio para outra pessoa abrir sem ter o app | A fazer, depois de publicar a v3.11.0 | Marcelo |
 | P84 | Indicar o tatino. (Meus baralhos e Aparência) e "Sua semana" em Meus baralhos (domingo a terça; o selo de dias abre a qualquer hora), com imagem para compartilhar | ✅ Testada no navegador e publicada na v3.11.0 (21/11) | Claude |
