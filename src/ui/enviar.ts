@@ -1,4 +1,5 @@
 import { arquivoDoBaralho, arquivoDosCartoes } from '../core/compartilhar'
+import { progressoDoBaralho, type Progresso } from '../core/progresso'
 import type { Baralho, Cartao } from '../core/types'
 
 /** O que vai ser enviado, por link ou arquivo (o texto é o mesmo JSON nos dois). */
@@ -33,13 +34,21 @@ export async function enviarArquivo(nome: string, texto: string, mensagem: strin
 export const MENSAGEM_ENVIO = 'Para abrir no tatino.: segure o arquivo → Compartilhar → tatino.'
 
 /** O baralho inteiro. */
-export function conteudoBaralho(b: Baralho): ConteudoEnvio {
-  const { nome, texto } = arquivoDoBaralho(b)
-  return { o_que: 'baralho', titulo: `Baralho “${b.titulo}”`, nome, texto, mensagem: `Baralho “${b.titulo}”. ${MENSAGEM_ENVIO}` }
+export function conteudoBaralho(b: Baralho, progresso?: Progresso): ConteudoEnvio {
+  const { nome, texto } = arquivoDoBaralho(b, progresso)
+  const titulo = `Baralho “${b.titulo}”${progresso ? ' com o progresso' : ''}`
+  return { o_que: 'baralho', titulo, nome, texto, mensagem: `${titulo}. ${MENSAGEM_ENVIO}` }
 }
 
 /** Um cartão (com o tema dele). */
 export function conteudoCartao(b: Baralho, c: Cartao): ConteudoEnvio {
   const { nome, texto } = arquivoDosCartoes(b, [c])
   return { o_que: 'cartao', titulo: 'Cartão do tatino.', nome, texto, mensagem: `Cartão do tatino. ${MENSAGEM_ENVIO}` }
+}
+
+/** O baralho com o progresso dela, para a caixa "Incluir meu progresso" (null se não estudou nada). */
+export async function conteudoBaralhoComProgresso(b: Baralho): Promise<{ conteudo: ConteudoEnvio; estudados: number } | null> {
+  const p = await progressoDoBaralho(b.id)
+  if (!p.estados.length) return null
+  return { conteudo: conteudoBaralho(b, p), estudados: p.estados.length }
 }

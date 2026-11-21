@@ -40,7 +40,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         const lido = lerRecebido(r.texto)
         avisarLink(true, lido.tipo)
         if (lido.tipo === 'cartoes') setCartoesRecebidos(lido)
-        else setPlano(await planejar(lido.baralho))
+        else setPlano(await planejar(lido.baralho, lido.progresso))
       } catch (err) {
         avisarLink(false)
         setErro((err as Error).message)
