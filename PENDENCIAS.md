@@ -66,4 +66,6 @@ Atualizado em 21/11/2026.
 | P66 | Sorteio mais justo: um só embaralhamento (Fisher–Yates) com gerador criptográfico em alternativas, lacunas, fila e cálculos; as lacunas usavam `sort(() => Math.random() - 0.5)`, que favorece algumas ordens | ✅ Publicada na v3.6.1 (21/11) | Claude |
 | P67 | Botão "Não sei" nas lacunas do nível fácil (mostra a frase completa e conta como erro) | ✅ Publicada na v3.6.2 (21/11) | Claude |
 | P68 | Bugs achados testando "Já tenho as perguntas": temas novos sumiam ao salvar Configurar baralho logo depois de criar cartões com IA; passo 2 citava PDF nesse modo; "1 cartões" | ✅ Publicada na v3.6.3 (21/11) | Claude |
+| P69 | "Já tenho as perguntas" também em Novo baralho? Hoje só existe em baralho → Configurar baralho → Criar com IA; quem quer um baralho só com as próprias perguntas precisa criar o baralho de outro jeito antes | Decidir | Marcelo |
+| P70 | Instrução de "Já tenho as perguntas": a lista "Escolha o tipo" não cita "lacunas", embora o formato da resposta descreva esse tipo (veio com a v3.6.0) | A fazer | Claude |
 | P52 | v3 · E7 Testar o fluxo novo com gente de verdade (um baralho com PDF de aula e um de assunto livre) | A fazer, depois da publicação | Marcelo / estudante |
