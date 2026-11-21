@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import { validar } from '../validar'
-import { EXEMPLOS, montarCorrecao, montarInstrucao, VERSAO_INSTRUCAO } from './instrucao'
+import { EXEMPLOS, montarCorrecao, montarInstrucao, montarInstrucaoFormatacao, VERSAO_INSTRUCAO } from './instrucao'
 import { extrairJson, lerPlano, lerResposta, parecePerguntas } from './resposta'
 
 const destino = { id: 'fis', titulo: 'Física', versao: 1, temas: [{ id: 'dinamica', nome: 'Dinâmica' }] }
 
 describe('instrução para o Gemini', () => {
+  it('modo formatar: inclui as perguntas coladas, proíbe invenção e pede naoConvertidos', () => {
+    const t = montarInstrucaoFormatacao({ texto: 'P: O que é inércia? R: resistência à mudança' })
+    expect(t).toContain('O que é inércia?')
+    expect(t).toContain('Não invente')
+    expect(t).toContain('naoConvertidos')
+    expect(t).toContain('SOMENTE')
+  })
+
   it('os exemplos da instrução passam no validador do app', () => {
     expect(validar({ id: 'x', titulo: 'x', versao: 1, temas: EXEMPLOS.temas, cartoes: EXEMPLOS.cartoes }, 200)).toEqual([])
   })
@@ -79,7 +87,7 @@ describe('lendo a resposta', () => {
 
 describe('instrução v3 (objetivo e cobertos)', () => {
   it('versão 3', () => {
-    expect(VERSAO_INSTRUCAO).toBe(3)
+    expect(VERSAO_INSTRUCAO).toBe(4)
   })
 
   it('com objetivo: seção, nível, foco, evitar (spoilers), descrição do tema e prioridade', () => {

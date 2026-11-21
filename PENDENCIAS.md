@@ -59,4 +59,5 @@ Atualizado em 21/11/2026.
 | P59 | Enviar baralho ou cartão por link e QR code (vale 2 horas; Cloudflare Worker + KV em `worker/`); arquivo continua como alternativa | ✅ Publicada na v3.4.0 (21/11) | Claude |
 | P60 | Ligar o link em produção: conta Cloudflare, token `tatino-github` (vence em 1 ano, 11/2027), segredos `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID`, worker em `https://tatino-links.britin.workers.dev` e variável `VITE_LINKS_URL` | ✅ Feito (21/11). Quando o token vencer, o deploy do worker falha: criar outro e trocar o segredo | — |
 | P61 | Testar envio e abertura por link e QR entre dois celulares | ✅ Funcionou (21/11) | — |
+| P62 | Criar com IA · Modo "Já tenho as perguntas" (a IA só formata perguntas e respostas prontas, em qualquer formato) | ✅ Publicada na v3.5.0 (21/11) | Claude |
 | P52 | v3 · E7 Testar o fluxo novo com gente de verdade (um baralho com PDF de aula e um de assunto livre) | A fazer, depois da publicação | Marcelo / estudante |

@@ -4,7 +4,7 @@ import type { Baralho, Cartao, Objetivo, Tema } from '../types'
 import { infoNivel } from '../types'
 import { jaCobertos } from './cobertos'
 
-export const VERSAO_INSTRUCAO = 3
+export const VERSAO_INSTRUCAO = 4
 
 export type Origem = 'pdf' | 'texto' | 'tema'
 export type Mistura = 'misto' | 'teoria' | 'calculo'
@@ -176,6 +176,42 @@ ${regrasTipos(fonte)}
 - Português do Brasil. Uma ideia por cartão. Pergunta que se entende sozinha, sem "segundo o texto".
 - Fiel ao material: não invente dados, valores ou fórmulas que não estejam nele${p.origem === 'tema' ? ' (aqui, fiel ao conhecimento estabelecido)' : ''}.
 ${p.origem === 'pdf' ? '- Em "fonte.pagina", ponha a página do PDF de onde saiu o cartão.\n' : ''}- ${prioridade}
+${regrasTextoJson()}
+
+## Exemplo (formato; não copie o conteúdo)
+\`\`\`json
+${JSON.stringify(EXEMPLOS, null, 1)}
+\`\`\`
+`
+}
+
+/** Pedido de formatação: a pessoa já tem perguntas e respostas (em qualquer formato) e a IA só as converte. */
+export function montarInstrucaoFormatacao(p: { texto: string; baralho?: Pick<Baralho, 'titulo' | 'temas'> & Partial<Pick<Baralho, 'objetivo' | 'cartoes'>> }): string {
+  const fonte = '"fonte": { "apostila": "Perguntas próprias" }'
+  const cobertos = jaCobertos({ temas: p.baralho?.temas ?? [], cartoes: p.baralho?.cartoes ?? [] })
+  const coberturaSecao = cobertos ? `## Já cobertos\nNão repita estes assuntos com a mesma pergunta:\n${cobertos}\n\n` : ''
+  return `Você vai converter perguntas e respostas que eu já tenho em flashcards para o app Tatino. Responda SOMENTE com um bloco de código JSON, sem texto antes ou depois.
+
+## Material
+As perguntas e respostas estão abaixo, entre as linhas ===. Podem estar em qualquer formato (lista, "P:/R:", tabela, texto corrido).
+===
+${p.texto.trim()}
+===
+
+## Como converter
+- Converta cada item em um cartão, mantendo o sentido e as palavras da pessoa. Não invente, não complete e não corrija conteúdo. Se a resposta original estiver incompleta ou incorreta, mantenha como está.
+- Um cartão por ideia. Escolha o tipo que melhor encaixa: "conceito" para pergunta aberta com resposta, "vf" para afirmação verdadeira ou falsa, "associacao" para pergunta com resposta curta (crie 5 ou 6 alternativas erradas plausíveis), "calculo" só se houver exercício com números.
+- Se um item não couber em nenhum tipo ou não tiver resposta, não crie cartão para ele: liste o texto dele em "naoConvertidos".
+- Se o item tiver fonte (página, aula), mantenha; senão use "Perguntas próprias".
+
+${coberturaSecao}## Formato da resposta
+{ "temas": [ { "id": "...", "nome": "..." } ], "cartoes": [ ... ], "naoConvertidos": [ "texto do item que ficou de fora" ] }
+Crie de 2 a 8 temas que organizem os itens (id em minúsculas, sem acento, com hífens).
+
+${regrasTipos(fonte)}
+
+## Regras
+- Português do Brasil. Pergunta que se entende sozinha, sem "segundo o texto".
 ${regrasTextoJson()}
 
 ## Exemplo (formato; não copie o conteúdo)

@@ -2,7 +2,7 @@ import { evento } from '../core/telemetria'
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { salvar } from '../core/baralhos'
 import { avaliarBaralho, type Avaliacao } from '../core/desempenho'
-import { EXEMPLOS, VERSAO_INSTRUCAO, montarCorrecao, montarInstrucao, type Mistura, type Origem } from '../core/ia/instrucao'
+import { EXEMPLOS, VERSAO_INSTRUCAO, montarCorrecao, montarInstrucao, montarInstrucaoFormatacao, type Mistura, type Origem } from '../core/ia/instrucao'
 import { extrairJson, lerResposta, type RespostaLida } from '../core/ia/resposta'
 import { infoNivel, normalizarNivel, type Baralho } from '../core/types'
 import type { Navegacao } from './App'
@@ -18,6 +18,10 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
   const [paginas, setPaginas] = useState('')
   const [texto, setTexto] = useState('')
   const [assunto, setAssunto] = useState(assuntoInicial ? `${assuntoInicial} (${baralho.titulo})` : '')
+  // Modo "formatar": a pessoa já tem perguntas e respostas, em qualquer formato, e a IA só as converte.
+  const [formatar, setFormatar] = useState(false)
+  const [perguntas, setPerguntas] = useState('')
+  const [naoConvertidos, setNaoConvertidos] = useState<string[]>([])
   const [quantidade, setQuantidade] = useState(20)
   const [mistura, setMistura] = useState<Mistura>('misto')
   const [copiado, setCopiado] = useState('')
@@ -45,28 +49,34 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
   const temSugestao = !!avaliacao && avaliacao.sugestao !== 'manter' && !!avaliacao.nivel
   const nivelUsado = temSugestao && usarSugestao ? avaliacao!.nivel : nivelAtual
 
-  const materialOk = origem === 'pdf' || (origem === 'texto' ? texto.trim().length > 40 : assunto.trim().length > 3)
+  const materialOk = formatar
+    ? perguntas.trim().length > 20
+    : origem === 'pdf' || (origem === 'texto' ? texto.trim().length > 40 : assunto.trim().length > 3)
   const instrucao = useMemo(
     () =>
-      montarInstrucao({
-        origem,
-        nomePdf,
-        paginas,
-        texto,
-        assunto,
-        quantidade,
-        mistura,
-        baralho: {
-          titulo: baralho.titulo,
-          temas: baralho.temas,
-          objetivo: baralho.objetivo && nivelUsado ? { ...baralho.objetivo, nivel: nivelUsado } : baralho.objetivo,
-          cartoes: baralho.cartoes,
-        },
-        temaPrioritario: temaId,
-      }),
-    [origem, nomePdf, paginas, texto, assunto, quantidade, mistura, baralho, temaId, nivelUsado],
+      formatar
+        ? montarInstrucaoFormatacao({ texto: perguntas, baralho })
+        : montarInstrucao({
+            origem,
+            nomePdf,
+            paginas,
+            texto,
+            assunto,
+            quantidade,
+            mistura,
+            baralho: {
+              titulo: baralho.titulo,
+              temas: baralho.temas,
+              objetivo: baralho.objetivo && nivelUsado ? { ...baralho.objetivo, nivel: nivelUsado } : baralho.objetivo,
+              cartoes: baralho.cartoes,
+            },
+            temaPrioritario: temaId,
+          }),
+    [formatar, perguntas, origem, nomePdf, paginas, texto, assunto, quantidade, mistura, baralho, temaId, nivelUsado],
   )
-  const fontePadrao = origem === 'pdf' ? nomePdf.trim() || 'Gerado por IA' : origem === 'texto' ? 'Texto colado' : 'Gerado por IA'
+  const fontePadrao = formatar
+    ? 'Perguntas próprias'
+    : origem === 'pdf' ? nomePdf.trim() || 'Gerado por IA' : origem === 'texto' ? 'Texto colado' : 'Gerado por IA'
   const comObjetivo = !!baralho.objetivo
 
   const copiar = async (conteudo: string, qual: string) => {
@@ -82,7 +92,10 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
   const ler = () => {
     setErroLeitura('')
     try {
-      const r = lerResposta(extrairJson(resposta), baralho, fontePadrao)
+      const dados = extrairJson(resposta)
+      const r = lerResposta(dados, baralho, fontePadrao)
+      const fora = (dados as { naoConvertidos?: unknown })?.naoConvertidos
+      if (Array.isArray(fora)) setNaoConvertidos((ant) => [...ant, ...fora.filter((x): x is string => typeof x === 'string')])
       const exemplo = new Set(EXEMPLOS.cartoes.map((c) => ('frente' in c ? c.frente : c.titulo)))
       if (r.cartoes.every((c) => exemplo.has('frente' in c.cartao ? c.cartao.frente : c.cartao.titulo)))
         throw new Error('Você colou a instrução. Cole a resposta que a IA deu.')
@@ -167,6 +180,26 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
 
       <section class="bloco passo">
         <h2><span class="num-passo">1</span> Material</h2>
+        <div class="segmentado" role="radiogroup" aria-label="Modo">
+          <button role="radio" aria-checked={!formatar} class={!formatar ? 'ativo' : ''} onClick={() => setFormatar(false)}>
+            Criar do zero
+          </button>
+          <button role="radio" aria-checked={formatar} class={formatar ? 'ativo' : ''} onClick={() => setFormatar(true)}>
+            Já tenho as perguntas
+          </button>
+        </div>
+        {formatar ? (
+          <label class="campo">
+            Perguntas e respostas
+            <textarea
+              rows={8}
+              value={perguntas}
+              placeholder={'Cole aqui, em qualquer formato:\nQual a unidade de força? N\nP: O que é inércia? R: resistência à mudança de movimento'}
+              onInput={(e) => setPerguntas((e.target as HTMLTextAreaElement).value)}
+            />
+          </label>
+        ) : (
+          <>
         <div class="segmentado" role="radiogroup" aria-label="Material">
           {(['pdf', 'texto', 'tema'] as Origem[]).map((o) => (
             <button role="radio" aria-checked={origem === o} class={origem === o ? 'ativo' : ''} onClick={() => setOrigem(o)}>
@@ -216,6 +249,8 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
             </select>
           </label>
         </div>
+          </>
+        )}
       </section>
 
       <section class="bloco passo">
@@ -274,6 +309,17 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
             </div>
           )}
 
+          {naoConvertidos.length > 0 && (
+            <div class="problemas-ia">
+              <p>{naoConvertidos.length} {naoConvertidos.length === 1 ? 'item ficou de fora' : 'itens ficaram de fora'}:</p>
+              <ul class="problemas">
+                {naoConvertidos.map((t) => (
+                  <li>✕ {t}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <ul class="lista-revisao">
             {validos.map((c) => {
               const marcado = !desmarcados.has(c.cartao.id)
@@ -291,7 +337,7 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
           <button class="btn principal" disabled={!escolhidos.length || salvando} onClick={adicionar}>
             Salvar {escolhidos.length} {escolhidos.length === 1 ? 'cartão' : 'cartões'}
           </button>
-          <button class="btn terciario" onClick={() => setLida(null)}>
+          <button class="btn terciario" onClick={() => { setLida(null); setNaoConvertidos([]) }}>
             Descartar
           </button>
         </section>

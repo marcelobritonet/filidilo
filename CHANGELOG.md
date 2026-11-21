@@ -2,6 +2,17 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.5.0] — 2026-11-21
+
+**Já tem as perguntas? Só falta formatar.** Quem já tem perguntas e respostas, em qualquer formato, pode colá-las em Criar com IA e pedir à IA que só as converta nos cartões do tatino, sem inventar conteúdo.
+
+### Novo
+- **Criar com IA → Já tenho as perguntas**: cole a lista ou o texto como estiver (numerada, "P:/R:", tabela etc.). A instrução pede à IA que mantenha as palavras originais e escolha o tipo de cartão.
+- Itens que não encaixam em nenhum tipo, ou que não têm resposta, aparecem na confira como "ficaram de fora", em vez de virar cartão sem sentido.
+
+### Mudou
+- O fluxo "Criar do zero" continua igual. Colar a resposta, validar e salvar são os mesmos nos dois modos.
+
 ## [3.4.0] — 2026-11-19
 
 **Envie por link ou QR code.** Enviar um baralho ou um cartão agora gera um link que vale 2 horas, com QR code para ler com a câmera de outro celular. Quem abre o link cai no tatino. com o resumo de sempre (adicionar, atualizar ou importar como baralho separado). Funciona no Android, no iPhone e no computador, com ou sem o app instalado.
