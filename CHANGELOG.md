@@ -2,6 +2,13 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.8.3] — 2026-11-21
+
+**Menos uma pergunta para quem já tem as perguntas.**
+
+### Melhorado
+- Em "Já tenho as perguntas", o passo 1 não pergunta mais "Quanto você já sabe sobre isso?". A IA só converte as suas perguntas, então o nível não mudava nada. Se quiser, defina o nível em "Editar", na conferência, ou depois, em Configurar baralho.
+
 ## [3.8.2] — 2026-11-21
 
 **A folha de resultado com a cara certa.** A v3.8.1 saiu sem os estilos novos.

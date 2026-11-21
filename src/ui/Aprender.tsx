@@ -70,7 +70,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
   )
   const modo = formatar ? 'formatar' : 'aprender'
   // Sem o nível escolhido a instrução não sai: é ele que define a dificuldade dos cartões.
-  // Com perguntas prontas o nível é opcional: não muda as perguntas, só como as lacunas aparecem.
+  // Com perguntas prontas o nível não é pedido: a IA só converte, e ele pode ser definido em "Editar" ou depois.
   const pedidoOk = formatar ? perguntas.trim().length > 20 : pedido.trim().length >= 3 && !!nivelPedido
   const mudarModo = (f: boolean) => {
     if (f === formatar) return
@@ -122,7 +122,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
       if (formatar && Array.isArray(fora)) setNaoConvertidos((ant) => [...ant, ...fora.filter((x): x is string => typeof x === 'string')])
       if (!lido) {
         // O nível é o que a pessoa escolheu, não o que a IA devolveu.
-        const ini: Edicao = { titulo: r.baralho.titulo, resumo: r.baralho.objetivo?.resumo ?? '', nivel: nivelPedido }
+        const ini: Edicao = { titulo: r.baralho.titulo, resumo: r.baralho.objetivo?.resumo ?? '', nivel: formatar ? '' : nivelPedido }
         setInicial(ini)
         setCfg(ini)
         setLido(r)
@@ -222,22 +222,26 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
         ) : (
           <input class="texto" aria-label="O que você quer aprender" value={pedido} placeholder="Ex.: espanhol para viajar" onInput={(e) => setPedido((e.target as HTMLInputElement).value)} />
         )}
-        <p class="rotulo">{formatar ? 'Quanto você já sabe sobre isso? (opcional)' : 'Quanto você já sabe sobre isso?'}</p>
-        <div class="opcoes-nivel" role="radiogroup" aria-label="Quanto você já sabe">
-          {NIVEIS.map((n) => (
-            <button
-              role="radio"
-              aria-checked={nivelPedido === n.valor}
-              class={`opcao-nivel ${nivelPedido === n.valor ? 'ativo' : ''}`}
-              onClick={() => {
-                setNivelPedido(formatar && nivelPedido === n.valor ? '' : n.valor)
-                evento('aprender_nivel', { nivel: n.valor })
-              }}
-            >
-              {n.pedido}
-            </button>
-          ))}
-        </div>
+        {!formatar && (
+          <>
+            <p class="rotulo">Quanto você já sabe sobre isso?</p>
+            <div class="opcoes-nivel" role="radiogroup" aria-label="Quanto você já sabe">
+              {NIVEIS.map((n) => (
+                <button
+                  role="radio"
+                  aria-checked={nivelPedido === n.valor}
+                  class={`opcao-nivel ${nivelPedido === n.valor ? 'ativo' : ''}`}
+                  onClick={() => {
+                    setNivelPedido(n.valor)
+                    evento('aprender_nivel', { nivel: n.valor })
+                  }}
+                >
+                  {n.pedido}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
         {formatar ? null : !materialAberto ? (
           <button class="link" onClick={() => { setMaterialAberto(true); evento('aprender_material', { origem: material }) }}>
             Tenho um material (PDF ou texto)
