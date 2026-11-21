@@ -2,6 +2,15 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.10.1] — 2026-11-21
+
+**A IA erra menos nos níveis altos.**
+
+### Melhorado
+- As instruções para a IA pedem para conferir que nenhuma alternativa errada também responde à pergunta, que cada lacuna tenha uma resposta certa clara e, nos níveis expert e extremo, só criar cálculo com alguma sutileza, nunca a aplicação direta de uma fórmula.
+- No fim, a IA revisa cada cartão "como um professor que corrige prova" e corrige ou tira o que estiver errado, sem deixar dúvidas como "Espere" no texto.
+- Fórmulas sempre com os dois `$`.
+
 ## [3.10.0] — 2026-11-21
 
 **Arquivar baralho: terminou de estudar, tira da lista sem perder nada.**

@@ -4,7 +4,7 @@ import type { Baralho, Cartao, Objetivo, Tema } from '../types'
 import { infoNivel } from '../types'
 import { jaCobertos } from './cobertos'
 
-export const VERSAO_INSTRUCAO = 6
+export const VERSAO_INSTRUCAO = 7
 
 export type Origem = 'pdf' | 'texto' | 'tema'
 export type Mistura = 'misto' | 'teoria' | 'calculo'
@@ -96,9 +96,9 @@ export function regrasTipos(fonte: string): string {
   return `Cada cartão tem "id" (curto e único, ex.: "c1"), "tipo", "tema" (o id de um tema), "explicacao" (curta, opcional) e ${fonte}. Por tipo:
 - "conceito": "frente" (pergunta) e "verso" (resposta).
 - "vf": "frente" (afirmação) e "resposta" (true ou false). Toda afirmação falsa precisa de "explicacao" dizendo o que está errado.
-- "associacao": "frente" (pergunta), "opcoes" (1 certa e 5 ou 6 erradas plausíveis, sem repetir), "correta" (índice da certa, começando em 0) e "outrasFormas" (lista com 1 outra forma de dizer a resposta certa, com palavras diferentes e o mesmo sentido). O app mostra 4 de cada vez e alterna as formas da certa, então nenhuma errada pode ser obviamente absurda e a outra forma não pode ser maior nem mais detalhada que as erradas. Varie a posição da correta.
-- "lacunas": "frente" com ____ no lugar de cada palavra a completar (ex.: "A Terra gira em torno do ____.") e "respostas", uma por lacuna, na ordem. Use "/" para sinônimos aceitos ("Sol/astro-rei"). A frase precisa fazer sentido completa.
-- "calculo": exercício com números sorteados. Campos:
+- "associacao": "frente" (pergunta), "opcoes" (1 certa e 5 ou 6 erradas plausíveis, sem repetir), "correta" (índice da certa, começando em 0) e "outrasFormas" (lista com 1 outra forma de dizer a resposta certa, com palavras diferentes e o mesmo sentido). O app mostra 4 de cada vez e alterna as formas da certa, então nenhuma errada pode ser obviamente absurda e a outra forma não pode ser maior nem mais detalhada que as erradas. Varie a posição da correta. Confira cada errada: nenhuma pode também responder à pergunta, nem num caso particular.
+- "lacunas": "frente" com ____ no lugar de cada palavra a completar (ex.: "A Terra gira em torno do ____.") e "respostas", uma por lacuna, na ordem. Use "/" para sinônimos aceitos ("Sol/astro-rei"). A frase precisa fazer sentido completa. Cada lacuna precisa ter uma resposta certa clara (mais os sinônimos); se várias palavras diferentes completassem bem, reescreva a frase.
+- "calculo": exercício com números sorteados. A conta precisa combinar com o nível: nos níveis "expert" e "extremo", só crie cálculo com uma sutileza (caso-limite, hipótese que falha, armadilha comum), nunca a aplicação direta de uma fórmula. Campos:
   - "titulo" e "enunciado"; no enunciado, {nome} mostra o valor sorteado.
   - "parametros": { "nome": { "min": n, "max": n, "passo": n, "unidade": "..." } }. Escolha faixas realistas.
   - "derivados" (opcional): { "nome": "expressão" }, valores intermediários.
@@ -110,7 +110,8 @@ export function regrasTipos(fonte: string): string {
 
 /** Regras de formato do texto (LaTeX, negrito) e de entrega do JSON. Usadas pelas instruções de cartões e de plano. */
 export function regrasTextoJson(): string {
-  return `- Fórmulas podem ir entre $...$ em LaTeX. **Negrito** com dois asteriscos é permitido. Nada de HTML.
+  return `- Fórmulas podem ir entre $...$ em LaTeX, sempre com os dois $. **Negrito** com dois asteriscos é permitido. Nada de HTML.
+- Antes de responder, revise cada cartão como um professor que corrige prova: a resposta marcada está certa? A pergunta parte de uma premissa possível? Se achar erro, corrija o cartão ou tire-o. Nunca deixe no texto dúvidas ou correções ("Espere", "vamos corrigir").
 
 ## Entrega
 ${regraEntrega()}

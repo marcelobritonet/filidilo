@@ -3,7 +3,7 @@
 import { infoNivel, type Cartao, type Nivel, type Tema } from '../types'
 import { origemTexto, regrasTextoJson, regrasTipos } from './instrucao'
 
-export const VERSAO_PLANO = 3
+export const VERSAO_PLANO = 4
 
 export interface PedidoPlano {
   /** O que a pessoa digitou em "Aprender uma coisa nova hoje". */

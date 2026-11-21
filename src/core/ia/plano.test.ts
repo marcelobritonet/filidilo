@@ -5,7 +5,7 @@ import { extrairJson } from './resposta'
 
 describe('instrução de planejamento (Aprender)', () => {
   it('versão 1', () => {
-    expect(VERSAO_PLANO).toBe(3)
+    expect(VERSAO_PLANO).toBe(4)
   })
 
   it('o exemplo passa no validador do app', () => {
@@ -52,5 +52,15 @@ describe('nível de conhecimento no pedido', () => {
     const t = montarPlano({ pedido: 'xadrez' })
     expect(t).not.toContain('Quanto a pessoa já sabe')
     expect(t).toContain('"zero", "iniciante", "nocoes", "bastante", "expert" e "extremo"')
+  })
+})
+
+describe('regras de conteúdo (P58)', () => {
+  it('pede conferir as erradas, lacuna com resposta única e cálculo com sutileza nos níveis altos', () => {
+    const t = montarPlano({ pedido: 'Derivadas', nivel: 'extremo' })
+    expect(t).toContain('nenhuma pode também responder à pergunta')
+    expect(t).toContain('Cada lacuna precisa ter uma resposta certa clara')
+    expect(t).toContain('nunca a aplicação direta de uma fórmula')
+    expect(t).toContain('revise cada cartão como um professor que corrige prova')
   })
 })
