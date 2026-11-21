@@ -4,7 +4,7 @@ import type { Baralho, Cartao, Objetivo, Tema } from '../types'
 import { infoNivel } from '../types'
 import { jaCobertos } from './cobertos'
 
-export const VERSAO_INSTRUCAO = 9
+export const VERSAO_INSTRUCAO = 10
 
 export type Origem = 'pdf' | 'texto' | 'tema'
 export type Mistura = 'misto' | 'teoria' | 'calculo'
@@ -96,7 +96,7 @@ export function regrasTipos(fonte: string): string {
   return `Cada cartão tem "id" (curto e único, ex.: "c1"), "tipo", "tema" (o id de um tema), "explicacao" (curta, opcional) e ${fonte}. Por tipo:
 - "conceito": "frente" (pergunta) e "verso" (resposta).
 - "vf": "frente" (afirmação) e "resposta" (true ou false). Toda afirmação falsa precisa de "explicacao" dizendo o que está errado.
-- Nunca ponha alternativas (A, B, C…) dentro de "frente" ou "verso": pergunta com alternativas é sempre "associacao", com cada alternativa em "opcoes".
+- Nunca ponha alternativas (A, B, C…) dentro de "frente" ou "verso": pergunta com alternativas é sempre "associacao", com cada alternativa em "opcoes". Questão que já vem com alternativas (de prova, de lista) é a exceção à regra abaixo: use só as alternativas dela, sem criar erradas novas, e sem "outrasFormas".
 - "associacao": "frente" (pergunta), "opcoes" (1 certa e 5 ou 6 erradas plausíveis, sem repetir), "correta" (índice da certa, começando em 0) e "outrasFormas" (lista com 1 outra forma de dizer a resposta certa, com palavras diferentes e o mesmo sentido). O app mostra 4 de cada vez e alterna as formas da certa, então nenhuma errada pode ser obviamente absurda e a outra forma não pode ser maior nem mais detalhada que as erradas. Varie a posição da correta. Confira cada errada: nenhuma pode também responder à pergunta, nem num caso particular.
 - "lacunas": "frente" com ____ no lugar de cada palavra a completar (ex.: "A Terra gira em torno do ____.") e "respostas", uma por lacuna, na ordem. Use "/" para sinônimos aceitos ("Sol/astro-rei"). A frase precisa fazer sentido completa. Cada lacuna precisa ter uma resposta certa clara (mais os sinônimos); se várias palavras diferentes completassem bem, reescreva a frase.
 - "calculo": exercício com números sorteados. A conta precisa combinar com o nível: nos níveis "expert" e "extremo", só crie cálculo com uma sutileza (caso-limite, hipótese que falha, armadilha comum), nunca a aplicação direta de uma fórmula. Campos:
@@ -236,15 +236,15 @@ ${p.texto.trim()}
 ===
 
 ## Como converter
-- Converta cada item em um cartão, mantendo o sentido e as palavras da pessoa. Não invente, não complete e não corrija conteúdo. Se a resposta original estiver incompleta ou incorreta, mantenha como está.
+- Converta cada item em um cartão, mantendo o sentido e as palavras da pessoa. Não invente, não complete e não corrija conteúdo (a única coisa que você completa é o gabarito que falta numa questão de múltipla escolha). Se a resposta original estiver incompleta ou incorreta, mantenha como está.
 - Única exceção ao "não corrija": se a pergunta original entregar a resposta (veja "Não entregue a resposta"), reescreva só a pergunta, ou troque o tipo (por exemplo, de "lacunas" para "conceito"), para que ela não entregue. A resposta continua a da pessoa, com as palavras dela. As alternativas erradas que você criar seguem a mesma regra.
 - Um cartão por ideia. Escolha o tipo que melhor encaixa: "conceito" para pergunta aberta com resposta, "vf" para afirmação verdadeira ou falsa, "associacao" para pergunta com alternativas ou com resposta curta, "lacunas" para frase de completar (com ____ ou espaço em branco no original), "calculo" só se houver exercício com números.
 - Questão de múltipla escolha (alternativas marcadas com A) B) C), a., (a), 1) 2) ou parecido) vira SEMPRE "associacao", nunca "conceito":
   - "frente": só a pergunta, sem as alternativas e sem número ou cabeçalho da questão ("Questão 31 | BWM", "31."). A sigla ou assunto do cabeçalho pode virar o tema.
   - "opcoes": o texto de cada alternativa, sem a letra, na ordem original. Use só as alternativas originais: não crie erradas novas.
   - "correta": o índice (começando em 0) da alternativa certa segundo o gabarito, que pode estar junto da questão ou numa lista no fim ("31-B", "Gabarito: B").
-  - Sem gabarito, resolva a questão com conhecimento consolidado, marque a certa e diga em "explicacao" por que ela é a certa.
-  - "outrasFormas" é opcional aqui.
+  - Sem gabarito, resolva a questão com conhecimento consolidado, marque a certa e diga em "explicacao" por que ela é a certa. Nunca mande uma questão de múltipla escolha para "naoConvertidos" por falta de gabarito.
+  - Não use "outrasFormas" aqui: as alternativas já vêm da questão, e uma outra forma da certa (mais longa ou com palavras da pergunta) entregaria a resposta.
 - Se um item não couber em nenhum tipo ou não tiver resposta (fora a questão de múltipla escolha sem gabarito, que você resolve), não crie cartão para ele: liste o texto dele em "naoConvertidos".
 - Se o item tiver fonte (página, aula), mantenha; senão use "Perguntas próprias".
 

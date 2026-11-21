@@ -61,10 +61,24 @@ function alternativaDoVerso(verso: string, opcoes: string[]): { correta: number;
 }
 
 /**
+ * Questão de prova (até 5 alternativas): tira a outra forma da certa que for mais longa que todas as erradas,
+ * porque entre opções curtas ela entregaria a resposta (o ChatGPT fez isso no teste da P90).
+ */
+function semFormaQueEntrega(c: CartaoAssociacao): CartaoAssociacao {
+  if (!Array.isArray(c.opcoes) || c.opcoes.length > 5 || !Array.isArray(c.outrasFormas)) return c
+  const maior = Math.max(...c.opcoes.filter((_, i) => i !== c.correta).map((o) => String(o).length))
+  const formas = c.outrasFormas.filter((f) => typeof f === 'string' && f.length <= maior)
+  if (formas.length === c.outrasFormas.length) return c
+  const { outrasFormas: _f, ...resto } = c
+  return formas.length ? { ...resto, outrasFormas: formas } : resto
+}
+
+/**
  * Conserta o cartão que veio com alternativas no texto.
  * "conceito" com a letra certa no verso vira "associacao"; senão, devolve o erro para o pedido de correção.
  */
 export function consertarMultipla(c: Cartao): { cartao: Cartao; erro?: string } {
+  if (c.tipo === 'associacao') return { cartao: semFormaQueEntrega(c) }
   if (c.tipo === 'calculo' || typeof c.frente !== 'string') return { cartao: c }
   const alt = separarAlternativas(c.frente)
   if (!alt) return { cartao: c }

@@ -2,6 +2,15 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.13.3] — 2026-11-21
+
+**Questões de prova ficam com as alternativas originais, sem pistas da certa.**
+
+### Corrigido
+- Em "Já tenho as perguntas", o ChatGPT às vezes criava uma "outra forma" da alternativa certa, mais longa que as erradas (por exemplo, "Resíduos e materiais descartados pelos navios" no meio de "óleo" e "esgoto"), o que entregava a resposta. Agora a IA usa só as alternativas da questão, e o app descarta essa outra forma quando ela é mais longa que todas as erradas.
+- A IA também não cria mais alternativas erradas a mais nessas questões.
+- Questão sem gabarito não fica mais de fora: a IA resolve, marca a certa e explica.
+
 ## [3.13.2] — 2026-11-21
 
 **Cartões da IA que não entregam a resposta na pergunta.**

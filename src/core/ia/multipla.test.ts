@@ -22,6 +22,7 @@ describe('questões de múltipla escolha (P90)', () => {
     const regra = 'Nunca ponha alternativas (A, B, C…) dentro de "frente" ou "verso"'
     expect(montarInstrucao({ origem: 'pdf', quantidade: 10, mistura: 'misto' })).toContain(regra)
     expect(montarPlano({ pedido: 'BWM' })).toContain(regra)
+    expect(montarInstrucao({ origem: 'pdf', quantidade: 10, mistura: 'misto' })).toContain('use só as alternativas dela, sem criar erradas novas, e sem "outrasFormas"')
   })
 
   it('separa pergunta, sem cabeçalho, e alternativas', () => {
@@ -59,5 +60,21 @@ describe('questões de múltipla escolha (P90)', () => {
     const r = ler({ tipo: 'associacao', frente: PERGUNTA, opcoes: OPCOES, correta: 1 })
     expect(r.erros).toEqual([])
     expect(r.cartao).toMatchObject({ frente: PERGUNTA, opcoes: OPCOES, correta: 1 })
+  })
+
+  it('questão de prova: tira a outra forma da certa mais longa que as erradas (P92)', () => {
+    const r = ler({ tipo: 'associacao', frente: PERGUNTA, opcoes: OPCOES, correta: 1, outrasFormas: ['Documento que estabelece os procedimentos de gerenciamento da água de lastro a bordo.'] })
+    expect(r.erros).toEqual([])
+    expect(r.cartao).not.toHaveProperty('outrasFormas')
+    const curta = ler({ tipo: 'associacao', frente: 'Qual o anexo?', opcoes: ['óleo', 'esgoto', 'lixo', 'emissões atmosféricas'], correta: 2, outrasFormas: ['resíduos', 'Resíduos e materiais descartados pelos navios.'] })
+    expect(curta.cartao).toMatchObject({ outrasFormas: ['resíduos'] })
+    // Cartão gerado (6 ou mais opções) segue a regra da instrução, sem corte automático.
+    const gerado = ler({ tipo: 'associacao', frente: 'Unidade de força?', opcoes: ['newton (N)', 'joule (J)', 'watt (W)', 'pascal (Pa)', 'dina (dyn)', 'quilograma (kg)'], correta: 0, outrasFormas: ['N, que equivale a kg·m/s²'] })
+    expect(gerado.cartao).toMatchObject({ outrasFormas: ['N, que equivale a kg·m/s²'] })
+  })
+
+  it('a instrução de formatação proíbe outrasFormas em questão de prova (P92)', () => {
+    expect(montarInstrucaoFormatacao({ texto: FRENTE })).toContain('Não use "outrasFormas" aqui')
+    expect(montarInstrucaoFormatacao({ texto: FRENTE })).toContain('Nunca mande uma questão de múltipla escolha para "naoConvertidos"')
   })
 })

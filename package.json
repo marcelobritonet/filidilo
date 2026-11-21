@@ -1,6 +1,6 @@
 {
   "name": "tatino",
-  "version": "3.13.2",
+  "version": "3.13.3",
   "description": "Flashcards offline (PWA) para aprender qualquer coisa",
   "scripts": {
     "dev": "vite",
