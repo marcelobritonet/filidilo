@@ -218,6 +218,7 @@ export function parecePerguntas(texto: string): boolean {
   }
   return texto.split(/\r?\n/).some((linha) => {
     const t = linha.trim()
-    return t.endsWith('?') && t.length <= 200
+    // A pergunta pode vir seguida de um exemplo entre parênteses: "Qual o objetivo? (ex.: viajar)".
+    return /\?(\s*\([^)]*\))?[\s.:]*$/.test(t) && t.length <= 300
   })
 }

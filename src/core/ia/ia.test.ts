@@ -234,6 +234,11 @@ describe('plano: leitura da resposta (Aprender)', () => {
     expect(lerPlano(extrairJson(texto), 'pedido').cartoes).toHaveLength(1)
   })
 
+  it('perguntas com exemplo entre parênteses no fim (como o Gemini fez no teste T3)', () => {
+    const texto = 'Para montar o plano ideal do zero para você, me diga rapidinho:\n\nQual é o seu objetivo principal? (ex.: viajar, trabalho, dia a dia ou começar do começo sem pressa)\n\nQuanto tempo por dia você pretende estudar? (ex.: 5 a 10 minutos ou 20+ minutos)'
+    expect(parecePerguntas(texto)).toBe(true)
+  })
+
   it('texto sem JSON e sem pergunta não é pergunta', () => {
     expect(parecePerguntas('Não entendi o pedido.')).toBe(false)
   })

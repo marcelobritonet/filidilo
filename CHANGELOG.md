@@ -2,6 +2,13 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.11.1] — 2026-11-21
+
+**O app reconhece quando a IA faz perguntas com exemplos.**
+
+### Corrigido
+- Quando a IA responde com perguntas em vez dos cartões, e cada pergunta termina com um exemplo entre parênteses ("Qual é o seu objetivo? (ex.: viajar, trabalho)"), o app mostrava erro de JSON. Agora mostra "A IA fez perguntas. Responda lá e cole aqui a resposta final."
+
 ## [3.11.0] — 2026-11-21
 
 **Comemorar e compartilhar o estudo: imagem para WhatsApp e story, sequência de dias, conquistas e desafio com um cartão.**
