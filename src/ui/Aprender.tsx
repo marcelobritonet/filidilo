@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'preact/hooks'
 import { novoId, salvar } from '../core/baralhos'
+import { ganharFolga, MAX_FOLGAS } from '../core/ofensiva'
 import { montarCorrecao, montarInstrucaoFormatacao } from '../core/ia/instrucao'
 import { EXEMPLO_PLANO, montarPlano } from '../core/ia/plano'
 import { extrairJson, lerPlano, parecePerguntas, type PlanoLido } from '../core/ia/resposta'
@@ -189,6 +190,12 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
       modo,
     })
     await salvar(b)
+    // Criar baralho guarda uma folga da ofensiva (uma por dia, até 2).
+    const folgas = await ganharFolga('baralho').catch(() => null)
+    if (folgas !== null) {
+      evento('folga_ganha', { motivo: 'baralho' })
+      nav.avisar({ texto: `Baralho criado. +1 folga guardada (${folgas} de ${MAX_FOLGAS}).` })
+    }
     nav.mudou()
     conf.fechar(() => nav.substituir({ nome: 'baralho', id: b.id }))
   }

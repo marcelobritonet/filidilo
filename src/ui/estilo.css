@@ -608,3 +608,41 @@ details.bloco > summary { font-weight: 650; }
 .modal.enviar .desafiar small { color: var(--text-muted); font-size: 14px; }
 .opcoes-desafio { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
 .opcoes-desafio legend { font-weight: 650; margin-bottom: 6px; }
+
+/* ---------- Ofensiva ---------- */
+.cabecalho-ofensiva { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.selo-ofensiva { display: inline-flex; align-items: center; gap: 10px; min-height: 40px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
+.selo-ofensiva .folgas { display: inline-flex; gap: 2px; color: var(--warning); }
+.selo-ofensiva .escudo { opacity: .35; }
+.selo-ofensiva .escudo.cheio { opacity: 1; color: var(--gold); }
+.selo-ofensiva .chama { font-weight: 700; font-size: 16px; color: var(--accent-text); }
+.selo-ofensiva .garantido { color: var(--success); }
+.selo-ofensiva.feito { border-color: var(--success); background: var(--success-soft); }
+.fio-dia { position: fixed; top: 0; left: 0; right: 0; height: 5px; z-index: 30; background: var(--surface-subtle); }
+.fio-dia > div { height: 100%; background: var(--accent); transition: width 1s linear; }
+.bloco.ofensiva { display: grid; gap: 8px; }
+.bloco.ofensiva.em-risco { border-color: var(--accent); background: var(--accent-soft); }
+.bloco.ofensiva .dica { margin: 0; }
+.bloco.ofensiva .restam { font-weight: 600; color: var(--accent-text); }
+.ofensiva-linha { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.ofensiva .dias { display: flex; gap: 6px; }
+.ofensiva .dias span { display: grid; justify-items: center; gap: 2px; width: 26px; }
+.ofensiva .dias small { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+.ofensiva .dias i { width: 18px; height: 18px; border-radius: 50%; background: var(--surface-subtle); border: 2px solid var(--border); }
+.ofensiva .dias .sessao i { background: var(--accent); border-color: var(--accent); }
+.ofensiva .dias .folga i { background: var(--gold); border-color: var(--gold); }
+.ofensiva .dias .hoje i { background: transparent; border: 2px dashed var(--accent); }
+.ofensiva .dias .hoje small { color: var(--text); }
+.fim .ofensiva-fim { display: grid; justify-items: center; gap: 2px; margin: 0; }
+.fim .ofensiva-fim strong { font: 700 22px/1.2 var(--font-display); color: var(--accent-text); animation: pulo .6s ease-out 1; }
+.fim .ofensiva-fim span { color: var(--text-muted); }
+.aviso-folga { margin: 0; padding: 8px 12px; border-radius: var(--radius-sm); background: var(--warning-soft); color: var(--warning); font-weight: 600; }
+/* Nas últimas horas do dia: pisca devagar. Com "reduzir movimento", só a cor mais forte. */
+@keyframes piscar { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+.fio-dia.pisca > div { animation: piscar 1.6s ease-in-out infinite; background: var(--danger); }
+.selo-ofensiva.pisca .chama { animation: piscar 1.6s ease-in-out infinite; }
+.selo-ofensiva.pisca { border-color: var(--accent); }
+@media (prefers-reduced-motion: reduce) {
+  .fio-dia.pisca > div, .selo-ofensiva.pisca .chama { animation: none; }
+  .fim .ofensiva-fim strong { animation: none; }
+}

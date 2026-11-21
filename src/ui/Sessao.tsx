@@ -11,6 +11,7 @@ import { formasAceitas, NIVEIS_COM_ALTERNATIVAS, partesDaFrente } from '../core/
 import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, CartaoLacunas, Objetivo } from '../core/types'
 import { pecaMarco, pecaResultado } from '../core/artes'
 import { fecharSessao, type Marco } from '../core/conquistas'
+import { concluirSessao, type Conclusao } from '../core/ofensiva'
 import { CompartilharImagem, urlApp, type OpcaoImagem } from './CompartilharImagem'
 import { Confete } from './Confete'
 import { DesafiarModal } from './Desafio'
@@ -295,10 +296,20 @@ function Fim(props: {
   const pct = total ? Math.round((100 * placar.certos) / total) : 0
   // Sequência de dias e marco novo (cada marco comemora uma vez só).
   const [conquista, setConquista] = useState<{ sequencia: number; marco?: Marco } | null>(null)
+  // Ofensiva: a sessão concluída garante o dia (antes das conquistas, que usam a mesma sequência).
+  const [ofensiva, setOfensiva] = useState<Conclusao | null>(null)
   const [compartilhando, setCompartilhando] = useState(false)
   useEffect(() => {
     if (vazio || !total) return
-    fecharSessao([baralho], !!bateuMeta)
+    concluirSessao()
+      .then((r) => {
+        setOfensiva(r)
+        if (r.primeiraHoje) evento('ofensiva_dia', { sequencia: r.sequencia })
+        if (r.usadas) evento('folga_usada', { n: r.usadas })
+        if (r.folgaGanha) evento('folga_ganha', { motivo: 'semana' })
+      })
+      .catch(() => undefined)
+      .then(() => fecharSessao([baralho], !!bateuMeta))
       .then((r) => {
         setConquista(r)
         if (r.marco) evento('marco', { tipo: r.marco.tipo })
@@ -342,7 +353,15 @@ function Fim(props: {
       </p>
       {total > 0 && <p class="placar-final">{Math.round((100 * placar.certos) / total)}% de acerto</p>}
       {tempo && tempo !== 'esgotado' && <p class="dica">Terminou os cartões em {tempo}.</p>}
-      {sequencia >= 2 && <p class="sequencia">🔥 {sequencia} dias seguidos</p>}
+      {ofensiva?.primeiraHoje ? (
+        <p class="ofensiva-fim" role="status">
+          <strong>🔥 {ofensiva.sequencia} {ofensiva.sequencia === 1 ? 'dia' : 'dias'}</strong>
+          <span>{ofensiva.sequencia === 1 ? 'Ofensiva começada. Volte amanhã para crescer.' : 'Hoje garantido.'}</span>
+        </p>
+      ) : (
+        sequencia >= 2 && <p class="sequencia">🔥 {sequencia} dias seguidos</p>
+      )}
+      {ofensiva?.folgaGanha && <p class="aviso-folga">+1 folga guardada por {ofensiva.sequencia} dias seguidos</p>}
       {marco && (
         <section class="conquista" role="status">
           <span class="selo-conquista">Conquista!</span>

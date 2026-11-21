@@ -2,13 +2,10 @@
 // As regras são puras (recebem os dados); as funções do fim do arquivo leem e gravam no aparelho.
 import { db, type Revisao } from './db'
 import { chave, dominado } from './srs'
+import { diaLocal, sequenciaAtual } from './ofensiva'
 import type { Baralho } from './types'
 
-/** Dia no fuso do aparelho, como "2026-11-21". */
-export function diaLocal(t: number): string {
-  const d = new Date(t)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
+export { diaLocal }
 
 /** Volta n dias no calendário (meio-dia, para não tropeçar no horário de verão). */
 function diaAntes(t: number, n: number): number {
@@ -131,7 +128,8 @@ async function situacao(baralhos: Baralho[], bateuMeta = false): Promise<Situaca
   const [revisoes, estados] = await Promise.all([db.revisoes.toArray(), db.estados.toArray()])
   const m = new Map(estados.map((e) => [e.id, e]))
   return {
-    sequencia: diasSeguidos(revisoes.map((r) => r.data)),
+    // A sequência é a da ofensiva: dias com sessão concluída (ou salvos por folga).
+    sequencia: await sequenciaAtual(),
     respostas: revisoes.length,
     bateuMeta,
     dominados: baralhos
@@ -159,9 +157,9 @@ export async function fecharSessao(baralhos: Baralho[], bateuMeta: boolean): Pro
   return { sequencia: s.sequencia, marco: mostrar }
 }
 
-/** Para Meus baralhos: sequência e semana. */
+/** Para Meus baralhos: sequência (da ofensiva) e semana. */
 export async function painel(agora = Date.now()): Promise<{ sequencia: number; semana: Semana }> {
   // Sequências de mais de um ano contam até um ano: basta para a tela inicial.
   const revisoes = await db.revisoes.where('data').above(diaAntes(agora, 370)).toArray()
-  return { sequencia: diasSeguidos(revisoes.map((r) => r.data), agora), semana: resumoSemana(revisoes, agora) }
+  return { sequencia: await sequenciaAtual(agora), semana: resumoSemana(revisoes, agora) }
 }

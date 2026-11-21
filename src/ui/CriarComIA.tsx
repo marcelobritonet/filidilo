@@ -1,6 +1,7 @@
 import { evento } from '../core/telemetria'
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import { salvar } from '../core/baralhos'
+import { ganharFolga, MAX_FOLGAS } from '../core/ofensiva'
 import { avaliarBaralho, type Avaliacao } from '../core/desempenho'
 import { EXEMPLOS, VERSAO_INSTRUCAO, montarCorrecao, montarInstrucao, montarInstrucaoFormatacao, type Mistura, type Origem } from '../core/ia/instrucao'
 import { extrairJson, lerResposta, type RespostaLida } from '../core/ia/resposta'
@@ -140,8 +141,12 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
     const usados = new Set(escolhidos.map((c) => c.cartao.tema))
     const temasNovos = lida.temasNovos.filter((t) => usados.has(t.id) && !baralho.temas.some((x) => x.id === t.id))
     await salvar({ ...baralho, temas: [...baralho.temas, ...temasNovos], cartoes: [...baralho.cartoes, ...escolhidos.map((c) => c.cartao)] })
+    // Criar cartões com IA guarda uma folga da ofensiva (uma por dia, até 2).
+    const folgas = await ganharFolga('ia').catch(() => null)
+    if (folgas !== null) evento('folga_ganha', { motivo: 'ia' })
     nav.mudou()
-    nav.avisar({ texto: `${escolhidos.length} ${escolhidos.length === 1 ? 'cartão criado' : 'cartões criados'}.` })
+    const criados = `${escolhidos.length} ${escolhidos.length === 1 ? 'cartão criado' : 'cartões criados'}.`
+    nav.avisar({ texto: folgas !== null ? `${criados} +1 folga guardada (${folgas} de ${MAX_FOLGAS}).` : criados })
     conf.fechar(nav.voltar)
   }
 

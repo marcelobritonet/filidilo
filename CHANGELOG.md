@@ -2,6 +2,20 @@
 
 Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.13.0] — 2026-11-21
+
+**Ofensiva diária: um motivo para estudar todo dia, sem pressão.**
+
+### Novo
+- **Ofensiva**: conta os dias seguidos em que você terminou pelo menos uma sessão (sair pelo X não conta). O selo 🔥 com o número fica no topo de Meus baralhos.
+- **Fio do dia**: enquanto falta a sessão de hoje, um fio no topo encolhe até a meia-noite e o cartão "Falta uma sessão hoje" mostra a semana, quanto tempo resta e o botão Estudar (abre o último baralho estudado). A partir das 21h, o fio e a chama piscam devagar (com "reduzir movimento", não piscam).
+- **Hoje garantido**: ao terminar a primeira sessão do dia, o fim da sessão mostra "🔥 N dias · Hoje garantido", e em Meus baralhos o fio e o cartão somem e o selo fica verde com ✓.
+- **Folgas** (até 2): cobrem um dia sem sessão, e a ofensiva continua. Você ganha uma ao criar um baralho, ao criar cartões com IA (uma por dia para cada um) e a cada 7 dias seguidos.
+
+### Mudou
+- A sequência das conquistas e das imagens de compartilhar passou a ser a da ofensiva (dias com sessão concluída). Na primeira vez, os dias em que você já tinha estudado contam.
+- O backup leva a ofensiva e as folgas.
+
 ## [3.12.0] — 2026-11-21
 
 **Você escolhe a ordem dos baralhos.**

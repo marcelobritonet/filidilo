@@ -12,11 +12,12 @@ import { abriuPorLink, pegarRecebido } from './recebido'
 import { InstalarCard } from './InstalarCard'
 import { registrarAbertura } from './instalar'
 import { iniciarMarcos, painel, type Semana } from '../core/conquistas'
+import { CartaoOfensiva, FioDoDia, SeloOfensiva, usePainelOfensiva } from './Ofensiva'
 import { pecaConvite, pecaSemana } from '../core/artes'
 import { CompartilharImagem, urlApp, type OpcaoImagem } from './CompartilharImagem'
-
 import { ordenar } from '../core/baralhos'
 import { OrdenarBaralhos } from './OrdenarBaralhos'
+
 const SEM_INTERNET = 'Precisa de internet para falar com a IA.'
 
 /** Faixa do texto digitado, só para o evento: curto, médio ou longo. */
@@ -39,6 +40,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const [organizando, setOrganizando] = useState<Baralho[] | null>(null)
   const [mexeu, setMexeu] = useState(false)
   const ativos = organizando ?? baralhos.filter((b) => !b.arquivadoEm)
+  const ofensiva = usePainelOfensiva(versao)
   const arquivados = baralhos.filter((b) => b.arquivadoEm)
 
   // Chegou pelo "Compartilhar" do Android (WhatsApp → Compartilhar → tatino.) ou por um link (?b=<codigo>)?
@@ -142,15 +144,26 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
 
   return (
     <main class="tela inicio">
+      {ofensiva.painel && !ofensiva.painel.hojeFeito && ofensiva.painel.sequencia > 0 && ativos.length > 0 && <FioDoDia agora={ofensiva.agora} />}
       <header class="cabecalho">
-        <Marca />
+        <div class="cabecalho-ofensiva">
+          <Marca />
+          {ofensiva.painel && (ofensiva.painel.sequencia > 0 || ofensiva.painel.folgas > 0) && <SeloOfensiva painel={ofensiva.painel} agora={ofensiva.agora} abrir={abrirSemana} />}
+        </div>
         <h1>Meus baralhos</h1>
-        {!!resumo && resumo.sequencia >= 2 && (
-          <button class="selo-sequencia" aria-label={`${resumo.sequencia} dias seguidos estudando. Ver sua semana`} onClick={abrirSemana}>
-            🔥 {resumo.sequencia} dias
-          </button>
-        )}
       </header>
+
+      {ofensiva.painel && !ofensiva.painel.hojeFeito && ativos.length > 0 && (
+        <CartaoOfensiva
+          painel={ofensiva.painel}
+          agora={ofensiva.agora}
+          estudar={() => {
+            const id = ativos.some((b) => b.id === ofensiva.ultimoBaralho) ? ofensiva.ultimoBaralho! : ativos[0].id
+            evento('ofensiva_estudar', { sequencia: ofensiva.painel?.sequencia ?? 0 })
+            nav.ir({ nome: 'baralho', id })
+          }}
+        />
+      )}
 
       <section class="bloco aprender">
         <label class="campo">

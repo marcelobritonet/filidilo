@@ -1,4 +1,5 @@
 import { db, type Estado, type Marca, type Reporte, type Revisao } from './db'
+import { CHAVE_OFENSIVA, juntar, lerOfensiva, lerRegistro, type Ofensiva } from './ofensiva'
 import { mesclarProgresso } from './progresso'
 import type { Baralho, Cartao } from './types'
 
@@ -12,6 +13,8 @@ interface Backup {
   marcas: Marca[]
   /** A partir da fase 2: os baralhos também vivem no aparelho. */
   baralhos?: Baralho[]
+  /** A partir da v3.12: dias da ofensiva e folgas. */
+  ofensiva?: Ofensiva
 }
 
 export async function exportar(): Promise<Blob> {
@@ -24,6 +27,7 @@ export async function exportar(): Promise<Blob> {
     reportes: await db.reportes.toArray(),
     marcas: await db.marcas.toArray(),
     baralhos: await db.baralhos.toArray(),
+    ofensiva: await lerOfensiva(),
   }
   return new Blob([JSON.stringify(dados)], { type: 'application/json' })
 }
@@ -48,6 +52,9 @@ export async function importar(texto: string): Promise<{ estados: number; reviso
     nRev = r.revisoes
     for (const rep of d.reportes ?? []) await db.reportes.put(rep)
   })
+  // Ofensiva: junta os dias dos dois lados; das folgas, fica a maior.
+  const recebida = d.ofensiva ? lerRegistro(JSON.stringify(d.ofensiva)) : null
+  if (recebida) await db.meta.put({ chave: CHAVE_OFENSIVA, valor: JSON.stringify(juntar(await lerOfensiva(), recebida)) })
   return { estados: nEst, revisoes: nRev, baralhos: nBar }
 }
 
