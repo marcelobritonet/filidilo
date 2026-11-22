@@ -9,6 +9,7 @@ import { useEstados } from './estado'
 import { Importar, ImportarCartoes } from './Importar'
 import { Marca } from './Marca'
 import { abriuPorLink, pegarRecebido } from './recebido'
+import type { MotivoLink } from '../core/link'
 import { InstalarCard } from './InstalarCard'
 import { registrarAbertura } from './instalar'
 import { iniciarMarcos, painel, type Semana } from '../core/conquistas'
@@ -21,6 +22,28 @@ import { OrdenarBaralhos } from './OrdenarBaralhos'
 const SEM_INTERNET = 'Precisa de internet para falar com a IA.'
 
 /** Faixa do texto digitado, só para o evento: curto, médio ou longo. */
+/** Título e texto do aviso quando o link (ou o arquivo compartilhado) não abre. */
+function textoDoAviso(via: 'arquivo' | 'link', motivo: MotivoLink | undefined, mensagem: string): { titulo: string; texto: string } {
+  if (via === 'arquivo') return { titulo: 'Não consegui abrir o arquivo', texto: mensagem }
+  if (motivo === 'expirou') return { titulo: 'Este link expirou', texto: 'Os links do Filidilo valem 2 horas (desafios, 7 dias). Peça a quem enviou um link novo.' }
+  if (motivo === 'internet') return { titulo: 'Sem internet', texto: 'Conecte-se e abra o link de novo.' }
+  return { titulo: 'Não consegui abrir o link', texto: mensagem }
+}
+
+function AvisoRecebido({ titulo, texto, fechar }: { titulo: string; texto: string; fechar: () => void }) {
+  return (
+    <div class="modal-fundo" onClick={(e) => e.target === e.currentTarget && fechar()}>
+      <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="titulo-aviso-recebido" aria-describedby="texto-aviso-recebido">
+        <h2 id="titulo-aviso-recebido">{titulo}</h2>
+        <p id="texto-aviso-recebido">{texto}</p>
+        <button class="btn principal" autoFocus onClick={fechar}>
+          Entendi
+        </button>
+      </div>
+    </div>
+  )
+}
+
 const faixa = (t: string): 'curto' | 'medio' | 'longo' => (t.length <= 20 ? 'curto' : t.length <= 60 ? 'medio' : 'longo')
 
 export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: Navegacao; versao: number }) {
@@ -29,7 +52,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const [semInternet, setSemInternet] = useState<'' | 'campo' | 'botao'>('')
   const [plano, setPlano] = useState<PlanoImportacao | null>(null)
   const [cartoesRecebidos, setCartoesRecebidos] = useState<CartoesRecebidos | null>(null)
-  const [erro, setErro] = useState('')
+  const [aviso, setAviso] = useState<{ titulo: string; texto: string } | null>(null)
   // Desafio recebido: responde o cartão primeiro; "Salvar" segue para a importação de sempre.
   const [desafio, setDesafio] = useState<{ cartao: Cartao; baralho: Baralho; origem: string; salvar: () => void; rotulo: string } | null>(null)
   const [abrindoLink, setAbrindoLink] = useState(abriuPorLink)
@@ -48,15 +71,15 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
     pegarRecebido().then(async (r) => {
       setAbrindoLink(false)
       if (!r) return
-      const avisarLink = (ok: boolean, tipo?: string) => r.via === 'link' && evento('link_aberto', { ok, tipo })
+      const avisarLink = (ok: boolean, extra: { tipo?: string; motivo?: string } = {}) => r.via === 'link' && evento('link_aberto', { ok, ...extra })
       if ('erro' in r) {
-        avisarLink(false)
-        return setErro(r.erro)
+        avisarLink(false, { motivo: r.motivo })
+        return setAviso(textoDoAviso(r.via, r.motivo, r.erro))
       }
       try {
-        setErro('')
+        setAviso(null)
         const lido = lerRecebido(r.texto)
-        avisarLink(true, lido.tipo)
+        avisarLink(true, { tipo: lido.tipo })
         if (lido.desafio) {
           evento('desafio_aberto', { junto: lido.tipo === 'baralho' ? 'baralho' : 'cartao', tipo: lido.desafio.tipo })
           if (lido.tipo === 'cartoes') {
@@ -70,8 +93,8 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         } else if (lido.tipo === 'cartoes') setCartoesRecebidos(lido)
         else setPlano(await planejar(lido.baralho, lido.progresso))
       } catch (err) {
-        avisarLink(false)
-        setErro((err as Error).message)
+        avisarLink(false, { motivo: 'conteudo' })
+        setAviso({ titulo: r.via === 'link' ? 'Não consegui abrir o link' : 'Não consegui abrir o arquivo', texto: (err as Error).message })
       }
     })
   }, [])
@@ -152,6 +175,12 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         </div>
         <h1>Meus baralhos</h1>
       </header>
+
+      {abrindoLink && (
+        <p class="resultado" role="status">
+          Abrindo o baralho do link…
+        </p>
+      )}
 
       {ofensiva.painel && !ofensiva.painel.hojeFeito && ativos.length > 0 && (
         <CartaoOfensiva
@@ -268,16 +297,6 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
             {SEM_INTERNET}
           </p>
         )}
-        {abrindoLink && (
-          <p class="resultado" role="status">
-            Abrindo o baralho do link…
-          </p>
-        )}
-        {erro && (
-          <p class="resultado erro" role="alert">
-            ✕ {erro}
-          </p>
-        )}
       </section>
 
       <nav class="rodape" aria-label="Mais opções">
@@ -292,6 +311,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         </button>
       </nav>
       <p class="versao">Funciona sem internet · seus cartões ficam neste aparelho</p>
+      {aviso && <AvisoRecebido titulo={aviso.titulo} texto={aviso.texto} fechar={() => setAviso(null)} />}
       {plano && <Importar plano={plano} nav={nav} fechar={() => setPlano(null)} />}
       {compartilhar && <CompartilharImagem opcoes={compartilhar.opcoes} onde={compartilhar.onde} avisar={(texto) => nav.avisar({ texto })} fechar={() => setCompartilhar(null)} />}
       {cartoesRecebidos && <ImportarCartoes recebido={cartoesRecebidos} baralhos={baralhos} nav={nav} fechar={() => setCartoesRecebidos(null)} />}

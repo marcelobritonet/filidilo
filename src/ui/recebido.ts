@@ -2,7 +2,7 @@
 // guarda o texto num cache e abre o app com ?receber=1.
 // Link recebido (…/filidilo/?b=<codigo>): o conteúdo vem do worker de links (src/core/link.ts).
 
-import { abrirLink } from '../core/link'
+import { abrirLink, ErroLink, type MotivoLink } from '../core/link'
 
 const CACHE = 'tatino-recebido'
 const chave = () => `${import.meta.env.BASE_URL}__recebido`
@@ -11,7 +11,7 @@ const chave = () => `${import.meta.env.BASE_URL}__recebido`
 export const abriuPorLink = () => new URLSearchParams(location.search).has('b')
 
 /** Se o app abriu por um compartilhamento ou link, devolve o conteúdo (uma vez só) e limpa a URL. */
-export async function pegarRecebido(): Promise<{ texto: string; via: 'arquivo' | 'link' } | { erro: string; via: 'arquivo' | 'link' } | null> {
+export async function pegarRecebido(): Promise<{ texto: string; via: 'arquivo' | 'link' } | { erro: string; via: 'arquivo' | 'link'; motivo?: MotivoLink } | null> {
   const params = new URLSearchParams(location.search)
   const codigo = params.get('b')
   if (codigo !== null) {
@@ -19,7 +19,7 @@ export async function pegarRecebido(): Promise<{ texto: string; via: 'arquivo' |
     try {
       return { texto: await abrirLink(codigo), via: 'link' }
     } catch (e) {
-      return { erro: (e as Error).message, via: 'link' }
+      return { erro: (e as Error).message, via: 'link', motivo: e instanceof ErroLink ? e.motivo : 'outro' }
     }
   }
   const q = params.get('receber')

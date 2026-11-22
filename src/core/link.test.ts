@@ -42,6 +42,9 @@ describe('link', () => {
     expect(await abrirLink('Ab12345678', (async () => resposta(200, '{"ok":1}')) as unknown as typeof fetch)).toBe('{"ok":1}')
     await expect(abrirLink('Ab12345678', (async () => resposta(404, {})) as unknown as typeof fetch)).rejects.toThrow('expirou')
     await expect(abrirLink('../x', fetch)).rejects.toThrow('não é do Filidilo')
+    await expect(abrirLink('Ab12345678', (async () => resposta(404, {})) as unknown as typeof fetch)).rejects.toMatchObject({ motivo: 'expirou' })
+    await expect(abrirLink('Ab12345678', (async () => { throw new TypeError('rede') }) as unknown as typeof fetch)).rejects.toMatchObject({ motivo: 'internet' })
+    await expect(abrirLink('Ab12345678', (async () => resposta(500, {})) as unknown as typeof fetch)).rejects.toMatchObject({ motivo: 'outro' })
   })
 
   it('sem VITE_LINKS_URL fica desligado', async () => {

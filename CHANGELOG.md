@@ -2,6 +2,13 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.14.3] — 2026-11-22
+
+**Aviso claro quando o link não abre**
+- Quem abre um link que já expirou vê agora um aviso na tela, com o que aconteceu e o que fazer ("Peça a quem enviou um link novo"). Antes, a mensagem ficava no fim da lista de baralhos e quase ninguém via.
+- O mesmo aviso aparece quando falta internet para abrir o link ou quando um arquivo compartilhado não abre.
+- "Abrindo o baralho do link…" aparece no topo da tela.
+
 ## [3.14.2] — 2026-11-22
 
 **Envio por link com o nome novo**

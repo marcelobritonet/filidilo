@@ -42,17 +42,29 @@ export async function criarLink(texto: string, f: typeof fetch = fetch, validade
   return { codigo: d.codigo, url: urlDoApp(d.codigo), expiraEm: new Date(d.expiraEm) }
 }
 
-/** Baixa o conteúdo de um código. Lança erro com mensagem em português. */
+/** Por que o link não abriu: decide o título e o texto do aviso. */
+export type MotivoLink = 'expirou' | 'internet' | 'outro'
+
+export class ErroLink extends Error {
+  constructor(
+    mensagem: string,
+    readonly motivo: MotivoLink,
+  ) {
+    super(mensagem)
+  }
+}
+
+/** Baixa o conteúdo de um código. Lança ErroLink com mensagem em português. */
 export async function abrirLink(codigo: string, f: typeof fetch = fetch): Promise<string> {
-  if (!RE_CODIGO.test(codigo)) throw new Error('Este link não é do Filidilo.')
-  if (!URL_LINKS) throw new Error('Esta versão do app não abre links.')
+  if (!RE_CODIGO.test(codigo)) throw new ErroLink('Este link não é do Filidilo.', 'outro')
+  if (!URL_LINKS) throw new ErroLink('Esta versão do app não abre links.', 'outro')
   let r: Response
   try {
     r = await f(`${URL_LINKS}/l/${codigo}`)
   } catch {
-    throw new Error('Sem internet para abrir o link.')
+    throw new ErroLink('Sem internet para abrir o link.', 'internet')
   }
-  if (r.status === 404) throw new Error('Este link expirou. Peça um novo a quem enviou.')
-  if (!r.ok) throw new Error('Não consegui abrir o link agora. Tente de novo.')
+  if (r.status === 404) throw new ErroLink('Este link expirou. Peça um novo a quem enviou.', 'expirou')
+  if (!r.ok) throw new ErroLink('Não consegui abrir o link agora. Tente de novo.', 'outro')
   return r.text()
 }
