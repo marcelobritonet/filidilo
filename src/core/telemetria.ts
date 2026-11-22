@@ -120,7 +120,7 @@ export async function enviar(saindo = false): Promise<void> {
         api_key: CHAVE_POSTHOG,
         batch: lote.map((e) => ({
           ...e,
-          properties: { versao: __VERSAO__, ...e.properties, distinct_id, $lib: 'tatino', $process_person_profile: false },
+          properties: { versao: __VERSAO__, ...e.properties, distinct_id, $lib: 'filidilo', $process_person_profile: false },
         })),
       }),
     })

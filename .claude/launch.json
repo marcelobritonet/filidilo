@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "tatino",
+      "name": "filidilo",
       "runtimeExecutable": "npx",
       "runtimeArgs": [
         "vite",
@@ -13,7 +13,7 @@
       "port": 5173
     },
     {
-      "name": "tatino-prod",
+      "name": "filidilo-prod",
       "runtimeExecutable": "npx",
       "runtimeArgs": [
         "vite",
@@ -39,7 +39,7 @@
       "port": 8787
     },
     {
-      "name": "tatino-com-links",
+      "name": "filidilo-com-links",
       "runtimeExecutable": "npx",
       "runtimeArgs": [
         "vite",
@@ -69,7 +69,7 @@
       "port": 8787
     },
     {
-      "name": "tatino-5174-com-links",
+      "name": "filidilo-5174-com-links",
       "runtimeExecutable": "npx",
       "runtimeArgs": [
         "vite",
@@ -83,7 +83,7 @@
       }
     },
     {
-      "name": "tatino-5175",
+      "name": "filidilo-5175",
       "runtimeExecutable": "npx",
       "runtimeArgs": [
         "vite",
