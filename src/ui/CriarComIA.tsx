@@ -3,20 +3,23 @@ import { useEffect, useMemo, useState } from 'preact/hooks'
 import { salvar } from '../core/baralhos'
 import { ganharFolga, MAX_FOLGAS } from '../core/ofensiva'
 import { avaliarBaralho, type Avaliacao } from '../core/desempenho'
-import { EXEMPLOS, VERSAO_INSTRUCAO, montarCorrecao, montarInstrucao, montarInstrucaoFormatacao, type Mistura, type Origem } from '../core/ia/instrucao'
-import { extrairJson, lerResposta, type RespostaLida } from '../core/ia/resposta'
+import { EXEMPLOS, VERSAO_INSTRUCAO, montarCorrecao, montarInstrucao, montarInstrucaoFormatacao, montarMaisDoMaterial, type Mistura, type Origem } from '../core/ia/instrucao'
+import { extrairJson, lerResposta, parecePerguntas, type RespostaLida } from '../core/ia/resposta'
 import { infoNivel, normalizarNivel, type Baralho } from '../core/types'
 import type { Navegacao } from './App'
 import { AbrirIA } from './AbrirIA'
+import { ComoAnexar } from './ComoAnexar'
 import { Conferencia, useConferencia } from './Conferencia'
 
 
 /** Criar cartões com IA: copia a instrução, cola na IA, cola a resposta aqui, confere e salva. */
 export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: Baralho; assuntoInicial?: string; temaId?: string; nav: Navegacao }) {
   // Vindo do fim de uma sessão, já abre no tema em que houve mais dificuldade.
-  const [origem, setOrigem] = useState<Origem>(assuntoInicial ? 'tema' : 'pdf')
-  const [nomePdf, setNomePdf] = useState('')
-  const [paginas, setPaginas] = useState('')
+  // Baralho com cartões tirados de arquivo (têm página): começa em "Arquivo", na mesma conversa.
+  const veioDeArquivo = !assuntoInicial && baralho.cartoes.some((c) => c.fonte?.pagina != null)
+  const [origem, setOrigem] = useState<Origem>(assuntoInicial ? 'tema' : 'arquivo')
+  // Mais cartões do mesmo arquivo: pedido curto para colar na conversa em que o arquivo já está.
+  const [continuar, setContinuar] = useState(veioDeArquivo)
   const [texto, setTexto] = useState('')
   const [assunto, setAssunto] = useState(assuntoInicial ? `${assuntoInicial} (${baralho.titulo})` : '')
   // Modo "formatar": a pessoa já tem perguntas e respostas, em qualquer formato, e a IA só as converte.
@@ -29,6 +32,7 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
   const [resposta, setResposta] = useState('')
   const [lida, setLida] = useState<RespostaLida | null>(null)
   const [erroLeitura, setErroLeitura] = useState('')
+  const [iaPerguntou, setIaPerguntou] = useState(false)
   const [desmarcados, setDesmarcados] = useState<Set<string>>(new Set())
   const [salvando, setSalvando] = useState(false)
   const conf = useConferencia()
@@ -52,15 +56,16 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
 
   const materialOk = formatar
     ? perguntas.trim().length > 20
-    : origem === 'pdf' || (origem === 'texto' ? texto.trim().length > 40 : assunto.trim().length > 3)
+    : origem === 'arquivo' || (origem === 'texto' ? texto.trim().length > 40 : assunto.trim().length > 3)
+  const continuando = !formatar && origem === 'arquivo' && continuar
   const instrucao = useMemo(
     () =>
       formatar
         ? montarInstrucaoFormatacao({ texto: perguntas, baralho })
-        : montarInstrucao({
+        : continuando
+          ? montarMaisDoMaterial({ baralho, mistura })
+          : montarInstrucao({
             origem,
-            nomePdf,
-            paginas,
             texto,
             assunto,
             quantidade,
@@ -73,11 +78,11 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
             },
             temaPrioritario: temaId,
           }),
-    [formatar, perguntas, origem, nomePdf, paginas, texto, assunto, quantidade, mistura, baralho, temaId, nivelUsado],
+    [formatar, continuando, perguntas, origem, texto, assunto, quantidade, mistura, baralho, temaId, nivelUsado],
   )
   const fontePadrao = formatar
     ? 'Perguntas próprias'
-    : origem === 'pdf' ? nomePdf.trim() || 'Gerado por IA' : origem === 'texto' ? 'Texto colado' : 'Gerado por IA'
+    : origem === 'arquivo' ? 'Arquivo' : origem === 'texto' ? 'Texto colado' : 'Gerado por IA'
   const comObjetivo = !!baralho.objetivo
 
   const copiar = async (conteudo: string, qual: string) => {
@@ -117,7 +122,11 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
 
   const ler = () => {
     const erro = lerTexto(resposta)
-    setErroLeitura(erro ?? '')
+    // Resposta sem JSON com perguntas (quantos cartões, mande o arquivo): não é erro, é a conversa seguindo.
+    const perguntou = !!erro && parecePerguntas(resposta)
+    if (perguntou) evento('ia_perguntas', { origem })
+    setIaPerguntou(perguntou)
+    setErroLeitura(perguntou ? '' : erro ?? '')
     if (erro) return
     setResposta('')
     conf.abrir()
@@ -232,23 +241,25 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
         ) : (
           <>
         <div class="segmentado" role="radiogroup" aria-label="Material">
-          {(['pdf', 'texto', 'tema'] as Origem[]).map((o) => (
+          {(['arquivo', 'texto', 'tema'] as Origem[]).map((o) => (
             <button role="radio" aria-checked={origem === o} class={origem === o ? 'ativo' : ''} onClick={() => setOrigem(o)}>
-              {o === 'pdf' ? 'PDF' : o === 'texto' ? 'Texto' : 'Assunto'}
+              {o === 'arquivo' ? 'PDF ou Imagem' : o === 'texto' ? 'Texto' : 'Assunto'}
             </button>
           ))}
         </div>
-        {origem === 'pdf' && (
-          <div class="linha">
-            <label class="campo">
-              Nome do PDF
-              <input class="texto" value={nomePdf} placeholder="Aula 4" onInput={(e) => setNomePdf((e.target as HTMLInputElement).value)} />
-            </label>
-            <label class="campo">
-              Páginas
-              <input class="texto" value={paginas} placeholder="todas" onInput={(e) => setPaginas((e.target as HTMLInputElement).value)} />
-            </label>
-          </div>
+        {origem === 'arquivo' && (
+          <>
+            {baralho.cartoes.length > 0 && (
+              <div class="segmentado" role="radiogroup" aria-label="Conversa com a IA">
+                <button role="radio" aria-checked={!continuar} class={!continuar ? 'ativo' : ''} onClick={() => setContinuar(false)}>
+                  Arquivo novo
+                </button>
+                <button role="radio" aria-checked={continuar} class={continuar ? 'ativo' : ''} onClick={() => setContinuar(true)}>
+                  Mesma conversa
+                </button>
+              </div>
+            )}
+          </>
         )}
         {origem === 'texto' && (
           <label class="campo">
@@ -263,14 +274,16 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
           </label>
         )}
         <div class="linha">
-          <label class="campo">
-            Cartões
-            <select value={quantidade} onChange={(e) => setQuantidade(Number((e.target as HTMLSelectElement).value))}>
-              {[10, 20, 40].map((n) => (
-                <option value={n}>{n}</option>
-              ))}
-            </select>
-          </label>
+          {origem !== 'arquivo' && (
+            <label class="campo">
+              Cartões
+              <select value={quantidade} onChange={(e) => setQuantidade(Number((e.target as HTMLSelectElement).value))}>
+                {[10, 20, 40].map((n) => (
+                  <option value={n}>{n}</option>
+                ))}
+              </select>
+            </label>
+          )}
           <label class="campo">
             Tipo
             <select value={mistura} onChange={(e) => setMistura((e.target as HTMLSelectElement).value as Mistura)}>
@@ -286,11 +299,9 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
 
       <section class="bloco passo">
         <h2><span class="num-passo">2</span> Peça à IA</h2>
-        <p class="dica">
-          Copie a instrução e cole na IA{origem === 'pdf' && !formatar ? ', junto com o PDF' : ''}.
-        </p>
-        <button class="btn principal" disabled={!materialOk} onClick={() => copiar(instrucao, 'instrucao')}>
-          {copiado === 'instrucao' ? '✓ Instrução copiada' : 'Copiar instrução'}
+        {origem === 'arquivo' && !formatar ? <ComoAnexar continuar={continuando} /> : <p class="dica">Copie a instrução e cole na IA.</p>}
+        <button class="btn principal" disabled={!materialOk} onClick={() => copiar(instrucao, continuando ? 'mais' : 'instrucao')}>
+          {copiado === (continuando ? 'mais' : 'instrucao') ? (continuando ? '✓ Pedido copiado' : '✓ Instrução copiada') : continuando ? 'Copiar pedido' : 'Copiar instrução'}
         </button>
         <AbrirIA />
         {copiado === 'erro' && (
@@ -309,6 +320,11 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
         <button class="btn principal" disabled={!resposta.trim()} onClick={ler}>
           Criar cartões
         </button>
+        {iaPerguntou && (
+          <p class="dica" role="status">
+            A IA fez perguntas. Responda lá e cole aqui a resposta final.
+          </p>
+        )}
         {erroLeitura && (
           <p class="resultado erro" role="alert">
             ✕ {erroLeitura}

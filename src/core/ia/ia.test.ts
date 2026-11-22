@@ -31,13 +31,15 @@ describe('instrução para o Gemini', () => {
     expect(validar({ id: 'x', titulo: 'x', versao: 1, temas: EXEMPLOS.temas, cartoes: EXEMPLOS.cartoes }, 200)).toEqual([])
   })
   it('inclui quantidade, mistura, origem e os temas do baralho', () => {
-    const t = montarInstrucao({ origem: 'pdf', nomePdf: 'Aula 4.pdf', paginas: '3-9', quantidade: 20, mistura: 'teoria', baralho: { titulo: 'Física', temas: destino.temas } })
-    expect(t).toContain('Crie 20 cartões')
+    const t = montarInstrucao({ origem: 'arquivo', quantidade: 20, mistura: 'teoria', baralho: { titulo: 'Física', temas: destino.temas } })
+    // Com arquivo, a IA pergunta a quantidade: o número do app não entra.
+    expect(t).not.toContain('Crie 20 cartões')
+    expect(t).toContain('Crie a quantidade de cartões que eu pedir, no máximo 40 por resposta')
     expect(t).toContain('Não crie "calculo"')
-    expect(t).toContain('"Aula 4.pdf"')
-    expect(t).toContain('somente as páginas 3-9')
+    // Nome e páginas vêm da conversa com a IA, não do app.
+    expect(t).toContain('Quer usar o material todo ou só algumas páginas?')
     expect(t).toContain('"dinamica": Dinâmica')
-    expect(t).toContain('"pagina": número da página')
+    expect(t).toContain('"pagina": número da página ou da imagem')
     // O exemplo dentro da instrução é JSON válido.
     expect(extrairJson(t)).toEqual(JSON.parse(JSON.stringify(EXEMPLOS)))
   })
@@ -124,7 +126,7 @@ describe('lendo a resposta', () => {
 
 describe('instrução v3 (objetivo e cobertos)', () => {
   it('versão 3', () => {
-    expect(VERSAO_INSTRUCAO).toBe(10)
+    expect(VERSAO_INSTRUCAO).toBe(11)
   })
 
   it('com objetivo: seção, nível, foco, evitar (spoilers), descrição do tema e prioridade', () => {

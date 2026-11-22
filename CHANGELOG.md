@@ -2,6 +2,16 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.15.0] — 2026-11-22
+
+**Criar baralho a partir de PDF ou imagem**
+- Em "Aprender" e em "Criar com IA", a opção agora se chama **PDF ou Imagem** e serve também para foto ou print de caderno, slide ou livro.
+- A tela diz em uma frase o que fazer: copie a instrução, cole na IA e anexe lá o PDF ou a imagem. O arquivo vai para a IA, não para o Filidilo. O "Saiba mais" traz os detalhes: o Gemini e o ChatGPT pedem login para anexar, a opção Texto serve para quem não tem conta e dá para mandar o material em partes.
+- Não precisa mais digitar o nome do material nem as páginas. A IA conta o que leu e pergunta que parte usar e quantos cartões criar.
+- Com um arquivo, o campo "O que você quer aprender" fica opcional.
+- Em "Criar com IA", **Mesma conversa** pede mais cartões do arquivo que você já mandou à IA, sem repetir os que o baralho tem e sem anexar de novo.
+- Quando a IA responde com perguntas, "Criar com IA" mostra um aviso para responder lá, em vez de dar erro.
+
 ## [3.14.3] — 2026-11-22
 
 **Aviso claro quando o link não abre**

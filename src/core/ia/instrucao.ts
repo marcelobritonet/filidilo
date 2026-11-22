@@ -4,17 +4,13 @@ import type { Baralho, Cartao, Objetivo, Tema } from '../types'
 import { infoNivel } from '../types'
 import { jaCobertos } from './cobertos'
 
-export const VERSAO_INSTRUCAO = 10
+export const VERSAO_INSTRUCAO = 11
 
-export type Origem = 'pdf' | 'texto' | 'tema'
+export type Origem = 'arquivo' | 'texto' | 'tema'
 export type Mistura = 'misto' | 'teoria' | 'calculo'
 
 export interface PedidoIA {
   origem: Origem
-  /** Nome do PDF (vira a fonte dos cartões). */
-  nomePdf?: string
-  /** Ex.: "3–10". Vazio = o PDF todo. */
-  paginas?: string
   /** Texto colado (origem "texto"). */
   texto?: string
   /** Tema descrito (origem "tema"), ex.: "Leis de Newton, ensino médio". */
@@ -139,14 +135,36 @@ export function regraEntrega(): string {
 - Dentro dos textos: barra invertida sempre dobrada (\\\\Delta, \\\\frac), aspas internas como \\", quebra de linha como \\n e nenhuma entidade HTML (&#x20;, &nbsp;).`
 }
 
-/** Material: PDF e texto usam o mesmo texto de sempre. */
-export function origemTexto(p: PedidoIA): string {
-  if (p.origem === 'pdf') {
-    const pag = p.paginas?.trim() ? `, somente as páginas ${p.paginas.trim()}` : ''
-    return `Use como material o PDF que anexei${p.nomePdf ? ` ("${p.nomePdf}")` : ''}${pag}. Leia também o que estiver em imagens, tabelas e fórmulas dos slides.`
+/** Material: arquivo anexado na IA (PDF ou imagens), texto colado ou assunto. */
+export function origemTexto(p: Pick<PedidoIA, 'origem' | 'texto' | 'assunto'>): string {
+  if (p.origem === 'arquivo') {
+    // Nome e páginas não são pedidos no app: a IA lê o nome do arquivo e pergunta o recorte.
+    return `Use como material os arquivos que eu anexar nesta conversa: PDF ou imagens (fotos, prints). Leia também o que estiver em figuras, tabelas, fórmulas e texto escrito à mão.
+
+## Antes de criar os cartões
+1. Se ainda não houver arquivo anexado nesta conversa, peça numa frase curta que eu anexe o PDF ou as imagens (pelo botão + ou pelo clipe 📎) e espere. Não crie cartões sem o material.
+2. Com o material em mãos, responda numa mensagem curta, sem JSON: o que você leu (quantas páginas ou imagens e o assunto, em poucas palavras) e se alguma parte ficou ilegível. Na mesma mensagem, pergunte "Quer usar o material todo ou só algumas páginas?" e "Quantos cartões você quer? Sugiro N." (N entre 10 e 40, conforme o tamanho do material). Espere a resposta.
+3. Se eu já tiver respondido a alguma dessas perguntas, não pergunte de novo.`
   }
   if (p.origem === 'texto') return `Use como material o texto abaixo, entre as linhas ===.\n===\n${(p.texto ?? '').trim()}\n===`
   return `Não há material anexado. Crie os cartões sobre: "${(p.assunto ?? '').trim()}". Use conhecimento consolidado e correto; prefira o que é ensinado em cursos regulares.`
+}
+
+/** Quantidade quando o material é arquivo: a IA pergunta e respeita o limite por resposta. */
+export function quantidadeArquivo(): string {
+  return 'Crie a quantidade de cartões que eu pedir, no máximo 40 por resposta. Se eu pedir mais de 40, entregue 40 e avise que posso pedir o resto nesta mesma conversa.'
+}
+
+/** Campo "fonte" do exemplo de cartão, conforme o material. */
+export function fonteDe(origem: Origem | undefined): string {
+  if (origem === 'arquivo') return '"fonte": { "apostila": "nome do arquivo, sem a extensão", "pagina": número da página ou da imagem }'
+  if (origem === 'texto') return '"fonte": { "apostila": "Texto colado" }'
+  return '"fonte": { "apostila": "Gerado por IA" }'
+}
+
+/** Regra da página de origem do cartão, só quando o material é arquivo. */
+export function regraPagina(origem: Origem | undefined): string {
+  return origem === 'arquivo' ? '- Em "fonte.pagina", ponha a página do PDF (ou o número da imagem, na ordem em que vieram) de onde saiu o cartão.\n' : ''
 }
 
 function temasTexto(p: PedidoIA): string {
@@ -173,20 +191,21 @@ function objetivoTexto(obj?: Objetivo): string {
 
 /** Instrução completa para colar na IA. */
 export function montarInstrucao(p: PedidoIA): string {
-  const fonte = p.origem === 'pdf' ? `"fonte": { "apostila": "${p.nomePdf?.trim() || 'nome do material'}", "pagina": número da página }` : p.origem === 'texto' ? '"fonte": { "apostila": "Texto colado" }' : '"fonte": { "apostila": "Gerado por IA" }'
+  const fonte = fonteDe(p.origem)
+  const arquivo = p.origem === 'arquivo'
   const objetivo = objetivoTexto(p.baralho?.objetivo)
   const cobertos = jaCobertos({ temas: p.baralho?.temas ?? [], cartoes: p.baralho?.cartoes ?? [] })
   const coberturaSecao = cobertos
     ? `## Já cobertos\nJá cobertos (não repita o mesmo assunto com a mesma pergunta; pode aprofundar):\n${cobertos}\n\n`
     : ''
   const prioridade = objetivo ? 'Priorize o que mais serve ao objetivo.' : 'Priorize o que é mais importante do assunto.'
-  return `Você vai criar flashcards de estudo para o app Filidilo. Responda SOMENTE com um bloco de código JSON, sem texto antes ou depois (veja "Entrega").
+  return `Você vai criar flashcards de estudo para o app Filidilo. ${arquivo ? 'Primeiro siga "Antes de criar os cartões"; depois, responda SOMENTE com um bloco de código JSON, sem texto antes ou depois (veja "Entrega").' : 'Responda SOMENTE com um bloco de código JSON, sem texto antes ou depois (veja "Entrega").'}
 
 ## Material
 ${origemTexto(p)}
 
 ## Quantidade e tipos
-Crie ${p.quantidade} cartões. ${PROPORCAO[p.mistura]}
+${arquivo ? quantidadeArquivo() : `Crie ${p.quantidade} cartões.`} ${PROPORCAO[p.mistura]}
 
 ${objetivo}## Temas
 ${temasTexto(p)}
@@ -202,13 +221,32 @@ ${regraNaoEntregar()}
 ## Regras
 - Português do Brasil. Uma ideia por cartão. Pergunta que se entende sozinha, sem "segundo o texto".
 - Fiel ao material: não invente dados, valores ou fórmulas que não estejam nele${p.origem === 'tema' ? ' (aqui, fiel ao conhecimento estabelecido)' : ''}.
-${p.origem === 'pdf' ? '- Em "fonte.pagina", ponha a página do PDF de onde saiu o cartão.\n' : ''}- ${prioridade}
+${regraPagina(p.origem)}- ${prioridade}
 ${regrasTextoJson()}
 
 ## Exemplo (formato; não copie o conteúdo)
 \`\`\`json
 ${JSON.stringify(EXEMPLOS, null, 1)}
 \`\`\`
+`
+}
+
+/**
+ * Mais cartões do mesmo material: pedido curto para colar na conversa em que o arquivo já foi anexado.
+ * A IA já tem as regras e o material; aqui vão só os cartões que o baralho já tem, para não repetir.
+ */
+export function montarMaisDoMaterial(p: { baralho: Pick<Baralho, 'temas' | 'cartoes'>; mistura: Mistura }): string {
+  const cobertos = jaCobertos({ temas: p.baralho.temas, cartoes: p.baralho.cartoes })
+  const temas = p.baralho.temas.map((t) => `"${t.id}" (${t.nome})`).join(', ')
+  return `Quero mais flashcards do mesmo material desta conversa (não vou anexar de novo).
+- Use primeiro as páginas ou imagens que ainda não viraram cartão; depois, aprofunde o que já foi visto.
+- Pergunte quantos cartões eu quero (sugira um número) e espere. ${quantidadeArquivo()}
+- ${PROPORCAO[p.mistura]}
+- Siga as mesmas regras e o mesmo formato de cartão da primeira instrução, com "fonte.pagina".
+${temas ? `- Reaproveite os temas que o baralho já tem, com o mesmo "id": ${temas}.\n` : ''}${cobertos ? `\nJá tenho estes (não repita a mesma pergunta):\n${cobertos}\n` : ''}
+## Entrega
+Depois da quantidade, responda SOMENTE com um objeto JSON {"temas": [...], "cartoes": [...]}, sem texto antes ou depois.
+${regraEntrega()}
 `
 }
 

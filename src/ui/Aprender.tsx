@@ -8,9 +8,10 @@ import { evento } from '../core/telemetria'
 import { NIVEIS, type Baralho, type Cartao, type Nivel, type Objetivo } from '../core/types'
 import type { Navegacao } from './App'
 import { AbrirIA } from './AbrirIA'
+import { ComoAnexar } from './ComoAnexar'
 import { Conferencia, useConferencia } from './Conferencia'
 
-type Material = 'pdf' | 'texto'
+type Material = 'arquivo' | 'texto'
 
 /** Texto de partida do cartão, para reconhecer cartões copiados da instrução de exemplo. */
 const textoBase = (c: Cartao) => (c.tipo === 'calculo' ? c.titulo : c.frente)
@@ -39,9 +40,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
   const [naoConvertidos, setNaoConvertidos] = useState<string[]>([])
   const [nivelPedido, setNivelPedido] = useState<Nivel | ''>('')
   const [materialAberto, setMaterialAberto] = useState(false)
-  const [material, setMaterial] = useState<Material>('pdf')
-  const [nomePdf, setNomePdf] = useState('')
-  const [paginas, setPaginas] = useState('')
+  const [material, setMaterial] = useState<Material>('arquivo')
   const [texto, setTexto] = useState('')
   const [copiado, setCopiado] = useState('')
   const [falha, setFalha] = useState<{ qual: string; texto: string } | null>(null)
@@ -57,8 +56,8 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
   // O material só entra na instrução se estiver preenchido.
   const origemMaterial: Material | undefined = !materialAberto
     ? undefined
-    : material === 'pdf'
-      ? 'pdf'
+    : material === 'arquivo'
+      ? 'arquivo'
       : texto.trim().length > 40
         ? 'texto'
         : undefined
@@ -66,13 +65,14 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
     () =>
       formatar
         ? montarInstrucaoFormatacao({ texto: perguntas, novo: { titulo: nome } })
-        : montarPlano({ pedido, nivel: nivelPedido || undefined, origem: origemMaterial, nomePdf, paginas, texto }),
-    [formatar, perguntas, nome, pedido, nivelPedido, origemMaterial, nomePdf, paginas, texto],
+        : montarPlano({ pedido, nivel: nivelPedido || undefined, origem: origemMaterial, texto }),
+    [formatar, perguntas, nome, pedido, nivelPedido, origemMaterial, texto],
   )
   const modo = formatar ? 'formatar' : 'aprender'
   // Sem o nível escolhido a instrução não sai: é ele que define a dificuldade dos cartões.
+  // Com arquivo, o pedido é opcional: o material dá o recorte.
   // Com perguntas prontas o nível não é pedido: a IA só converte, e ele pode ser definido em "Editar" ou depois.
-  const pedidoOk = formatar ? perguntas.trim().length > 20 : pedido.trim().length >= 3 && !!nivelPedido
+  const pedidoOk = formatar ? perguntas.trim().length > 20 : (pedido.trim().length >= 3 || origemMaterial === 'arquivo') && !!nivelPedido
   const mudarModo = (f: boolean) => {
     if (f === formatar) return
     setFormatar(f)
@@ -108,7 +108,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
       return { texto: (e as Error).message, erro: true }
     }
     try {
-      const r = formatar ? lerPlano(dados, nome.trim() || 'Minhas perguntas', 'Perguntas próprias') : lerPlano(dados, pedido)
+      const r = formatar ? lerPlano(dados, nome.trim() || 'Minhas perguntas', 'Perguntas próprias') : lerPlano(dados, pedido.trim() || 'Meu material', origemMaterial === 'arquivo' ? 'Arquivo' : undefined)
       if (r.cartoes.length && r.cartoes.every((c) => DO_EXEMPLO.has(textoBase(c.cartao))))
         throw new Error('Você colou a instrução. Cole a resposta que a IA deu.')
       evento('aprender_resposta_lida', {
@@ -288,7 +288,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
             </label>
           </>
         ) : (
-          <input class="texto" aria-label="O que você quer aprender" value={pedido} placeholder="Ex.: espanhol para viajar" onInput={(e) => setPedido((e.target as HTMLInputElement).value)} />
+          <input class="texto" aria-label="O que você quer aprender" value={pedido} placeholder={origemMaterial === 'arquivo' ? 'Opcional com arquivo. Ex.: só o capítulo 2' : 'Ex.: espanhol para viajar'} onInput={(e) => setPedido((e.target as HTMLInputElement).value)} />
         )}
         {!formatar && (
           <>
@@ -312,29 +312,18 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
         )}
         {formatar ? null : !materialAberto ? (
           <button class="link" onClick={() => { setMaterialAberto(true); evento('aprender_material', { origem: material }) }}>
-            Tenho um material (PDF ou texto)
+            Tenho um material (PDF, imagem ou texto)
           </button>
         ) : (
           <>
             <div class="segmentado" role="radiogroup" aria-label="Material">
-              {(['pdf', 'texto'] as Material[]).map((o) => (
+              {(['arquivo', 'texto'] as Material[]).map((o) => (
                 <button role="radio" aria-checked={material === o} class={material === o ? 'ativo' : ''} onClick={() => { setMaterial(o); evento('aprender_material', { origem: o }) }}>
-                  {o === 'pdf' ? 'PDF' : 'Texto'}
+                  {o === 'arquivo' ? 'PDF ou Imagem' : 'Texto'}
                 </button>
               ))}
             </div>
-            {material === 'pdf' ? (
-              <div class="linha">
-                <label class="campo">
-                  Nome do PDF
-                  <input class="texto" value={nomePdf} placeholder="Aula 4" onInput={(e) => setNomePdf((e.target as HTMLInputElement).value)} />
-                </label>
-                <label class="campo">
-                  Páginas
-                  <input class="texto" value={paginas} placeholder="todas" onInput={(e) => setPaginas((e.target as HTMLInputElement).value)} />
-                </label>
-              </div>
-            ) : (
+            {material === 'texto' && (
               <label class="campo">
                 Texto
                 <textarea rows={6} value={texto} placeholder="Cole aqui o resumo ou trecho" onInput={(e) => setTexto((e.target as HTMLTextAreaElement).value)} />
@@ -346,9 +335,9 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
 
       <section class="bloco passo">
         <h2><span class="num-passo">2</span> Peça à IA</h2>
-        <p class="dica">Copie a instrução e cole na IA{origemMaterial === 'pdf' && !formatar ? ', junto com o PDF' : ''}.</p>
+        {origemMaterial === 'arquivo' && !formatar ? <ComoAnexar /> : <p class="dica">Copie a instrução e cole na IA.</p>}
         {!pedidoOk && (
-          <p class="dica">{formatar ? 'Cole suas perguntas e respostas no passo 1.' : 'Escreva o que quer aprender e escolha quanto você já sabe, no passo 1.'}</p>
+          <p class="dica">{formatar ? 'Cole suas perguntas e respostas no passo 1.' : origemMaterial === 'arquivo' ? 'Escolha quanto você já sabe, no passo 1.' : 'Escreva o que quer aprender e escolha quanto você já sabe, no passo 1.'}</p>
         )}
         <button class="btn principal" disabled={!pedidoOk} onClick={() => copiar(instrucao, 'instrucao')}>
           {copiado === 'instrucao' ? '✓ Instrução copiada' : 'Copiar instrução'}

@@ -5,7 +5,7 @@ import { extrairJson } from './resposta'
 
 describe('instrução de planejamento (Aprender)', () => {
   it('versão 1', () => {
-    expect(VERSAO_PLANO).toBe(7)
+    expect(VERSAO_PLANO).toBe(8)
   })
 
   it('o exemplo passa no validador do app', () => {
@@ -28,10 +28,10 @@ describe('instrução de planejamento (Aprender)', () => {
     expect(t).not.toContain('"meta"')
   })
 
-  it('o material de PDF entra com nome e páginas', () => {
-    const t = montarPlano({ pedido: 'cinemática', origem: 'pdf', nomePdf: 'Aula 2', paginas: '1-4' })
-    expect(t).toContain('"Aula 2"')
-    expect(t).toContain('somente as páginas 1-4')
+  it('com arquivo, a IA pergunta o recorte e usa o nome do arquivo como fonte', () => {
+    const t = montarPlano({ pedido: 'cinemática', origem: 'arquivo' })
+    expect(t).toContain('Quer usar o material todo ou só algumas páginas?')
+    expect(t).toContain('"apostila": "nome do arquivo, sem a extensão"')
   })
 
   it('o exemplo dentro da instrução é o JSON de EXEMPLO_PLANO', () => {

@@ -1,19 +1,17 @@
 // Harness "Aprender uma coisa nova hoje": monta a instrução que a pessoa cola na IA para planejar um baralho.
 // Versão da instrução: mude ao alterar regras (como em VERSAO_INSTRUCAO).
 import { infoNivel, type Cartao, type Nivel, type Tema } from '../types'
-import { origemTexto, regraNaoEntregar, regrasTextoJson, regrasTipos } from './instrucao'
+import { fonteDe, origemTexto, quantidadeArquivo, regraNaoEntregar, regraPagina, regrasTextoJson, regrasTipos } from './instrucao'
 
-export const VERSAO_PLANO = 7
+export const VERSAO_PLANO = 8
 
 export interface PedidoPlano {
-  /** O que a pessoa digitou em "Aprender uma coisa nova hoje". */
+  /** O que a pessoa digitou em "Aprender uma coisa nova hoje". Com arquivo, pode ficar vazio. */
   pedido: string
   /** Quanto a pessoa já sabe (escolhido ao lado do pedido). */
   nivel?: Nivel
-  /** Material opcional: PDF (com nome e páginas) ou texto colado. */
-  origem?: 'pdf' | 'texto'
-  nomePdf?: string
-  paginas?: string
+  /** Material opcional: arquivo anexado na IA (PDF ou imagens) ou texto colado. */
+  origem?: 'arquivo' | 'texto'
   texto?: string
 }
 
@@ -63,26 +61,25 @@ export const EXEMPLO_PLANO: {
 /** Instrução de planejamento completa para colar na IA. */
 export function montarPlano(p: PedidoPlano): string {
   const material = p.origem
-    ? origemTexto({ origem: p.origem, nomePdf: p.nomePdf, paginas: p.paginas, texto: p.texto, quantidade: 15, mistura: 'misto' })
+    ? origemTexto({ origem: p.origem, texto: p.texto })
     : 'Não há material anexado: use conhecimento consolidado e correto, do que é ensinado em cursos regulares.'
   const nivel = infoNivel(p.nivel)
-  const fonte =
-    p.origem === 'pdf'
-      ? `"fonte": { "apostila": "${p.nomePdf?.trim() || 'nome do material'}", "pagina": número da página }`
-      : '"fonte": { "apostila": "Gerado por IA" }'
+  const arquivo = p.origem === 'arquivo'
+  const fonte = arquivo ? fonteDe('arquivo') : fonteDe('tema')
+  const pedido = p.pedido.trim() || 'Não escrevi um pedido: monte o plano para estudar o que está no material anexado.'
 
-  return `Você é um professor que monta um plano de estudo em flashcards para o app Filidilo. Responda SOMENTE com um bloco de código JSON (veja "Entrega"), exceto quando precisar fazer perguntas (ver "Antes de responder").
+  return `Você é um professor que monta um plano de estudo em flashcards para o app Filidilo. Responda SOMENTE com um bloco de código JSON (veja "Entrega"), exceto quando precisar fazer perguntas (ver "Antes de responder"${arquivo ? ' e "Antes de criar os cartões"' : ''}).
 
 ## Pedido
 ===
-${p.pedido.trim()}
+${pedido}
 ===
 
 ## Material
 ${material}
 ${nivel ? `\n## Quanto a pessoa já sabe\nNível "${nivel.nome}" (${nivel.valor}). ${nivel.instrucao}\nEsse nível foi escolhido pela própria pessoa: não mude. Ele manda na dificuldade e no tom de todos os cartões.\n` : ''}
 ## Antes de responder
-Se o pedido for vago demais para montar um bom plano (não dá para saber o objetivo ou o recorte), faça até 3 perguntas curtas, numa mensagem só, e espere a resposta. Senão, responda direto.
+Se o pedido for vago demais para montar um bom plano (não dá para saber o objetivo ou o recorte), faça até 3 perguntas curtas, numa mensagem só, e espere a resposta. Senão, responda direto.${arquivo ? ' Com material anexado, o pedido pode ser curto ou vazio: o material dá o recorte.' : ''}
 
 ## Planejar
 - Interprete o objetivo da pessoa e escreva o objetivo em 1 frase.${nivel ? ` O nível é "${nivel.valor}".` : ' Escolha o nível entre "zero", "iniciante", "nocoes", "bastante", "expert" e "extremo".'}
@@ -90,7 +87,7 @@ Se o pedido for vago demais para montar um bom plano (não dá para saber o obje
 - Crie de 3 a 8 temas, na ordem em que se aprende, cada um com uma frase de descrição.
 
 ## Cartões
-Crie 15 cartões, distribuídos pelos temas e começando pelos primeiros. Adeque a dificuldade ao nível da pessoa. Os tipos devem combinar com o assunto: "calculo" só se houver contas; para idiomas, use "conceito" e "associacao".
+${arquivo ? quantidadeArquivo() : 'Crie 15 cartões.'} Distribua os cartões pelos temas, começando pelos primeiros. Adeque a dificuldade ao nível da pessoa. Os tipos devem combinar com o assunto: "calculo" só se houver contas; para idiomas, use "conceito" e "associacao".
 
 ## Formato da resposta
 Um objeto JSON com "baralho", "temas" e "cartoes":
@@ -104,9 +101,9 @@ ${regraNaoEntregar()}
 
 ## Regras
 - Português do Brasil (menos o conteúdo do idioma estudado, se for o caso). Uma ideia por cartão. Pergunta que se entende sozinha.
-- Fiel ao conhecimento consolidado: se não tiver certeza, não crie o cartão.
+- ${arquivo ? 'Fiel ao material: não invente dados, valores ou fórmulas que não estejam nele.' : 'Fiel ao conhecimento consolidado: se não tiver certeza, não crie o cartão.'}
 - Nada de spoilers, nem do que estiver em "evitar".
-${p.origem === 'pdf' ? '- Em "fonte.pagina", ponha a página do PDF de onde saiu o cartão.\n' : ''}${regrasTextoJson()}
+${regraPagina(p.origem)}${regrasTextoJson()}
 
 ## Exemplo (formato; não copie o conteúdo)
 \`\`\`json

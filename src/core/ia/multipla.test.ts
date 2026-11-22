@@ -20,9 +20,9 @@ describe('questões de múltipla escolha (P90)', () => {
     expect(f).toContain('Sem gabarito, resolva a questão')
     expect(f).toContain('não crie erradas novas')
     const regra = 'Nunca ponha alternativas (A, B, C…) dentro de "frente" ou "verso"'
-    expect(montarInstrucao({ origem: 'pdf', quantidade: 10, mistura: 'misto' })).toContain(regra)
+    expect(montarInstrucao({ origem: 'arquivo', quantidade: 10, mistura: 'misto' })).toContain(regra)
     expect(montarPlano({ pedido: 'BWM' })).toContain(regra)
-    expect(montarInstrucao({ origem: 'pdf', quantidade: 10, mistura: 'misto' })).toContain('use só as alternativas dela, sem criar erradas novas, e sem "outrasFormas"')
+    expect(montarInstrucao({ origem: 'arquivo', quantidade: 10, mistura: 'misto' })).toContain('use só as alternativas dela, sem criar erradas novas, e sem "outrasFormas"')
   })
 
   it('separa pergunta, sem cabeçalho, e alternativas', () => {
