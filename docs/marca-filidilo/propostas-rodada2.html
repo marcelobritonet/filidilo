@@ -1,0 +1,808 @@
+<title>Propostas de marca Filidilo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700&family=Lexend:wght@400;600&family=Unbounded:wght@600;700&family=Baloo+2:wght@700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: uma página de prancha — abertura curta, três propostas empilhadas (cada uma é um espécime com cores próprias), quadro comparativo e decisão no fim. */
+:root {
+  --bg: #F3F5FA;
+  --surface: #FFFFFF;
+  --fg: #141B2E;
+  --muted: #5A6480;
+  --line: #DCE1EC;
+  --accent: #1F4FD1;
+  --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-head: 'Sora', 'Inter', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0C1222; --surface: #141C31; --fg: #E8ECF6; --muted: #9BA6C2; --line: #26304A; --accent: #7FA6FF; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #0C1222; --surface: #141C31; --fg: #E8ECF6; --muted: #9BA6C2; --line: #26304A; --accent: #7FA6FF; color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 40px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--font-head); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(28px, 4vw, 40px); letter-spacing: -.02em; }
+.lede { max-width: 66ch; color: var(--muted); margin: 8px 0 0; }
+.eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+/* Proposta: painel com as cores da própria proposta */
+.prop { border-radius: 28px; overflow: hidden; border: 1px solid var(--line); }
+.prop-head { padding: 28px 28px 8px; display: grid; gap: 6px; }
+.prop-head .tag { font-family: var(--font-ui); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; }
+.prop-head h2 { font-size: clamp(24px, 3vw, 32px); }
+.prop-head p { margin: 0; max-width: 70ch; }
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; padding: 20px 28px 28px; }
+.cell { border-radius: 20px; padding: 20px; min-width: 0; display: grid; gap: 12px; align-content: start; }
+.cell h3 { font-family: var(--font-ui); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; }
+.c-mascote { grid-column: span 5; }
+.c-logo { grid-column: span 7; }
+.c-paleta { grid-column: span 12; }
+.c-mood { grid-column: span 7; }
+.c-tela { grid-column: span 5; }
+@media (max-width: 860px) { .c-mascote, .c-logo, .c-mood, .c-tela { grid-column: span 12; } }
+@media (max-width: 480px) { .grid { padding: 16px; } .prop-head { padding: 20px 16px 4px; } }
+
+.mascote-row { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; }
+.mascote-row svg.main { width: min(220px, 100%); height: auto; }
+.mascote-row .mini { display: grid; gap: 8px; justify-items: center; font-size: 12px; }
+.logo-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.tile { width: 88px; height: 88px; border-radius: 22px; display: grid; place-items: center; flex: none; }
+.tile svg { width: 64px; height: 64px; }
+.tile.sm { width: 44px; height: 44px; border-radius: 11px; } .tile.sm svg { width: 32px; height: 32px; }
+.tile.xs { width: 22px; height: 22px; border-radius: 6px; } .tile.xs svg { width: 16px; height: 16px; }
+.wm-box { border-radius: 16px; padding: 18px 22px; flex: 1 1 220px; display: flex; align-items: center; gap: 12px; min-width: 0; }
+.note { font-size: 13px; opacity: .85; margin: 0; }
+
+.swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.sw { border-radius: 14px; overflow: hidden; font-size: 12px; }
+.sw .chip { height: 72px; }
+.sw .lbl { padding: 8px 10px; display: grid; gap: 2px; }
+.sw .lbl b { font-size: 13px; }
+.sw .lbl code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; opacity: .8; }
+.sw .lbl span { opacity: .75; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips span { padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 500; }
+.ideas { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.ideas li { display: grid; grid-template-columns: 112px 1fr; gap: 10px; font-size: 14px; }
+.ideas li b { font-weight: 600; }
+@media (max-width: 480px) { .ideas li { grid-template-columns: 1fr; gap: 0; } }
+.typespec { display: grid; gap: 4px; }
+
+/* Mini tela do app */
+.phone { width: 100%; max-width: 300px; margin: 0 auto; border-radius: 28px; padding: 14px; display: grid; gap: 10px; }
+.phone .bar { display: flex; justify-content: space-between; align-items: center; }
+.phone .card { border-radius: 16px; padding: 12px 14px; display: grid; gap: 4px; font-size: 13px; }
+.phone .btn { border: 0; border-radius: 999px; padding: 8px 14px; font-weight: 600; font-size: 13px; justify-self: start; font-family: inherit; }
+.phone .badge { border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600; display: inline-flex; gap: 6px; align-items: center; }
+
+/* ===== Proposta A · Ocelo ===== */
+.A { background: #0B1E3F; color: #EEF3FB; }
+.A .tag { color: #13C2BE; }
+.A h2 { font-family: 'Sora', sans-serif; }
+.A .cell { background: #12295A; }
+.A .cell.light { background: #EEF3FB; color: #0B1E3F; }
+.A .wm { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 38px; letter-spacing: -.03em; line-height: 1; }
+.ocelo { display: inline-block; width: .6em; height: .6em; border-radius: 50%; vertical-align: -.02em; margin-left: .02em;
+  background: radial-gradient(circle, #0B1E3F 0 16%, #1F4FD1 16% 40%, #C9933A 40% 60%, #13A3A0 60%); }
+.A .chips span { background: #1C3A78; color: #EEF3FB; }
+.A .phone { background: #0B1E3F; border: 1px solid #2A4785; font-family: 'Inter', sans-serif; }
+.A .phone .card { background: #12295A; }
+.A .phone .btn { background: #13A3A0; color: #06142B; }
+.A .phone .badge { background: #1C3A78; color: #EEF3FB; }
+
+/* ===== Proposta B · Leque de cartões ===== */
+.B { background: #F2F6FF; color: #121A3D; }
+.B .tag { color: #2546F0; }
+.B h2 { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: clamp(26px, 3.2vw, 36px); }
+.B .cell { background: #FFFFFF; border: 2px solid #121A3D; box-shadow: 4px 4px 0 #121A3D; }
+.B .cell.dark { background: #2546F0; color: #FFFFFF; }
+.B .wm { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 42px; line-height: 1; letter-spacing: -.01em; }
+.pi { position: relative; display: inline-block; }
+.pi::after { content: ""; position: absolute; left: 50%; top: .02em; width: .22em; height: .22em; border-radius: 50%; transform: translateX(-50%); background: var(--dot); box-shadow: 0 0 0 .035em currentColor; }
+.B .chips span { background: #DCE6FF; color: #121A3D; border: 1.5px solid #121A3D; }
+.B .phone { background: #F2F6FF; border: 2px solid #121A3D; font-family: 'Nunito', sans-serif; }
+.B .phone .card { background: #FFFFFF; border: 2px solid #121A3D; }
+.B .phone .btn { background: #FFC23D; color: #121A3D; border: 2px solid #121A3D; box-shadow: 2px 2px 0 #121A3D; }
+.B .phone .badge { background: #2546F0; color: #FFFFFF; }
+
+/* Famílias */
+.family { display: grid; gap: 20px; }
+.family-head { display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 24px; }
+.family-head h2 { font-size: clamp(22px, 2.6vw, 28px); }
+.family-head p { margin: 0; color: var(--muted); max-width: 72ch; }
+.scales { display: flex; gap: 4px; }
+.scales i { width: 22px; height: 14px; border-radius: 0 0 11px 11px; background: #123A66; }
+.scales i.on { background: #0F8C7A; box-shadow: inset 0 -3px 0 #B8893A; }
+
+/* ===== A2 · Ocelo claro ===== */
+.A2 { background: #E6F0FF; color: #10295C; }
+.A2 .tag { color: #2F6BFF; }
+.A2 h2, .A2 .prop-head p, .A2 .cell { font-family: 'Lexend', sans-serif; }
+.A2 h2 { font-weight: 600; }
+.A2 .cell { background: #FFFFFF; box-shadow: 0 6px 24px rgba(47,107,255,.10); }
+.A2 .cell.tint { background: #2F6BFF; color: #FFFFFF; }
+.A2 .wm { font-family: 'Lexend', sans-serif; font-weight: 600; font-size: 40px; letter-spacing: -.03em; line-height: 1; }
+.ocelo-a2 { display: inline-block; width: .6em; height: .6em; border-radius: 50%; vertical-align: -.02em; margin-left: .02em;
+  background: radial-gradient(circle at 60% 40%, #FFFFFF 0 9%, transparent 10%), radial-gradient(circle, #10295C 0 16%, #2F6BFF 16% 40%, #E0A84A 40% 58%, #1FB5B0 58%); }
+.A2 .chips span { background: #E6F0FF; color: #10295C; }
+.A2 .tint .chips span { background: rgba(255,255,255,.2); color: #FFFFFF; }
+.A2 .phone { background: #F4F8FF; border: 1px solid #CFE0FF; font-family: 'Lexend', sans-serif; }
+.A2 .phone .card { background: #FFFFFF; }
+.A2 .phone .btn { background: #2F6BFF; color: #FFFFFF; }
+.A2 .phone .badge { background: #E6F0FF; color: #10295C; }
+
+/* ===== A3 · Escamas ===== */
+.A3 { background: #071A33; color: #E9EEF2; }
+.A3 .tag { color: #4FD1E0; }
+.A3 h2 { font-family: 'Unbounded', sans-serif; font-weight: 600; letter-spacing: -.01em; }
+.A3 .cell { background: #0C2747; border: 1px solid #16406B; }
+.A3 .cell.light { background: #E9EEF2; color: #071A33; border-color: #E9EEF2; }
+.A3 .wm { font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 30px; letter-spacing: -.02em; line-height: 1; }
+.ocelo-a3 { display: inline-block; width: .62em; height: .62em; border-radius: 50%; vertical-align: -.02em; margin-left: .02em;
+  background: radial-gradient(circle, #071A33 0 16%, #0E5FA8 16% 40%, #B8893A 40% 58%, #0F8C7A 58%); }
+.A3 .chips span { background: #123A66; color: #E9EEF2; }
+.A3 .phone { background: #071A33; border: 1px solid #16406B; font-family: 'Inter', sans-serif; }
+.A3 .phone .card { background: #0C2747; }
+.A3 .phone .btn { background: #4FD1E0; color: #071A33; }
+.A3 .phone .badge { background: #123A66; color: #E9EEF2; }
+
+/* ===== B2 · Leque suave ===== */
+.B2 { background: #F7F9FF; color: #2B3350; }
+.B2 .tag { color: #3A5BD9; }
+.B2 h2 { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: clamp(26px, 3.2vw, 36px); }
+.B2 .prop-head p, .B2 .cell { font-family: 'Nunito', sans-serif; }
+.B2 .cell { background: #FFFFFF; box-shadow: 0 10px 30px rgba(58,91,217,.10); border-radius: 28px; }
+.B2 .cell.tint { background: #3A5BD9; color: #FFFFFF; }
+.B2 .wm { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 46px; line-height: 1; }
+.B2 .pi::after { box-shadow: none; top: .1em; }
+.B2 .chips span { background: #E8EEFF; color: #2B3350; }
+.B2 .tint .chips span { background: rgba(255,255,255,.18); color: #FFFFFF; }
+.B2 .phone { background: #F7F9FF; box-shadow: inset 0 0 0 1px #E1E7F7; font-family: 'Nunito', sans-serif; }
+.B2 .phone .card { background: #FFFFFF; box-shadow: 0 4px 14px rgba(58,91,217,.08); }
+.B2 .phone .btn { background: #3A5BD9; color: #FFFFFF; }
+.B2 .phone .badge { background: #E8EEFF; color: #3A5BD9; }
+
+/* ===== B3 · Pavão-cartão ===== */
+.B3 { background: #1F3DFF; color: #FFFFFF; }
+.B3 .tag { color: #FFC23D; }
+.B3 h2 { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: clamp(26px, 3.2vw, 36px); }
+.B3 .prop-head p, .B3 .cell { font-family: 'Nunito', sans-serif; }
+.B3 .cell { background: #FFFFFF; color: #0D1640; border: 2px solid #0D1640; box-shadow: 4px 4px 0 #0D1640; }
+.B3 .cell.dark { background: #0D1640; color: #FFFFFF; }
+.B3 .wm { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 42px; line-height: 1; }
+.B3 .chips span { background: #A9C8FF; color: #0D1640; border: 1.5px solid #0D1640; }
+.B3 .phone { background: #EEF3FF; border: 2px solid #0D1640; font-family: 'Nunito', sans-serif; }
+.B3 .phone .card { background: #FFFFFF; border: 2px solid #0D1640; }
+.B3 .phone .btn { background: #FFC23D; color: #0D1640; border: 2px solid #0D1640; box-shadow: 2px 2px 0 #0D1640; }
+.B3 .phone .badge { background: #1F3DFF; color: #FFFFFF; border: 2px solid #0D1640; }
+
+/* Quadro final */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 24px; display: grid; gap: 14px; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td:first-child { font-weight: 600; white-space: nowrap; }
+.pick { color: var(--accent); font-weight: 600; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">tatino. → Filidilo · redesign de marca · rodada 2</div>
+    <h1>Seis caminhos para o Filidilo</h1>
+    <p class="lede">A pena iridescente (C) saiu. O Ocelo (A) e o Leque de cartões (B) ganharam duas variações cada: A1 e B1 são as originais da rodada 1, e as derivadas mudam tom, mascote e uso no app. No fim, as seis lado a lado e a minha sugestão.</p>
+  </header>
+
+  <div class="family">
+  <div class="family-head"><span class="eyebrow">Família A</span><h2>Ocelo: o olho da pena</h2><p>Símbolo geométrico de anéis. Muda o clima: escuro e sóbrio (A1), claro e simpático (A2), padrão de escamas (A3).</p></div>
+  <!-- ================= A ================= -->
+  <section class="prop A" aria-labelledby="ta">
+    <div class="prop-head">
+      <span class="tag">A1 · original</span>
+      <h2 id="ta">Ocelo</h2>
+      <p>O "olho" da pena do pavão (o ocelo) vira o símbolo inteiro: anéis concêntricos de azul, bronze e turquesa. Geométrico, calmo, feito para ícone pequeno. O pavão é desenhado só com círculos.</p>
+    </div>
+    <div class="grid">
+      <div class="cell c-mascote">
+        <h3>Mascote</h3>
+        <div class="mascote-row">
+          <svg class="main" viewBox="0 0 200 200" role="img" aria-label="Pavão geométrico com cinco ocelos na cauda">
+            <g stroke="#2A4785" stroke-width="2.5">
+              <line x1="100" y1="130" x2="38" y2="84"/><line x1="100" y1="130" x2="162" y2="84"/>
+              <line x1="100" y1="130" x2="64" y2="58"/><line x1="100" y1="130" x2="136" y2="58"/>
+              <line x1="100" y1="130" x2="100" y2="46"/>
+            </g>
+            <g id="ocA">
+              <g transform="translate(38 84)"><circle r="22" fill="#13A3A0"/><circle r="14" fill="#C9933A"/><circle r="9" fill="#1F4FD1"/><circle r="4" fill="#0B1E3F"/></g>
+              <g transform="translate(162 84)"><circle r="22" fill="#13A3A0"/><circle r="14" fill="#C9933A"/><circle r="9" fill="#1F4FD1"/><circle r="4" fill="#0B1E3F"/></g>
+              <g transform="translate(64 58)"><circle r="22" fill="#13A3A0"/><circle r="14" fill="#C9933A"/><circle r="9" fill="#1F4FD1"/><circle r="4" fill="#0B1E3F"/></g>
+              <g transform="translate(136 58)"><circle r="22" fill="#13A3A0"/><circle r="14" fill="#C9933A"/><circle r="9" fill="#1F4FD1"/><circle r="4" fill="#0B1E3F"/></g>
+              <g transform="translate(100 46)"><circle r="22" fill="#13A3A0"/><circle r="14" fill="#C9933A"/><circle r="9" fill="#1F4FD1"/><circle r="4" fill="#0B1E3F"/></g>
+            </g>
+            <path d="M100 112C122 112 130 140 126 160C122 178 78 178 74 160C70 140 78 112 100 112Z" fill="#1F4FD1"/>
+            <path d="M86 136C96 128 112 132 113 152C102 154 90 149 86 136Z" fill="#13A3A0"/>
+            <circle cx="100" cy="102" r="17" fill="#1F4FD1"/>
+            <g stroke="#1F4FD1" stroke-width="2.5" stroke-linecap="round"><line x1="98" y1="86" x2="90" y2="72"/><line x1="100" y1="85" x2="100" y2="69"/><line x1="102" y1="86" x2="110" y2="72"/></g>
+            <circle cx="90" cy="71" r="3.5" fill="#C9933A"/><circle cx="100" cy="68" r="3.5" fill="#C9933A"/><circle cx="110" cy="71" r="3.5" fill="#C9933A"/>
+            <circle cx="106" cy="99" r="4.8" fill="#EEF3FB"/><circle cx="107.3" cy="99" r="2.3" fill="#0B1E3F"/>
+            <path d="M115 101L127 104L115 108Z" fill="#C9933A"/>
+            <g stroke="#C9933A" stroke-width="3" stroke-linecap="round"><line x1="92" y1="174" x2="90" y2="184"/><line x1="108" y1="174" x2="110" y2="184"/></g>
+          </svg>
+          <div class="mini">
+            <svg width="64" height="64" viewBox="0 0 100 100" aria-hidden="true">
+              <circle cx="50" cy="50" r="40" fill="#13A3A0"/><circle cx="50" cy="50" r="27" fill="#C9933A"/><circle cx="50" cy="50" r="18" fill="#1F4FD1"/><circle cx="50" cy="50" r="8" fill="#0B1E3F"/>
+            </svg>
+            <span>reduzido a 1 ocelo</span>
+          </div>
+        </div>
+        <p class="note">Corpo em gota, crista de 3 pontos de bronze, cauda em leque de 5 ocelos. Expressão neutra e atenta; anima "acendendo" os anéis.</p>
+      </div>
+
+      <div class="cell c-logo">
+        <h3>Prévia do logo</h3>
+        <div class="logo-row">
+          <div class="tile" style="background:#0B1E3F;box-shadow:inset 0 0 0 1px #2A4785">
+            <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 10C76 30 82 60 67 78C59 88 41 88 33 78C18 60 24 30 50 10Z" fill="#13A3A0"/><ellipse cx="50" cy="62" rx="16" ry="18" fill="#C9933A"/><ellipse cx="50" cy="63" rx="10.5" ry="12" fill="#1F4FD1"/><circle cx="50" cy="64" r="4.5" fill="#EEF3FB"/></svg>
+          </div>
+          <div class="tile sm" style="background:#0B1E3F;box-shadow:inset 0 0 0 1px #2A4785"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 10C76 30 82 60 67 78C59 88 41 88 33 78C18 60 24 30 50 10Z" fill="#13A3A0"/><ellipse cx="50" cy="62" rx="16" ry="18" fill="#C9933A"/><ellipse cx="50" cy="63" rx="10.5" ry="12" fill="#1F4FD1"/></svg></div>
+          <div class="tile xs" style="background:#0B1E3F;box-shadow:inset 0 0 0 1px #2A4785"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 10C76 30 82 60 67 78C59 88 41 88 33 78C18 60 24 30 50 10Z" fill="#13A3A0"/><ellipse cx="50" cy="62" rx="16" ry="18" fill="#C9933A"/></svg></div>
+        </div>
+        <div class="logo-row">
+          <div class="wm-box" style="background:#EEF3FB;color:#0B1E3F"><span class="wm">filidil<span class="ocelo" aria-hidden="true"></span></span></div>
+          <div class="wm-box" style="background:#06142B;color:#EEF3FB"><span class="wm">filidil<span class="ocelo" aria-hidden="true"></span></span></div>
+        </div>
+        <p class="note">Ícone do app: uma pena em gota com o ocelo. No nome, o "o" final é o ocelo. Funciona em 16 px (favicon) porque é só forma e cor.</p>
+      </div>
+
+      <div class="cell c-paleta light">
+        <h3>Paleta</h3>
+        <div class="swatches">
+          <div class="sw" style="background:#FFFFFF"><div class="chip" style="background:#0B1E3F"></div><div class="lbl"><b>Noite de pavão</b><code>#0B1E3F</code><span>fundo, texto forte</span></div></div>
+          <div class="sw" style="background:#FFFFFF"><div class="chip" style="background:#1F4FD1"></div><div class="lbl"><b>Cobalto</b><code>#1F4FD1</code><span>cor principal</span></div></div>
+          <div class="sw" style="background:#FFFFFF"><div class="chip" style="background:#13A3A0"></div><div class="lbl"><b>Turquesa</b><code>#13A3A0</code><span>ação, acerto</span></div></div>
+          <div class="sw" style="background:#FFFFFF"><div class="chip" style="background:#C9933A"></div><div class="lbl"><b>Bronze</b><code>#C9933A</code><span>conquista, detalhe</span></div></div>
+          <div class="sw" style="background:#FFFFFF"><div class="chip" style="background:#EEF3FB;box-shadow:inset 0 -1px 0 #DCE1EC"></div><div class="lbl"><b>Névoa</b><code>#EEF3FB</code><span>fundo claro</span></div></div>
+        </div>
+      </div>
+
+      <div class="cell c-mood">
+        <h3>Mood</h3>
+        <div class="chips"><span>foco</span><span>noite de estudo</span><span>precisão</span><span>calma</span><span>escuro primeiro</span></div>
+        <div class="typespec">
+          <span style="font-family:'Sora';font-weight:600;font-size:22px">Sora para títulos</span>
+          <span style="font-family:'Inter';font-size:15px;opacity:.85">Inter para o texto do app e dos cartões.</span>
+        </div>
+        <ul class="ideas">
+          <li><b>Ofensiva</b><span>Cada dia estudado acende um anel do ocelo. 7 dias = olho completo.</span></li>
+          <li><b>Conquistas</b><span>Medalhas redondas, uma pena com ocelo de bronze, prata ou turquesa.</span></li>
+          <li><b>Compartilhar</b><span>Imagem escura com a cauda de ocelos ao fundo e o número grande.</span></li>
+          <li><b>Tom de voz</b><span>Sóbrio e encorajador: "Mais um anel aceso."</span></li>
+        </ul>
+      </div>
+
+      <div class="cell c-tela">
+        <h3>No app</h3>
+        <div class="phone">
+          <div class="bar"><span style="font-family:'Sora';font-weight:700;font-size:18px;letter-spacing:-.02em">filidil<span class="ocelo"></span></span><span class="badge"><span class="ocelo" style="font-size:14px"></span> 12 dias</span></div>
+          <div class="card" style="background:#1C3A78"><b>Falta uma sessão hoje</b><span style="opacity:.8">Restam 5 h para acender o anel.</span><button class="btn" type="button">Estudar</button></div>
+          <div class="card"><b>Hidrodinâmica</b><span style="opacity:.8">24 para revisar · 3 novos</span></div>
+          <div class="card"><b>Inglês · verbos</b><span style="opacity:.8">Em dia</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= A2 ================= -->
+  <section class="prop A2" aria-labelledby="ta2">
+    <div class="prop-head">
+      <span class="tag">A2 · derivada do Ocelo</span>
+      <h2 id="ta2">Ocelo claro</h2>
+      <p>O mesmo olho da pena, agora de dia: fundo claro, azul mais vivo e um pavão mais simpático, de rosto de frente e olhos com brilho. O ocelo ganha um reflexo e vira, ele mesmo, a cabeça do pavão no ícone. Mais acolhedor que a A1 sem perder a geometria.</p>
+    </div>
+    <div class="grid">
+      <div class="cell c-mascote">
+        <h3>Mascote</h3>
+        <div class="mascote-row">
+          <svg class="main" viewBox="0 0 200 200" role="img" aria-label="Pavão simpático de frente, com três ocelos grandes na cauda">
+            <g stroke="#8FB4FF" stroke-width="3"><line x1="100" y1="120" x2="56" y2="74"/><line x1="100" y1="120" x2="144" y2="74"/><line x1="100" y1="120" x2="100" y2="56"/></g>
+            <g transform="translate(56 74)"><circle r="28" fill="#1FB5B0"/><circle r="19" fill="#E0A84A"/><circle r="12" fill="#2F6BFF"/><circle r="5" fill="#10295C"/><circle cx="5" cy="-5" r="2.6" fill="#FFFFFF"/></g>
+            <g transform="translate(144 74)"><circle r="28" fill="#1FB5B0"/><circle r="19" fill="#E0A84A"/><circle r="12" fill="#2F6BFF"/><circle r="5" fill="#10295C"/><circle cx="5" cy="-5" r="2.6" fill="#FFFFFF"/></g>
+            <g transform="translate(100 56)"><circle r="28" fill="#1FB5B0"/><circle r="19" fill="#E0A84A"/><circle r="12" fill="#2F6BFF"/><circle r="5" fill="#10295C"/><circle cx="5" cy="-5" r="2.6" fill="#FFFFFF"/></g>
+            <path d="M100 108C128 108 138 138 134 158C130 180 70 180 66 158C62 138 72 108 100 108Z" fill="#2F6BFF"/>
+            <ellipse cx="100" cy="156" rx="20" ry="16" fill="#8FB4FF"/>
+            <circle cx="100" cy="100" r="22" fill="#2F6BFF"/>
+            <g stroke="#2F6BFF" stroke-width="3" stroke-linecap="round"><line x1="97" y1="80" x2="91" y2="65"/><line x1="100" y1="79" x2="100" y2="62"/><line x1="103" y1="80" x2="109" y2="65"/></g>
+            <circle cx="91" cy="64" r="4" fill="#E0A84A"/><circle cx="100" cy="60" r="4" fill="#E0A84A"/><circle cx="109" cy="64" r="4" fill="#E0A84A"/>
+            <circle cx="92" cy="98" r="6" fill="#FFFFFF"/><circle cx="108" cy="98" r="6" fill="#FFFFFF"/>
+            <circle cx="93" cy="99" r="3.2" fill="#10295C"/><circle cx="109" cy="99" r="3.2" fill="#10295C"/>
+            <circle cx="94.3" cy="97.6" r="1.1" fill="#FFFFFF"/><circle cx="110.3" cy="97.6" r="1.1" fill="#FFFFFF"/>
+            <path d="M96.5 107H103.5L100 114Z" fill="#E0A84A"/>
+            <circle cx="84" cy="107" r="3.5" fill="#8FB4FF"/><circle cx="116" cy="107" r="3.5" fill="#8FB4FF"/>
+            <g stroke="#E0A84A" stroke-width="3" stroke-linecap="round"><line x1="90" y1="176" x2="88" y2="186"/><line x1="110" y1="176" x2="112" y2="186"/></g>
+          </svg>
+          <div class="mini">
+            <svg width="64" height="64" viewBox="0 0 100 100" aria-hidden="true">
+              <g stroke="#2F6BFF" stroke-width="4" stroke-linecap="round"><line x1="50" y1="22" x2="40" y2="9"/><line x1="50" y1="22" x2="50" y2="6"/><line x1="50" y1="22" x2="60" y2="9"/></g>
+              <circle cx="40" cy="9" r="4.5" fill="#E0A84A"/><circle cx="50" cy="6" r="4.5" fill="#E0A84A"/><circle cx="60" cy="9" r="4.5" fill="#E0A84A"/>
+              <circle cx="50" cy="58" r="38" fill="#1FB5B0"/><circle cx="50" cy="58" r="26" fill="#E0A84A"/><circle cx="50" cy="58" r="17" fill="#2F6BFF"/><circle cx="50" cy="58" r="7" fill="#10295C"/><circle cx="57" cy="51" r="4" fill="#FFFFFF"/>
+            </svg>
+            <span>o olho é a cabeça</span>
+          </div>
+        </div>
+        <p class="note">Três ocelos grandes em vez de cinco (lê melhor pequeno). Rosto de frente, bochechas, olhos com brilho. Pisca quando a sessão termina.</p>
+      </div>
+
+      <div class="cell c-logo">
+        <h3>Prévia do logo</h3>
+        <div class="logo-row">
+          <div class="tile" style="background:#FFFFFF;box-shadow:inset 0 0 0 1.5px #CFE0FF">
+            <svg viewBox="0 0 100 100" aria-hidden="true"><g stroke="#2F6BFF" stroke-width="4" stroke-linecap="round"><line x1="50" y1="22" x2="40" y2="9"/><line x1="50" y1="22" x2="50" y2="6"/><line x1="50" y1="22" x2="60" y2="9"/></g><circle cx="40" cy="9" r="4.5" fill="#E0A84A"/><circle cx="50" cy="6" r="4.5" fill="#E0A84A"/><circle cx="60" cy="9" r="4.5" fill="#E0A84A"/><circle cx="50" cy="58" r="38" fill="#1FB5B0"/><circle cx="50" cy="58" r="26" fill="#E0A84A"/><circle cx="50" cy="58" r="17" fill="#2F6BFF"/><circle cx="50" cy="58" r="7" fill="#10295C"/><circle cx="57" cy="51" r="4" fill="#FFFFFF"/></svg>
+          </div>
+          <div class="tile sm" style="background:#2F6BFF"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="56" r="40" fill="#1FB5B0"/><circle cx="50" cy="56" r="27" fill="#E0A84A"/><circle cx="50" cy="56" r="17" fill="#FFFFFF"/><circle cx="50" cy="56" r="8" fill="#10295C"/><circle cx="40" cy="8" r="6" fill="#E0A84A"/><circle cx="60" cy="8" r="6" fill="#E0A84A"/></svg></div>
+          <div class="tile xs" style="background:#2F6BFF"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="52" r="42" fill="#1FB5B0"/><circle cx="50" cy="52" r="26" fill="#FFFFFF"/><circle cx="50" cy="52" r="12" fill="#10295C"/></svg></div>
+        </div>
+        <div class="logo-row">
+          <div class="wm-box" style="background:#E6F0FF;color:#10295C"><span class="wm">filidil<span class="ocelo-a2" aria-hidden="true"></span></span></div>
+          <div class="wm-box" style="background:#2F6BFF;color:#FFFFFF"><span class="wm">filidil<span class="ocelo-a2" aria-hidden="true"></span></span></div>
+        </div>
+        <p class="note">Ícone: o ocelo com reflexo e a crista de três pontos em cima, como um rosto. Fundo branco no ícone do app, azul na versão pequena. Letra em Lexend, feita para leitura fácil.</p>
+      </div>
+
+      <div class="cell c-paleta">
+        <h3>Paleta</h3>
+        <div class="swatches">
+          <div class="sw" style="border:1px solid #DCE6FA"><div class="chip" style="background:#2F6BFF"></div><div class="lbl"><b>Azul-ocelo</b><code>#2F6BFF</code><span>cor principal</span></div></div>
+          <div class="sw" style="border:1px solid #DCE6FA"><div class="chip" style="background:#10295C"></div><div class="lbl"><b>Marinho</b><code>#10295C</code><span>texto</span></div></div>
+          <div class="sw" style="border:1px solid #DCE6FA"><div class="chip" style="background:#1FB5B0"></div><div class="lbl"><b>Turquesa</b><code>#1FB5B0</code><span>acerto, progresso</span></div></div>
+          <div class="sw" style="border:1px solid #DCE6FA"><div class="chip" style="background:#E0A84A"></div><div class="lbl"><b>Mel</b><code>#E0A84A</code><span>conquista, crista</span></div></div>
+          <div class="sw" style="border:1px solid #DCE6FA"><div class="chip" style="background:#8FB4FF"></div><div class="lbl"><b>Azul-claro</b><code>#8FB4FF</code><span>superfícies, detalhe</span></div></div>
+          <div class="sw" style="border:1px solid #DCE6FA"><div class="chip" style="background:#E6F0FF"></div><div class="lbl"><b>Céu</b><code>#E6F0FF</code><span>fundo</span></div></div>
+        </div>
+      </div>
+
+      <div class="cell c-mood tint">
+        <h3>Mood</h3>
+        <div class="chips"><span>leve</span><span>diurno</span><span>acolhedor</span><span>leitura fácil</span><span>claro primeiro</span></div>
+        <div class="typespec">
+          <span style="font-family:'Lexend';font-weight:600;font-size:22px">Lexend em tudo</span>
+          <span style="font-family:'Lexend';font-size:15px;opacity:.9">Uma família só, em pesos diferentes: menos ruído na hora de estudar.</span>
+        </div>
+        <ul class="ideas">
+          <li><b>Ofensiva</b><span>O pavão abre um ocelo por dia na cauda; com 3 dias, o leque está completo e começa outra volta.</span></li>
+          <li><b>Conquistas</b><span>Ocelos de cores raras (prata, furta-cor) que ficam na cauda.</span></li>
+          <li><b>Compartilhar</b><span>Fundo céu, pavão de frente, número de dias dentro de um ocelo grande.</span></li>
+          <li><b>Tom de voz</b><span>Caloroso: "Olho aberto! Mais um dia de estudo."</span></li>
+        </ul>
+      </div>
+
+      <div class="cell c-tela">
+        <h3>No app</h3>
+        <div class="phone">
+          <div class="bar"><span style="font-weight:600;font-size:19px;letter-spacing:-.03em">filidil<span class="ocelo-a2"></span></span><span class="badge"><span class="ocelo-a2" style="font-size:14px"></span> 12 dias</span></div>
+          <div class="card" style="background:#2F6BFF;color:#FFFFFF"><b>Falta uma sessão hoje</b><span style="opacity:.85">Restam 5 h para abrir o olho de hoje.</span><button class="btn" type="button" style="background:#FFFFFF;color:#2F6BFF">Estudar</button></div>
+          <div class="card"><b>Hidrodinâmica</b><span style="opacity:.75">24 para revisar · 3 novos</span></div>
+          <div class="card"><b>Inglês · verbos</b><span style="opacity:.75">Em dia</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= A3 ================= -->
+  <section class="prop A3" aria-labelledby="ta3">
+    <div class="prop-head">
+      <span class="tag">A3 · derivada do Ocelo</span>
+      <h2 id="ta3">Escamas</h2>
+      <p>Olhando de perto, o peito e o pescoço do pavão têm penas pequenas em escamas. Aqui o ocelo vira um sistema: escamas que se repetem e formam padrões. Cada dia de estudo, cada cartão revisado, preenche uma escama. Fica escuro, rítmico, com cara de coleção.</p>
+    </div>
+    <div class="grid">
+      <div class="cell c-mascote">
+        <h3>Mascote</h3>
+        <div class="mascote-row">
+          <svg class="main" viewBox="0 0 200 200" role="img" aria-label="Pavão com a cauda em meio-círculo preenchida de escamas">
+            <defs>
+              <pattern id="escA3" width="20" height="16" patternUnits="userSpaceOnUse">
+                <rect width="20" height="16" fill="#0E5FA8"/>
+                <g stroke="#071A33" stroke-width="1.2">
+                  <circle cx="10" cy="0" r="10" fill="#0E5FA8"/>
+                  <circle cx="0" cy="8" r="10" fill="#0F8C7A"/><circle cx="20" cy="8" r="10" fill="#0F8C7A"/>
+                  <circle cx="10" cy="16" r="10" fill="#0E5FA8"/>
+                </g>
+              </pattern>
+            </defs>
+            <path d="M18 150A82 82 0 0 1 182 150Z" fill="url(#escA3)" stroke="#B8893A" stroke-width="3"/>
+            <g><circle cx="29" cy="109" r="8" fill="#B8893A"/><circle cx="29" cy="109" r="4" fill="#071A33"/>
+              <circle cx="59" cy="79" r="8" fill="#B8893A"/><circle cx="59" cy="79" r="4" fill="#071A33"/>
+              <circle cx="100" cy="68" r="8" fill="#B8893A"/><circle cx="100" cy="68" r="4" fill="#071A33"/>
+              <circle cx="141" cy="79" r="8" fill="#B8893A"/><circle cx="141" cy="79" r="4" fill="#071A33"/>
+              <circle cx="171" cy="109" r="8" fill="#B8893A"/><circle cx="171" cy="109" r="4" fill="#071A33"/></g>
+            <path d="M100 112C120 112 128 140 124 160C120 178 80 178 76 160C72 140 80 112 100 112Z" fill="#0E5FA8" stroke="#071A33" stroke-width="2"/>
+            <path d="M84 140C92 132 112 134 114 154C102 158 88 152 84 140Z" fill="#0F8C7A"/>
+            <circle cx="100" cy="102" r="17" fill="#0E5FA8" stroke="#071A33" stroke-width="2"/>
+            <g stroke="#4FD1E0" stroke-width="2.5" stroke-linecap="round"><line x1="98" y1="86" x2="90" y2="72"/><line x1="100" y1="85" x2="100" y2="69"/><line x1="102" y1="86" x2="110" y2="72"/></g>
+            <circle cx="90" cy="71" r="3.5" fill="#4FD1E0"/><circle cx="100" cy="68" r="3.5" fill="#4FD1E0"/><circle cx="110" cy="71" r="3.5" fill="#4FD1E0"/>
+            <circle cx="106" cy="99" r="4.8" fill="#E9EEF2"/><circle cx="107.3" cy="99" r="2.3" fill="#071A33"/>
+            <path d="M115 101L127 104L115 108Z" fill="#B8893A"/>
+            <g stroke="#B8893A" stroke-width="3" stroke-linecap="round"><line x1="92" y1="174" x2="90" y2="184"/><line x1="108" y1="174" x2="110" y2="184"/></g>
+          </svg>
+          <div class="mini">
+            <svg width="72" height="72" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="18" fill="url(#escA3)"/></svg>
+            <span>padrão de escamas</span>
+          </div>
+        </div>
+        <p class="note">Mesmo pavão de círculos da A1, com a cauda virando um leque de escamas e bordas de ouro-velho. O padrão vira textura de fundo, de cartão e de conquista.</p>
+      </div>
+
+      <div class="cell c-logo">
+        <h3>Prévia do logo</h3>
+        <div class="logo-row">
+          <div class="tile" style="background:#071A33;box-shadow:inset 0 0 0 1px #16406B">
+            <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M8 80A42 42 0 0 1 92 80Z" fill="url(#escA3)" stroke="#B8893A" stroke-width="4"/><circle cx="50" cy="80" r="11" fill="#B8893A"/><circle cx="50" cy="80" r="5" fill="#071A33"/></svg>
+          </div>
+          <div class="tile sm" style="background:#071A33;box-shadow:inset 0 0 0 1px #16406B"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M8 80A42 42 0 0 1 92 80Z" fill="#0F8C7A" stroke="#B8893A" stroke-width="6"/><path d="M30 80A20 20 0 0 1 70 80" fill="none" stroke="#0E5FA8" stroke-width="10"/><circle cx="50" cy="80" r="10" fill="#B8893A"/></svg></div>
+          <div class="tile xs" style="background:#071A33"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M6 82A44 44 0 0 1 94 82Z" fill="#0F8C7A" stroke="#B8893A" stroke-width="10"/></svg></div>
+        </div>
+        <div class="logo-row">
+          <div class="wm-box" style="background:#E9EEF2;color:#071A33"><span class="wm">filidil<span class="ocelo-a3" aria-hidden="true"></span></span></div>
+          <div class="wm-box" style="background:#0C2747;color:#E9EEF2"><span class="wm">filidil<span class="ocelo-a3" aria-hidden="true"></span></span></div>
+        </div>
+        <p class="note">Ícone: meia-lua de escamas com borda de ouro e o ocelo na base, que também lembra um sol nascendo. Letra em Unbounded, larga e geométrica.</p>
+      </div>
+
+      <div class="cell c-paleta light">
+        <h3>Paleta</h3>
+        <div class="swatches">
+          <div class="sw" style="background:#FFFFFF"><div class="chip" style="background:#071A33"></div><div class="lbl"><b>Abismo</b><code>#071A33</code><span>fundo</span></div></div>
+          <div class="sw" style="background:#FFFFFF"><div class="chip" style="background:#0E5FA8"></div><div class="lbl"><b>Azul-pavão</b><code>#0E5FA8</code><span>cor principal</span></div></div>
+          <div class="sw" style="background:#FFFFFF"><div class="chip" style="background:#0F8C7A"></div><div class="lbl"><b>Verde-pavão</b><code>#0F8C7A</code><span>escama cheia, acerto</span></div></div>
+          <div class="sw" style="background:#FFFFFF"><div class="chip" style="background:#4FD1E0"></div><div class="lbl"><b>Ciano</b><code>#4FD1E0</code><span>ação, botão</span></div></div>
+          <div class="sw" style="background:#FFFFFF"><div class="chip" style="background:#B8893A"></div><div class="lbl"><b>Ouro-velho</b><code>#B8893A</code><span>bordas, conquista</span></div></div>
+          <div class="sw" style="background:#FFFFFF"><div class="chip" style="background:#E9EEF2;box-shadow:inset 0 -1px 0 #DCE1EC"></div><div class="lbl"><b>Areia-fria</b><code>#E9EEF2</code><span>texto, fundo claro</span></div></div>
+        </div>
+      </div>
+
+      <div class="cell c-mood">
+        <h3>Mood</h3>
+        <div class="chips"><span>ritmo</span><span>padrão</span><span>coleção</span><span>constância</span><span>escuro primeiro</span></div>
+        <div class="typespec">
+          <span style="font-family:'Unbounded';font-weight:600;font-size:20px">Unbounded nos títulos</span>
+          <span style="font-family:'Inter';font-size:15px;opacity:.85">Inter no texto dos cartões e da interface.</span>
+        </div>
+        <ul class="ideas">
+          <li><b>Ofensiva</b><span>"Sua semana" vira uma fileira de escamas; o mês, um mosaico. Dia estudado = escama cheia.</span></li>
+          <li><b>Conquistas</b><span>Escamas de ouro, que aparecem no mosaico do mês.</span></li>
+          <li><b>Compartilhar</b><span>O mosaico do mês, com o número de dias em cima. Cada pessoa tem um desenho diferente.</span></li>
+          <li><b>Tom de voz</b><span>Constante: "Mais uma escama. Faltam 3 para a semana."</span></li>
+        </ul>
+      </div>
+
+      <div class="cell c-tela">
+        <h3>No app</h3>
+        <div class="phone">
+          <div class="bar"><span style="font-family:'Unbounded';font-weight:700;font-size:16px;letter-spacing:-.02em">filidil<span class="ocelo-a3"></span></span><span class="badge">12 dias</span></div>
+          <div class="card"><b>Sua semana</b><div class="scales" aria-label="4 de 7 dias"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div><span style="opacity:.8">Falta a escama de hoje. Restam 5 h.</span><button class="btn" type="button">Estudar</button></div>
+          <div class="card"><b>Hidrodinâmica</b><span style="opacity:.8">24 para revisar · 3 novos</span></div>
+          <div class="card"><b>Inglês · verbos</b><span style="opacity:.8">Em dia</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+  <div class="family">
+  <div class="family-head"><span class="eyebrow">Família B</span><h2>Leque: a cauda de cartões</h2><p>As penas são flashcards. Muda o traço: contorno grosso (B1), macio e pastel (B2), o mascote como um cartão de verdade (B3).</p></div>
+  <!-- ================= B ================= -->
+  <section class="prop B" aria-labelledby="tb">
+    <div class="prop-head">
+      <span class="tag">B1 · original</span>
+      <h2 id="tb">Leque de cartões</h2>
+      <p>As penas da cauda são flashcards abertos em leque, cada uma com o seu ocelo dourado. O pavão é redondo, de olhos grandes, com contorno grosso e sombra chapada. É a mais "jogo" das três e a que mais conversa com ofensiva e conquistas.</p>
+    </div>
+    <div class="grid">
+      <div class="cell c-mascote">
+        <h3>Mascote</h3>
+        <div class="mascote-row">
+          <svg class="main" viewBox="0 0 200 200" role="img" aria-label="Pavão redondo com a cauda feita de cinco cartões em leque">
+            <g stroke="#121A3D" stroke-width="3" stroke-linejoin="round">
+              <g transform="rotate(-60 100 140)"><rect x="82" y="34" width="36" height="78" rx="10" fill="#7FB2FF"/><circle cx="100" cy="56" r="7" fill="#FFC23D"/></g>
+              <g transform="rotate(60 100 140)"><rect x="82" y="34" width="36" height="78" rx="10" fill="#7FB2FF"/><circle cx="100" cy="56" r="7" fill="#FFC23D"/></g>
+              <g transform="rotate(-30 100 140)"><rect x="82" y="34" width="36" height="78" rx="10" fill="#00B3A4"/><circle cx="100" cy="56" r="7" fill="#FFC23D"/></g>
+              <g transform="rotate(30 100 140)"><rect x="82" y="34" width="36" height="78" rx="10" fill="#00B3A4"/><circle cx="100" cy="56" r="7" fill="#FFC23D"/></g>
+              <g><rect x="82" y="34" width="36" height="78" rx="10" fill="#FFFFFF"/><circle cx="100" cy="56" r="7" fill="#FFC23D"/></g>
+              <circle cx="100" cy="138" r="42" fill="#2546F0"/>
+              <ellipse cx="100" cy="152" rx="25" ry="20" fill="#7FB2FF" stroke="none"/>
+              <line x1="92" y1="96" x2="86" y2="82"/><line x1="100" y1="96" x2="100" y2="79"/><line x1="108" y1="96" x2="114" y2="82"/>
+              <circle cx="86" cy="80" r="5" fill="#00B3A4"/><circle cx="100" cy="76" r="5" fill="#FFC23D"/><circle cx="114" cy="80" r="5" fill="#00B3A4"/>
+              <circle cx="86" cy="124" r="9" fill="#FFFFFF"/><circle cx="114" cy="124" r="9" fill="#FFFFFF"/>
+              <path d="M93 136H107L100 146Z" fill="#FFC23D" stroke-width="2.5"/>
+              <ellipse cx="86" cy="181" rx="9" ry="4.5" fill="#FFC23D"/><ellipse cx="114" cy="181" rx="9" ry="4.5" fill="#FFC23D"/>
+            </g>
+            <circle cx="88" cy="125" r="4.5" fill="#121A3D"/><circle cx="116" cy="125" r="4.5" fill="#121A3D"/>
+            <circle cx="89.5" cy="123.5" r="1.5" fill="#FFFFFF"/><circle cx="117.5" cy="123.5" r="1.5" fill="#FFFFFF"/>
+          </svg>
+          <div class="mini">
+            <svg width="72" height="72" viewBox="0 0 200 200" aria-hidden="true">
+              <g stroke="#121A3D" stroke-width="5" stroke-linejoin="round">
+                <g transform="rotate(-28 100 150)"><rect x="72" y="40" width="56" height="110" rx="14" fill="#7FB2FF"/></g>
+                <g transform="rotate(28 100 150)"><rect x="72" y="40" width="56" height="110" rx="14" fill="#00B3A4"/></g>
+                <rect x="72" y="40" width="56" height="110" rx="14" fill="#FFFFFF"/><circle cx="100" cy="72" r="12" fill="#FFC23D"/>
+              </g>
+            </svg>
+            <span>só o leque</span>
+          </div>
+        </div>
+        <p class="note">Contorno de 3 px, sombra chapada, expressões fáceis (feliz, surpreso, dormindo). A cauda abre e fecha conforme o progresso.</p>
+      </div>
+
+      <div class="cell c-logo">
+        <h3>Prévia do logo</h3>
+        <div class="logo-row">
+          <div class="tile" style="background:#2546F0;border:2px solid #121A3D">
+            <svg viewBox="0 0 200 200" aria-hidden="true"><g stroke="#121A3D" stroke-width="6" stroke-linejoin="round"><g transform="rotate(-28 100 158)"><rect x="70" y="36" width="60" height="118" rx="15" fill="#7FB2FF"/></g><g transform="rotate(28 100 158)"><rect x="70" y="36" width="60" height="118" rx="15" fill="#00B3A4"/></g><rect x="70" y="36" width="60" height="118" rx="15" fill="#FFFFFF"/><circle cx="100" cy="70" r="13" fill="#FFC23D"/></g></svg>
+          </div>
+          <div class="tile sm" style="background:#2546F0;border:2px solid #121A3D"><svg viewBox="0 0 200 200" aria-hidden="true"><g stroke="#121A3D" stroke-width="9" stroke-linejoin="round"><g transform="rotate(-28 100 158)"><rect x="70" y="36" width="60" height="118" rx="15" fill="#7FB2FF"/></g><g transform="rotate(28 100 158)"><rect x="70" y="36" width="60" height="118" rx="15" fill="#00B3A4"/></g><rect x="70" y="36" width="60" height="118" rx="15" fill="#FFFFFF"/><circle cx="100" cy="70" r="14" fill="#FFC23D"/></g></svg></div>
+          <div class="tile xs" style="background:#2546F0"><svg viewBox="0 0 200 200" aria-hidden="true"><g transform="rotate(-28 100 158)"><rect x="70" y="36" width="60" height="118" rx="15" fill="#7FB2FF"/></g><g transform="rotate(28 100 158)"><rect x="70" y="36" width="60" height="118" rx="15" fill="#00B3A4"/></g><rect x="70" y="36" width="60" height="118" rx="15" fill="#FFFFFF"/></svg></div>
+        </div>
+        <div class="logo-row">
+          <div class="wm-box" style="background:#FFFFFF;color:#121A3D;border:2px solid #121A3D"><span class="wm" aria-label="filidilo">f<span class="pi" style="--dot:#00B3A4">ı</span>l<span class="pi" style="--dot:#FFC23D">ı</span>d<span class="pi" style="--dot:#7FB2FF">ı</span>lo</span></div>
+          <div class="wm-box" style="background:#121A3D;color:#FFFFFF"><span class="wm" aria-label="filidilo">f<span class="pi" style="--dot:#00B3A4">ı</span>l<span class="pi" style="--dot:#FFC23D">ı</span>d<span class="pi" style="--dot:#7FB2FF">ı</span>lo</span></div>
+        </div>
+        <p class="note">Ícone: três cartões em leque, o da frente com o ocelo dourado. No nome, os três pingos dos "i" são três ocelos coloridos.</p>
+      </div>
+
+      <div class="cell c-paleta">
+        <h3>Paleta</h3>
+        <div class="swatches">
+          <div class="sw" style="border:1.5px solid #121A3D"><div class="chip" style="background:#2546F0"></div><div class="lbl"><b>Azul-real</b><code>#2546F0</code><span>cor principal</span></div></div>
+          <div class="sw" style="border:1.5px solid #121A3D"><div class="chip" style="background:#7FB2FF"></div><div class="lbl"><b>Céu</b><code>#7FB2FF</code><span>superfícies, cartões</span></div></div>
+          <div class="sw" style="border:1.5px solid #121A3D"><div class="chip" style="background:#00B3A4"></div><div class="lbl"><b>Turquesa viva</b><code>#00B3A4</code><span>acerto, progresso</span></div></div>
+          <div class="sw" style="border:1.5px solid #121A3D"><div class="chip" style="background:#FFC23D"></div><div class="lbl"><b>Ouro</b><code>#FFC23D</code><span>botão, conquista</span></div></div>
+          <div class="sw" style="border:1.5px solid #121A3D"><div class="chip" style="background:#121A3D"></div><div class="lbl"><b>Tinta</b><code>#121A3D</code><span>contorno, texto</span></div></div>
+          <div class="sw" style="border:1.5px solid #121A3D"><div class="chip" style="background:#F2F6FF"></div><div class="lbl"><b>Gelo</b><code>#F2F6FF</code><span>fundo</span></div></div>
+        </div>
+      </div>
+
+      <div class="cell c-mood dark">
+        <h3>Mood</h3>
+        <div class="chips"><span>brincalhão</span><span>conquista</span><span>colorido</span><span>jogo</span><span>claro primeiro</span></div>
+        <div class="typespec">
+          <span style="font-family:'Fredoka';font-weight:600;font-size:24px">Fredoka para títulos</span>
+          <span style="font-family:'Nunito';font-size:15px;opacity:.9">Nunito para o texto, arredondada e fácil de ler.</span>
+        </div>
+        <ul class="ideas">
+          <li><b>Ofensiva</b><span>Cada dia ganha uma pena-cartão na cauda. 7 dias = leque aberto.</span></li>
+          <li><b>Conquistas</b><span>O mascote ganha penas raras (furta-cor, dourada) para a cauda.</span></li>
+          <li><b>Compartilhar</b><span>O mascote exibindo o leque, com o número de dias num cartão.</span></li>
+          <li><b>Tom de voz</b><span>Animado e curto: "Leque aberto! 7 dias seguidos."</span></li>
+        </ul>
+      </div>
+
+      <div class="cell c-tela">
+        <h3>No app</h3>
+        <div class="phone">
+          <div class="bar"><span style="font-family:'Fredoka';font-weight:700;font-size:22px">f<span class="pi" style="--dot:#00B3A4">ı</span>l<span class="pi" style="--dot:#FFC23D">ı</span>d<span class="pi" style="--dot:#7FB2FF">ı</span>lo</span><span class="badge">▮▮▮ 12 dias</span></div>
+          <div class="card"><b>Falta uma sessão hoje</b><span>Faltam 5 h para a próxima pena.</span><button class="btn" type="button">Estudar</button></div>
+          <div class="card"><b>Hidrodinâmica</b><span>24 para revisar · 3 novos</span></div>
+          <div class="card"><b>Inglês · verbos</b><span>Em dia ✓</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= B2 ================= -->
+  <section class="prop B2" aria-labelledby="tb2">
+    <div class="prop-head">
+      <span class="tag">B2 · derivada do Leque</span>
+      <h2 id="tb2">Leque suave</h2>
+      <p>A mesma cauda de cartões, sem contorno preto nem sombra chapada: formas macias, sombras leves e azuis mais calmos. O leque cresce para sete cartões, um para cada dia da semana. Continua com cara de jogo, mas conversa com qualquer idade.</p>
+    </div>
+    <div class="grid">
+      <div class="cell c-mascote">
+        <h3>Mascote</h3>
+        <div class="mascote-row">
+          <svg class="main" viewBox="0 0 200 200" role="img" aria-label="Pavão macio com sete cartões em leque na cauda">
+            <g transform="rotate(-72 100 140)"><rect x="88" y="40" width="24" height="72" rx="12" fill="#BFD6FF"/><circle cx="100" cy="58" r="6" fill="#FFD27A"/></g>
+            <g transform="rotate(72 100 140)"><rect x="88" y="40" width="24" height="72" rx="12" fill="#BFD6FF"/><circle cx="100" cy="58" r="6" fill="#FFD27A"/></g>
+            <g transform="rotate(-48 100 140)"><rect x="88" y="40" width="24" height="72" rx="12" fill="#8FE0D6"/><circle cx="100" cy="58" r="6" fill="#FFD27A"/></g>
+            <g transform="rotate(48 100 140)"><rect x="88" y="40" width="24" height="72" rx="12" fill="#8FE0D6"/><circle cx="100" cy="58" r="6" fill="#FFD27A"/></g>
+            <g transform="rotate(-24 100 140)"><rect x="88" y="40" width="24" height="72" rx="12" fill="#BFD6FF"/><circle cx="100" cy="58" r="6" fill="#FFD27A"/></g>
+            <g transform="rotate(24 100 140)"><rect x="88" y="40" width="24" height="72" rx="12" fill="#BFD6FF"/><circle cx="100" cy="58" r="6" fill="#FFD27A"/></g>
+            <g><rect x="88" y="40" width="24" height="72" rx="12" fill="#E8EEFF"/><circle cx="100" cy="58" r="6" fill="#FFD27A"/></g>
+            <ellipse cx="100" cy="185" rx="40" ry="6" fill="#2B3350" opacity=".12"/>
+            <path d="M100 100C126 100 140 128 138 150C136 172 120 182 100 182C80 182 64 172 62 150C60 128 74 100 100 100Z" fill="#3A5BD9"/>
+            <ellipse cx="100" cy="158" rx="24" ry="20" fill="#BFD6FF"/>
+            <g stroke="#3A5BD9" stroke-width="3" stroke-linecap="round"><line x1="98" y1="102" x2="92" y2="86"/><line x1="100" y1="101" x2="100" y2="82"/><line x1="102" y1="102" x2="108" y2="86"/></g>
+            <circle cx="92" cy="85" r="5" fill="#8FE0D6"/><circle cx="100" cy="80" r="5" fill="#FFD27A"/><circle cx="108" cy="85" r="5" fill="#8FE0D6"/>
+            <ellipse cx="88" cy="126" rx="4" ry="5.5" fill="#2B3350"/><ellipse cx="112" cy="126" rx="4" ry="5.5" fill="#2B3350"/>
+            <circle cx="89.4" cy="124" r="1.4" fill="#FFFFFF"/><circle cx="113.4" cy="124" r="1.4" fill="#FFFFFF"/>
+            <path d="M95 136Q100 134 105 136L100 143Z" fill="#FFD27A"/>
+            <circle cx="79" cy="137" r="5" fill="#8FE0D6" opacity=".8"/><circle cx="121" cy="137" r="5" fill="#8FE0D6" opacity=".8"/>
+            <ellipse cx="88" cy="182" rx="8" ry="4" fill="#FFD27A"/><ellipse cx="112" cy="182" rx="8" ry="4" fill="#FFD27A"/>
+          </svg>
+          <div class="mini">
+            <svg width="72" height="72" viewBox="0 0 100 100" aria-hidden="true">
+              <g transform="rotate(-50 50 82)"><rect x="43" y="22" width="14" height="52" rx="7" fill="#BFD6FF"/></g>
+              <g transform="rotate(50 50 82)"><rect x="43" y="22" width="14" height="52" rx="7" fill="#BFD6FF"/></g>
+              <g transform="rotate(-25 50 82)"><rect x="43" y="22" width="14" height="52" rx="7" fill="#8FE0D6"/></g>
+              <g transform="rotate(25 50 82)"><rect x="43" y="22" width="14" height="52" rx="7" fill="#8FE0D6"/></g>
+              <rect x="43" y="22" width="14" height="52" rx="7" fill="#3A5BD9"/><circle cx="50" cy="32" r="4.5" fill="#FFD27A"/>
+            </svg>
+            <span>leque de 5</span>
+          </div>
+        </div>
+        <p class="note">Corpo em pera, olhos ovais calmos, bochechas cor de água. Sem contorno: as formas se separam pela cor. Sombra só embaixo dos pés.</p>
+      </div>
+
+      <div class="cell c-logo">
+        <h3>Prévia do logo</h3>
+        <div class="logo-row">
+          <div class="tile" style="background:linear-gradient(160deg,#5C7CF0,#3A5BD9)">
+            <svg viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-50 50 84)"><rect x="42" y="20" width="16" height="56" rx="8" fill="#BFD6FF"/></g><g transform="rotate(50 50 84)"><rect x="42" y="20" width="16" height="56" rx="8" fill="#BFD6FF"/></g><g transform="rotate(-25 50 84)"><rect x="42" y="20" width="16" height="56" rx="8" fill="#8FE0D6"/></g><g transform="rotate(25 50 84)"><rect x="42" y="20" width="16" height="56" rx="8" fill="#8FE0D6"/></g><rect x="42" y="20" width="16" height="56" rx="8" fill="#FFFFFF"/><circle cx="50" cy="31" r="5" fill="#FFD27A"/></svg>
+          </div>
+          <div class="tile sm" style="background:#3A5BD9"><svg viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-36 50 84)"><rect x="40" y="18" width="20" height="58" rx="10" fill="#BFD6FF"/></g><g transform="rotate(36 50 84)"><rect x="40" y="18" width="20" height="58" rx="10" fill="#8FE0D6"/></g><rect x="40" y="18" width="20" height="58" rx="10" fill="#FFFFFF"/><circle cx="50" cy="31" r="6" fill="#FFD27A"/></svg></div>
+          <div class="tile xs" style="background:#3A5BD9"><svg viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-36 50 84)"><rect x="38" y="16" width="24" height="60" rx="12" fill="#BFD6FF"/></g><g transform="rotate(36 50 84)"><rect x="38" y="16" width="24" height="60" rx="12" fill="#8FE0D6"/></g><rect x="38" y="16" width="24" height="60" rx="12" fill="#FFFFFF"/></svg></div>
+        </div>
+        <div class="logo-row">
+          <div class="wm-box" style="background:#F7F9FF;color:#3A5BD9"><span class="wm" aria-label="filidilo">f<span class="pi" style="--dot:#8FE0D6">ı</span>l<span class="pi" style="--dot:#FFD27A">ı</span>d<span class="pi" style="--dot:#BFD6FF">ı</span>lo</span></div>
+          <div class="wm-box" style="background:#3A5BD9;color:#FFFFFF"><span class="wm" aria-label="filidilo">f<span class="pi" style="--dot:#8FE0D6">ı</span>l<span class="pi" style="--dot:#FFD27A">ı</span>d<span class="pi" style="--dot:#BFD6FF">ı</span>lo</span></div>
+        </div>
+        <p class="note">Ícone: leque de cinco cartões arredondados, sem contorno, sobre azul com leve degradê. Os pingos coloridos dos "i" continuam, agora sem aro. Letra em Baloo 2.</p>
+      </div>
+
+      <div class="cell c-paleta">
+        <h3>Paleta</h3>
+        <div class="swatches">
+          <div class="sw" style="border:1px solid #E1E7F7"><div class="chip" style="background:#3A5BD9"></div><div class="lbl"><b>Anil</b><code>#3A5BD9</code><span>cor principal</span></div></div>
+          <div class="sw" style="border:1px solid #E1E7F7"><div class="chip" style="background:#BFD6FF"></div><div class="lbl"><b>Céu pastel</b><code>#BFD6FF</code><span>cartões, superfícies</span></div></div>
+          <div class="sw" style="border:1px solid #E1E7F7"><div class="chip" style="background:#8FE0D6"></div><div class="lbl"><b>Água</b><code>#8FE0D6</code><span>acerto, progresso</span></div></div>
+          <div class="sw" style="border:1px solid #E1E7F7"><div class="chip" style="background:#FFD27A"></div><div class="lbl"><b>Mel</b><code>#FFD27A</code><span>ocelo, conquista</span></div></div>
+          <div class="sw" style="border:1px solid #E1E7F7"><div class="chip" style="background:#2B3350"></div><div class="lbl"><b>Ardósia</b><code>#2B3350</code><span>texto</span></div></div>
+          <div class="sw" style="border:1px solid #E1E7F7"><div class="chip" style="background:#F7F9FF"></div><div class="lbl"><b>Neve</b><code>#F7F9FF</code><span>fundo</span></div></div>
+        </div>
+      </div>
+
+      <div class="cell c-mood tint">
+        <h3>Mood</h3>
+        <div class="chips"><span>macio</span><span>calmo</span><span>para todas as idades</span><span>progresso visível</span><span>claro primeiro</span></div>
+        <div class="typespec">
+          <span style="font-family:'Baloo 2';font-weight:700;font-size:24px">Baloo 2 nos títulos</span>
+          <span style="font-family:'Nunito';font-size:15px;opacity:.9">Nunito no texto, como na B1.</span>
+        </div>
+        <ul class="ideas">
+          <li><b>Ofensiva</b><span>Sete cartões na cauda, um por dia da semana. Domingo de leque cheio ganha brilho.</span></li>
+          <li><b>Conquistas</b><span>Cartões especiais para a cauda (estampado, dourado), trocáveis.</span></li>
+          <li><b>Compartilhar</b><span>Pavão de leque aberto num fundo pastel, número de dias no cartão do meio.</span></li>
+          <li><b>Tom de voz</b><span>Gentil: "Mais um cartão no leque. Até amanhã."</span></li>
+        </ul>
+      </div>
+
+      <div class="cell c-tela">
+        <h3>No app</h3>
+        <div class="phone">
+          <div class="bar"><span style="font-family:'Baloo 2';font-weight:800;font-size:23px;color:#3A5BD9">f<span class="pi" style="--dot:#8FE0D6">ı</span>l<span class="pi" style="--dot:#FFD27A">ı</span>d<span class="pi" style="--dot:#BFD6FF">ı</span>lo</span><span class="badge">12 dias · 5 de 7</span></div>
+          <div class="card"><b>Falta uma sessão hoje</b><span style="opacity:.8">Restam 5 h para o cartão de sábado.</span><button class="btn" type="button">Estudar</button></div>
+          <div class="card"><b>Hidrodinâmica</b><span style="opacity:.8">24 para revisar · 3 novos</span></div>
+          <div class="card"><b>Inglês · verbos</b><span style="opacity:.8">Em dia</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= B3 ================= -->
+  <section class="prop B3" aria-labelledby="tb3">
+    <div class="prop-head">
+      <span class="tag">B3 · derivada do Leque</span>
+      <h2 id="tb3">Pavão-cartão</h2>
+      <p>O mascote é o próprio flashcard: um cartão com rosto de pavão, crista em cima e o leque de penas-cartão atrás. Na frente ele faz caretas; quando vira, mostra o verso, como um cartão de estudo. Mantém o contorno grosso da B1 e ganha um personagem de verdade.</p>
+    </div>
+    <div class="grid">
+      <div class="cell c-mascote">
+        <h3>Mascote</h3>
+        <div class="mascote-row">
+          <svg class="main" viewBox="0 0 200 200" role="img" aria-label="Flashcard com rosto de pavão, crista e leque de cartões atrás">
+            <g stroke="#0D1640" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+              <g transform="rotate(-52 100 150)"><rect x="88" y="34" width="24" height="66" rx="8" fill="#A9C8FF"/><circle cx="100" cy="51" r="6" fill="#FFC23D"/></g>
+              <g transform="rotate(52 100 150)"><rect x="88" y="34" width="24" height="66" rx="8" fill="#A9C8FF"/><circle cx="100" cy="51" r="6" fill="#FFC23D"/></g>
+              <g transform="rotate(-26 100 150)"><rect x="88" y="34" width="24" height="66" rx="8" fill="#00C2B2"/><circle cx="100" cy="51" r="6" fill="#FFC23D"/></g>
+              <g transform="rotate(26 100 150)"><rect x="88" y="34" width="24" height="66" rx="8" fill="#00C2B2"/><circle cx="100" cy="51" r="6" fill="#FFC23D"/></g>
+              <rect x="66" y="76" width="80" height="100" rx="16" fill="#0D1640" stroke="none"/>
+              <line x1="92" y1="70" x2="86" y2="54"/><line x1="100" y1="70" x2="100" y2="50"/><line x1="108" y1="70" x2="114" y2="54"/>
+              <rect x="60" y="70" width="80" height="100" rx="16" fill="#FFFFFF"/>
+              <circle cx="86" cy="52" r="5" fill="#00C2B2"/><circle cx="100" cy="47" r="5" fill="#FFC23D"/><circle cx="114" cy="52" r="5" fill="#00C2B2"/>
+              <path d="M93 116H107L100 126Z" fill="#FFC23D" stroke-width="2.5"/>
+              <line x1="76" y1="146" x2="124" y2="146" stroke="#A9C8FF" stroke-width="4"/>
+              <line x1="76" y1="157" x2="108" y2="157" stroke="#A9C8FF" stroke-width="4"/>
+              <ellipse cx="86" cy="178" rx="9" ry="4.5" fill="#FFC23D"/><ellipse cx="114" cy="178" rx="9" ry="4.5" fill="#FFC23D"/>
+            </g>
+            <circle cx="85" cy="103" r="7" fill="#0D1640"/><circle cx="115" cy="103" r="7" fill="#0D1640"/>
+            <circle cx="87.5" cy="100.5" r="2.2" fill="#FFFFFF"/><circle cx="117.5" cy="100.5" r="2.2" fill="#FFFFFF"/>
+            <circle cx="73" cy="118" r="5" fill="#A9C8FF"/><circle cx="127" cy="118" r="5" fill="#A9C8FF"/>
+          </svg>
+          <div class="mini">
+            <svg width="76" height="76" viewBox="0 0 100 100" aria-hidden="true">
+              <rect x="17" y="17" width="70" height="80" rx="12" fill="#0D1640"/>
+              <rect x="13" y="12" width="70" height="80" rx="12" fill="#1F3DFF" stroke="#0D1640" stroke-width="3"/>
+              <text x="48" y="58" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="34" fill="#FFFFFF">12</text>
+              <text x="48" y="76" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="700" font-size="12" fill="#FFC23D">dias</text>
+            </svg>
+            <span>o verso</span>
+          </div>
+        </div>
+        <p class="note">Corpo = cartão branco com as linhas de texto na barriga. Expressões na frente (feliz, pensando, dormindo, comemorando); o verso mostra números e respostas.</p>
+      </div>
+
+      <div class="cell c-logo">
+        <h3>Prévia do logo</h3>
+        <div class="logo-row">
+          <div class="tile" style="background:#1F3DFF;border:2px solid #0D1640">
+            <svg viewBox="0 0 100 100" aria-hidden="true"><g stroke="#0D1640" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="44" y1="26" x2="38" y2="13"/><line x1="50" y1="26" x2="50" y2="10"/><line x1="56" y1="26" x2="62" y2="13"/><circle cx="38" cy="12" r="5" fill="#00C2B2"/><circle cx="50" cy="9" r="5" fill="#FFC23D"/><circle cx="62" cy="12" r="5" fill="#00C2B2"/><rect x="24" y="26" width="52" height="64" rx="11" fill="#FFFFFF"/><path d="M45 60H55L50 67Z" fill="#FFC23D" stroke-width="3"/></g><circle cx="40" cy="48" r="5.5" fill="#0D1640"/><circle cx="60" cy="48" r="5.5" fill="#0D1640"/><circle cx="42" cy="46" r="1.8" fill="#FFFFFF"/><circle cx="62" cy="46" r="1.8" fill="#FFFFFF"/></svg>
+          </div>
+          <div class="tile sm" style="background:#1F3DFF;border:2px solid #0D1640"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="38" cy="12" r="7" fill="#00C2B2"/><circle cx="50" cy="8" r="7" fill="#FFC23D"/><circle cx="62" cy="12" r="7" fill="#00C2B2"/><rect x="22" y="24" width="56" height="68" rx="12" fill="#FFFFFF" stroke="#0D1640" stroke-width="5"/><circle cx="39" cy="50" r="7" fill="#0D1640"/><circle cx="61" cy="50" r="7" fill="#0D1640"/></svg></div>
+          <div class="tile xs" style="background:#1F3DFF"><svg viewBox="0 0 100 100" aria-hidden="true"><rect x="18" y="18" width="64" height="74" rx="14" fill="#FFFFFF"/><circle cx="38" cy="48" r="9" fill="#0D1640"/><circle cx="62" cy="48" r="9" fill="#0D1640"/></svg></div>
+        </div>
+        <div class="logo-row">
+          <div class="wm-box" style="background:#FFFFFF;color:#0D1640;border:2px solid #0D1640"><span class="wm" aria-label="filidilo">f<span class="pi" style="--dot:#00C2B2">ı</span>l<span class="pi" style="--dot:#FFC23D">ı</span>d<span class="pi" style="--dot:#A9C8FF">ı</span>lo</span></div>
+          <div class="wm-box" style="background:#0D1640;color:#FFFFFF"><span class="wm" aria-label="filidilo">f<span class="pi" style="--dot:#00C2B2">ı</span>l<span class="pi" style="--dot:#FFC23D">ı</span>d<span class="pi" style="--dot:#A9C8FF">ı</span>lo</span></div>
+        </div>
+        <p class="note">Ícone: o rosto do pavão-cartão, com crista. Em 16 px sobra um cartão com dois olhos, que ainda se reconhece. Nome igual ao da B1 (Fredoka, pingos coloridos).</p>
+      </div>
+
+      <div class="cell c-paleta">
+        <h3>Paleta</h3>
+        <div class="swatches">
+          <div class="sw" style="border:1.5px solid #0D1640"><div class="chip" style="background:#1F3DFF"></div><div class="lbl"><b>Azul-elétrico</b><code>#1F3DFF</code><span>cor principal, fundos</span></div></div>
+          <div class="sw" style="border:1.5px solid #0D1640"><div class="chip" style="background:#FFFFFF;box-shadow:inset 0 -1px 0 #DCE1EC"></div><div class="lbl"><b>Papel</b><code>#FFFFFF</code><span>corpo do cartão</span></div></div>
+          <div class="sw" style="border:1.5px solid #0D1640"><div class="chip" style="background:#A9C8FF"></div><div class="lbl"><b>Céu</b><code>#A9C8FF</code><span>detalhes, bochechas</span></div></div>
+          <div class="sw" style="border:1.5px solid #0D1640"><div class="chip" style="background:#00C2B2"></div><div class="lbl"><b>Turquesa</b><code>#00C2B2</code><span>acerto, crista</span></div></div>
+          <div class="sw" style="border:1.5px solid #0D1640"><div class="chip" style="background:#FFC23D"></div><div class="lbl"><b>Ouro</b><code>#FFC23D</code><span>botão, ocelo, bico</span></div></div>
+          <div class="sw" style="border:1.5px solid #0D1640"><div class="chip" style="background:#0D1640"></div><div class="lbl"><b>Marinho-tinta</b><code>#0D1640</code><span>contorno, texto</span></div></div>
+        </div>
+      </div>
+
+      <div class="cell c-mood dark">
+        <h3>Mood</h3>
+        <div class="chips"><span>personagem</span><span>figurinha</span><span>expressivo</span><span>frente e verso</span><span>claro primeiro</span></div>
+        <div class="typespec">
+          <span style="font-family:'Fredoka';font-weight:600;font-size:24px">Fredoka nos títulos</span>
+          <span style="font-family:'Nunito';font-size:15px;opacity:.9">Nunito no texto, como na B1.</span>
+        </div>
+        <ul class="ideas">
+          <li><b>Ofensiva</b><span>No fim da sessão o pavão-cartão vira e mostra os dias seguidos no verso.</span></li>
+          <li><b>Conquistas</b><span>Figurinhas do mascote em poses (de óculos, de capelo, dormindo), num álbum.</span></li>
+          <li><b>Compartilhar</b><span>Figurinha do mascote comemorando, com o número no verso ao lado.</span></li>
+          <li><b>Tom de voz</b><span>Brincalhão e em primeira pessoa: "Virei! 12 dias seguidos."</span></li>
+        </ul>
+      </div>
+
+      <div class="cell c-tela">
+        <h3>No app</h3>
+        <div class="phone">
+          <div class="bar"><span style="font-family:'Fredoka';font-weight:700;font-size:22px">f<span class="pi" style="--dot:#00C2B2">ı</span>l<span class="pi" style="--dot:#FFC23D">ı</span>d<span class="pi" style="--dot:#A9C8FF">ı</span>lo</span><span class="badge">12 dias</span></div>
+          <div class="card"><b>Falta uma sessão hoje</b><span>O pavão está esperando. Restam 5 h.</span><button class="btn" type="button">Estudar</button></div>
+          <div class="card"><b>Hidrodinâmica</b><span>24 para revisar · 3 novos</span></div>
+          <div class="card"><b>Inglês · verbos</b><span>Em dia ✓</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+  <!-- ================= Comparativo ================= -->
+  <section class="panel" aria-labelledby="tcmp">
+    <h2 id="tcmp" style="font-size:22px">As seis lado a lado</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Proposta</th><th>O que muda</th><th>Ícone em 16 px</th><th>Ligação com o app</th><th>Esforço para levar ao app</th><th>Risco</th></tr></thead>
+        <tbody>
+          <tr><td>A1 · Ocelo</td><td>Original: olho geométrico, escuro</td><td>Excelente</td><td>Média</td><td>Baixo</td><td>Sério demais</td></tr>
+          <tr><td>A2 · Ocelo claro</td><td>Claro, rosto de frente, o olho vira cabeça</td><td>Excelente</td><td>Média</td><td>Baixo</td><td>Pouco marcante</td></tr>
+          <tr><td>A3 · Escamas</td><td>Ocelo vira padrão; semana e mês em escamas</td><td>Boa</td><td>Forte na ofensiva</td><td>Médio (padrão em vários lugares)</td><td>Ficar pesado no escuro</td></tr>
+          <tr><td>B1 · Leque de cartões</td><td>Original: cauda de cartões, contorno grosso</td><td>Boa</td><td>Forte</td><td>Médio</td><td>Infantil se exagerar</td></tr>
+          <tr><td>B2 · Leque suave</td><td>Sem contorno, pastel, 7 cartões = semana</td><td>Boa</td><td>Forte</td><td>Médio</td><td>Parecer genérico</td></tr>
+          <tr><td>B3 · Pavão-cartão</td><td>O mascote é o próprio cartão, com frente e verso</td><td>Boa (cartão com olhos)</td><td>Muito forte</td><td>Médio a alto (poses do mascote)</td><td>Pavão pouco evidente sem a crista</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin:0">Minha sugestão: <span class="pick">B3 · Pavão-cartão</span>, com a fileira de escamas da <span class="pick">A3</span> como desenho da "Sua semana". O mascote passa a ser o próprio produto (um cartão que vira) e a ofensiva ganha um momento claro: o cartão vira e mostra os dias. Se preferir algo mais calmo, a B2 é a alternativa no mesmo conceito.</p>
+  </section>
+</div>

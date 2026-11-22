@@ -1,0 +1,298 @@
+<title>Propostas de marca Filidilo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: rodada final de mascotes — o que já foi aprovado no topo, depois três mascotes, cada um nas duas paletas e em três expressões, e a decisão no fim. */
+:root {
+  --bg: #F3F5FA; --surface: #FFFFFF; --fg: #141B2E; --muted: #5A6480; --line: #DCE1EC; --accent: #1F4FD1; --ok: #13806E;
+  --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-head: 'Sora', 'Inter', system-ui, sans-serif;
+  /* Paleta A1 (escura) e B2 (clara): cores da marca, fixas nos dois temas da página */
+  --a1-bg: #0B1E3F; --b2-bg: #F7F9FF; --b2-ink: #2B3350;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0C1222; --surface: #141C31; --fg: #E8ECF6; --muted: #9BA6C2; --line: #26304A; --accent: #7FA6FF; --ok: #4FD1B8; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #0C1222; --surface: #141C31; --fg: #E8ECF6; --muted: #9BA6C2; --line: #26304A; --accent: #7FA6FF; --ok: #4FD1B8; color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 40px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--font-head); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(28px, 4vw, 40px); letter-spacing: -.02em; }
+h2 { font-size: clamp(22px, 2.6vw, 28px); letter-spacing: -.01em; }
+.lede { max-width: 68ch; color: var(--muted); margin: 8px 0 0; }
+.eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 24px; display: grid; gap: 18px; min-width: 0; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td:first-child { font-weight: 600; white-space: nowrap; }
+.ok { color: var(--ok); font-weight: 600; }
+.pick { color: var(--accent); font-weight: 600; }
+
+/* Base aprovada */
+.base { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .base { grid-template-columns: 1fr; } }
+.theme { border-radius: 20px; padding: 20px; display: grid; gap: 14px; min-width: 0; }
+.theme.escuro { background: var(--a1-bg); color: #EEF3FB; }
+.theme.claro { background: var(--b2-bg); color: var(--b2-ink); box-shadow: inset 0 0 0 1px #E1E7F7; }
+.theme h3 { font-family: var(--font-ui); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; }
+.logo-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.tile { width: 72px; height: 72px; border-radius: 18px; display: grid; place-items: center; background: #0B1E3F; box-shadow: inset 0 0 0 1px #2A4785; flex: none; }
+.tile svg { width: 52px; height: 52px; }
+.wm { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 36px; letter-spacing: -.03em; line-height: 1; }
+.ocelo { display: inline-block; width: .6em; height: .6em; border-radius: 50%; vertical-align: -.02em; margin-left: .02em;
+  background: radial-gradient(circle, #0B1E3F 0 16%, #1F4FD1 16% 40%, #C9933A 40% 60%, #13A3A0 60%); }
+.sws { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 8px; }
+.sw { display: grid; gap: 4px; font-size: 11px; }
+.sw i { height: 40px; border-radius: 10px; display: block; }
+.theme.escuro .sw i { box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
+.theme.claro .sw i { box-shadow: inset 0 0 0 1px #E1E7F7; }
+.sw b { font-size: 12px; }
+.sw code { font-family: ui-monospace, Menlo, monospace; opacity: .75; }
+
+/* Mascotes */
+.mascote { display: grid; gap: 16px; }
+.mascote-head { display: grid; gap: 4px; }
+.mascote-head p { margin: 0; max-width: 72ch; color: var(--muted); }
+.tag { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+.stages { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .stages { grid-template-columns: 1fr; } }
+.stage { border-radius: 20px; padding: 16px; display: grid; gap: 10px; justify-items: center; min-width: 0; }
+.stage.escuro { background: var(--a1-bg); color: #EEF3FB; }
+.stage.claro { background: var(--b2-bg); color: var(--b2-ink); box-shadow: inset 0 0 0 1px #E1E7F7; }
+.stage .big svg { width: min(240px, 100%); height: auto; display: block; }
+.stage .lbl { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; opacity: .8; justify-self: start; }
+.exprs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.expr { display: grid; gap: 2px; justify-items: center; font-size: 12px; }
+.expr svg { width: 84px; height: 84px; }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 760px) { .facts { grid-template-columns: 1fr; } }
+.fact { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; font-size: 14px; min-width: 0; }
+.fact b { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">tatino. → Filidilo · redesign de marca · rodada 4, mascote</div>
+    <h1>Mascote do Filidilo</h1>
+    <p class="lede">Logo, ícone e fonte da A1 estão aprovados, e as paletas da A1 e da B2 seguem daqui para a frente. Falta o mascote. Aqui vão três pavões com forma de pavão e o leque aberto, vetoriais e fofos, nas duas paletas e em três expressões. Dormindo, o leque fecha.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="tbase">
+    <div class="eyebrow">Já decidido</div>
+    <h2 id="tbase">A base</h2>
+    <div class="base">
+      <div class="theme escuro">
+        <h3>Paleta A1 · noite</h3>
+        <div class="logo-row">
+          <div class="tile"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 10C76 30 82 60 67 78C59 88 41 88 33 78C18 60 24 30 50 10Z" fill="#13A3A0"/><ellipse cx="50" cy="62" rx="16" ry="18" fill="#C9933A"/><ellipse cx="50" cy="63" rx="10.5" ry="12" fill="#1F4FD1"/><circle cx="50" cy="64" r="4.5" fill="#EEF3FB"/></svg></div>
+          <span class="wm">filidil<span class="ocelo" aria-hidden="true"></span></span>
+        </div>
+        <div class="sws">
+          <div class="sw"><i style="background:#0B1E3F"></i><b>Noite</b><code>#0B1E3F</code></div>
+          <div class="sw"><i style="background:#1F4FD1"></i><b>Cobalto</b><code>#1F4FD1</code></div>
+          <div class="sw"><i style="background:#13A3A0"></i><b>Turquesa</b><code>#13A3A0</code></div>
+          <div class="sw"><i style="background:#C9933A"></i><b>Bronze</b><code>#C9933A</code></div>
+          <div class="sw"><i style="background:#EEF3FB"></i><b>Névoa</b><code>#EEF3FB</code></div>
+        </div>
+      </div>
+      <div class="theme claro">
+        <h3>Paleta B2 · dia</h3>
+        <div class="logo-row">
+          <div class="tile"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 10C76 30 82 60 67 78C59 88 41 88 33 78C18 60 24 30 50 10Z" fill="#13A3A0"/><ellipse cx="50" cy="62" rx="16" ry="18" fill="#C9933A"/><ellipse cx="50" cy="63" rx="10.5" ry="12" fill="#1F4FD1"/><circle cx="50" cy="64" r="4.5" fill="#EEF3FB"/></svg></div>
+          <span class="wm" style="color:#0B1E3F">filidil<span class="ocelo" aria-hidden="true"></span></span>
+        </div>
+        <div class="sws">
+          <div class="sw"><i style="background:#3A5BD9"></i><b>Anil</b><code>#3A5BD9</code></div>
+          <div class="sw"><i style="background:#BFD6FF"></i><b>Céu pastel</b><code>#BFD6FF</code></div>
+          <div class="sw"><i style="background:#8FE0D6"></i><b>Água</b><code>#8FE0D6</code></div>
+          <div class="sw"><i style="background:#FFD27A"></i><b>Mel</b><code>#FFD27A</code></div>
+          <div class="sw"><i style="background:#2B3350"></i><b>Ardósia</b><code>#2B3350</code></div>
+          <div class="sw"><i style="background:#F7F9FF"></i><b>Neve</b><code>#F7F9FF</code></div>
+        </div>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Peça</th><th>Decisão</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Logo e ícone</td><td>A1: pena em gota com ocelo; o "o" final do nome é o ocelo</td><td class="ok">Aprovado</td></tr>
+          <tr><td>Fonte</td><td>Sora nos títulos e no nome, Inter no texto</td><td class="ok">Aprovado</td></tr>
+          <tr><td>Paletas</td><td>A1 e B2. Minha proposta: A1 no tema escuro do app, B2 no tema claro</td><td>Aprovadas; falta confirmar quem fica em qual tema</td></tr>
+          <tr><td>Mascote</td><td>Escolher entre P1, P2 e P3 abaixo</td><td>Esta rodada</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="mascote" aria-labelledby="tp1">
+    <div class="mascote-head">
+      <span class="tag">P1</span>
+      <h2 id="tp1">Pavão de leque, de frente</h2>
+      <p>A pose clássica: de frente, pescoço fino, cabeça pequena com crista e o leque inteiro aberto atrás, com três fileiras de ocelos. Proporção de pavão de verdade, só com a cabeça e os olhos um pouco maiores para ficar fofo.</p>
+    </div>
+    <div class="stages" data-m="p1"></div>
+    <div class="facts">
+      <div class="fact"><b>Força</b>É o pavão que todo mundo reconhece. O leque cheio fica imponente e bonito.</div>
+      <div class="fact"><b>Cuidado</b>Muitos ocelos: em tamanho pequeno, usar uma versão com só duas fileiras.</div>
+      <div class="fact"><b>No app</b>Fim da sessão (abre o leque), tela de boas-vindas, conquistas. Dormindo, fecha o leque.</div>
+    </div>
+  </section>
+
+  <section class="mascote" aria-labelledby="tp2">
+    <div class="mascote-head">
+      <span class="tag">P2</span>
+      <h2 id="tp2">Pavão de leque, de perfil</h2>
+      <p>Corpo de lado, pescoço em curva e bico para a frente, com o leque aberto atrás. É como o pavão aparece nas fotos quando se exibe. Dá mais movimento: ele pode andar, virar a cabeça, olhar para o botão.</p>
+    </div>
+    <div class="stages" data-m="p2"></div>
+    <div class="facts">
+      <div class="fact"><b>Força</b>Mais natural e com mais movimento; olha "para dentro" da tela, apontando para o conteúdo.</div>
+      <div class="fact"><b>Cuidado</b>Um olho só aparece; a expressão depende mais da postura e do leque.</div>
+      <div class="fact"><b>No app</b>Ao lado de mensagens ("Falta uma sessão hoje"), olhando para o botão Estudar.</div>
+    </div>
+  </section>
+
+  <section class="mascote" aria-labelledby="tp3">
+    <div class="mascote-head">
+      <span class="tag">P3</span>
+      <h2 id="tp3">Pavãozinho</h2>
+      <p>O mesmo pavão de frente, em versão filhote: cabeça e corpo mais redondos, olhos maiores, pescoço curto e um leque com menos penas, maiores. Continua sendo um pavão, só que mais fofo e mais fácil de ler pequeno.</p>
+    </div>
+    <div class="stages" data-m="p3"></div>
+    <div class="facts">
+      <div class="fact"><b>Força</b>O mais fofo dos três e o que funciona melhor em tamanho pequeno (avatar, notificação).</div>
+      <div class="fact"><b>Cuidado</b>Sem exagerar na cabeça, para não virar um pintinho; o pescoço e a crista seguram o pavão.</div>
+      <div class="fact"><b>No app</b>Em todo lugar: ofensiva, vazios, conquistas, imagem de compartilhar.</div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="tcmp">
+    <h2 id="tcmp">Os três lado a lado</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Mascote</th><th>Pose</th><th>Fofura</th><th>Parece pavão</th><th>Tamanho pequeno</th><th>Movimento</th></tr></thead>
+        <tbody>
+          <tr><td>P1 · De frente</td><td>Frontal, leque de 3 fileiras</td><td>Média</td><td>Muito</td><td>Médio (2 fileiras)</td><td>Abre e fecha o leque</td></tr>
+          <tr><td>P2 · De perfil</td><td>Lateral, leque atrás</td><td>Média</td><td>Muito</td><td>Médio</td><td>Anda, vira, aponta</td></tr>
+          <tr><td>P3 · Pavãozinho</td><td>Frontal, filhote, leque de 2 fileiras</td><td>Alta</td><td>Bem</td><td>Ótimo</td><td>Abre e fecha o leque</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin:0">Minha sugestão: <span class="pick">P3 · Pavãozinho</span> como mascote principal, porque é o mais fofo e o que aguenta tamanho pequeno. O P1 pode ser a versão "adulta" para a tela de boas-vindas e a imagem de compartilhar, com o mesmo desenho.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  var PAL = {
+    escuro: { nome: 'Paleta A1', body: '#1F4FD1', fan: '#13A3A0', fanEdge: '#0F8784', mid: '#C9933A', ink: '#0B1E3F', light: '#EEF3FB', wing: '#C9933A', leg: '#8FA3C8', shaft: '#9FE3E0', shadow: '#000000', cheek: '#13A3A0', text: '#EEF3FB' },
+    claro:  { nome: 'Paleta B2', body: '#3A5BD9', fan: '#8FE0D6', fanEdge: '#6FCFC3', mid: '#FFD27A', ink: '#2B3350', light: '#FFFFFF', wing: '#FFD27A', leg: '#8B93AD', shaft: '#FFFFFF', shadow: '#2B3350', cheek: '#BFD6FF', text: '#2B3350' }
+  };
+  function f(n) { return Math.round(n * 10) / 10; }
+  function pt(cx, cy, r, a) { var t = a * Math.PI / 180; return [f(cx + r * Math.sin(t)), f(cy - r * Math.cos(t))]; }
+  function ocelo(x, y, rot, s, p) {
+    return '<g transform="translate(' + x + ' ' + y + ') rotate(' + rot + ') scale(' + s + ')">' +
+      '<ellipse rx="8" ry="11" fill="' + p.mid + '"/><ellipse cy="1" rx="5.6" ry="7.6" fill="' + p.body + '"/>' +
+      '<ellipse cy="1.8" rx="3" ry="4.2" fill="' + p.ink + '"/><circle cx="1.3" cy="-1.2" r="1" fill="' + p.light + '" opacity=".8"/></g>';
+  }
+  /* Leque: fundo em setor, borda recortada, hastes e fileiras de ocelos. aberto = 1 (aberto) ou menor (fechando). */
+  function leque(cx, cy, R, spread, rows, p, aberto) {
+    var A = spread * aberto, Rr = R * (0.7 + 0.3 * aberto), out = '';
+    var a0 = pt(cx, cy, Rr, -A), a1 = pt(cx, cy, Rr, A);
+    out += '<path d="M' + cx + ' ' + cy + 'L' + a0[0] + ' ' + a0[1] + 'A' + Rr + ' ' + Rr + ' 0 ' + (A > 90 ? 1 : 0) + ' 1 ' + a1[0] + ' ' + a1[1] + 'Z" fill="' + p.fan + '"/>';
+    var nb = Math.max(5, Math.round(A / 7)), step = 2 * A / nb, rb = Rr * step * Math.PI / 180 * 0.62;
+    for (var i = 0; i <= nb; i++) { var q = pt(cx, cy, Rr, -A + i * step); out += '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="' + f(rb) + '" fill="' + p.fanEdge + '"/>'; }
+    out += '<path d="M' + cx + ' ' + cy + 'L' + pt(cx, cy, Rr - rb, -A).join(' ') + 'A' + f(Rr - rb) + ' ' + f(Rr - rb) + ' 0 ' + (A > 90 ? 1 : 0) + ' 1 ' + pt(cx, cy, Rr - rb, A).join(' ') + 'Z" fill="' + p.fan + '"/>';
+    if (aberto < .5) rows = [{ r: R * .78, n: 3, s: .9, span: .62 }];
+    rows.forEach(function (row, k) {
+      var n = row.n, r = row.r * (0.7 + 0.3 * aberto), a = A * row.span;
+      for (var j = 0; j < n; j++) {
+        var ang = n === 1 ? 0 : -a + j * (2 * a / (n - 1)), q = pt(cx, cy, r, ang);
+        if (k === 0) out += '<line x1="' + cx + '" y1="' + cy + '" x2="' + q[0] + '" y2="' + q[1] + '" stroke="' + p.shaft + '" stroke-width="1" opacity=".45"/>';
+        out += ocelo(q[0], q[1], f(ang), row.s, p);
+      }
+    });
+    return out;
+  }
+  function olho(x, y, r, expr, p, faixa) {
+    var s = faixa && expr === 'atento' ? '<ellipse cx="' + x + '" cy="' + f(y + r * 1.05) + '" rx="' + f(r * 1.3) + '" ry="' + f(r * .6) + '" fill="' + p.light + '"/>' : '';
+    if (expr === 'feliz') return s + '<path d="M' + f(x - r) + ' ' + f(y + r * .3) + 'Q' + x + ' ' + f(y - r * 1.2) + ' ' + f(x + r) + ' ' + f(y + r * .3) + '" fill="none" stroke="' + p.ink + '" stroke-width="' + f(Math.max(1.6, r * .6)) + '" stroke-linecap="round"/>';
+    if (expr === 'dormindo') return s + '<path d="M' + f(x - r) + ' ' + y + 'Q' + x + ' ' + f(y + r) + ' ' + f(x + r) + ' ' + y + '" fill="none" stroke="' + p.ink + '" stroke-width="' + f(Math.max(1.6, r * .6)) + '" stroke-linecap="round"/>';
+    return s + '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + p.ink + '"/><circle cx="' + f(x + r * .35) + '" cy="' + f(y - r * .35) + '" r="' + f(r * .35) + '" fill="' + p.light + '"/>';
+  }
+  function crista(cx, cy, len, angs, p, rt) {
+    var out = '';
+    angs.forEach(function (a) { var q = pt(cx, cy, len, a); out += '<line x1="' + cx + '" y1="' + cy + '" x2="' + q[0] + '" y2="' + q[1] + '" stroke="' + p.body + '" stroke-width="1.4" stroke-linecap="round"/><circle cx="' + q[0] + '" cy="' + q[1] + '" r="' + rt + '" fill="' + p.fan + '"/>'; });
+    return out;
+  }
+  function pernas(xs, y0, y1, p) {
+    var out = '<g stroke="' + p.leg + '" stroke-width="2.6" stroke-linecap="round">';
+    xs.forEach(function (x) { var d = x < 100 ? -1 : 1, xe = x + d; out += '<line x1="' + x + '" y1="' + y0 + '" x2="' + xe + '" y2="' + y1 + '"/><line x1="' + xe + '" y1="' + y1 + '" x2="' + (xe - 5) + '" y2="' + (y1 + 3) + '"/><line x1="' + xe + '" y1="' + y1 + '" x2="' + (xe + 4) + '" y2="' + (y1 + 3) + '"/>'; });
+    return out + '</g>';
+  }
+  function zz(x, y, p) { return '<text x="' + x + '" y="' + y + '" font-family="Sora, sans-serif" font-weight="700" font-size="14" fill="' + p.text + '">z</text><text x="' + (x + 10) + '" y="' + (y - 9) + '" font-family="Sora, sans-serif" font-weight="700" font-size="10" fill="' + p.text + '" opacity=".7">z</text>'; }
+  function sombra(cx, cy, rx, p) { return '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="5" fill="' + p.shadow + '" opacity=".16"/>'; }
+  function abertura(expr) { return expr === 'dormindo' ? 0.3 : (expr === 'feliz' ? 1.06 : 1); }
+
+  var M = {
+    p1: function (p, expr) {
+      var s = sombra(100, 186, 40, p);
+      s += leque(100, 132, 86, 100, [{ r: 78, n: 13, s: 1, span: .94 }, { r: 57, n: 10, s: .82, span: .86 }, { r: 37, n: 7, s: .62, span: .78 }], p, abertura(expr));
+      s += pernas([95, 105], 164, 181, p);
+      s += '<path d="M95 66C94 80 88 94 85 110C81 130 83 152 92 164C96 168 104 168 108 164C117 152 119 130 115 110C112 94 106 80 105 66Z" fill="' + p.body + '"/>';
+      s += '<path d="M86 118C78 128 78 150 88 162C92 150 92 132 86 118Z" fill="' + p.wing + '"/><path d="M114 118C122 128 122 150 112 162C108 150 108 132 114 118Z" fill="' + p.wing + '"/>';
+      s += crista(100, 50, 14, [-26, -13, 0, 13, 26], p, 2.4);
+      s += '<circle cx="100" cy="60" r="12" fill="' + p.body + '"/>';
+      s += olho(95.4, 58.5, 2.6, expr, p, true) + olho(104.6, 58.5, 2.6, expr, p, true);
+      s += '<path d="M98 64L102 64L100 69Z" fill="' + p.mid + '"/>';
+      if (expr === 'dormindo') s += zz(116, 50, p);
+      return s;
+    },
+    p2: function (p, expr) {
+      var s = sombra(96, 186, 40, p);
+      s += '<g transform="translate(86 134) scale(.9 1) translate(-86 -134)">' + leque(86, 134, 84, 98, [{ r: 77, n: 12, s: 1, span: .94 }, { r: 56, n: 10, s: .82, span: .86 }, { r: 36, n: 7, s: .62, span: .78 }], p, abertura(expr)) + '</g>';
+      s += pernas([91, 102], 156, 181, p);
+      s += '<ellipse cx="96" cy="136" rx="22" ry="24" transform="rotate(-15 96 136)" fill="' + p.body + '"/>';
+      s += '<path d="M97 120C104 102 106 84 110 68L126 66C121 84 119 102 116 124Z" fill="' + p.body + '"/>';
+      s += '<path d="M80 133C90 125 106 127 112 141C102 149 88 148 80 133Z" fill="' + p.wing + '"/>';
+      s += crista(116, 49, 14, [-34, -22, -10, 2], p, 2.4);
+      s += '<circle cx="118" cy="60" r="12" fill="' + p.body + '"/>';
+      s += olho(121.5, 58, 2.8, expr, p, true);
+      s += '<path d="M128.5 57L138 61L128.5 64Z" fill="' + p.mid + '"/>';
+      if (expr === 'dormindo') s += zz(132, 46, p);
+      return s;
+    },
+    p3: function (p, expr) {
+      var s = sombra(100, 186, 36, p);
+      s += leque(100, 140, 80, 98, [{ r: 68, n: 9, s: 1.3, span: .92 }, { r: 44, n: 7, s: .95, span: .8 }], p, abertura(expr));
+      s += pernas([94, 106], 170, 182, p);
+      s += '<path d="M90 106C90 118 88 124 85 130L115 130C112 124 110 118 110 106Z" fill="' + p.body + '"/>';
+      s += '<circle cx="100" cy="148" r="27" fill="' + p.body + '"/>';
+      s += '<ellipse cx="76" cy="150" rx="8" ry="14" transform="rotate(14 76 150)" fill="' + p.wing + '"/><ellipse cx="124" cy="150" rx="8" ry="14" transform="rotate(-14 124 150)" fill="' + p.wing + '"/>';
+      s += crista(100, 84, 14, [-26, -13, 0, 13, 26], p, 3);
+      s += '<circle cx="100" cy="100" r="19" fill="' + p.body + '"/>';
+      s += '<circle cx="87" cy="108" r="3.4" fill="' + p.cheek + '" opacity=".55"/><circle cx="113" cy="108" r="3.4" fill="' + p.cheek + '" opacity=".55"/>';
+      s += olho(93, 98, 4.2, expr, p, true) + olho(107, 98, 4.2, expr, p, true);
+      s += '<path d="M97 105L103 105L100 111Z" fill="' + p.mid + '"/>';
+      if (expr === 'dormindo') s += zz(122, 82, p);
+      return s;
+    }
+  };
+  var NOMES = { p1: 'Pavão de leque de frente', p2: 'Pavão de leque de perfil', p3: 'Pavãozinho' };
+  function svg(m, p, expr, label) { return '<svg viewBox="0 0 200 200" role="img" aria-label="' + label + '">' + M[m](p, expr) + '</svg>'; }
+  var EXPR = [['atento', 'atento'], ['feliz', 'comemorando'], ['dormindo', 'dormindo']];
+  document.querySelectorAll('.stages[data-m]').forEach(function (el) {
+    var m = el.getAttribute('data-m'), html = '';
+    ['escuro', 'claro'].forEach(function (t) {
+      var p = PAL[t];
+      html += '<div class="stage ' + t + '"><span class="lbl">' + p.nome + '</span><div class="big">' + svg(m, p, 'atento', NOMES[m] + ' na ' + p.nome) + '</div><div class="exprs">';
+      EXPR.forEach(function (e) { html += '<div class="expr">' + svg(m, p, e[0], NOMES[m] + ' ' + e[1]) + '<span>' + e[1] + '</span></div>'; });
+      html += '</div></div>';
+    });
+    el.innerHTML = html;
+  });
+})();
+</script>

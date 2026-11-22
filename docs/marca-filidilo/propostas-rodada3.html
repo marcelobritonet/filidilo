@@ -1,0 +1,276 @@
+<title>Propostas de marca Filidilo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: rodada final de mascotes — o que já foi aprovado no topo, depois três mascotes, cada um nas duas paletas e em três expressões, e a decisão no fim. */
+:root {
+  --bg: #F3F5FA; --surface: #FFFFFF; --fg: #141B2E; --muted: #5A6480; --line: #DCE1EC; --accent: #1F4FD1; --ok: #13806E;
+  --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-head: 'Sora', 'Inter', system-ui, sans-serif;
+  /* Paleta A1 (escura) e B2 (clara): cores da marca, fixas nos dois temas da página */
+  --a1-bg: #0B1E3F; --b2-bg: #F7F9FF; --b2-ink: #2B3350;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0C1222; --surface: #141C31; --fg: #E8ECF6; --muted: #9BA6C2; --line: #26304A; --accent: #7FA6FF; --ok: #4FD1B8; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #0C1222; --surface: #141C31; --fg: #E8ECF6; --muted: #9BA6C2; --line: #26304A; --accent: #7FA6FF; --ok: #4FD1B8; color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 40px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--font-head); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(28px, 4vw, 40px); letter-spacing: -.02em; }
+h2 { font-size: clamp(22px, 2.6vw, 28px); letter-spacing: -.01em; }
+.lede { max-width: 68ch; color: var(--muted); margin: 8px 0 0; }
+.eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 24px; display: grid; gap: 18px; min-width: 0; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td:first-child { font-weight: 600; white-space: nowrap; }
+.ok { color: var(--ok); font-weight: 600; }
+.pick { color: var(--accent); font-weight: 600; }
+
+/* Base aprovada */
+.base { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .base { grid-template-columns: 1fr; } }
+.theme { border-radius: 20px; padding: 20px; display: grid; gap: 14px; min-width: 0; }
+.theme.escuro { background: var(--a1-bg); color: #EEF3FB; }
+.theme.claro { background: var(--b2-bg); color: var(--b2-ink); box-shadow: inset 0 0 0 1px #E1E7F7; }
+.theme h3 { font-family: var(--font-ui); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; }
+.logo-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.tile { width: 72px; height: 72px; border-radius: 18px; display: grid; place-items: center; background: #0B1E3F; box-shadow: inset 0 0 0 1px #2A4785; flex: none; }
+.tile svg { width: 52px; height: 52px; }
+.wm { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 36px; letter-spacing: -.03em; line-height: 1; }
+.ocelo { display: inline-block; width: .6em; height: .6em; border-radius: 50%; vertical-align: -.02em; margin-left: .02em;
+  background: radial-gradient(circle, #0B1E3F 0 16%, #1F4FD1 16% 40%, #C9933A 40% 60%, #13A3A0 60%); }
+.sws { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 8px; }
+.sw { display: grid; gap: 4px; font-size: 11px; }
+.sw i { height: 40px; border-radius: 10px; display: block; }
+.theme.escuro .sw i { box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
+.theme.claro .sw i { box-shadow: inset 0 0 0 1px #E1E7F7; }
+.sw b { font-size: 12px; }
+.sw code { font-family: ui-monospace, Menlo, monospace; opacity: .75; }
+
+/* Mascotes */
+.mascote { display: grid; gap: 16px; }
+.mascote-head { display: grid; gap: 4px; }
+.mascote-head p { margin: 0; max-width: 72ch; color: var(--muted); }
+.tag { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+.stages { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .stages { grid-template-columns: 1fr; } }
+.stage { border-radius: 20px; padding: 16px; display: grid; gap: 10px; justify-items: center; min-width: 0; }
+.stage.escuro { background: var(--a1-bg); color: #EEF3FB; }
+.stage.claro { background: var(--b2-bg); color: var(--b2-ink); box-shadow: inset 0 0 0 1px #E1E7F7; }
+.stage .big svg { width: min(240px, 100%); height: auto; display: block; }
+.stage .lbl { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; opacity: .8; justify-self: start; }
+.exprs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.expr { display: grid; gap: 2px; justify-items: center; font-size: 12px; }
+.expr svg { width: 84px; height: 84px; }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 760px) { .facts { grid-template-columns: 1fr; } }
+.fact { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; font-size: 14px; min-width: 0; }
+.fact b { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">tatino. → Filidilo · redesign de marca · rodada 3, final</div>
+    <h1>Mascote do Filidilo</h1>
+    <p class="lede">Logo, ícone e fonte da A1 estão aprovados, e as paletas da A1 e da B2 seguem daqui para a frente. Falta o mascote. Aqui vão três pavões, todos feitos com a gota e o ocelo do ícone aprovado, mostrados nas duas paletas e em três expressões.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="tbase">
+    <div class="eyebrow">Já decidido</div>
+    <h2 id="tbase">A base</h2>
+    <div class="base">
+      <div class="theme escuro">
+        <h3>Paleta A1 · noite</h3>
+        <div class="logo-row">
+          <div class="tile"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 10C76 30 82 60 67 78C59 88 41 88 33 78C18 60 24 30 50 10Z" fill="#13A3A0"/><ellipse cx="50" cy="62" rx="16" ry="18" fill="#C9933A"/><ellipse cx="50" cy="63" rx="10.5" ry="12" fill="#1F4FD1"/><circle cx="50" cy="64" r="4.5" fill="#EEF3FB"/></svg></div>
+          <span class="wm">filidil<span class="ocelo" aria-hidden="true"></span></span>
+        </div>
+        <div class="sws">
+          <div class="sw"><i style="background:#0B1E3F"></i><b>Noite</b><code>#0B1E3F</code></div>
+          <div class="sw"><i style="background:#1F4FD1"></i><b>Cobalto</b><code>#1F4FD1</code></div>
+          <div class="sw"><i style="background:#13A3A0"></i><b>Turquesa</b><code>#13A3A0</code></div>
+          <div class="sw"><i style="background:#C9933A"></i><b>Bronze</b><code>#C9933A</code></div>
+          <div class="sw"><i style="background:#EEF3FB"></i><b>Névoa</b><code>#EEF3FB</code></div>
+        </div>
+      </div>
+      <div class="theme claro">
+        <h3>Paleta B2 · dia</h3>
+        <div class="logo-row">
+          <div class="tile"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 10C76 30 82 60 67 78C59 88 41 88 33 78C18 60 24 30 50 10Z" fill="#13A3A0"/><ellipse cx="50" cy="62" rx="16" ry="18" fill="#C9933A"/><ellipse cx="50" cy="63" rx="10.5" ry="12" fill="#1F4FD1"/><circle cx="50" cy="64" r="4.5" fill="#EEF3FB"/></svg></div>
+          <span class="wm" style="color:#0B1E3F">filidil<span class="ocelo" aria-hidden="true"></span></span>
+        </div>
+        <div class="sws">
+          <div class="sw"><i style="background:#3A5BD9"></i><b>Anil</b><code>#3A5BD9</code></div>
+          <div class="sw"><i style="background:#BFD6FF"></i><b>Céu pastel</b><code>#BFD6FF</code></div>
+          <div class="sw"><i style="background:#8FE0D6"></i><b>Água</b><code>#8FE0D6</code></div>
+          <div class="sw"><i style="background:#FFD27A"></i><b>Mel</b><code>#FFD27A</code></div>
+          <div class="sw"><i style="background:#2B3350"></i><b>Ardósia</b><code>#2B3350</code></div>
+          <div class="sw"><i style="background:#F7F9FF"></i><b>Neve</b><code>#F7F9FF</code></div>
+        </div>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Peça</th><th>Decisão</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Logo e ícone</td><td>A1: pena em gota com ocelo; o "o" final do nome é o ocelo</td><td class="ok">Aprovado</td></tr>
+          <tr><td>Fonte</td><td>Sora nos títulos e no nome, Inter no texto</td><td class="ok">Aprovado</td></tr>
+          <tr><td>Paletas</td><td>A1 e B2. Minha proposta: A1 no tema escuro do app, B2 no tema claro</td><td>Aprovadas; falta confirmar quem fica em qual tema</td></tr>
+          <tr><td>Mascote</td><td>Escolher entre M1, M2 e M3 abaixo</td><td>Esta rodada</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="mascote" aria-labelledby="tm1">
+    <div class="mascote-head">
+      <span class="tag">M1</span>
+      <h2 id="tm1">Pavão de ocelos</h2>
+      <p>O pavão geométrico da A1, refinado: as cinco penas da cauda passam a ter exatamente a forma do ícone (gota com ocelo). De perfil, sóbrio, feito de círculos. É o mais próximo do que já foi aprovado.</p>
+    </div>
+    <div class="stages" data-m="m1"></div>
+    <div class="facts">
+      <div class="fact"><b>Força</b>Casa com o ícone sem esforço; a cauda é o logo repetido cinco vezes.</div>
+      <div class="fact"><b>Risco</b>Pouca expressão: um olho só, de perfil. Lê melhor em tamanho médio e grande.</div>
+      <div class="fact"><b>No app</b>Cabeçalho das conquistas e fim da sessão, com a cauda acendendo pena por pena.</div>
+    </div>
+  </section>
+
+  <section class="mascote" aria-labelledby="tm2">
+    <div class="mascote-head">
+      <span class="tag">M2</span>
+      <h2 id="tm2">Pavão macio</h2>
+      <p>O corpo em pera e o rosto de frente da B2, sem contorno, com a cauda de sete gotas do ícone em vez de cartões. Uma pena para cada dia da semana. Junta a maciez que você gostou na B2 com a forma aprovada da A1.</p>
+    </div>
+    <div class="stages" data-m="m2"></div>
+    <div class="facts">
+      <div class="fact"><b>Força</b>O mais simpático e expressivo; sete penas viram o "Sua semana" sem texto.</div>
+      <div class="fact"><b>Risco</b>Muitos elementos para tamanho pequeno; em avatar, usar só o rosto.</div>
+      <div class="fact"><b>No app</b>Ofensiva (cauda de 7 penas que vão acendendo), cartão "Falta uma sessão hoje", vazios.</div>
+    </div>
+  </section>
+
+  <section class="mascote" aria-labelledby="tm3">
+    <div class="mascote-head">
+      <span class="tag">M3</span>
+      <h2 id="tm3">Ocelinho</h2>
+      <p>O próprio ícone vira o personagem: a gota ganha olhos, bico, crista e pés, e o ocelo fica na barriga. Fechado, ele é o logo; quando comemora, abre uma cauda de gotas atrás. O logo e o mascote passam a ser a mesma figura.</p>
+    </div>
+    <div class="stages" data-m="m3"></div>
+    <div class="facts">
+      <div class="fact"><b>Força</b>Máxima coerência: quem vê o mascote reconhece o ícone, e vice-versa. Funciona até pequeno.</div>
+      <div class="fact"><b>Risco</b>Parece menos um pavão quando está com a cauda fechada; a crista e a cauda aberta resolvem.</div>
+      <div class="fact"><b>No app</b>Animação de abertura (ícone ganha olhos), fim da sessão (abre a cauda), figurinhas das conquistas.</div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="tcmp">
+    <h2 id="tcmp">Os três lado a lado</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Mascote</th><th>Ideia</th><th>Casa com o logo</th><th>Expressão</th><th>Tamanho pequeno</th><th>Esforço para animar</th></tr></thead>
+        <tbody>
+          <tr><td>M1 · Pavão de ocelos</td><td>A1 refinado, cauda = 5 ícones</td><td>Muito</td><td>Baixa</td><td>Médio</td><td>Baixo</td></tr>
+          <tr><td>M2 · Pavão macio</td><td>Corpo da B2, cauda de 7 gotas</td><td>Bem</td><td>Alta</td><td>Fraco (usar só o rosto)</td><td>Médio</td></tr>
+          <tr><td>M3 · Ocelinho</td><td>O ícone é o mascote</td><td>Total</td><td>Média a alta</td><td>Ótimo</td><td>Médio</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin:0">Minha sugestão: <span class="pick">M3 · Ocelinho</span>. Com logo e ícone aprovados, um mascote que é o próprio ícone fecha a marca numa figura só, e a cauda que abre na comemoração dá à ofensiva e às conquistas um momento próprio. Se ele parecer pouco pavão, a M2 é a segunda opção.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  var PAL = {
+    escuro: { nome: 'Paleta A1', body: '#1F4FD1', outer: '#13A3A0', mid: '#C9933A', inner: '#1F4FD1', ink: '#0B1E3F', light: '#EEF3FB', belly: '#13A3A0', stem: '#2A4785', text: '#EEF3FB', cheek: '#13A3A0', dot: '#EEF3FB' },
+    claro:  { nome: 'Paleta B2', body: '#3A5BD9', outer: '#8FE0D6', mid: '#FFD27A', inner: '#3A5BD9', ink: '#2B3350', light: '#FFFFFF', belly: '#BFD6FF', stem: '#BFD6FF', text: '#2B3350', cheek: '#8FE0D6', dot: '#FFFFFF' }
+  };
+  var GOTA = 'M0 -26C16 -14 20 4 11 15C6 21 -6 21 -11 15C-20 4 -16 -14 0 -26Z';
+  function gota(cx, cy, s, rot, p) {
+    return '<g transform="translate(' + cx + ' ' + cy + ') rotate(' + rot + ') scale(' + s + ')"><path d="' + GOTA + '" fill="' + p.outer + '"/>' +
+      '<ellipse cx="0" cy="5" rx="10" ry="11" fill="' + p.mid + '"/><ellipse cx="0" cy="6" rx="6.5" ry="7.5" fill="' + p.inner + '"/><circle cx="0" cy="7" r="3" fill="' + p.ink + '"/></g>';
+  }
+  function leque(ox, oy, dist, angs, s, p, haste) {
+    var out = '';
+    angs.forEach(function (a) {
+      var r = a * Math.PI / 180, x = ox + dist * Math.sin(r), y = oy - dist * Math.cos(r);
+      if (haste) out += '<line x1="' + ox + '" y1="' + oy + '" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="' + p.stem + '" stroke-width="2.5"/>';
+      out += gota(x.toFixed(1), y.toFixed(1), s, a, p);
+    });
+    return out;
+  }
+  function olho(x, y, r, expr, p) {
+    if (expr === 'feliz') return '<path d="M' + (x - r) + ' ' + (y + r * .35) + 'Q' + x + ' ' + (y - r * 1.1) + ' ' + (x + r) + ' ' + (y + r * .35) + '" fill="none" stroke="' + p.ink + '" stroke-width="3" stroke-linecap="round"/>';
+    if (expr === 'dormindo') return '<path d="M' + (x - r) + ' ' + y + 'Q' + x + ' ' + (y + r * .9) + ' ' + (x + r) + ' ' + y + '" fill="none" stroke="' + p.ink + '" stroke-width="3" stroke-linecap="round"/>';
+    return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + p.light + '"/><circle cx="' + (x + r * .25) + '" cy="' + (y + r * .1) + '" r="' + (r * .52) + '" fill="' + p.ink + '"/><circle cx="' + (x + r * .5) + '" cy="' + (y - r * .25) + '" r="' + (r * .2) + '" fill="' + p.light + '"/>';
+  }
+  function zz(x, y, p) { return '<text x="' + x + '" y="' + y + '" font-family="Sora, sans-serif" font-weight="700" font-size="16" fill="' + p.text + '">z</text><text x="' + (x + 11) + '" y="' + (y - 10) + '" font-family="Sora, sans-serif" font-weight="700" font-size="11" fill="' + p.text + '" opacity=".7">z</text>'; }
+  function crista(cx, base, top, cor, dots, w) {
+    return '<g stroke="' + cor + '" stroke-width="' + w + '" stroke-linecap="round"><line x1="' + (cx - 2) + '" y1="' + base + '" x2="' + (cx - 9) + '" y2="' + (top + 3) + '"/><line x1="' + cx + '" y1="' + base + '" x2="' + cx + '" y2="' + top + '"/><line x1="' + (cx + 2) + '" y1="' + base + '" x2="' + (cx + 9) + '" y2="' + (top + 3) + '"/></g>' +
+      '<circle cx="' + (cx - 9) + '" cy="' + (top + 2) + '" r="4" fill="' + dots[0] + '"/><circle cx="' + cx + '" cy="' + (top - 1) + '" r="4" fill="' + dots[1] + '"/><circle cx="' + (cx + 9) + '" cy="' + (top + 2) + '" r="4" fill="' + dots[0] + '"/>';
+  }
+
+  var M = {
+    m1: function (p, expr) {
+      var s = leque(100, 136, 74, [-64, -32, 0, 32, 64], 1, p, true);
+      s += '<path d="M100 112C122 112 130 140 126 160C122 178 78 178 74 160C70 140 78 112 100 112Z" fill="' + p.body + '"/>';
+      s += '<path d="M86 136C96 128 112 132 113 152C102 154 90 149 86 136Z" fill="' + p.outer + '"/>';
+      s += '<circle cx="100" cy="102" r="17" fill="' + p.body + '"/>';
+      s += crista(100, 86, 69, p.body, [p.mid, p.mid], 2.5);
+      s += olho(106, 99, 4.8, expr, p);
+      s += '<path d="M115 101L127 104L115 108Z" fill="' + p.mid + '"/>';
+      s += '<g stroke="' + p.mid + '" stroke-width="3" stroke-linecap="round"><line x1="92" y1="174" x2="90" y2="184"/><line x1="108" y1="174" x2="110" y2="184"/></g>';
+      if (expr === 'dormindo') s += zz(124, 86, p);
+      return s;
+    },
+    m2: function (p, expr) {
+      var s = '<ellipse cx="100" cy="187" rx="42" ry="6" fill="' + p.ink + '" opacity=".15"/>';
+      s += leque(100, 140, 66, [-72, -48, -24, 0, 24, 48, 72], .8, p, false);
+      s += '<path d="M100 100C126 100 140 128 138 150C136 172 120 182 100 182C80 182 64 172 62 150C60 128 74 100 100 100Z" fill="' + p.body + '"/>';
+      s += '<ellipse cx="100" cy="158" rx="24" ry="20" fill="' + p.belly + '"/>';
+      s += crista(100, 102, 84, p.body, [p.outer, p.mid], 3);
+      s += olho(88, 125, 6, expr, p) + olho(112, 125, 6, expr, p);
+      s += '<path d="M95 136Q100 134 105 136L100 143Z" fill="' + p.mid + '"/>';
+      s += '<circle cx="78" cy="137" r="5" fill="' + p.cheek + '" opacity=".7"/><circle cx="122" cy="137" r="5" fill="' + p.cheek + '" opacity=".7"/>';
+      s += '<ellipse cx="88" cy="182" rx="8" ry="4" fill="' + p.mid + '"/><ellipse cx="112" cy="182" rx="8" ry="4" fill="' + p.mid + '"/>';
+      if (expr === 'dormindo') s += zz(130, 112, p);
+      return s;
+    },
+    m3: function (p, expr) {
+      var s = '<ellipse cx="100" cy="171" rx="36" ry="5" fill="' + p.ink + '" opacity=".15"/>';
+      if (expr === 'feliz') s += leque(100, 128, 70, [-70, -35, 0, 35, 70], .9, p, false);
+      s += '<g transform="translate(30 40) scale(1.4)">';
+      s += '<path d="M50 10C76 30 82 60 67 78C59 88 41 88 33 78C18 60 24 30 50 10Z" fill="' + p.outer + '"/>';
+      s += '<ellipse cx="50" cy="67" rx="14" ry="15" fill="' + p.mid + '"/><ellipse cx="50" cy="68" rx="9" ry="10" fill="' + p.inner + '"/><circle cx="50" cy="69" r="3.8" fill="' + p.dot + '"/>';
+      s += '</g>';
+      s += crista(100, 56, 38, p.outer, [p.mid, p.mid], 3);
+      s += olho(89, 99, 5.5, expr, p) + olho(111, 99, 5.5, expr, p);
+      s += '<path d="M95.5 108H104.5L100 115Z" fill="' + p.mid + '"/>';
+      s += '<ellipse cx="89" cy="166" rx="8" ry="4" fill="' + p.mid + '"/><ellipse cx="111" cy="166" rx="8" ry="4" fill="' + p.mid + '"/>';
+      if (expr === 'dormindo') s += zz(126, 72, p);
+      return s;
+    }
+  };
+  var NOMES = { m1: 'Pavão de ocelos', m2: 'Pavão macio', m3: 'Ocelinho' };
+  function svg(m, p, expr, label) {
+    return '<svg viewBox="0 0 200 200" role="img" aria-label="' + label + '">' + M[m](p, expr) + '</svg>';
+  }
+  var EXPR = [['atento', 'atento'], ['feliz', 'comemorando'], ['dormindo', 'dormindo']];
+  document.querySelectorAll('.stages[data-m]').forEach(function (el) {
+    var m = el.getAttribute('data-m'), html = '';
+    ['escuro', 'claro'].forEach(function (t) {
+      var p = PAL[t];
+      html += '<div class="stage ' + t + '"><span class="lbl">' + p.nome + '</span><div class="big">' + svg(m, p, 'atento', NOMES[m] + ' na ' + p.nome) + '</div><div class="exprs">';
+      EXPR.forEach(function (e) { html += '<div class="expr">' + svg(m, p, e[0], NOMES[m] + ' ' + e[1]) + '<span>' + e[1] + '</span></div>'; });
+      html += '</div></div>';
+    });
+    el.innerHTML = html;
+  });
+})();
+</script>
