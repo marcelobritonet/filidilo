@@ -5,7 +5,7 @@ export type PreferenciaTema = 'system' | 'light' | 'dark'
 export type Tema = 'light' | 'dark'
 
 const CHAVE = 'tatino-theme'
-const COR_NAVEGADOR: Record<Tema, string> = { light: '#FFF5DC', dark: '#111418' }
+const COR_NAVEGADOR: Record<Tema, string> = { light: '#F7F9FF', dark: '#0B1E3F' }
 const consultaEscuro = () => window.matchMedia('(prefers-color-scheme: dark)')
 
 export function lerPreferencia(): PreferenciaTema {

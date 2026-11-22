@@ -2,33 +2,61 @@
 import qrcode from 'qrcode-generator'
 import { pseudoAleatorio, quebrar, TAMANHO, type Arte, type Formato } from '../core/artes'
 
-// Cores do kit de marca (src/ui/estilo.css).
-const COR = { fundo: '#263F31', fundo2: '#1D3226', creme: '#FFF5DC', ouro: '#D7A453', laranja: '#E85A36', suave: '#B9C4B5', escuro: '#20262C' }
-const SERIFA = 'Georgia, "Times New Roman", serif'
-const SANS = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
+import { GOTA, MARCA, NOME } from './marcaFormas'
 
-/** Símbolo do tatino. (os mesmos caminhos de src/assets/brand/simbolo.svg, em 512×512). */
+// Paleta Noite do Filidilo: a imagem de compartilhar usa sempre a Noite, com o app em qualquer tema.
+const COR = { fundo: MARCA.noite, fundo2: '#081631', creme: MARCA.nevoa, ouro: MARCA.bronze, laranja: MARCA.turquesa, sobreLaranja: '#06142B', suave: '#A9B8D9' }
+const SERIFA = 'Sora, system-ui, -apple-system, "Segoe UI", sans-serif'
+const SANS = 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
+
+/** Ícone do Filidilo (quadrado noite com a pena), com lado `tam`. */
 function simbolo(ctx: CanvasRenderingContext2D, x: number, y: number, tam: number) {
   ctx.save()
   ctx.translate(x, y)
-  ctx.scale(tam / 512, tam / 512)
-  ctx.fillStyle = '#1A2C22'
+  ctx.scale(tam / 100, tam / 100)
+  ctx.fillStyle = '#12295A'
   ctx.beginPath()
-  ctx.roundRect(0, 0, 512, 512, 116)
+  ctx.roundRect(0, 0, 100, 100, 22.6)
   ctx.fill()
-  ctx.fillStyle = COR.ouro
-  ctx.fill(new Path2D('M116 153q0-30 34-30h215v262H150q-34 0-34-34z'))
-  const folha = new Path2D('M365 153q0-30-34-30H150v262h181q34 0 34-34z')
-  ctx.fillStyle = COR.escuro
-  ctx.fill(folha)
-  ctx.strokeStyle = COR.laranja
-  ctx.lineWidth = 15
-  ctx.stroke(folha)
-  ctx.strokeStyle = '#F2EEE5'
-  ctx.lineWidth = 18
-  ctx.lineCap = 'round'
-  ctx.stroke(new Path2D('M189 195h122M189 243h87M189 314q41-39 85 0'))
+  ctx.translate(14, 13)
+  ctx.scale(0.72, 0.72)
+  ctx.fillStyle = MARCA.turquesa
+  ctx.fill(new Path2D(GOTA))
+  const elipse = (cy: number, rx: number, ry: number, cor: string) => {
+    ctx.fillStyle = cor
+    ctx.beginPath()
+    ctx.ellipse(50, cy, rx, ry, 0, 0, Math.PI * 2)
+    ctx.fill()
+  }
+  elipse(62, 16, 18, MARCA.bronze)
+  elipse(63, 10.5, 12, MARCA.cobalto)
+  elipse(64, 4.5, 4.5, MARCA.nevoa)
   ctx.restore()
+}
+
+/** Ocelo de quatro anéis com centro em (cx, cy). */
+function ocelo(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
+  for (const [f, cor] of [[1, MARCA.turquesa], [0.6, MARCA.bronze], [0.4, MARCA.cobalto], [0.16, MARCA.noite]] as const) {
+    ctx.fillStyle = cor
+    ctx.beginPath()
+    ctx.arc(cx, cy, r * f, 0, Math.PI * 2)
+    ctx.fill()
+  }
+}
+
+/** Nome "filidilo" em curvas, com a linha de base em `y` e a altura das letras altas `alt`. Devolve a largura. */
+function nome(ctx: CanvasRenderingContext2D, x: number, y: number, alt: number, medir = false): number {
+  const [, topo, larg] = NOME.caixa
+  const k = alt / -topo
+  if (medir) return larg * k
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.scale(k, k)
+  ctx.fillStyle = COR.creme
+  ctx.fill(new Path2D(NOME.letras))
+  ctx.restore()
+  ocelo(ctx, x + NOME.ocelo.cx * k, y + NOME.ocelo.cy * k, NOME.ocelo.r * k)
+  return larg * k
 }
 
 function qr(ctx: CanvasRenderingContext2D, url: string, x: number, y: number, tam: number) {
@@ -42,13 +70,13 @@ function qr(ctx: CanvasRenderingContext2D, url: string, x: number, y: number, ta
   ctx.beginPath()
   ctx.roundRect(x, y, tam, tam, tam * 0.06)
   ctx.fill()
-  ctx.fillStyle = '#111418'
+  ctx.fillStyle = MARCA.noite
   for (let l = 0; l < n; l++) for (let c = 0; c < n; c++) if (q.isDark(l, c)) ctx.fillRect(x + margem + c * celula, y + margem + l * celula, Math.ceil(celula), Math.ceil(celula))
 }
 
 function confete(ctx: CanvasRenderingContext2D, w: number, h: number) {
   const r = pseudoAleatorio(7)
-  const cores = [COR.ouro, COR.laranja, COR.creme, '#7DBD99']
+  const cores = [MARCA.turquesa, MARCA.bronze, MARCA.cobalto, COR.creme]
   for (let i = 0; i < 70; i++) {
     // Mais confete nas bordas de cima, longe do centro onde vai o texto.
     const x = r() * w
@@ -103,7 +131,7 @@ function blocos(ctx: CanvasRenderingContext2D, a: Arte, w: number, e: number, qu
       ctx.beginPath()
       ctx.roundRect(cx - seloL / 2, y, seloL, seloPx + 36 * e, (seloPx + 36 * e) / 2)
       ctx.fill()
-      texto(a.selo.toUpperCase(), `700 ${seloPx}px ${SANS}`, '#FFFFFF', y + 19 * e)
+      texto(a.selo.toUpperCase(), `700 ${seloPx}px ${SANS}`, COR.sobreLaranja, y + 19 * e)
     },
   })
 
@@ -135,12 +163,15 @@ function blocos(ctx: CanvasRenderingContext2D, a: Arte, w: number, e: number, qu
       desenhar: (y) => {
         a.dias!.forEach((d, i) => {
           const x = cx - total / 2 + i * (bola + gap)
-          ctx.beginPath()
-          ctx.arc(x + bola / 2, y + bola / 2, bola / 2, 0, Math.PI * 2)
-          ctx.fillStyle = d.estudou ? COR.ouro : 'rgba(255,245,220,.12)'
-          ctx.fill()
+          if (d.estudou) ocelo(ctx, x + bola / 2, y + bola / 2, bola / 2)
+          else {
+            ctx.beginPath()
+            ctx.arc(x + bola / 2, y + bola / 2, bola / 2, 0, Math.PI * 2)
+            ctx.fillStyle = 'rgba(238,243,251,.12)'
+            ctx.fill()
+          }
           ctx.font = `700 ${36 * e}px ${SANS}`
-          ctx.fillStyle = d.estudou ? COR.fundo2 : COR.suave
+          ctx.fillStyle = d.estudou ? COR.creme : COR.suave
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
           ctx.fillText(d.rotulo, x + bola / 2, y + bola / 2 + 2 * e)
@@ -188,14 +219,11 @@ export function desenhar(canvas: HTMLCanvasElement, a: Arte, formato: Formato): 
   const marcaTam = quadrado ? 72 : 96
 
   // Marca no topo.
-  ctx.font = `700 ${marcaTam * 0.62}px ${SERIFA}`
-  const nomeL = ctx.measureText('tatino.').width
-  const marcaL = marcaTam + 22 + nomeL
+  const altNome = marcaTam * 0.62
+  const nomeL = nome(ctx, 0, 0, altNome, true)
+  const marcaL = marcaTam + 24 + nomeL
   simbolo(ctx, w / 2 - marcaL / 2, topo, marcaTam)
-  ctx.fillStyle = COR.creme
-  ctx.textAlign = 'left'
-  ctx.textBaseline = 'middle'
-  ctx.fillText('tatino.', w / 2 - marcaL / 2 + marcaTam + 22, topo + marcaTam / 2 + 2)
+  nome(ctx, w / 2 - marcaL / 2 + marcaTam + 24, topo + marcaTam / 2 + altNome / 2, altNome)
 
   // Endereço embaixo.
   ctx.font = `500 ${quadrado ? 30 : 36}px ${SANS}`

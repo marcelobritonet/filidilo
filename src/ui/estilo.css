@@ -1,58 +1,78 @@
-/* tatino. — sistema visual (kit de marca "curiosidade analógica").
-   Tokens em :root[data-theme]; a preferência é aplicada por src/ui/tema.ts. */
+/* Filidilo — sistema visual (manual da marca em docs/marca-filidilo/design-system/).
+   Paleta Noite no tema escuro e Dia no claro. Tokens em :root[data-theme]; a preferência é aplicada por src/ui/tema.ts. */
+
+@font-face { font-family: 'Sora'; font-style: normal; font-weight: 600 700; font-display: swap; src: url('../assets/fontes/sora-latin.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 400 700; font-display: swap; src: url('../assets/fontes/inter-latin.woff2') format('woff2'); }
 
 :root {
-  --font-display: Georgia, 'Times New Roman', serif;
-  --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Sora', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-ui: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --radius-sm: 12px;
   --radius-md: 16px;
   --radius-lg: 24px;
-  --shadow-card: 0 2px 14px rgba(38, 63, 49, .08);
-  --focus-ring: 0 0 0 3px rgba(232, 90, 54, .35);
+  /* cores fixas da marca (o símbolo e o ocelo não mudam com o tema) */
+  --marca-noite: #0B1E3F;
+  --marca-cobalto: #1F4FD1;
+  --marca-turquesa: #13A3A0;
+  --marca-bronze: #C9933A;
+  --marca-nevoa: #EEF3FB;
+  --marca-mel: #FFD27A;
   color-scheme: light dark;
 }
 
+/* Tema claro: paleta Dia */
 :root,
 :root[data-theme='light'] {
-  --bg: #FFF5DC;
-  --surface: #FFFDF7;
-  --surface-subtle: #F8EBCF;
-  --text: #263F31;
-  --text-muted: #59655D;
-  --border: #E7D9BE;
-  --accent: #E85A36;
-  --accent-ink: #1C1613;
-  --accent-soft: #F9DCD3;
-  --accent-text: #B13A1B; /* destaque em texto sobre fundo claro (contraste AA) */
-  --gold: #D7A453;
-  --success: #2E7656;
-  --success-soft: #DDF0E5;
-  --danger: #AD3F32;
-  --danger-soft: #F8DFDA;
-  --warning: #855A00; /* kit: #9A6800, escurecido para contraste AA (4,26 → ≥4,5) */
-  --warning-soft: #FFF0C7;
+  --bg: #F7F9FF;
+  --surface: #FFFFFF;
+  --surface-subtle: #EEF3FB;
+  --text: #2B3350;
+  --text-muted: #5A6480;
+  --border: #DCE3F2;
+  --border-control: #7E88A6;
+  --accent: #3A5BD9;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E3EAFF;
+  --accent-text: #3A5BD9;
+  --gold: #FFD27A;
+  --gold-ink: #2B3350;
+  --success: #1F7A5C;
+  --success-soft: #E3F4EC;
+  --danger: #B4402F;
+  --danger-soft: #FBE6E2;
+  --warning: #8A5A00;
+  --warning-soft: #FFF3D6;
+  --shadow-card: 0 2px 14px rgba(58, 91, 217, .10);
+  --shadow-sheet: 0 -8px 32px rgba(43, 51, 80, .16);
+  --overlay: rgba(11, 30, 63, .45);
+  --focus-ring: 0 0 0 3px #3A5BD9;
 }
 
+/* Tema escuro: paleta Noite */
 :root[data-theme='dark'] {
-  --bg: #111418;
-  --surface: #20262C;
-  --surface-subtle: #171B20;
-  --text: #F2EEE5;
-  --text-muted: #B8B5AD;
-  --border: #343D45;
-  --accent: #E85A36;
-  --accent-ink: #1C1613;
-  --accent-soft: #4A2924;
-  --accent-text: #F4927A;
-  --gold: #D7A453;
-  --success: #7DBD99;
-  --success-soft: #1E3B2E;
-  --danger: #F0A194;
-  --danger-soft: #482522;
-  --warning: #E0B85B;
-  --warning-soft: #493B1D;
-  --shadow-card: 0 2px 14px rgba(0, 0, 0, .22);
-  --focus-ring: 0 0 0 3px rgba(232, 90, 54, .55);
+  --bg: #0B1E3F;
+  --surface: #12295A;
+  --surface-subtle: #0F244D;
+  --text: #EEF3FB;
+  --text-muted: #A9B8D9;
+  --border: #2A4785;
+  --border-control: #7B91C2;
+  --accent: #13A3A0;
+  --accent-ink: #06142B;
+  --accent-soft: #0F3B57;
+  --accent-text: #4FD1CC;
+  --gold: #C9933A;
+  --gold-ink: #06142B;
+  --success: #7DD3A8;
+  --success-soft: #163F3A;
+  --danger: #F2A08F;
+  --danger-soft: #4A2A33;
+  --warning: #E8C26A;
+  --warning-soft: #3F3520;
+  --shadow-card: 0 2px 14px rgba(0, 0, 0, .28);
+  --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, .40);
+  --overlay: rgba(4, 12, 28, .62);
+  --focus-ring: 0 0 0 3px #4FD1CC;
 }
 
 /* ---------- Base ---------- */
@@ -66,7 +86,7 @@ body {
 }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
-h1, h2 { font-family: var(--font-display); font-weight: 700; margin: 0; }
+h1, h2 { font-family: var(--font-display); font-weight: 700; letter-spacing: -.02em; margin: 0; }
 h1 { font-size: clamp(28px, 7vw, 34px); line-height: 1.15; }
 h2 { font-size: clamp(22px, 5.5vw, 24px); line-height: 1.2; margin: 28px 0 8px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 p { margin: 0 0 12px; }
@@ -84,10 +104,10 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
 }
 
 /* ---------- Marca e cabeçalhos ---------- */
-.marca { display: inline-flex; align-items: center; gap: 10px; }
-.marca .simbolo { flex: none; border-radius: 8px; }
-.marca-nome { font-family: var(--font-display); font-weight: 700; font-size: 26px; line-height: 1; letter-spacing: -.02em; }
-.marca.grande .marca-nome { font-size: clamp(38px, 10vw, 48px); }
+.marca { display: inline-flex; align-items: center; gap: 10px; color: var(--text); }
+.marca .simbolo { flex: none; }
+.marca-nome { display: block; width: auto; flex: none; }
+.so-leitor { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .cabecalho { display: grid; gap: 10px; padding: 8px 0 20px; }
 .cabecalho-linha { display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 8px; }
@@ -387,7 +407,7 @@ textarea { line-height: 1.5; resize: vertical; }
 .aviso-nivel { margin: 0 0 12px; padding: 10px 12px; border-radius: var(--radius-sm); font-size: 14px; background: var(--warning-soft); color: var(--text); border: 1px solid var(--border); }
 
 /* ---------- Modal, aviso e toast ---------- */
-.modal-fundo { position: fixed; inset: 0; background: rgba(17, 20, 24, .55); display: flex; align-items: flex-end; justify-content: center; z-index: 50; }
+.modal-fundo { position: fixed; inset: 0; background: var(--overlay); display: flex; align-items: flex-end; justify-content: center; z-index: 50; }
 .modal {
   background: var(--surface); color: var(--text); width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0; border: 1px solid var(--border);
@@ -463,7 +483,7 @@ textarea.instrucao { font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monosp
 
 /* Folha que sobe de baixo (bottom sheet), no estilo das modais nativas do celular. */
 .folha-fundo {
-  position: fixed; inset: 0; z-index: 40; background: rgba(17, 20, 24, .45);
+  position: fixed; inset: 0; z-index: 40; background: var(--overlay);
   animation: folha-escurecer .25s ease both;
 }
 .folha {
@@ -473,7 +493,7 @@ textarea.instrucao { font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monosp
   background: var(--surface); color: var(--text);
   border: 1px solid var(--border); border-bottom: 0;
   border-radius: 28px 28px 0 0;
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, .18);
+  box-shadow: var(--shadow-sheet);
   padding: 0 20px calc(16px + env(safe-area-inset-bottom));
   animation: folha-subir .32s cubic-bezier(.2, .8, .2, 1) both;
 }
@@ -583,18 +603,18 @@ details.bloco > summary { font-weight: 650; }
 .conquista .selo-conquista { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-text); }
 .conquista .destaque { font: 700 44px/1.05 var(--font-display); color: var(--text); }
 .confete { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 40; }
-.confete span { position: absolute; top: -20px; width: 10px; height: 14px; border-radius: 2px; animation: confete-cair 2.4s ease-in forwards; }
-.confete .c0 { background: var(--gold); }
-.confete .c1 { background: var(--accent); }
-.confete .c2 { background: var(--success); }
-.confete .c3 { background: var(--text); opacity: .5; border-radius: 50%; width: 9px; height: 9px; }
+.confete span { position: absolute; top: -20px; width: 12px; height: 12px; border-radius: 50%; animation: confete-cair 2.4s ease-in forwards; }
+.confete .c0 { background: radial-gradient(circle, var(--marca-noite) 0 16%, var(--marca-cobalto) 16% 40%, var(--marca-bronze) 40% 60%, var(--marca-turquesa) 60%); width: 14px; height: 14px; }
+.confete .c1 { background: var(--marca-turquesa); }
+.confete .c2 { background: var(--marca-cobalto); width: 9px; height: 9px; }
+.confete .c3 { background: var(--marca-bronze); width: 8px; height: 8px; }
 @keyframes confete-cair { 0% { translate: 0 0; opacity: 1; } 85% { opacity: 1; } 100% { translate: 30px 105vh; rotate: 540deg; opacity: 0; } }
 @keyframes pulo { 0% { transform: scale(.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) {
   .confete { display: none; }
   .fim.comemorando .icone-fim { animation: none; }
 }
-.compartilhar-imagem .previa { justify-self: center; display: block; border-radius: var(--radius-sm); box-shadow: var(--shadow-card); background: #263F31; }
+.compartilhar-imagem .previa { justify-self: center; display: block; border-radius: var(--radius-sm); box-shadow: var(--shadow-card); background: var(--marca-noite); }
 .compartilhar-imagem .previa.story { height: min(46vh, 420px); width: auto; aspect-ratio: 9 / 16; }
 .compartilhar-imagem .previa.quadrado { height: min(40vh, 320px); width: auto; aspect-ratio: 1; }
 .compartilhar-imagem .segmentado { margin-bottom: 0; }
@@ -602,7 +622,7 @@ details.bloco > summary { font-weight: 650; }
 .semana { display: grid; gap: 10px; }
 .semana .dias { display: flex; gap: 6px; }
 .semana .dias span { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: var(--surface-subtle); color: var(--text-muted); }
-.semana .dias span.estudou { background: var(--gold); color: #1D3226; }
+.semana .dias span.estudou { background: var(--gold); color: var(--gold-ink); }
 .cabecalho .selo-sequencia { justify-self: start; }
 .modal.enviar .desafiar { display: grid; gap: 4px; text-align: left; padding: 14px 16px; border-radius: var(--radius-md); border: 2px solid var(--accent); background: var(--accent-soft); color: var(--text); }
 .modal.enviar .desafiar small { color: var(--text-muted); font-size: 14px; }
@@ -612,10 +632,21 @@ details.bloco > summary { font-weight: 650; }
 /* ---------- Ofensiva ---------- */
 .cabecalho-ofensiva { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .selo-ofensiva { display: inline-flex; align-items: center; gap: 10px; min-height: 40px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
-.selo-ofensiva .folgas { display: inline-flex; gap: 2px; color: var(--warning); }
-.selo-ofensiva .escudo { opacity: .35; }
-.selo-ofensiva .escudo.cheio { opacity: 1; color: var(--gold); }
-.selo-ofensiva .chama { font-weight: 700; font-size: 16px; color: var(--accent-text); }
+.selo-ofensiva .folgas { display: inline-flex; gap: 3px; }
+.pena-folga path { fill: none; stroke: var(--border-control); }
+.pena-folga.cheia path { fill: var(--gold); stroke: var(--gold); }
+.selo-ofensiva .chama { display: inline-flex; align-items: center; gap: 6px; font: 700 16px/1 var(--font-display); color: var(--text); }
+/* Ocelo e leque da ofensiva (manual: Forma, ícones e movimento) */
+.ocelo { flex: none; display: block; }
+.ocelo.apagado { color: var(--border-control); }
+.leque { flex: none; display: block; }
+.leque .pena { fill: var(--marca-turquesa); stroke: var(--bg); }
+.selo-ofensiva .leque .pena { stroke: var(--surface); }
+.selo-ofensiva.feito .leque .pena { stroke: var(--success-soft); }
+.leque .anel-1 { fill: var(--marca-bronze); }
+.leque .anel-2 { fill: var(--marca-cobalto); }
+.leque .anel-3 { fill: var(--marca-nevoa); }
+.leque.apagado { filter: grayscale(1); opacity: .45; }
 .selo-ofensiva .garantido { color: var(--success); }
 .selo-ofensiva.feito { border-color: var(--success); background: var(--success-soft); }
 .fio-dia { position: fixed; top: 0; left: 0; right: 0; height: 5px; z-index: 30; background: var(--surface-subtle); }
@@ -629,12 +660,12 @@ details.bloco > summary { font-weight: 650; }
 .ofensiva .dias span { display: grid; justify-items: center; gap: 2px; width: 26px; }
 .ofensiva .dias small { font-size: 12px; font-weight: 700; color: var(--text-muted); }
 .ofensiva .dias i { width: 18px; height: 18px; border-radius: 50%; background: var(--surface-subtle); border: 2px solid var(--border); }
-.ofensiva .dias .sessao i { background: var(--accent); border-color: var(--accent); }
-.ofensiva .dias .folga i { background: var(--gold); border-color: var(--gold); }
+.ofensiva .dias .folga i { background: transparent; border: 5px solid var(--gold); }
 .ofensiva .dias .hoje i { background: transparent; border: 2px dashed var(--accent); }
 .ofensiva .dias .hoje small { color: var(--text); }
 .fim .ofensiva-fim { display: grid; justify-items: center; gap: 2px; margin: 0; }
-.fim .ofensiva-fim strong { font: 700 22px/1.2 var(--font-display); color: var(--accent-text); animation: pulo .6s ease-out 1; }
+.fim .ofensiva-fim strong { display: inline-flex; align-items: center; gap: 8px; font: 700 22px/1.2 var(--font-display); color: var(--text); animation: pulo .6s ease-out 1; }
+.fim .sequencia { display: inline-flex; align-items: center; gap: 6px; }
 .fim .ofensiva-fim span { color: var(--text-muted); }
 .aviso-folga { margin: 0; padding: 8px 12px; border-radius: var(--radius-sm); background: var(--warning-soft); color: var(--warning); font-weight: 600; }
 /* Nas últimas horas do dia: pisca devagar. Com "reduzir movimento", só a cor mais forte. */

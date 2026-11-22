@@ -25,8 +25,8 @@ export default defineConfig({
         scope: base,
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#FFF5DC',
-        theme_color: '#FFF5DC',
+        background_color: '#0B1E3F',
+        theme_color: '#0B1E3F',
         // Aparece no "Compartilhar" do Android quando o app está instalado:
         // WhatsApp → segurar o arquivo → Compartilhar → tatino. (tratado em public/sw-receber.js).
         share_target: {
