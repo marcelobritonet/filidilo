@@ -1,4 +1,4 @@
-// Instalação do tatino como app (PWA). Captura o convite do navegador logo no início,
+// Instalação do Filidilo como app (PWA). Captura o convite do navegador logo no início,
 // para não perdê-lo caso ele chegue antes de a tela montar, e decide quando perguntar.
 import { evento } from '../core/telemetria'
 

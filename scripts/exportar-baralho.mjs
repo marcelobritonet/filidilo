@@ -12,6 +12,6 @@ const cartoes = partes.flatMap((f) => JSON.parse(readFileSync(join(pasta, 'parte
 const baralho = { ...meta, cartoes }
 const titulo = baralho.titulo.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim()
 mkdirSync('dist-baralhos', { recursive: true })
-const saida = join('dist-baralhos', `${titulo} (Tatino).txt`)
+const saida = join('dist-baralhos', `${titulo} (Filidilo).txt`)
 writeFileSync(saida, JSON.stringify({ app: 'tatino', tipo: 'baralho', formato: 2, baralho }))
 console.log(`${saida}: ${cartoes.length} cartões`)

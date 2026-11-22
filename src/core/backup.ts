@@ -4,6 +4,7 @@ import { mesclarProgresso } from './progresso'
 import type { Baralho, Cartao } from './types'
 
 interface Backup {
+  /** Identificador do formato (o app se chamava tatino.); continua igual para restaurar backups antigos. */
   app: 'tatino'
   formato: 1
   data: string
@@ -35,7 +36,7 @@ export async function exportar(): Promise<Blob> {
 /** Restaura mesclando: o estado mais recente de cada cartão vence; nada é apagado. */
 export async function importar(texto: string): Promise<{ estados: number; revisoes: number; baralhos: number }> {
   const d = JSON.parse(texto) as Backup
-  if (d.app !== 'tatino' || !Array.isArray(d.estados)) throw new Error('Este arquivo não é um backup do Tatino.')
+  if (d.app !== 'tatino' || !Array.isArray(d.estados)) throw new Error('Este arquivo não é um backup do Filidilo.')
   let nEst = 0
   let nRev = 0
   let nBar = 0
@@ -63,7 +64,7 @@ export async function textoReportes(baralhos: Baralho[], apenasNovos: boolean): 
   const reportes = (await db.reportes.toArray()).filter((r) => !apenasNovos || !r.enviado).sort((a, z) => a.data - z.data)
   const marcas = (await db.marcas.toArray()).filter((m) => m.status !== 'ok')
   const porId = new Map<string, Cartao>(baralhos.flatMap((b) => b.cartoes.map((c): [string, Cartao] => [`${b.id}/${c.id}`, c])))
-  const linhas = [`Tatino — reportes (${new Date().toLocaleString('pt-BR')})`, '']
+  const linhas = [`Filidilo — reportes (${new Date().toLocaleString('pt-BR')})`, '']
   for (const r of reportes) {
     const c = porId.get(r.cartao)
     const frente = c ? ('frente' in c ? c.frente : c.titulo) : ''

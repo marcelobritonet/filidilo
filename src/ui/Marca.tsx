@@ -36,7 +36,7 @@ export function Marca({ grande = false }: { grande?: boolean }) {
     <span class={`marca ${grande ? 'grande' : ''}`}>
       <Simbolo tamanho={grande ? 44 : 30} />
       <Nome altura={grande ? 40 : 22} />
-      <span class="so-leitor">tatino.</span>
+      <span class="so-leitor">Filidilo</span>
     </span>
   )
 }

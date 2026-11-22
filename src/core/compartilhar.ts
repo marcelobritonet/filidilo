@@ -5,6 +5,7 @@ import { validar } from './validar'
 
 /** Envelope do arquivo compartilhado. Aceitamos também um Baralho "cru". */
 interface ArquivoBaralho {
+  /** Identificador do formato, do tempo em que o app se chamava tatino.; continua igual para abrir arquivos e links já enviados. */
   app: 'tatino'
   tipo: 'baralho'
   formato: 2
@@ -24,13 +25,14 @@ export function arquivoDoBaralho(b: Baralho, progresso?: Progresso, desafio?: st
   const { arquivadoEm: _arq, ...baralho } = b
   const envelope: ArquivoBaralho = { app: 'tatino', tipo: 'baralho', formato: 2, baralho, ...(progresso && { progresso }), ...(desafio && { desafio }) }
   const titulo = nomeArquivo(b.titulo) || 'baralho'
-  return { nome: `${titulo}${progresso ? ' com progresso' : ''} (Tatino).txt`, texto: JSON.stringify(envelope) }
+  return { nome: `${titulo}${progresso ? ' com progresso' : ''} (Filidilo).txt`, texto: JSON.stringify(envelope) }
 }
 
 const nomeArquivo = (s: string) => s.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim()
 
 /** Envelope com alguns cartões soltos (enviar um cartão). */
 interface ArquivoCartoes {
+  /** Identificador do formato, do tempo em que o app se chamava tatino.; continua igual para abrir arquivos e links já enviados. */
   app: 'tatino'
   tipo: 'cartoes'
   formato: 2
@@ -53,7 +55,7 @@ export function arquivoDosCartoes(b: Baralho, cartoes: Cartao[], desafio?: strin
   const envelope: ArquivoCartoes = { app: 'tatino', tipo: 'cartoes', formato: 2, origem: { titulo: b.titulo }, temas: b.temas.filter((t) => usados.has(t.id)), cartoes, ...(desafio && { desafio }) }
   const c = cartoes[0]
   const resumo = nomeArquivo(('frente' in c ? c.frente : c.titulo).replace(/[$*]/g, '')).slice(0, 40)
-  return { nome: `${cartoes.length === 1 ? `Cartão - ${resumo}` : `${cartoes.length} cartões - ${nomeArquivo(b.titulo)}`} (Tatino).txt`, texto: JSON.stringify(envelope) }
+  return { nome: `${cartoes.length === 1 ? `Cartão - ${resumo}` : `${cartoes.length} cartões - ${nomeArquivo(b.titulo)}`} (Filidilo).txt`, texto: JSON.stringify(envelope) }
 }
 
 /** Lê o que chegou: um baralho inteiro ou cartões soltos. `desafio` é o cartão a responder primeiro, se existir. */
@@ -75,7 +77,7 @@ function lerRecebidoSemDesafio(texto: string): { tipo: 'baralho'; baralho: Baral
   try {
     d = JSON.parse(texto)
   } catch {
-    throw new Error('Este arquivo não é do tatino.')
+    throw new Error('Este arquivo não é do Filidilo.')
   }
   if (d?.app === 'tatino' && d.tipo === 'cartoes') {
     if (!Array.isArray(d.cartoes) || !d.cartoes.length || !Array.isArray(d.temas)) throw new Error('Este arquivo não tem cartões.')
@@ -130,12 +132,12 @@ export function lerBaralho(texto: string): Baralho {
   try {
     dados = JSON.parse(texto)
   } catch {
-    throw new Error('Este arquivo não é do tatino.')
+    throw new Error('Este arquivo não é do Filidilo.')
   }
   const d = dados as Partial<ArquivoBaralho> & Partial<Baralho> & { estados?: unknown }
   if (d.app === 'tatino' && d.estados) throw new Error('Este arquivo é um backup. Use Backup → Restaurar.')
   const b = (d.tipo === 'baralho' ? d.baralho : d) as Baralho
-  if (!b || typeof b.id !== 'string' || !Array.isArray(b.cartoes) || !Array.isArray(b.temas)) throw new Error('Este arquivo não é do tatino.')
+  if (!b || typeof b.id !== 'string' || !Array.isArray(b.cartoes) || !Array.isArray(b.temas)) throw new Error('Este arquivo não é do Filidilo.')
   const erros = validar(b, 20)
   if (erros.length) throw new Error(`O baralho tem ${erros.length} problema(s), por exemplo: ${erros[0]}`)
   return b

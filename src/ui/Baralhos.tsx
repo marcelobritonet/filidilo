@@ -43,7 +43,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const ofensiva = usePainelOfensiva(versao)
   const arquivados = baralhos.filter((b) => b.arquivadoEm)
 
-  // Chegou pelo "Compartilhar" do Android (WhatsApp → Compartilhar → tatino.) ou por um link (?b=<codigo>)?
+  // Chegou pelo "Compartilhar" do Android (WhatsApp → Compartilhar → Filidilo) ou por um link (?b=<codigo>)?
   useEffect(() => {
     pegarRecebido().then(async (r) => {
       setAbrindoLink(false)
@@ -288,7 +288,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
           Aparência
         </button>
         <button class="btn terciario" onClick={convidar}>
-          Indicar o tatino.
+          Indicar o Filidilo
         </button>
       </nav>
       <p class="versao">Funciona sem internet · seus cartões ficam neste aparelho</p>

@@ -11,6 +11,7 @@
 export const CHAVE_POSTHOG: string = import.meta.env.VITE_POSTHOG_KEY ?? ''
 const HOST = 'https://us.i.posthog.com'
 
+// As chaves guardadas no aparelho mantêm o prefixo do nome antigo (tatino.) para não perder o que já foi salvo.
 const K_ID = 'tatino-tel-id'
 const K_FILA = 'tatino-tel-fila'
 const K_DESLIGADA = 'tatino-telemetria'

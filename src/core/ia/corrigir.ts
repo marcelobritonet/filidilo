@@ -42,7 +42,7 @@ export function montarPedidoCorrecao(b: Pick<Baralho, 'titulo' | 'temas'>, c: Ca
     nivel && `Nível: ${nivel}.`,
     objetivo?.evitar?.length && `Não crie nada sobre: ${objetivo.evitar.join('; ')}.`,
   ].filter(Boolean)
-  return `Este flashcard do app tatino. pode estar errado. Disciplina: "${b.titulo}". Tema: "${tema}".
+  return `Este flashcard do app Filidilo pode estar errado. Disciplina: "${b.titulo}". Tema: "${tema}".
 ${contexto.length ? `\n${contexto.join(' ')}\nMantenha o recorte e o nível: não aumente a dificuldade nem saia do objetivo.\n` : ''}${problema?.trim() ? `\nO que parece errado: ${problema.trim()}\n` : ''}
 Cartão atual (JSON):
 \`\`\`json

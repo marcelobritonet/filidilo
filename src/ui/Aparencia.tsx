@@ -38,7 +38,7 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
         <span />
       </header>
       <fieldset class="opcoes-tema">
-        <legend class="dica">Escolha como o tatino. aparece. A escolha fica salva neste aparelho.</legend>
+        <legend class="dica">Escolha como o Filidilo aparece. A escolha fica salva neste aparelho.</legend>
         {OPCOES.map((o) => (
           <label class={`opcao-tema ${pref === o.valor ? 'selecionada' : ''}`}>
             <input type="radio" name="tema" value={o.valor} checked={pref === o.valor} onChange={() => escolher(o.valor)} />
@@ -60,15 +60,15 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
           <input type="checkbox" checked={estatisticas} onChange={(e) => alternarEstatisticas((e.target as HTMLInputElement).checked)} />
           <span class="textos">
             <strong>Enviar estatísticas de uso</strong>
-            <small>Anônimas: só quais funções são usadas, nunca o texto dos cartões. Ajudam a melhorar o tatino.</small>
+            <small>Anônimas: só quais funções são usadas, nunca o texto dos cartões. Ajudam a melhorar o Filidilo.</small>
           </span>
         </label>
       )}
       <section class="bloco">
-        <strong>Indicar o tatino.</strong>
+        <strong>Indicar o Filidilo</strong>
         <p class="dica">Mande para quem também estuda: uma imagem com o link e o QR code do app.</p>
         <button class="btn secundario" onClick={() => { evento('convite_aberto', { onde: 'aparencia' }); setConvidando(true) }}>
-          Indicar o tatino.
+          Indicar o Filidilo
         </button>
       </section>
       {convidando && <CompartilharImagem opcoes={[{ rotulo: 'Convite', peca: () => pecaConvite({ urlApp: urlApp() }) }]} onde="convite" avisar={(texto) => nav.avisar({ texto })} fechar={() => setConvidando(false)} />}

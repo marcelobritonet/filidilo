@@ -74,7 +74,7 @@ export function CartaoOfensiva({ painel, agora, estudar }: { painel: Painel; ago
       <p class="dica">
         {sequencia > 0
           ? `Termine uma sessão até meia-noite para manter ${sequencia === 1 ? 'o dia' : `os ${sequencia} dias`} de ofensiva.`
-          : 'Termine uma sessão por dia e veja a chama crescer. Criar baralhos ou cartões com IA guarda folgas para os dias corridos.'}
+          : 'Termine uma sessão por dia e veja o leque abrir. Criar baralhos ou cartões com IA guarda folgas para os dias corridos.'}
       </p>
       <div class="ofensiva-linha">
         <div class="dias" aria-label="Últimos 7 dias">

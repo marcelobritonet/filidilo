@@ -677,3 +677,12 @@ details.bloco > summary { font-weight: 650; }
   .fio-dia.pisca > div, .selo-ofensiva.pisca .chama { animation: none; }
   .fim .ofensiva-fim strong { animation: none; }
 }
+
+/* ---------- Abertura (a cauda que abre) ---------- */
+.abertura {
+  position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center;
+  background: var(--marca-noite, #0B1E3F); overflow: hidden; cursor: pointer;
+  transition: opacity 250ms ease-out;
+}
+.abertura svg { overflow: visible; max-width: none; }
+.abertura.saindo { opacity: 0; pointer-events: none; }

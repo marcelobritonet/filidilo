@@ -7,11 +7,11 @@ describe('artes', () => {
   it('resultado: porcentagem, sequência e nome só quando pode', () => {
     const p = pecaResultado({ certos: 8, errados: 2, chutes: 0, baralho: 'Derivadas', comNome: true, sequencia: 4, urlApp: URL, bateuMeta: true })
     expect(p.arte).toMatchObject({ selo: 'Meta atingida!', destaque: '80%', titulo: 'Derivadas', confete: true })
-    expect(p.texto).toBe(`Fiz 8 acertos (80%) em “Derivadas” no tatino. 🔥 4 dias seguidos. Aprenda qualquer coisa: ${URL}`)
+    expect(p.texto).toBe(`Fiz 8 acertos (80%) em “Derivadas” no Filidilo. 4 dias seguidos. Aprenda qualquer coisa: ${URL}`)
     const sem = pecaResultado({ certos: 1, errados: 3, chutes: 0, baralho: 'Derivadas', comNome: false, sequencia: 1, urlApp: URL })
     expect(sem.arte.titulo).toBeUndefined()
     expect(sem.texto).not.toContain('Derivadas')
-    expect(sem.texto).not.toContain('🔥')
+    expect(sem.texto).not.toContain('dias seguidos')
     expect(sem.arte.confete).toBe(false)
   })
 

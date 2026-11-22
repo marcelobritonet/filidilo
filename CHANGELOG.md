@@ -1,6 +1,16 @@
 # Changelog
 
-Mudanças do Tatino, da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
+Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
+
+## [3.14.0] — 2026-11-22
+
+**O tatino. agora se chama Filidilo, de cara nova.**
+
+### Novo
+- **Nome novo:** Filidilo. Seus baralhos, o progresso e as escolhas continuam aqui, e o endereço é o mesmo. Na primeira vez que abrir o app depois da troca, um aviso lembra disso. Arquivos e links enviados com o nome antigo continuam abrindo.
+- **Visual novo**, inspirado nas penas do pavão: azul no lugar do verde, o símbolo de uma pena com o olho do pavão, letras novas (Sora e Inter) e ícone novo na tela inicial. O tema escuro é a paleta Noite e o claro, a Dia.
+- **Abertura:** na primeira vez que abre o app no dia, as penas se abrem em leque e se juntam no símbolo. Nas outras vezes, ou com "reduzir movimento" ligado, o símbolo aparece rápido. Um toque pula.
+- **Ofensiva sem fogo:** a chama virou o olho da pena, que acende a cada dia, e um leque que abre com os dias seguidos (3 penas a partir de 7 dias, 5 a partir de 30). A folga virou uma pena guardada.
 
 ## [3.13.3] — 2026-11-21
 

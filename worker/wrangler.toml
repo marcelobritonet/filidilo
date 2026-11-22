@@ -1,4 +1,4 @@
-# Links temporários do tatino.: guarda um baralho ou cartões por 2 horas (7 dias nos desafios) e devolve por um código.
+# Links temporários do Filidilo: guarda um baralho ou cartões por 2 horas (7 dias nos desafios) e devolve por um código.
 # Publicado pelo .github/workflows/deploy-worker.yml (segredos CLOUDFLARE_API_TOKEN e CLOUDFLARE_ACCOUNT_ID).
 name = "tatino-links"
 main = "src/index.ts"

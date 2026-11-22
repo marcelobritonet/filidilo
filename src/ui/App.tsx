@@ -3,6 +3,7 @@ import { useRegisterSW } from 'virtual:pwa-register/preact'
 import { pedirPersistencia } from '../core/db'
 import { aparelhoDeTeste } from '../core/telemetria'
 import type { OpcoesFila } from '../core/fila'
+import { Abertura } from './Abertura'
 import { Aparencia } from './Aparencia'
 import { Aprender } from './Aprender'
 import { Backup } from './Backup'
@@ -29,6 +30,8 @@ export type Tela =
   | { nome: 'aprender'; pedido?: string }
   | { nome: 'ia'; id: string; assunto?: string; temaId?: string }
 
+const AVISO_NOME = 'filidilo-aviso-nome'
+
 export interface Aviso {
   texto: string
   desfazer?: () => void
@@ -49,6 +52,7 @@ export function App() {
   const [pilha, setPilha] = useState<Tela[]>([{ nome: 'baralhos' }])
   const [versao, setVersao] = useState(0)
   const [aviso, setAviso] = useState<Aviso | null>(null)
+  const [abrindo, setAbrindo] = useState(true)
   const baralhos = useBaralhos(versao)
   const {
     needRefresh: [atualizar],
@@ -86,6 +90,18 @@ export function App() {
     pedirPersistencia()
     return () => window.removeEventListener('popstate', aoVoltar)
   }, [])
+
+  // O app se chamava tatino.: avisa uma vez quem já tinha baralhos que o nome mudou (depois da abertura, para ser visto).
+  useEffect(() => {
+    if (!baralhos || abrindo) return
+    try {
+      if (localStorage.getItem(AVISO_NOME)) return
+      localStorage.setItem(AVISO_NOME, '1')
+    } catch {
+      return
+    }
+    if (baralhos.length > 0) setAviso({ texto: 'O tatino. agora se chama Filidilo. Seus baralhos continuam aqui.' })
+  }, [baralhos, abrindo])
 
   useEffect(() => {
     if (!aviso) return
@@ -149,7 +165,7 @@ export function App() {
         </div>
       )}
       {conteudo}
-      <footer class="rodape-versao">tatino. v{__VERSAO__}{aparelhoDeTeste() && ' · aparelho de teste'}</footer>
+      <footer class="rodape-versao">Filidilo v{__VERSAO__}{aparelhoDeTeste() && ' · aparelho de teste'}</footer>
       {aviso && (
         <div class="toast" role="status" aria-live="polite">
           <span>{aviso.texto}</span>
@@ -166,6 +182,7 @@ export function App() {
           )}
         </div>
       )}
+      {abrindo && <Abertura aoTerminar={() => setAbrindo(false)} />}
     </>
   )
 }

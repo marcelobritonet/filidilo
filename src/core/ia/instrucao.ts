@@ -180,7 +180,7 @@ export function montarInstrucao(p: PedidoIA): string {
     ? `## Já cobertos\nJá cobertos (não repita o mesmo assunto com a mesma pergunta; pode aprofundar):\n${cobertos}\n\n`
     : ''
   const prioridade = objetivo ? 'Priorize o que mais serve ao objetivo.' : 'Priorize o que é mais importante do assunto.'
-  return `Você vai criar flashcards de estudo para o app Tatino. Responda SOMENTE com um bloco de código JSON, sem texto antes ou depois (veja "Entrega").
+  return `Você vai criar flashcards de estudo para o app Filidilo. Responda SOMENTE com um bloco de código JSON, sem texto antes ou depois (veja "Entrega").
 
 ## Material
 ${origemTexto(p)}
@@ -227,7 +227,7 @@ export function montarInstrucaoFormatacao(p: {
   const baralhoRegra = p.novo
     ? `Estas perguntas vão formar um baralho novo. Em "baralho", ${nomeDado ? `use o título "${nomeDado.slice(0, 40)}"` : 'dê um título curto (até 40 caracteres) que diga o assunto das perguntas'} e, em "objetivo", uma frase (até 160 caracteres) sobre o que o baralho ajuda a estudar.\n`
     : ''
-  return `Você vai converter perguntas e respostas que eu já tenho em flashcards para o app Tatino. Responda SOMENTE com um bloco de código JSON, sem texto antes ou depois (veja "Entrega").
+  return `Você vai converter perguntas e respostas que eu já tenho em flashcards para o app Filidilo. Responda SOMENTE com um bloco de código JSON, sem texto antes ou depois (veja "Entrega").
 
 ## Material
 As perguntas e respostas estão abaixo, entre as linhas ===. Podem estar em qualquer formato (lista, "P:/R:", tabela, texto corrido).
@@ -269,7 +269,7 @@ ${JSON.stringify(EXEMPLOS, null, 1)}
 
 /** Mensagem para colar no Gemini quando alguns cartões vieram com problema. */
 export function montarCorrecao(problemas: { id: string; erros: string[] }[], erroGeral?: string): string {
-  const linhas = ['Alguns cartões da sua resposta não passaram na validação do app Tatino.']
+  const linhas = ['Alguns cartões da sua resposta não passaram na validação do app Filidilo.']
   if (erroGeral) linhas.push(`Problema geral: ${erroGeral}`)
   for (const p of problemas) linhas.push(`- Cartão "${p.id}": ${p.erros.join('; ')}`)
   linhas.push('', 'Corrija e devolva SOMENTE um bloco JSON no mesmo formato ({"temas": [...], "cartoes": [...]}), apenas com os cartões corrigidos.', regraEntrega())

@@ -71,7 +71,7 @@ export function montarPlano(p: PedidoPlano): string {
       ? `"fonte": { "apostila": "${p.nomePdf?.trim() || 'nome do material'}", "pagina": número da página }`
       : '"fonte": { "apostila": "Gerado por IA" }'
 
-  return `Você é um professor que monta um plano de estudo em flashcards para o app tatino. Responda SOMENTE com um bloco de código JSON (veja "Entrega"), exceto quando precisar fazer perguntas (ver "Antes de responder").
+  return `Você é um professor que monta um plano de estudo em flashcards para o app Filidilo. Responda SOMENTE com um bloco de código JSON (veja "Entrega"), exceto quando precisar fazer perguntas (ver "Antes de responder").
 
 ## Pedido
 ===

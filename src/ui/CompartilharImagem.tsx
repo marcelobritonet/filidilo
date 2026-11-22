@@ -31,7 +31,7 @@ export function CompartilharImagem({ opcoes, onde, avisar, fechar }: { opcoes: O
     if (canvas.current) desenhar(canvas.current, peca.arte, formato)
   }, [i, formato, comNome])
 
-  const nome = `tatino-${peca.arte.modelo}-${formato}.png`
+  const nome = `filidilo-${peca.arte.modelo}-${formato}.png`
   const registrar = (como: string) => evento('compartilhar_imagem', { modelo: peca.arte.modelo, formato, como, com_nome: temNome && comNome, onde })
 
   const compartilhar = async () => {

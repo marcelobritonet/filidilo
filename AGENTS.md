@@ -9,6 +9,7 @@ Leia antes de mexer no projeto. Vale para qualquer sessão, de qualquer IA.
 | 1 | `PENDENCIAS.md` é a fonte da verdade. A ordem é do mais recente para o mais antigo: item novo entra no topo, com o próximo número `P…`. Altere ali o que for acrescentado, concluído ou removido. |
 | 2 | Pode haver outra sessão trabalhando nesta mesma pasta. Antes de commitar, rode `git status` e `git diff` e adicione só os seus arquivos. Na `PENDENCIAS.md`, mude só as suas linhas: nunca reescreva o arquivo a partir de uma cópia antiga. |
 | 3 | Textos para a pessoa em pt-BR. Pendências, opções e decisões em tabelas, uma linha por item. |
+| 4 | O app se chama **Filidilo** (antes **tatino.**). Em texto corrido, Filidilo com F maiúsculo; o logotipo é **filidilo**, em minúsculas e sem ponto (manual em `docs/marca-filidilo/design-system/`). Os identificadores internos continuam `tatino`: banco `tatino`, chaves `tatino-*` do `localStorage`, `app: "tatino"` nos arquivos, backups e links, worker `tatino-links`, endereço `/tatino/`. Trocar algum deles apaga dados ou quebra o que já foi enviado: só com migração e com o ok do Marcelo. |
 
 ## Testar sem sujar as estatísticas
 

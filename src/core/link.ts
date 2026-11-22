@@ -44,7 +44,7 @@ export async function criarLink(texto: string, f: typeof fetch = fetch, validade
 
 /** Baixa o conteúdo de um código. Lança erro com mensagem em português. */
 export async function abrirLink(codigo: string, f: typeof fetch = fetch): Promise<string> {
-  if (!RE_CODIGO.test(codigo)) throw new Error('Este link não é do tatino.')
+  if (!RE_CODIGO.test(codigo)) throw new Error('Este link não é do Filidilo.')
   if (!URL_LINKS) throw new Error('Esta versão do app não abre links.')
   let r: Response
   try {

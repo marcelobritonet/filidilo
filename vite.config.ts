@@ -17,8 +17,8 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['icon.svg', 'apple-touch-icon.png', 'favicon-32.png', 'favicon-16.png', 'favicon.ico'],
       manifest: {
-        name: 'tatino. — flashcards',
-        short_name: 'tatino.',
+        name: 'Filidilo: flashcards offline',
+        short_name: 'Filidilo',
         description: 'Aprenda qualquer coisa: flashcards com IA, estudados no seu ritmo, offline',
         lang: 'pt-BR',
         start_url: base,
@@ -28,7 +28,7 @@ export default defineConfig({
         background_color: '#0B1E3F',
         theme_color: '#0B1E3F',
         // Aparece no "Compartilhar" do Android quando o app está instalado:
-        // WhatsApp → segurar o arquivo → Compartilhar → tatino. (tratado em public/sw-receber.js).
+        // WhatsApp → segurar o arquivo → Compartilhar → Filidilo (tratado em public/sw-receber.js).
         share_target: {
           action: `${base}receber`,
           method: 'POST',

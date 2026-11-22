@@ -45,7 +45,7 @@ export interface Meta {
   valor: string
 }
 
-class TatinoDB extends Dexie {
+class FilidiloDB extends Dexie {
   estados!: Table<Estado, string>
   revisoes!: Table<Revisao, number>
   reportes!: Table<Reporte, string>
@@ -54,6 +54,7 @@ class TatinoDB extends Dexie {
   baralhos!: Table<Baralho, string>
 
   constructor() {
+    // O banco continua com o nome antigo (o app se chamava tatino.): trocar apagaria os baralhos de quem já usa.
     super('tatino')
     this.version(1).stores({
       estados: 'id',
@@ -67,7 +68,7 @@ class TatinoDB extends Dexie {
   }
 }
 
-export const db = new TatinoDB()
+export const db = new FilidiloDB()
 
 export const uuid = () =>
   typeof crypto !== 'undefined' && 'randomUUID' in crypto

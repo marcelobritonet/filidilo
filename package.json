@@ -1,6 +1,6 @@
 {
-  "name": "tatino",
-  "version": "3.13.3",
+  "name": "filidilo",
+  "version": "3.14.0",
   "description": "Flashcards offline (PWA) para aprender qualquer coisa",
   "scripts": {
     "dev": "vite",

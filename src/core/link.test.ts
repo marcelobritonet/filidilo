@@ -41,7 +41,7 @@ describe('link', () => {
     const { abrirLink } = await carregar()
     expect(await abrirLink('Ab12345678', (async () => resposta(200, '{"ok":1}')) as unknown as typeof fetch)).toBe('{"ok":1}')
     await expect(abrirLink('Ab12345678', (async () => resposta(404, {})) as unknown as typeof fetch)).rejects.toThrow('expirou')
-    await expect(abrirLink('../x', fetch)).rejects.toThrow('não é do tatino')
+    await expect(abrirLink('../x', fetch)).rejects.toThrow('não é do Filidilo')
   })
 
   it('sem VITE_LINKS_URL fica desligado', async () => {

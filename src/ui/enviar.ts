@@ -31,7 +31,7 @@ export async function enviarArquivo(nome: string, texto: string, mensagem: strin
   return 'baixado'
 }
 
-export const MENSAGEM_ENVIO = 'Para abrir no tatino.: segure o arquivo → Compartilhar → tatino.'
+export const MENSAGEM_ENVIO = 'Para abrir no Filidilo: segure o arquivo → Compartilhar → Filidilo.'
 
 /** O baralho inteiro. */
 export function conteudoBaralho(b: Baralho, progresso?: Progresso): ConteudoEnvio {
@@ -43,7 +43,7 @@ export function conteudoBaralho(b: Baralho, progresso?: Progresso): ConteudoEnvi
 /** Um cartão (com o tema dele). */
 export function conteudoCartao(b: Baralho, c: Cartao): ConteudoEnvio {
   const { nome, texto } = arquivoDosCartoes(b, [c])
-  return { o_que: 'cartao', titulo: 'Cartão do tatino.', nome, texto, mensagem: `Cartão do tatino. ${MENSAGEM_ENVIO}` }
+  return { o_que: 'cartao', titulo: 'Cartão do Filidilo', nome, texto, mensagem: `Cartão do Filidilo. ${MENSAGEM_ENVIO}` }
 }
 
 /** O baralho com o progresso dela, para a caixa "Incluir meu progresso" (null se não estudou nada). */

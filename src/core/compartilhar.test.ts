@@ -28,11 +28,11 @@ describe('compartilhar baralho', () => {
 
   it('o arquivo vai e volta igual; recusa backup e texto qualquer', () => {
     const { nome, texto } = arquivoDoBaralho(base())
-    expect(nome).toBe('Física (Tatino).txt')
+    expect(nome).toBe('Física (Filidilo).txt')
     expect(lerBaralho(texto)).toEqual(base())
     expect(lerBaralho(JSON.stringify(base()))).toEqual(base()) // baralho "cru"
     expect(() => lerBaralho('{"app":"tatino","estados":[]}')).toThrow(/backup/)
-    expect(() => lerBaralho('olá')).toThrow(/não é do tatino/)
+    expect(() => lerBaralho('olá')).toThrow(/não é do Filidilo/)
     expect(() => lerBaralho(JSON.stringify({ ...base(), cartoes: [{ id: 'x', tipo: 'vf', tema: 'zz', frente: 'f', resposta: true }] }))).toThrow(/problema/)
   })
 
@@ -109,7 +109,7 @@ describe('enviar cartões soltos', () => {
       ],
     }
     const { nome, texto } = arquivoDosCartoes(origem, [origem.cartoes[0]])
-    expect(nome).toBe('Cartão - O que é força (Tatino).txt')
+    expect(nome).toBe('Cartão - O que é força (Filidilo).txt')
     const r = lerRecebido(texto)
     expect(r.tipo).toBe('cartoes')
     if (r.tipo !== 'cartoes') return
@@ -133,7 +133,7 @@ describe('enviar cartões soltos', () => {
 
   it('baralho inteiro continua sendo lido como baralho', () => {
     expect(lerRecebido(arquivoDoBaralho(base()).texto).tipo).toBe('baralho')
-    expect(() => lerRecebido('oi')).toThrow(/não é do tatino/)
+    expect(() => lerRecebido('oi')).toThrow(/não é do Filidilo/)
   })
 })
 

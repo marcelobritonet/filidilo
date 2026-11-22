@@ -1,4 +1,6 @@
-# tatino.
+# Filidilo
+
+Antes se chamava **tatino.**. O endereço, o repositório e os identificadores internos (banco, chaves do aparelho, formato dos arquivos) continuam com o nome antigo, para ninguém perder dados.
 
 No ar: https://marcelobritonet.github.io/tatino/
 
@@ -10,8 +12,8 @@ No ar: https://marcelobritonet.github.io/tatino/
 - **Estudar** por tempo (o fio no topo encurta) ou até X acertos (o fio enche), escolhendo os temas. Ordem única: errados, vencidos hoje (FSRS, `ts-fsrs`), nunca vistos, difíceis e acertados.
 - **Respostas**: acertei fácil, com dificuldade, no chute (não conta acerto), não sabia, errei; "Não sei" em V/F e alternativas.
 - **Exercícios de cálculo**: números sorteados, resposta digitada, tolerância de ±2% e resolução passo a passo.
-- **Corrigir cartão com IA**, com antes e depois. **Enviar** cartão ou baralho por link e QR code (vale 2 horas) ou como arquivo pelo WhatsApp; receber abrindo o link ou pelo Compartilhar → tatino.
-- **Comemorar e compartilhar**: no fim da sessão, comemoração e imagem do resultado (Story 9:16 ou Quadrado, desenhada no aparelho em `src/ui/desenho.ts`, conteúdo em `src/core/artes.ts`) para WhatsApp e story; sequência de dias, conquistas e "Sua semana" (`src/core/conquistas.ts`, conquistas comemoradas guardadas em `meta`, chave `marcos`); "Desafiar amigos" com um cartão (link de 7 dias) e "Indicar o tatino.".
+- **Corrigir cartão com IA**, com antes e depois. **Enviar** cartão ou baralho por link e QR code (vale 2 horas) ou como arquivo pelo WhatsApp; receber abrindo o link ou pelo Compartilhar → Filidilo.
+- **Comemorar e compartilhar**: no fim da sessão, comemoração e imagem do resultado (Story 9:16 ou Quadrado, desenhada no aparelho em `src/ui/desenho.ts`, conteúdo em `src/core/artes.ts`) para WhatsApp e story; sequência de dias, conquistas e "Sua semana" (`src/core/conquistas.ts`, conquistas comemoradas guardadas em `meta`, chave `marcos`); "Desafiar amigos" com um cartão (link de 7 dias) e "Indicar o Filidilo".
 - **Backup** em arquivo; tudo fica só no aparelho.
 
 ## Visual

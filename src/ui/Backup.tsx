@@ -12,7 +12,7 @@ export function Backup({ sair }: { sair: () => void }) {
     contar()
   }, [])
 
-  const nomeArquivo = `tatino-backup-${new Date().toISOString().slice(0, 10)}.json`
+  const nomeArquivo = `filidilo-backup-${new Date().toISOString().slice(0, 10)}.json`
 
   const salvar = async () => {
     evento('backup_salvo')
@@ -20,7 +20,7 @@ export function Backup({ sair }: { sair: () => void }) {
     const arquivo = new File([blob], nomeArquivo, { type: 'application/json' })
     if (navigator.canShare?.({ files: [arquivo] })) {
       try {
-        await navigator.share({ files: [arquivo], title: 'Backup do Tatino' })
+        await navigator.share({ files: [arquivo], title: 'Backup do Filidilo' })
         setMsg('✓ Backup compartilhado.')
         return
       } catch (e) {

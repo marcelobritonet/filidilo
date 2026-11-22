@@ -24,7 +24,7 @@ export interface Arte {
   dias?: { rotulo: string; estudou: boolean }[]
   /** Endereço para o QR code. */
   qr?: string
-  /** Frase de chamada embaixo ("Responda no tatino."). */
+  /** Frase de chamada embaixo ("Responda no Filidilo."). */
   chamada?: string
   confete?: boolean
 }
@@ -36,7 +36,7 @@ export interface Peca {
 }
 
 const n = (q: number, um: string, varios: string) => `${q} ${q === 1 ? um : varios}`
-const fogo = (dias: number) => (dias >= 2 ? `🔥 ${dias} dias seguidos` : '')
+const diasSeguidos = (dias: number) => (dias >= 2 ? `${dias} dias seguidos` : '')
 
 export interface DadosResultado {
   certos: number
@@ -54,11 +54,11 @@ export interface DadosResultado {
 export function pecaResultado(d: DadosResultado): Peca {
   const total = d.certos + d.errados + d.chutes
   const pct = total ? Math.round((100 * d.certos) / total) : 0
-  const linhas = [`${n(d.certos, 'acerto', 'acertos')} em ${n(total, 'resposta', 'respostas')}`, d.tempo ? `em ${d.tempo}` : '', fogo(d.sequencia)].filter(Boolean)
+  const linhas = [`${n(d.certos, 'acerto', 'acertos')} em ${n(total, 'resposta', 'respostas')}`, d.tempo ? `em ${d.tempo}` : '', diasSeguidos(d.sequencia)].filter(Boolean)
   const onde = d.comNome ? ` em “${d.baralho}”` : ''
   return {
     arte: { modelo: 'resultado', selo: d.bateuMeta ? 'Meta atingida!' : pct >= 80 ? 'Mandei bem!' : 'Sessão concluída', titulo: d.comNome ? d.baralho : undefined, destaque: `${pct}%`, legenda: 'de acerto', linhas, confete: d.bateuMeta || pct >= 80, chamada: 'Aprenda qualquer coisa.' },
-    texto: [`Fiz ${n(d.certos, 'acerto', 'acertos')} (${pct}%)${onde} no tatino.`, fogo(d.sequencia) && `${fogo(d.sequencia)}.`, `Aprenda qualquer coisa: ${d.urlApp}`].filter(Boolean).join(' '),
+    texto: [`Fiz ${n(d.certos, 'acerto', 'acertos')} (${pct}%)${onde} no Filidilo.`, diasSeguidos(d.sequencia) && `${diasSeguidos(d.sequencia)}.`, `Aprenda qualquer coisa: ${d.urlApp}`].filter(Boolean).join(' '),
   }
 }
 
@@ -68,7 +68,7 @@ export function pecaMarco(m: Marco, d: { comNome: boolean; urlApp: string }): Pe
   return {
     // Sequência e respostas: o número e a legenda já dizem tudo; nos outros, a frase completa.
     arte: { modelo: 'marco', selo: 'Conquista!', destaque: m.destaque, legenda: m.legenda, linhas: m.tipo === 'sequencia' || m.tipo === 'respostas' ? [] : [frase], confete: true, chamada: 'Aprenda qualquer coisa.' },
-    texto: `${frase} no tatino. 🎉 Aprenda qualquer coisa: ${d.urlApp}`,
+    texto: `${frase} no Filidilo. Aprenda qualquer coisa: ${d.urlApp}`,
   }
 }
 
@@ -110,17 +110,17 @@ export function perguntaDoCartao(c: Cartao): { texto: string; dica: string } {
 export function pecaDesafio(c: Cartao, d: { baralho: string; comNome: boolean; url: string }): Peca {
   const { texto, dica } = perguntaDoCartao(c)
   return {
-    arte: { modelo: 'desafio', selo: 'Desafio', titulo: d.comNome ? d.baralho : undefined, texto, linhas: [dica], qr: d.url, chamada: 'Você sabe? Responda no tatino.' },
-    texto: `Te desafio: ${texto.length > 120 ? `${texto.slice(0, 117)}…` : texto} Responda no tatino.: ${d.url}`,
+    arte: { modelo: 'desafio', selo: 'Desafio', titulo: d.comNome ? d.baralho : undefined, texto, linhas: [dica], qr: d.url, chamada: 'Você sabe? Responda no Filidilo.' },
+    texto: `Te desafio: ${texto.length > 120 ? `${texto.slice(0, 117)}…` : texto} Responda no Filidilo: ${d.url}`,
   }
 }
 
 export function pecaSemana(s: Semana, d: { urlApp: string; sequencia: number }): Peca {
   const pct = s.respostas ? Math.round((100 * s.acertos) / s.respostas) : 0
-  const linhas = [`${n(s.respostas, 'cartão respondido', 'cartões respondidos')} · ${pct}% de acerto`, n(s.baralhos.length, 'baralho estudado', 'baralhos estudados'), fogo(d.sequencia)].filter(Boolean)
+  const linhas = [`${n(s.respostas, 'cartão respondido', 'cartões respondidos')} · ${pct}% de acerto`, n(s.baralhos.length, 'baralho estudado', 'baralhos estudados'), diasSeguidos(d.sequencia)].filter(Boolean)
   return {
     arte: { modelo: 'semana', selo: 'Minha semana', destaque: `${s.diasEstudados} de 7`, legenda: 'dias estudando', dias: s.dias, linhas, chamada: 'Aprenda qualquer coisa.' },
-    texto: `Minha semana no tatino.: estudei ${n(s.diasEstudados, 'dia', 'dias')} de 7 e respondi ${n(s.respostas, 'cartão', 'cartões')} (${pct}% de acerto). Aprenda qualquer coisa: ${d.urlApp}`,
+    texto: `Minha semana no Filidilo: estudei ${n(s.diasEstudados, 'dia', 'dias')} de 7 e respondi ${n(s.respostas, 'cartão', 'cartões')} (${pct}% de acerto). Aprenda qualquer coisa: ${d.urlApp}`,
   }
 }
 
@@ -132,9 +132,9 @@ export function pecaConvite(d: { urlApp: string }): Peca {
       titulo: 'Aprenda qualquer coisa.',
       linhas: ['Diga o que quer aprender: a IA monta os cartões', 'Estude por tempo ou por meta de acertos', 'Grátis, sem login, funciona sem internet'],
       qr: d.urlApp,
-      chamada: 'tatino. no celular, pelo navegador',
+      chamada: 'Filidilo no celular, pelo navegador',
     },
-    texto: `Estou usando o tatino. para estudar: você diz o que quer aprender e a IA monta os cartões. Grátis, sem login: ${d.urlApp}`,
+    texto: `Estou usando o Filidilo para estudar: você diz o que quer aprender e a IA monta os cartões. Grátis, sem login: ${d.urlApp}`,
   }
 }
 

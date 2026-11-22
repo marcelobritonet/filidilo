@@ -79,7 +79,7 @@ export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar
   const compartilhar = async () => {
     if (!link) return
     try {
-      await navigator.share({ title: conteudo.titulo, text: `${conteudo.titulo} no tatino. (o link vale até ${hora(link.expiraEm)})`, url: link.url })
+      await navigator.share({ title: conteudo.titulo, text: `${conteudo.titulo} no Filidilo (o link vale até ${hora(link.expiraEm)})`, url: link.url })
     } catch {
       /* cancelado */
     }
@@ -100,7 +100,7 @@ export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar
         {desafiar && linkLigado() && (
           <button class="cartao-acao desafiar" onClick={desafiar}>
             <strong>Desafiar amigos</strong>
-            <small>Imagem com a pergunta para o story ou o grupo; quem abrir responde no tatino.</small>
+            <small>Imagem com a pergunta para o story ou o grupo; quem abrir responde no Filidilo.</small>
           </button>
         )}
 

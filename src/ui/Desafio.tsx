@@ -49,7 +49,7 @@ export function DesafiarModal({ baralho, cartao, avisar, fechar }: { baralho: Ba
     <div class="modal-fundo" onClick={(e) => e.target === e.currentTarget && fechar()}>
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-desafiar">
         <h2 id="titulo-desafiar">Desafiar amigos</h2>
-        <p class="dica">Uma imagem com a pergunta (sem a resposta) para o story ou o grupo. Quem abrir o link responde no tatino. e pode salvar.</p>
+        <p class="dica">Uma imagem com a pergunta (sem a resposta) para o story ou o grupo. Quem abrir o link responde no Filidilo e pode salvar.</p>
         <fieldset class="opcoes-desafio">
           <legend>Junto vai</legend>
           <label class="opcao-check">
@@ -113,7 +113,7 @@ export function DesafioRecebido({ cartao, baralho, origem, salvarRotulo, salvar,
       ) : (
         <section class={`fim ${acertou ? 'comemorando' : ''}`}>
           {acertou && <Confete />}
-          <h2>{acertou ? 'Acertou! 🎉' : 'Não foi dessa vez'}</h2>
+          <h2>{acertou ? 'Acertou!' : 'Não foi dessa vez'}</h2>
           <p>{acertou ? 'Mandou bem no desafio.' : 'Agora você já sabe a resposta. Que tal treinar?'}</p>
           <button
             class="btn principal"

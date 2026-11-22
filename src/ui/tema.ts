@@ -4,6 +4,7 @@
 export type PreferenciaTema = 'system' | 'light' | 'dark'
 export type Tema = 'light' | 'dark'
 
+// Chave do nome antigo (tatino.), mantida para não perder a escolha de quem já usa. Igual em index.html.
 const CHAVE = 'tatino-theme'
 const COR_NAVEGADOR: Record<Tema, string> = { light: '#F7F9FF', dark: '#0B1E3F' }
 const consultaEscuro = () => window.matchMedia('(prefers-color-scheme: dark)')
@@ -24,7 +25,8 @@ export function temaResolvido(p: PreferenciaTema): Tema {
 
 function aplicar(t: Tema) {
   document.documentElement.dataset.theme = t
-  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute('content', COR_NAVEGADOR[t])
+  const cor = document.documentElement.classList.contains('abrindo') ? COR_NAVEGADOR.dark : COR_NAVEGADOR[t]
+  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute('content', cor)
 }
 
 let ouvinte: (() => void) | null = null
@@ -39,6 +41,12 @@ export function aplicarPreferencia(p: PreferenciaTema) {
     ouvinte = () => aplicar(temaResolvido('system'))
     mq.addEventListener('change', ouvinte)
   }
+}
+
+/** Fim da abertura: a página e a barra do navegador voltam para as cores do tema. */
+export function terminarAbertura() {
+  document.documentElement.classList.remove('abrindo')
+  aplicarPreferencia(lerPreferencia())
 }
 
 export function salvarPreferencia(p: PreferenciaTema) {
