@@ -13,9 +13,9 @@ Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As ve
 **Endereço novo: marcelobritonet.github.io/filidilo/**
 
 ### Mudou
-- O app agora fica em https://marcelobritonet.github.io/filidilo/. O endereço antigo (`/tatino/`) deixou de funcionar.
-- Seus baralhos, o progresso e as escolhas continuam no aparelho: basta abrir o endereço novo no mesmo navegador.
-- Quem instalou o app na tela inicial precisa instalar de novo a partir do endereço novo. Links de baralho e de desafio enviados antes da troca não abrem mais; peça um link novo.
+- O app agora fica em https://marcelobritonet.github.io/filidilo/. O endereço antigo (`/tatino/`) leva sozinho ao novo, inclusive os links de baralho e de desafio já enviados.
+- Seus baralhos, o progresso e as escolhas continuam no aparelho.
+- Quem instalou o app na tela inicial pelo endereço antigo é levado ao novo na próxima abertura. Para voltar a abrir como app, sem a barra do navegador, instale de novo a partir do endereço novo.
 
 ## [3.14.0] — 2026-11-22
 
