@@ -92,6 +92,30 @@
         "--strictPort"
       ],
       "port": 5175
+    },
+    {
+      "name": "filidilo-nome",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "../tatino-filidilo-nome",
+        "--port",
+        "5176",
+        "--strictPort"
+      ],
+      "port": 5176
+    },
+    {
+      "name": "filidilo-visual",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "../tatino-visual-filidilo",
+        "--port",
+        "5176",
+        "--strictPort"
+      ],
+      "port": 5176
     }
   ]
 }
