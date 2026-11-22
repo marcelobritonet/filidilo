@@ -1,8 +1,9 @@
-// Ofensiva em Meus baralhos: selo (chama + folgas) no cabeçalho, fio do dia no topo e o cartão "Falta uma sessão hoje".
+// Ofensiva em Meus baralhos: selo (ocelo ou leque + folgas) no cabeçalho, fio do dia no topo e o cartão "Falta uma sessão hoje".
 import { useEffect, useState } from 'preact/hooks'
 import { db } from '../core/db'
 import { MAX_FOLGAS, diaLocal, fracaoRestante, painelOfensiva, textoRestante, urgente, type Painel } from '../core/ofensiva'
 import { evento } from '../core/telemetria'
+import { DesenhoOfensiva, Ocelo, PenaFolga } from './Marca'
 
 /** Painel da ofensiva, refeito quando os dados mudam ou o dia vira; `agora` anda de minuto em minuto. */
 export function usePainelOfensiva(versao: number) {
@@ -31,15 +32,7 @@ export function usePainelOfensiva(versao: number) {
   return { painel, agora, ultimoBaralho }
 }
 
-function Escudo({ cheio }: { cheio: boolean }) {
-  return (
-    <svg class={`escudo ${cheio ? 'cheio' : ''}`} width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M12 3l7 3v5.5c0 4.4-3 8.2-7 9.5-4-1.3-7-5.1-7-9.5V6z" fill={cheio ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-    </svg>
-  )
-}
-
-/** Chama com o número e as folgas guardadas, ao lado da marca. */
+/** Ocelo ou leque com o número e as folgas guardadas, ao lado da marca. */
 export function SeloOfensiva({ painel, agora, abrir }: { painel: Painel; agora: number; abrir: () => void }) {
   const { sequencia, hojeFeito, folgas } = painel
   const pisca = !hojeFeito && sequencia > 0 && urgente(agora)
@@ -48,11 +41,12 @@ export function SeloOfensiva({ painel, agora, abrir }: { painel: Painel; agora: 
     <button class={`selo-ofensiva ${hojeFeito ? 'feito' : ''} ${pisca ? 'pisca' : ''}`} aria-label={rotulo} onClick={abrir}>
       <span class="folgas" title={`${folgas} de ${MAX_FOLGAS} folgas`}>
         {Array.from({ length: MAX_FOLGAS }, (_, i) => (
-          <Escudo cheio={i < folgas} />
+          <PenaFolga cheia={i < folgas} />
         ))}
       </span>
       <span class="chama">
-        🔥 {sequencia}
+        <DesenhoOfensiva dias={sequencia} aceso={hojeFeito} />
+        {sequencia}
         {hojeFeito && <span class="garantido"> ✓</span>}
       </span>
     </button>
@@ -87,7 +81,7 @@ export function CartaoOfensiva({ painel, agora, estudar }: { painel: Painel; ago
           {painel.semana.map((d) => (
             <span class={d.estado} title={ROTULO_ESTADO[d.estado]}>
               <small>{d.rotulo}</small>
-              <i aria-hidden="true" />
+              {d.estado === 'sessao' ? <Ocelo tamanho={20} /> : <i aria-hidden="true" />}
             </span>
           ))}
         </div>

@@ -7,9 +7,9 @@ import { CompartilharImagem, urlApp } from './CompartilharImagem'
 import { lerPreferencia, salvarPreferencia, type PreferenciaTema } from './tema'
 
 const OPCOES: { valor: PreferenciaTema; nome: string; descricao: string; cores: [string, string, string] }[] = [
-  { valor: 'system', nome: 'Usar tema do aparelho', descricao: 'acompanha o modo claro ou escuro do seu dispositivo', cores: ['#FFF5DC', '#111418', '#E85A36'] },
-  { valor: 'light', nome: 'Claro', descricao: 'papel claro e texto escuro', cores: ['#FFF5DC', '#FFFDF7', '#263F31'] },
-  { valor: 'dark', nome: 'Escuro', descricao: 'fundo grafite e texto suave para ambientes com pouca luz', cores: ['#111418', '#20262C', '#F2EEE5'] },
+  { valor: 'system', nome: 'Usar tema do aparelho', descricao: 'acompanha o modo claro ou escuro do seu dispositivo', cores: ['#F7F9FF', '#0B1E3F', '#13A3A0'] },
+  { valor: 'light', nome: 'Claro', descricao: 'papel claro e texto escuro', cores: ['#F7F9FF', '#FFFFFF', '#3A5BD9'] },
+  { valor: 'dark', nome: 'Escuro', descricao: 'fundo grafite e texto suave para ambientes com pouca luz', cores: ['#0B1E3F', '#12295A', '#EEF3FB'] },
 ]
 
 /** Escolha de aparência: salva e aplica na hora, sem botão de confirmar. */

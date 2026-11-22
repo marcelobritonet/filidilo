@@ -23,6 +23,7 @@ import { conteudoCartao } from './enviar'
 import { EnviarModal } from './EnviarModal'
 import { Folha } from './Folha'
 import { Icone } from './Icone'
+import { DesenhoOfensiva } from './Marca'
 import { Tex } from './Tex'
 
 export type Modo = 'prova' | 'espacada' | 'calculo'
@@ -355,11 +356,11 @@ function Fim(props: {
       {tempo && tempo !== 'esgotado' && <p class="dica">Terminou os cartões em {tempo}.</p>}
       {ofensiva?.primeiraHoje ? (
         <p class="ofensiva-fim" role="status">
-          <strong>🔥 {ofensiva.sequencia} {ofensiva.sequencia === 1 ? 'dia' : 'dias'}</strong>
+          <strong><DesenhoOfensiva dias={ofensiva.sequencia} aceso tamanho={28} /> {ofensiva.sequencia} {ofensiva.sequencia === 1 ? 'dia' : 'dias'}</strong>
           <span>{ofensiva.sequencia === 1 ? 'Ofensiva começada. Volte amanhã para crescer.' : 'Hoje garantido.'}</span>
         </p>
       ) : (
-        sequencia >= 2 && <p class="sequencia">🔥 {sequencia} dias seguidos</p>
+        sequencia >= 2 && <p class="sequencia"><DesenhoOfensiva dias={sequencia} aceso tamanho={18} /> {sequencia} dias seguidos</p>
       )}
       {ofensiva?.folgaGanha && <p class="aviso-folga">+1 folga guardada por {ofensiva.sequencia} dias seguidos</p>}
       {marco && (
