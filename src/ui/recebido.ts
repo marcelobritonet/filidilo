@@ -1,6 +1,6 @@
 // Arquivo recebido pelo "Compartilhar" do Android: o service worker (public/sw-receber.js)
 // guarda o texto num cache e abre o app com ?receber=1.
-// Link recebido (…/tatino/?b=<codigo>): o conteúdo vem do worker de links (src/core/link.ts).
+// Link recebido (…/filidilo/?b=<codigo>): o conteúdo vem do worker de links (src/core/link.ts).
 
 import { abrirLink } from '../core/link'
 

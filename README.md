@@ -1,8 +1,8 @@
 # Filidilo
 
-Antes se chamava **tatino.**. O endereço, o repositório e os identificadores internos (banco, chaves do aparelho, formato dos arquivos) continuam com o nome antigo, para ninguém perder dados.
+Antes se chamava **tatino.**. O endereço e o repositório já usam o nome novo; os identificadores internos (banco, chaves do aparelho, formato dos arquivos) continuam com o nome antigo, para ninguém perder dados.
 
-No ar: https://marcelobritonet.github.io/tatino/
+No ar: https://marcelobritonet.github.io/filidilo/
 
 **Aprenda qualquer coisa.** Flashcards offline (PWA) para estudar o que você quiser. Funciona no celular e no computador, instalável pelo navegador, sem login.
 
@@ -27,7 +27,7 @@ Antes de testar ou publicar, leia o [AGENTS.md](AGENTS.md): como testar sem suja
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173/tatino/
+npm run dev        # http://localhost:5173/filidilo/
 npm test           # núcleo + validação do baralho + gabaritos dos cálculos
 npm run build      # gera dist/ (PWA)
 ```
@@ -44,7 +44,7 @@ O app manda eventos anônimos ao PostHog (projeto na região EUA): nome do event
 
 ## Envio por link
 
-Enviar um baralho ou cartão sobe o mesmo JSON do arquivo para um worker do Cloudflare (`worker/`, KV com validade de 2 horas; 7 dias no desafio, com `?validade=7d`) e gera o link `…/tatino/?b=<código>` com QR code (`src/ui/EnviarModal.tsx`, `src/core/link.ts`). O conteúdo some sozinho depois de 2 horas; só quem tem o código (10 caracteres aleatórios) abre, e não há listagem. Limite de 1 MB e de 20 links por minuto por IP.
+Enviar um baralho ou cartão sobe o mesmo JSON do arquivo para um worker do Cloudflare (`worker/`, KV com validade de 2 horas; 7 dias no desafio, com `?validade=7d`) e gera o link `…/filidilo/?b=<código>` com QR code (`src/ui/EnviarModal.tsx`, `src/core/link.ts`). O conteúdo some sozinho depois de 2 horas; só quem tem o código (10 caracteres aleatórios) abre, e não há listagem. Limite de 1 MB e de 20 links por minuto por IP.
 
 - **Publicar o worker**: push na `main` que mexe em `worker/` roda `.github/workflows/deploy-worker.yml`. Precisa dos segredos `CLOUDFLARE_API_TOKEN` (permissões Workers Scripts e Workers KV Storage: Edit) e `CLOUDFLARE_ACCOUNT_ID`. O namespace KV é criado no primeiro deploy.
 - **Ligar no app**: a variável `VITE_LINKS_URL` do repositório (ex.: `https://tatino-links.<sua-conta>.workers.dev`), passada no build pelo `deploy.yml`. Sem ela, só aparece "Enviar como arquivo".
@@ -52,7 +52,7 @@ Enviar um baralho ou cartão sobe o mesmo JSON do arquivo para um worker do Clou
 
 ## Versões
 
-Histórico em [CHANGELOG.md](CHANGELOG.md) e nas [releases](https://github.com/marcelobritonet/tatino/releases). A versão vem do `package.json` e aparece no rodapé do app. Para lançar: subir a versão no `package.json`, escrever a seção no changelog, fazer o commit, criar a tag `vX.Y.Z` e a release.
+Histórico em [CHANGELOG.md](CHANGELOG.md) e nas [releases](https://github.com/marcelobritonet/filidilo/releases). A versão vem do `package.json` e aparece no rodapé do app. Para lançar: subir a versão no `package.json`, escrever a seção no changelog, fazer o commit, criar a tag `vX.Y.Z` e a release.
 
 Para gerar o arquivo de um baralho do repositório: `npm run exportar-baralho -- <id>` (sai em `dist-baralhos/`).
 

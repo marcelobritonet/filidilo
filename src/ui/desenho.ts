@@ -230,7 +230,7 @@ export function desenhar(canvas: HTMLCanvasElement, a: Arte, formato: Formato): 
   ctx.fillStyle = COR.suave
   ctx.textAlign = 'center'
   ctx.textBaseline = 'alphabetic'
-  ctx.fillText('marcelobritonet.github.io/tatino', w / 2, h - base)
+  ctx.fillText('marcelobritonet.github.io/filidilo', w / 2, h - base)
 
   // Miolo: diminui a escala até caber entre a marca e o endereço.
   const ini = topo + marcaTam + (quadrado ? 50 : 90)

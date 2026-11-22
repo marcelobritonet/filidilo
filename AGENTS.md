@@ -9,7 +9,7 @@ Leia antes de mexer no projeto. Vale para qualquer sessão, de qualquer IA.
 | 1 | `PENDENCIAS.md` é a fonte da verdade. A ordem é do mais recente para o mais antigo: item novo entra no topo, com o próximo número `P…`. Altere ali o que for acrescentado, concluído ou removido. |
 | 2 | Pode haver outra sessão trabalhando nesta mesma pasta. Antes de commitar, rode `git status` e `git diff` e adicione só os seus arquivos. Na `PENDENCIAS.md`, mude só as suas linhas: nunca reescreva o arquivo a partir de uma cópia antiga. |
 | 3 | Textos para a pessoa em pt-BR. Pendências, opções e decisões em tabelas, uma linha por item. |
-| 4 | O app se chama **Filidilo** (antes **tatino.**). Em texto corrido, Filidilo com F maiúsculo; o logotipo é **filidilo**, em minúsculas e sem ponto (manual em `docs/marca-filidilo/design-system/`). Os identificadores internos continuam `tatino`: banco `tatino`, chaves `tatino-*` do `localStorage`, `app: "tatino"` nos arquivos, backups e links, worker `tatino-links`, endereço `/tatino/`. Trocar algum deles apaga dados ou quebra o que já foi enviado: só com migração e com o ok do Marcelo. |
+| 4 | O app se chama **Filidilo** (antes **tatino.**). Em texto corrido, Filidilo com F maiúsculo; o logotipo é **filidilo**, em minúsculas e sem ponto (manual em `docs/marca-filidilo/design-system/`). Os identificadores internos continuam `tatino`: banco `tatino`, chaves `tatino-*` do `localStorage`, `app: "tatino"` nos arquivos, backups e links, worker `tatino-links`. Trocar algum deles apaga dados ou quebra o que já foi enviado: só com migração e com o ok do Marcelo. |
 
 ## Testar sem sujar as estatísticas
 
@@ -18,7 +18,7 @@ O app manda eventos anônimos ao PostHog (`src/core/telemetria.ts`). Teste não 
 | Onde o teste roda | Manda eventos? | O que fazer |
 |---|---|---|
 | Computador: `npm run dev` ou `npm run preview` (localhost) | **Não.** Sem `VITE_POSTHOG_KEY` a telemetria fica desligada | Nada. É o lugar preferido para testar. Nunca crie um `.env` com `VITE_POSTHOG_KEY`. |
-| Site publicado (https://marcelobritonet.github.io/tatino/) num celular ou navegador | **Sim** | Antes, marque o aparelho como de teste: abra uma vez `https://marcelobritonet.github.io/tatino/?teste=1`. O rodapé passa a mostrar "aparelho de teste" e todo evento vai com `teste: true`. `?teste=0` desmarca. No Android, o app instalado divide os dados com o Chrome; no iPhone, o app da tela inicial é separado do Safari (marque nos dois). |
+| Site publicado (https://marcelobritonet.github.io/filidilo/) num celular ou navegador | **Sim** | Antes, marque o aparelho como de teste: abra uma vez `https://marcelobritonet.github.io/filidilo/?teste=1`. O rodapé passa a mostrar "aparelho de teste" e todo evento vai com `teste: true`. `?teste=0` desmarca. No Android, o app instalado divide os dados com o Chrome; no iPhone, o app da tela inicial é separado do Safari (marque nos dois). |
 | Navegador do agente (painel do Claude, Playwright etc.) no site publicado | **Sim** | Prefira o localhost. Se precisar do site publicado, abra primeiro com `?teste=1`. |
 | Testes automáticos (`npm test`) | Não | Nada. |
 | Conversas com a IA (Gemini, ChatGPT…) para testar instruções | Não | Nada: elas não passam pelo app. Para levar a resposta ao app, use o localhost. |

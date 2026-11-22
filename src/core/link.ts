@@ -1,5 +1,5 @@
 // Envio por link: o conteúdo (o mesmo JSON do arquivo) fica 2 horas no worker do Cloudflare (worker/)
-// e quem abre o link do app (…/tatino/?b=<codigo>) baixa e vê o resumo de importação.
+// e quem abre o link do app (…/filidilo/?b=<codigo>) baixa e vê o resumo de importação.
 
 /**
  * Endereço do worker de links, vindo da variável VITE_LINKS_URL no build

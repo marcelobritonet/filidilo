@@ -2,6 +2,15 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.14.1] — 2026-11-22
+
+**Endereço novo: marcelobritonet.github.io/filidilo/**
+
+### Mudou
+- O app agora fica em https://marcelobritonet.github.io/filidilo/. O endereço antigo (`/tatino/`) deixou de funcionar.
+- Seus baralhos, o progresso e as escolhas continuam no aparelho: basta abrir o endereço novo no mesmo navegador.
+- Quem instalou o app na tela inicial precisa instalar de novo a partir do endereço novo. Links de baralho e de desafio enviados antes da troca não abrem mais; peça um link novo.
+
 ## [3.14.0] — 2026-11-22
 
 **O tatino. agora se chama Filidilo, de cara nova.**
