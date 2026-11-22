@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { pecaDesafio, pecaResultado, pecaSemana, podeDesafiar, quebrar, textoSimples } from './artes'
 
-const URL = 'https://app.example/tatino/'
+const URL = 'https://app.example/filidilo/'
 
 describe('artes', () => {
   it('resultado: porcentagem, sequência e nome só quando pode', () => {

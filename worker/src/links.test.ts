@@ -56,7 +56,7 @@ describe('worker de links', () => {
     expect((await worker.fetch(get('..%2F'), env)).status).toBe(404)
   })
 
-  it('recusa o que não é do tatino, backups e JSON quebrado', async () => {
+  it('recusa o que não é do Filidilo, backups e JSON quebrado', async () => {
     const { env } = ambiente()
     expect((await worker.fetch(post('{oi'), env)).status).toBe(400)
     expect((await worker.fetch(post(JSON.stringify({ app: 'outro', tipo: 'baralho' })), env)).status).toBe(400)

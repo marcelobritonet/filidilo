@@ -56,16 +56,16 @@ describe('telemetria', () => {
 
   it('?teste=1 marca o aparelho, ?teste=0 desmarca, e o parâmetro sai do endereço', async () => {
     const enderecos: string[] = []
-    vi.stubGlobal('window', { location: { href: 'https://x.dev/tatino/?teste=1#a' } })
+    vi.stubGlobal('window', { location: { href: 'https://x.dev/filidilo/?teste=1#a' } })
     vi.stubGlobal('history', { state: null, replaceState: (_s: unknown, _t: string, u: string) => enderecos.push(u) })
     const t = await import('./telemetria')
     expect(t.marcarTesteDaUrl()).toBe(true)
     expect(t.aparelhoDeTeste()).toBe(true)
-    expect(enderecos).toEqual(['/tatino/#a'])
-    vi.stubGlobal('window', { location: { href: 'https://x.dev/tatino/?teste=0' } })
+    expect(enderecos).toEqual(['/filidilo/#a'])
+    vi.stubGlobal('window', { location: { href: 'https://x.dev/filidilo/?teste=0' } })
     expect(t.marcarTesteDaUrl()).toBe(true)
     expect(t.aparelhoDeTeste()).toBe(false)
-    vi.stubGlobal('window', { location: { href: 'https://x.dev/tatino/' } })
+    vi.stubGlobal('window', { location: { href: 'https://x.dev/filidilo/' } })
     expect(t.marcarTesteDaUrl()).toBe(false)
   })
 })
