@@ -2,6 +2,12 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.14.2] — 2026-11-22
+
+**Envio por link com o nome novo**
+
+- O serviço que guarda os links de baralhos, cartões e desafios passou a se chamar Filidilo também. Nada muda para você: os links que você já mandou continuam abrindo.
+
 ## [3.14.1] — 2026-11-22
 
 **Endereço novo: marcelobritonet.github.io/filidilo/**

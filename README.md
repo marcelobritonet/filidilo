@@ -47,7 +47,7 @@ O app manda eventos anônimos ao PostHog (projeto na região EUA): nome do event
 Enviar um baralho ou cartão sobe o mesmo JSON do arquivo para um worker do Cloudflare (`worker/`, KV com validade de 2 horas; 7 dias no desafio, com `?validade=7d`) e gera o link `…/filidilo/?b=<código>` com QR code (`src/ui/EnviarModal.tsx`, `src/core/link.ts`). O conteúdo some sozinho depois de 2 horas; só quem tem o código (10 caracteres aleatórios) abre, e não há listagem. Limite de 1 MB e de 20 links por minuto por IP.
 
 - **Publicar o worker**: push na `main` que mexe em `worker/` roda `.github/workflows/deploy-worker.yml`. Precisa dos segredos `CLOUDFLARE_API_TOKEN` (permissões Workers Scripts e Workers KV Storage: Edit) e `CLOUDFLARE_ACCOUNT_ID`. O namespace KV é criado no primeiro deploy.
-- **Ligar no app**: a variável `VITE_LINKS_URL` do repositório (ex.: `https://tatino-links.<sua-conta>.workers.dev`), passada no build pelo `deploy.yml`. Sem ela, só aparece "Enviar como arquivo".
+- **Ligar no app**: a variável `VITE_LINKS_URL` do repositório (ex.: `https://filidilo-links.<sua-conta>.workers.dev`), passada no build pelo `deploy.yml`. Sem ela, só aparece "Enviar como arquivo".
 - **Rodar no computador**: `cd worker && npm install && npx wrangler dev --port 8787` e, noutro terminal, `VITE_LINKS_URL=http://127.0.0.1:8787 npm run dev`.
 
 ## Versões

@@ -1,13 +1,16 @@
 # Links temporários do Filidilo: guarda um baralho ou cartões por 2 horas (7 dias nos desafios) e devolve por um código.
 # Publicado pelo .github/workflows/deploy-worker.yml (segredos CLOUDFLARE_API_TOKEN e CLOUDFLARE_ACCOUNT_ID).
-name = "tatino-links"
+# Antes "tatino-links": o worker antigo continua no ar para apps e versões antigas, usando o mesmo KV.
+name = "filidilo-links"
 main = "src/index.ts"
 compatibility_date = "2026-11-01"
 workers_dev = true
 
-# O wrangler cria o namespace KV no primeiro deploy (sem "id") e guarda a ligação na conta.
+# Namespace KV criado no primeiro deploy do tatino-links ("tatino-links-links"). O id fixo faz o
+# filidilo-links usar os mesmos dados: os links já enviados continuam abrindo.
 [[kv_namespaces]]
 binding = "LINKS"
+id = "ae8549ab23824f36bf4aeb5d18ee6aef"
 
 # No máximo 20 links novos por minuto por IP.
 [[ratelimits]]
