@@ -114,6 +114,8 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
 .cabecalho-linha .marca { justify-self: start; }
 
 .barra-sessao { display: grid; grid-template-columns: 44px 1fr 72px; align-items: center; gap: 8px; margin-bottom: 12px; }
+.barra-sessao.livre { grid-template-columns: 44px 1fr auto auto; }
+.barra-sessao .terminar { justify-self: end; }
 .titulo-barra { font-family: var(--font-display); font-size: clamp(18px, 5vw, 22px); font-weight: 700; line-height: 1.2; text-align: center; margin: 0; }
 .fechar, .voltar {
   width: 44px; height: 44px; border: 1px solid transparent; border-radius: 50%;

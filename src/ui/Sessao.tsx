@@ -27,10 +27,14 @@ import { DesenhoOfensiva } from './Marca'
 import { Tex } from './Tex'
 
 export type Modo = 'prova' | 'espacada' | 'calculo'
-/** Até onde vai a sessão: N cartões ou X minutos. */
-export type Limite = { tipo: 'acertos'; n: number } | { tipo: 'tempo'; minutos: number }
+/** Até onde vai a sessão: N cartões, X minutos ou livre (até a pessoa tocar em Terminar). */
+export type Limite = { tipo: 'acertos'; n: number } | { tipo: 'tempo'; minutos: number } | { tipo: 'livre' }
 
-const TODOS = 10000 // por tempo: a fila tem todos os cartões; o relógio decide o fim
+const TODOS = 10000 // com limite: a fila tem todos os cartões; o relógio, a meta ou o Terminar decidem o fim
+
+/** No modo livre, Terminar só conclui a sessão (vale o dia da ofensiva) com pelo menos estas respostas. */
+export const MINIMO_LIVRE = 5
+export const podeTerminar = (respondidos: number) => respondidos >= MINIMO_LIVRE
 
 const relogio = (ms: number) => {
   const s = Math.ceil(ms / 1000)
@@ -97,6 +101,11 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   const restante = porTempo && fimEm ? Math.max(0, fimEm - agora) : totalMs
   const esgotou = porTempo && fimEm > 0 && restante === 0
   const meta = limite?.tipo === 'acertos' ? limite.n : 0
+  const livre = limite?.tipo === 'livre'
+  // Livre: a pessoa tocou em Terminar com respostas suficientes; a sessão vai para o fim.
+  const [terminou, setTerminou] = useState(false)
+  // Livre: tocou em Terminar com poucas respostas; pergunta se quer sair sem concluir.
+  const [avisoSair, setAvisoSair] = useState(false)
 
   // Relógio da sessão por tempo: atualiza a cada segundo até acabar.
   useEffect(() => {
@@ -117,6 +126,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
       setPos(0)
       setPlacar({ certos: 0, errados: 0, chutes: 0, pulados: 0 })
       setFracos({})
+      setTerminou(false)
       if (porTempo) {
         setAgora(Date.now())
         setFimEm(Date.now() + totalMs)
@@ -130,7 +140,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   const poucos = primeira && baralho.objetivo ? temaComPoucosCartoes(baralho) : undefined
 
   const bateuMeta = meta > 0 && placar.certos >= meta
-  const cartao = esgotou || bateuMeta ? undefined : fila[pos]
+  const cartao = esgotou || bateuMeta || terminou ? undefined : fila[pos]
   const respondidos = placar.certos + placar.errados + placar.chutes
   const avaliar = async (nota: Nota, chute = false) => {
     if (!cartao) return
@@ -167,9 +177,17 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
 
   const acoes: Acoes = { avaliar, corrigir: () => { evento('corrigir_aberto', { onde: 'estudo' }); setCorrigindo(true) } }
   const sairDaSessao = () => {
-    if (cartao) evento('sessao_abandonada', { respondidos, por: porTempo ? 'tempo' : 'acertos' })
+    if (cartao) evento('sessao_abandonada', { respondidos, por: porTempo ? 'tempo' : livre ? 'livre' : 'acertos' })
     sair()
   }
+  /** Livre: com respostas suficientes vai para o fim (conta como concluída); com menos, avisa e sai como o ←. */
+  const terminar = () => {
+    if (podeTerminar(respondidos)) {
+      evento('sessao_terminada', { respondidos })
+      setTerminou(true)
+    } else setAvisoSair(true)
+  }
+  const falta = MINIMO_LIVRE - respondidos
 
   /** Cartão corrigido: troca na sessão e mostra de novo, para responder já com o conteúdo certo. */
   const corrigido = (c: Cartao, b: Baralho) => {
@@ -198,15 +216,46 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
 
   return (
     <main class="tela sessao">
-      <header class="barra-sessao">
+      <header class={`barra-sessao ${livre ? 'livre' : ''}`}>
         <button class="fechar" aria-label="Sair da sessão" onClick={sairDaSessao}>
           ←
         </button>
         <span class="titulo-barra">{TITULO[modo]}</span>
         <span class="contador" aria-live="off">
-          {!cartao ? '' : porTempo ? relogio(restante) : meta ? `✓ ${placar.certos}/${meta}` : `${pos + 1} de ${fila.length}`}
+          {!cartao ? '' : porTempo ? relogio(restante) : meta ? `✓ ${placar.certos}/${meta}` : livre ? `✓ ${placar.certos}` : `${pos + 1} de ${fila.length}`}
         </span>
+        {livre && cartao && (
+          <button class="btn terciario compacto terminar" onClick={terminar}>
+            Terminar
+          </button>
+        )}
       </header>
+      {avisoSair && (
+        <>
+          <div class="folha-fundo" aria-hidden="true" onClick={() => setAvisoSair(false)} />
+          <div class="folha" role="dialog" aria-modal="true" aria-labelledby="titulo-sair-livre">
+            <span class="folha-alca" aria-hidden="true">
+              <span />
+            </span>
+            <h2 id="titulo-sair-livre" class="folha-titulo">
+              Sair sem concluir?
+            </h2>
+            <div class="folha-corpo">
+              <p>
+                Faltam {falta} {falta === 1 ? 'resposta' : 'respostas'} para a sessão valer o dia. O que você já respondeu fica salvo.
+              </p>
+            </div>
+            <div class="folha-acoes">
+              <button class="btn principal" onClick={() => setAvisoSair(false)}>
+                Continuar estudando
+              </button>
+              <button class="btn terciario" onClick={sairDaSessao}>
+                Sair mesmo assim
+              </button>
+            </div>
+          </div>
+        </>
+      )}
       {porTempo && cartao && (
         <div class="fio-tempo" role="timer" aria-label={`Tempo restante: ${relogio(restante)}`}>
           <div style={{ width: `${(100 * restante) / totalMs}%` }} />
@@ -217,7 +266,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
           <div style={{ width: `${(100 * placar.certos) / meta}%` }} />
         </div>
       )}
-      {!porTempo && !meta && fila.length > 0 && (
+      {!porTempo && !meta && !livre && fila.length > 0 && (
         <div class="progresso" role="progressbar" aria-label="Progresso da sessão" aria-valuemin={0} aria-valuemax={fila.length} aria-valuenow={pos}>
           <div style={{ width: `${(100 * pos) / fila.length}%` }} />
         </div>
@@ -225,7 +274,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
 
       {!cartao ? (
         <Fim
-          fimMotivo={fila.length === 0 ? 'vazia' : bateuMeta ? 'meta' : esgotou ? 'tempo' : 'fila'}
+          fimMotivo={fila.length === 0 ? 'vazia' : bateuMeta ? 'meta' : esgotou ? 'tempo' : terminou ? 'terminou' : 'fila'}
           placar={placar}
           vazio={fila.length === 0}
           modo={modo}

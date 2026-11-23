@@ -2,6 +2,13 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.16.0] — 2026-11-23
+
+**Estudar sem meta: modo Livre**
+- Em "Como estudar?", a nova opção **Livre** deixa estudar quanto quiser, sem meta de acertos nem de tempo.
+- Toque em **Terminar** quando cansar. Com 5 respostas ou mais, a sessão conta como concluída: vale o dia da ofensiva e mostra o resultado. Com menos, o app pergunta se você quer sair sem concluir.
+- O que você responde fica salvo na hora, mesmo saindo antes de terminar.
+
 ## [3.15.1] — 2026-11-23
 
 **Cartões corrigidos não voltam mais ao texto antigo**

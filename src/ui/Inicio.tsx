@@ -10,10 +10,11 @@ import { EnviarModal } from './EnviarModal'
 import { useEstados } from './estado'
 import { Icone } from './Icone'
 import { Marca } from './Marca'
+import { MINIMO_LIVRE } from './Sessao'
 
 /** Última escolha de como estudar, guardada por baralho. */
 interface Escolha {
-  por: 'acertos' | 'tempo'
+  por: 'acertos' | 'tempo' | 'livre'
   acertos: number
   minutos: number
   conteudo: Filtro
@@ -29,7 +30,7 @@ const chaveEscolha = (id: string) => `tatino-ajuste-${id}`
 function lerEscolha(id: string): Escolha {
   try {
     const salvo = JSON.parse(localStorage.getItem(chaveEscolha(id)) ?? '{}') as Partial<Escolha> & { por?: string }
-    return { ...PADRAO, ...salvo, por: salvo.por === 'tempo' ? 'tempo' : 'acertos' }
+    return { ...PADRAO, ...salvo, por: salvo.por === 'tempo' || salvo.por === 'livre' ? salvo.por : 'acertos' }
   } catch {
     return PADRAO
   }
@@ -85,13 +86,13 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
     }
     setPerguntando(false)
     const todos = escolha.temas.length === temasComCartoes.length
-    evento('sessao_iniciada', { por: escolha.por, meta: escolha.por === 'tempo' ? escolha.minutos : escolha.acertos, temas: escolha.temas.length, temas_total: temasComCartoes.length, cartoes: total })
+    evento('sessao_iniciada', { por: escolha.por, meta: escolha.por === 'tempo' ? escolha.minutos : escolha.por === 'livre' ? 0 : escolha.acertos, temas: escolha.temas.length, temas_total: temasComCartoes.length, cartoes: total })
     nav.ir({
       nome: 'sessao',
       id,
       modo: 'prova',
       opcoes: { temas: todos ? [] : escolha.temas, filtro: temCalculo ? escolha.conteudo : 'tudo' },
-      limite: escolha.por === 'tempo' ? { tipo: 'tempo', minutos: escolha.minutos } : { tipo: 'acertos', n: escolha.acertos },
+      limite: escolha.por === 'tempo' ? { tipo: 'tempo', minutos: escolha.minutos } : escolha.por === 'livre' ? { tipo: 'livre' } : { tipo: 'acertos', n: escolha.acertos },
     })
   }
 
@@ -204,12 +205,15 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
               <div class="campo">
                 Modo
                 <div class="segmentado" role="radiogroup" aria-label="Modo">
-                  {(['acertos', 'tempo'] as const).map((m) => (
+                  {(['acertos', 'tempo', 'livre'] as const).map((m) => (
                     <button role="radio" aria-checked={escolha.por === m} class={escolha.por === m ? 'ativo' : ''} onClick={() => setEscolha({ ...escolha, por: m })}>
-                      {m === 'acertos' ? 'Até acertar' : 'Por tempo'}
+                      {m === 'acertos' ? 'Até acertar' : m === 'tempo' ? 'Por tempo' : 'Livre'}
                     </button>
                   ))}
                 </div>
+                {escolha.por === 'livre' ? (
+                  <p class="dica">Estude quanto quiser e toque em Terminar. Com {MINIMO_LIVRE} respostas ou mais, vale o dia.</p>
+                ) : (
                 <div class="chips" role="radiogroup" aria-label={escolha.por === 'tempo' ? 'Minutos' : 'Acertos'}>
                   {escolha.por === 'tempo'
                     ? OPCOES_MINUTOS.map((m) => (
@@ -223,6 +227,7 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
                         </button>
                       ))}
                 </div>
+                )}
               </div>
 
               {temCalculo && (
