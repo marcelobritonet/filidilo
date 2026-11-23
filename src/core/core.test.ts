@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { confere, formatar, lerNumero, preencher, sortear } from './calc'
 import { avaliar } from './expr'
-import { filaProva } from './fila'
+import { filaProva, intercalar } from './fila'
 import type { Estado } from './db'
 import type { Baralho, CartaoCalculo } from './types'
 
@@ -77,5 +77,25 @@ describe('fila do modo prova', () => {
   it('ordem única: errados, vencidos hoje, nunca vistos e por último os acertados', () => {
     const f = filaProva(b, new Map([est('o2', 1), est('p1', 3), est('o1', 3, passado)]))
     expect(f.map((c) => c.id)).toEqual(['o2', 'o1', 'p2', 'p1'])
+  })
+  it('intercala um nunca visto a cada 3 cartões, mesmo com muitos errados', () => {
+    const grande: Baralho = {
+      ...b,
+      temas: [{ id: 't', nome: 'T' }],
+      cartoes: Array.from({ length: 15 }, (_, i) => ({ id: `c${i}`, tipo: 'vf' as const, tema: 't', frente: 'x', resposta: true })),
+    }
+    const errados = new Map(Array.from({ length: 10 }, (_, i) => est(`c${i}`, 1)))
+    const f = filaProva(grande, errados, { tamanho: 9 })
+    const novo = f.map((c) => !errados.has(`b/${c.id}`))
+    expect(novo).toEqual([false, false, true, false, false, true, false, false, true])
+  })
+  it('sem nada para revisar, só nunca vistos; com soNovos, só os sem estado', () => {
+    expect(filaProva(b, new Map()).length).toBe(4)
+    const f = filaProva(b, new Map([est('o2', 1), est('p1', 3)]), { soNovos: true })
+    expect(f.map((c) => c.id).sort()).toEqual(['o1', 'p2'])
+  })
+  it('intercalar: sobra de uma lista vai no fim', () => {
+    expect(intercalar(['r1'], ['n1', 'n2', 'n3'], 3)).toEqual(['r1', 'n1', 'n2', 'n3'])
+    expect(intercalar(['r1', 'r2', 'r3', 'r4'], ['n1'], 3)).toEqual(['r1', 'r2', 'n1', 'r3', 'r4'])
   })
 })

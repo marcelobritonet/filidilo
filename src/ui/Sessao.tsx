@@ -90,6 +90,9 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   const [fila, setFila] = useState<Cartao[] | null>(null)
   // Cartões de alternativas já dominados no início da sessão: aparecem sem alternativas.
   const [dominados, setDominados] = useState<Set<string>>(new Set())
+  // Cartões do baralho nunca vistos no início da sessão e os respondidos nela: no fim, diz quantos faltam.
+  const [naoVistos, setNaoVistos] = useState<Set<string>>(new Set())
+  const [respondidosIds, setRespondidosIds] = useState<Set<string>>(new Set())
   const [pos, setPos] = useState(0)
   const [placar, setPlacar] = useState({ certos: 0, errados: 0, chutes: 0, pulados: 0 })
   const [rodada, setRodada] = useState(0)
@@ -123,6 +126,8 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
       const f = modo === 'espacada' ? filaEspacada(baralho, m, { ...opcoes, tamanho }, porTempo ? 100 : Math.min(tamanho, 15)) : filaProva(baralho, m, { ...opcoes, tamanho })
       setFila(f)
       setDominados(new Set(baralho.cartoes.filter((c) => dominado(m.get(chave(baralho.id, c.id)))).map((c) => c.id)))
+      setNaoVistos(new Set(baralho.cartoes.filter((c) => !m.has(chave(baralho.id, c.id))).map((c) => c.id)))
+      setRespondidosIds(new Set())
       setPos(0)
       setPlacar({ certos: 0, errados: 0, chutes: 0, pulados: 0 })
       setFracos({})
@@ -150,6 +155,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
       console.error('Não foi possível salvar o progresso', e) // a sessão continua mesmo assim
     }
     evento('resposta', { tipo: cartao.tipo, nota, chute, sem_alternativas: dominados.has(cartao.id) })
+    setRespondidosIds((r) => new Set(r).add(cartao.id))
     setPlacar((p) => (nota === 1 ? { ...p, errados: p.errados + 1 } : chute ? { ...p, chutes: p.chutes + 1 } : { ...p, certos: p.certos + 1 }))
     if (nota === 1 || chute) {
       setFracos((f) => ({ ...f, [cartao.tema]: (f[cartao.tema] ?? 0) + 1 }))
@@ -288,6 +294,8 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
           objetivo={baralho.objetivo}
           criarMais={criarMais}
           baralho={baralho}
+          soNovos={!!opcoes.soNovos}
+          nuncaVistos={{ antes: naoVistos.size, faltam: [...naoVistos].filter((c) => !respondidosIds.has(c)).length }}
         />
       ) : (
         <>
@@ -337,6 +345,9 @@ function Fim(props: {
   outra: () => void
   sair: () => void
   criarMais: (assunto?: string, temaId?: string) => void
+  /** Nunca vistos no baralho antes da sessão e os que ainda faltam depois dela. */
+  nuncaVistos?: { antes: number; faltam: number }
+  soNovos?: boolean
 }) {
   const { placar, vazio, modo, tempo, bateuMeta, temaFraco, temaPoucos, objetivo, outra, sair, criarMais, baralho } = props
   const temaId = temaPoucos?.id ?? props.temaId
@@ -379,7 +390,7 @@ function Fim(props: {
     return (
       <section class="fim">
         <span class="icone-fim"><Icone nome="avancar" tamanho={48} /></span>
-        <p>{modo === 'espacada' ? 'Nada para revisar agora.' : 'Nenhum cartão nesses temas.'}</p>
+        <p>{modo === 'espacada' ? 'Nada para revisar agora.' : props.soNovos ? '✓ Você já passou por todos os cartões desses temas.' : 'Nenhum cartão nesses temas.'}</p>
         <button class="btn principal" onClick={sair}>Voltar ao início</button>
       </section>
     )
@@ -405,6 +416,13 @@ function Fim(props: {
       </p>
       {total > 0 && <p class="placar-final">{Math.round((100 * placar.certos) / total)}% de acerto</p>}
       {tempo && tempo !== 'esgotado' && <p class="dica">Terminou os cartões em {tempo}.</p>}
+      {props.nuncaVistos && props.nuncaVistos.antes > 0 && (
+        <p class="dica vistos" role="status">
+          {props.nuncaVistos.faltam === 0
+            ? '✓ Agora você já passou por todos os cartões deste baralho.'
+            : `Faltam ${props.nuncaVistos.faltam} ${props.nuncaVistos.faltam === 1 ? 'cartão que você nunca viu' : 'cartões que você nunca viu'} neste baralho.`}
+        </p>
+      )}
       {ofensiva?.primeiraHoje ? (
         <p class="ofensiva-fim" role="status">
           <strong><DesenhoOfensiva dias={ofensiva.sequencia} aceso tamanho={28} /> {ofensiva.sequencia} {ofensiva.sequencia === 1 ? 'dia' : 'dias'}</strong>

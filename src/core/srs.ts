@@ -26,5 +26,7 @@ export async function registrar(id: string, nota: Nota, modo: Revisao['modo']): 
   return estado
 }
 
+/** Já respondido pelo menos uma vez neste aparelho (pular não conta). */
+export const visto = (e?: Estado) => !!e
 export const dominado = (e?: Estado) => !!e && e.ultimaNota >= 3
 export const vencido = (e: Estado | undefined, agora = Date.now()) => !e || new Date(e.fsrs.due).getTime() <= agora

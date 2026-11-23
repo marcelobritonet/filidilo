@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'preact/hooks'
 import { desarquivar } from '../core/baralhos'
 import type { Filtro } from '../core/fila'
-import { chave, dominado, vencido } from '../core/srs'
+import { chave, dominado, vencido, visto } from '../core/srs'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
 import { evento } from '../core/telemetria'
@@ -20,9 +20,11 @@ interface Escolha {
   conteudo: Filtro
   /** Temas marcados. Vazio = todos (primeira vez). */
   temas: string[]
+  /** Só os cartões nunca vistos. */
+  soNovos: boolean
 }
 
-const PADRAO: Escolha = { por: 'acertos', acertos: 10, minutos: 10, conteudo: 'tudo', temas: [] }
+const PADRAO: Escolha = { por: 'acertos', acertos: 10, minutos: 10, conteudo: 'tudo', temas: [], soNovos: false }
 const OPCOES_ACERTOS = [5, 10, 20, 30]
 const OPCOES_MINUTOS = [5, 10, 15, 20]
 const chaveEscolha = (id: string) => `tatino-ajuste-${id}`
@@ -44,13 +46,15 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
   const [perguntando, setPerguntando] = useState(false)
 
   const porTema = useMemo(() => {
-    const m = new Map<string, { total: number; dominados: number }>()
-    for (const t of baralho.temas) m.set(t.id, { total: 0, dominados: 0 })
+    const m = new Map<string, { total: number; dominados: number; vistos: number }>()
+    for (const t of baralho.temas) m.set(t.id, { total: 0, dominados: 0, vistos: 0 })
     for (const c of baralho.cartoes) {
       const r = m.get(c.tema)
       if (!r) continue
       r.total++
-      if (dominado(estados?.get(chave(id, c.id)))) r.dominados++
+      const e = estados?.get(chave(id, c.id))
+      if (dominado(e)) r.dominados++
+      if (visto(e)) r.vistos++
     }
     return m
   }, [estados, baralho])
@@ -58,6 +62,7 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
   const temasComCartoes = baralho.temas.filter((t) => porTema.get(t.id)?.total)
   const total = baralho.cartoes.length
   const dominadosTotal = estados ? baralho.cartoes.filter((c) => dominado(estados.get(chave(id, c.id)))).length : 0
+  const vistosTotal = estados ? baralho.cartoes.filter((c) => visto(estados.get(chave(id, c.id)))).length : 0
   const paraHoje = estados ? baralho.cartoes.filter((c) => estados.has(chave(id, c.id)) && vencido(estados.get(chave(id, c.id)))).length : 0
   const temCalculo = baralho.cartoes.some((c) => c.tipo === 'calculo')
   // Quase tudo dominado (80% ou mais, com pelo menos 10 cartões): sugere cartões de um nível acima.
@@ -74,6 +79,17 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
 
   const alternarTema = (t: string) => setEscolha({ ...escolha, temas: escolha.temas.includes(t) ? escolha.temas.filter((x) => x !== t) : [...escolha.temas, t] })
   const todosMarcados = temasComCartoes.every((t) => escolha.temas.includes(t.id))
+  // Nunca vistos nos temas marcados e no conteúdo escolhido: é o que "Só os que nunca vi" vai estudar.
+  const filtroAtual: Filtro = temCalculo ? escolha.conteudo : 'tudo'
+  const novosMarcados = estados
+    ? baralho.cartoes.filter(
+        (c) =>
+          escolha.temas.includes(c.tema) &&
+          (filtroAtual === 'calculo' ? c.tipo === 'calculo' : filtroAtual === 'teoria' ? c.tipo !== 'calculo' : true) &&
+          !visto(estados.get(chave(id, c.id))),
+      ).length
+    : 0
+  const soNovos = escolha.soNovos && novosMarcados > 0
 
   const [enviando, setEnviando] = useState(false)
   const enviar = () => setEnviando(true)
@@ -86,12 +102,12 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
     }
     setPerguntando(false)
     const todos = escolha.temas.length === temasComCartoes.length
-    evento('sessao_iniciada', { por: escolha.por, meta: escolha.por === 'tempo' ? escolha.minutos : escolha.por === 'livre' ? 0 : escolha.acertos, temas: escolha.temas.length, temas_total: temasComCartoes.length, cartoes: total })
+    evento('sessao_iniciada', { por: escolha.por, meta: escolha.por === 'tempo' ? escolha.minutos : escolha.por === 'livre' ? 0 : escolha.acertos, temas: escolha.temas.length, temas_total: temasComCartoes.length, cartoes: total, so_novos: soNovos, nunca_vistos: total - vistosTotal })
     nav.ir({
       nome: 'sessao',
       id,
       modo: 'prova',
-      opcoes: { temas: todos ? [] : escolha.temas, filtro: temCalculo ? escolha.conteudo : 'tudo' },
+      opcoes: { temas: todos ? [] : escolha.temas, filtro: filtroAtual, soNovos },
       limite: escolha.por === 'tempo' ? { tipo: 'tempo', minutos: escolha.minutos } : escolha.por === 'livre' ? { tipo: 'livre' } : { tipo: 'acertos', n: escolha.acertos },
     })
   }
@@ -155,6 +171,17 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
             <div class="barra" aria-hidden="true">
               <div style={{ width: `${(100 * dominadosTotal) / Math.max(total, 1)}%` }} />
             </div>
+            {estados && (
+              <p class="dica vistos">
+                {vistosTotal === total ? (
+                  <>✓ Você já passou por todos os cartões</>
+                ) : (
+                  <>
+                    Já passou por <strong>{vistosTotal}</strong> de {total} · {total - vistosTotal} {total - vistosTotal === 1 ? 'nunca visto' : 'nunca vistos'}
+                  </>
+                )}
+              </p>
+            )}
           </section>
 
           <button class="btn principal grande" onClick={abrirPergunta}>
@@ -243,6 +270,19 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
                 </div>
               )}
 
+              {novosMarcados > 0 && (
+                <div class="campo">
+                  Quais cartões
+                  <div class="segmentado" role="radiogroup" aria-label="Quais cartões">
+                    {([false, true] as const).map((n) => (
+                      <button role="radio" aria-checked={soNovos === n} class={soNovos === n ? 'ativo' : ''} onClick={() => setEscolha({ ...escolha, soNovos: n })}>
+                        {n ? `Só os que nunca vi (${novosMarcados})` : 'Todos'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div class="campo">
                 <span class="campo-titulo">
                   Temas
@@ -268,6 +308,7 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
                           </span>
                           <span class="num">
                             {r.dominados} de {r.total}
+                            {r.vistos < r.total && <small> · {r.total - r.vistos} {r.total - r.vistos === 1 ? 'nunca visto' : 'nunca vistos'}</small>}
                           </span>
                         </button>
                       </li>

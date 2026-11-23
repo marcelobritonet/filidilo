@@ -2,7 +2,7 @@ import { evento } from '../core/telemetria'
 import { useEffect, useState } from 'preact/hooks'
 import { lerRecebido, planejar, type CartoesRecebidos, type PlanoImportacao } from '../core/compartilhar'
 import { DesafioRecebido } from './Desafio'
-import { chave, dominado } from '../core/srs'
+import { chave, dominado, visto } from '../core/srs'
 import type { Baralho, Cartao } from '../core/types'
 import type { Navegacao } from './App'
 import { useEstados } from './estado'
@@ -245,6 +245,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
           {ativos.map((b) => {
             const total = b.cartoes.length
             const dom = estados ? b.cartoes.filter((c) => dominado(estados.get(chave(b.id, c.id)))).length : 0
+            const nunca = estados ? b.cartoes.filter((c) => !visto(estados.get(chave(b.id, c.id)))).length : 0
             return (
               <li>
                 <button class="baralho-item cartao-acao" onClick={() => nav.ir({ nome: 'baralho', id: b.id })}>
@@ -257,6 +258,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
                   </span>
                   <span class="num">
                     {dom} de {total} dominados
+                    {nunca > 0 && nunca < total && <> · {nunca} {nunca === 1 ? 'nunca visto' : 'nunca vistos'}</>}
                   </span>
                 </button>
               </li>
