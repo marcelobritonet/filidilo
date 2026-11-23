@@ -56,7 +56,7 @@ function BotaoCorrigir({ acoes }: { acoes: Acoes }) {
   )
 }
 
-export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais }: { baralho: Baralho; modo: Modo; opcoes: OpcoesFila; limite?: Limite; sair: () => void; criarMais: (assunto?: string, temaId?: string) => void }) {
+export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais, mudou }: { baralho: Baralho; modo: Modo; opcoes: OpcoesFila; limite?: Limite; sair: () => void; criarMais: (assunto?: string, temaId?: string) => void; mudou?: () => void }) {
   // Cópia local: correções feitas durante a sessão entram aqui sem reiniciar a sessão.
   const [baralho, setBaralho] = useState(inicial)
   const [corrigindo, setCorrigindo] = useState(false)
@@ -174,6 +174,8 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   /** Cartão corrigido: troca na sessão e mostra de novo, para responder já com o conteúdo certo. */
   const corrigido = (c: Cartao, b: Baralho) => {
     setBaralho(b)
+    // Recarrega a lista do App: senão "Criar mais" e as outras telas abrem com o cartão antigo.
+    mudou?.()
     setFila(fila.map((x) => (x.id === c.id ? c : x)))
     setVez((v) => v + 1)
     setCorrigindo(false)

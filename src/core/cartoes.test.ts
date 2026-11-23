@@ -44,6 +44,30 @@ describe('edição de cartões', () => {
     await reinserirCartao(r.baralho, r.cartao!, r.pos)
     expect((await obter(b.id))!.cartoes[0].id).toBe('x1')
   })
+  it('cartão corrigido continua corrigido quando entram cartões novos de uma cópia velha do baralho', async () => {
+    const velho = await gravarCartao(await criar('Teste'), { id: 'x1', tipo: 'conceito', tema: 'geral', frente: 'Pergunta', verso: 'errada' })
+    // Corrigido na sessão; a tela de Criar com IA ainda tem `velho`.
+    await gravarCartao(velho, { id: 'x1', tipo: 'conceito', tema: 'geral', frente: 'Pergunta', verso: 'certa' })
+    const b = await adicionarCartoes(velho, [{ id: 'ia-1', tipo: 'conceito', tema: 'novo', frente: 'Nova', verso: 'v' }], [{ id: 'novo', nome: 'Novo' }])
+    expect(b.cartoes.find((c) => c.id === 'x1')).toMatchObject({ verso: 'certa', editado: true })
+    expect(b.cartoes.map((c) => c.id)).toEqual(['x1', 'ia-1'])
+    expect((await obter(b.id))!.temas.map((t) => t.id)).toEqual(['geral', 'novo'])
+    // Tema que já existe não duplica.
+    const de2 = await adicionarCartoes(velho, [{ id: 'ia-2', tipo: 'conceito', tema: 'novo', frente: 'Outra', verso: 'v' }], [{ id: 'novo', nome: 'Novo' }])
+    expect(de2.temas.map((t) => t.id)).toEqual(['geral', 'novo'])
+    expect(de2.cartoes.map((c) => c.id)).toEqual(['x1', 'ia-1', 'ia-2'])
+  })
+  it('duas correções a partir da mesma cópia ficam as duas', async () => {
+    let velho = await criar('Teste')
+    velho = await adicionarCartoes(velho, [
+      { id: 'a', tipo: 'conceito', tema: 'geral', frente: 'A', verso: '1' },
+      { id: 'b', tipo: 'conceito', tema: 'geral', frente: 'B', verso: '1' },
+    ])
+    await gravarCartao(velho, { id: 'a', tipo: 'conceito', tema: 'geral', frente: 'A', verso: '2' })
+    await gravarCartao(velho, { id: 'b', tipo: 'conceito', tema: 'geral', frente: 'B', verso: '2' })
+    const b = (await obter(velho.id))!
+    expect(b.cartoes.map((c) => c.tipo === 'conceito' && c.verso)).toEqual(['2', '2'])
+  })
   it('explica problemas em português', async () => {
     const b = await criar('T')
     expect(problemasDoCartao(b, { id: 'a', tipo: 'associacao', tema: 'geral', frente: 'x', opcoes: ['só uma'], correta: 0 })).toEqual(['precisa de 2 ou mais opções'])

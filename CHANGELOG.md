@@ -2,6 +2,13 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.15.1] — 2026-11-23
+
+**Cartões corrigidos não voltam mais ao texto antigo**
+- Quem corrigia um cartão durante o estudo e, no fim da sessão, tocava em "Criar mais cartões com IA" perdia a correção ao salvar os cartões novos: o cartão voltava ao texto de antes. Agora a correção fica.
+- O mesmo cuidado vale para colar uma lista, excluir e desfazer, e salvar Configurar baralho: o app sempre parte da versão salva do baralho.
+- Cartões que já voltaram ao texto antigo não são recuperados. Corrija de novo ou restaure um backup feito antes.
+
 ## [3.15.0] — 2026-11-22
 
 **Criar baralho a partir de PDF ou imagem**

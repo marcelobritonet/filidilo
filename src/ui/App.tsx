@@ -146,7 +146,7 @@ export function App() {
     )
   else if (tela.nome === 'baralho') conteudo = <Inicio baralho={baralho} nav={nav} versao={versao} />
   else if (tela.nome === 'ia') conteudo = <CriarComIA baralho={baralho} assuntoInicial={tela.assunto} temaId={tela.temaId} nav={nav} />
-  else if (tela.nome === 'sessao') conteudo = <Sessao baralho={baralho} modo={tela.modo} opcoes={tela.opcoes} limite={tela.limite} sair={nav.voltar} criarMais={(assunto, temaId) => nav.substituir({ nome: 'ia', id: baralho.id, assunto, temaId })} />
+  else if (tela.nome === 'sessao') conteudo = <Sessao baralho={baralho} modo={tela.modo} opcoes={tela.opcoes} limite={tela.limite} sair={nav.voltar} criarMais={(assunto, temaId) => nav.substituir({ nome: 'ia', id: baralho.id, assunto, temaId })} mudou={nav.mudou} />
   else if (tela.nome === 'revisar') conteudo = <Revisar baralho={baralho} nav={nav} />
   else if (tela.nome === 'cartao') conteudo = <EditarCartao key={tela.cartaoId ?? 'novo'} baralho={baralho} cartaoId={tela.cartaoId} temaInicial={tela.tema} nav={nav} />
   else if (tela.nome === 'colar') conteudo = <ColarLista baralho={baralho} nav={nav} />

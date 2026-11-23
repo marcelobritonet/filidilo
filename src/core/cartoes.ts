@@ -1,5 +1,6 @@
 import { salvar } from './baralhos'
-import type { Baralho, Cartao, CartaoConceito } from './types'
+import { db } from './db'
+import type { Baralho, Cartao, CartaoConceito, Tema } from './types'
 import { validar } from './validar'
 
 export const novoIdCartao = (prefixo = 'm') => `${prefixo}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`
@@ -10,35 +11,61 @@ export function problemasDoCartao(b: Baralho, c: Cartao): string[] {
 }
 
 /**
+ * Lê a versão gravada do baralho e aplica a mudança nela, numa transação. As telas guardam uma
+ * cópia do baralho que pode estar velha (ex.: corrigiu um cartão na sessão e foi criar mais com IA);
+ * gravar a partir dessa cópia desfaria as edições feitas no meio do caminho.
+ */
+async function mudarCartoes(b: Baralho, mudar: (atual: Baralho) => Baralho): Promise<Baralho> {
+  return db.transaction('rw', db.baralhos, async () => {
+    const atual = (await db.baralhos.get(b.id)) ?? b
+    return salvar(mudar(atual))
+  })
+}
+
+/**
  * Insere ou substitui um cartão. Um cartão existente é marcado como `editado`,
  * para que atualizações importadas não apaguem a edição dela.
  */
 export async function gravarCartao(b: Baralho, c: Cartao): Promise<Baralho> {
   const agora = Date.now()
-  const i = b.cartoes.findIndex((x) => x.id === c.id)
-  const cartoes = [...b.cartoes]
-  if (i >= 0) cartoes[i] = { ...c, editado: true, atualizadoEm: agora }
-  else cartoes.push({ ...c, origem: c.origem ?? 'manual', atualizadoEm: agora })
-  return salvar({ ...b, cartoes })
+  return mudarCartoes(b, (atual) => {
+    const i = atual.cartoes.findIndex((x) => x.id === c.id)
+    const cartoes = [...atual.cartoes]
+    if (i >= 0) cartoes[i] = { ...c, editado: true, atualizadoEm: agora }
+    else cartoes.push({ ...c, origem: c.origem ?? 'manual', atualizadoEm: agora })
+    return { ...atual, cartoes }
+  })
 }
 
-export async function adicionarCartoes(b: Baralho, novos: Cartao[]): Promise<Baralho> {
+/** Acrescenta cartões (e os temas que ainda não existem) à versão gravada do baralho. */
+export async function adicionarCartoes(b: Baralho, novos: Cartao[], temasNovos: Tema[] = []): Promise<Baralho> {
   const agora = Date.now()
-  return salvar({ ...b, cartoes: [...b.cartoes, ...novos.map((c) => ({ ...c, atualizadoEm: agora }))] })
+  return mudarCartoes(b, (atual) => {
+    const ids = new Set(atual.cartoes.map((c) => c.id))
+    const temas = [...atual.temas, ...temasNovos.filter((t) => !atual.temas.some((x) => x.id === t.id))]
+    const cartoes = [...atual.cartoes, ...novos.filter((c) => !ids.has(c.id)).map((c) => ({ ...c, atualizadoEm: agora }))]
+    return { ...atual, temas, cartoes }
+  })
 }
 
 /** Remove um cartão; devolve o baralho novo e a posição, para permitir desfazer. */
 export async function excluirCartao(b: Baralho, id: string): Promise<{ baralho: Baralho; cartao?: Cartao; pos: number }> {
-  const pos = b.cartoes.findIndex((c) => c.id === id)
-  const cartao = b.cartoes[pos]
-  const baralho = await salvar({ ...b, cartoes: b.cartoes.filter((c) => c.id !== id) })
+  let pos = -1
+  let cartao: Cartao | undefined
+  const baralho = await mudarCartoes(b, (atual) => {
+    pos = atual.cartoes.findIndex((c) => c.id === id)
+    cartao = atual.cartoes[pos]
+    return { ...atual, cartoes: atual.cartoes.filter((c) => c.id !== id) }
+  })
   return { baralho, cartao, pos }
 }
 
 export async function reinserirCartao(b: Baralho, c: Cartao, pos: number): Promise<Baralho> {
-  const cartoes = [...b.cartoes]
-  cartoes.splice(Math.min(pos, cartoes.length), 0, c)
-  return salvar({ ...b, cartoes })
+  return mudarCartoes(b, (atual) => {
+    const cartoes = atual.cartoes.filter((x) => x.id !== c.id)
+    cartoes.splice(pos < 0 ? cartoes.length : Math.min(pos, cartoes.length), 0, c)
+    return { ...atual, cartoes }
+  })
 }
 
 // ---------- Colar lista ----------

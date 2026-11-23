@@ -1,5 +1,5 @@
 import { useState } from 'preact/hooks'
-import { arquivar, desarquivar, duplicar, excluir, novoId, restaurar, salvar } from '../core/baralhos'
+import { arquivar, desarquivar, duplicar, excluir, novoId, obter, restaurar, salvar } from '../core/baralhos'
 import { NIVEIS, normalizarNivel, type Baralho, type Nivel, type Objetivo, type Tema } from '../core/types'
 import type { Navegacao } from './App'
 import { evento } from '../core/telemetria'
@@ -62,7 +62,11 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
 
   const gravar = async () => {
     if (objetivoMudou) evento('objetivo_editado', { nivel_mudou: (baralho.objetivo?.nivel ?? '') !== (objetivo?.nivel ?? '') })
-    await salvar({ ...baralho, titulo: titulo.trim(), objetivo, temas: temas.map((t) => ({ ...t, nome: t.nome.trim() })) })
+    // Cartões e temas que entraram depois de abrir esta tela vêm da versão gravada; daqui saem só nome, objetivo e temas.
+    const atual = (await obter(baralho.id)) ?? baralho
+    const vistos = new Set(baralho.temas.map((t) => t.id))
+    const temasDepois = atual.temas.filter((t) => !vistos.has(t.id) && !temas.some((x) => x.id === t.id))
+    await salvar({ ...atual, titulo: titulo.trim(), objetivo, temas: [...temas.map((t) => ({ ...t, nome: t.nome.trim() })), ...temasDepois] })
     nav.mudou()
     nav.avisar({ texto: 'Baralho salvo.' })
     nav.voltar()

@@ -1,6 +1,6 @@
 import { evento } from '../core/telemetria'
 import { useEffect, useMemo, useState } from 'preact/hooks'
-import { salvar } from '../core/baralhos'
+import { adicionarCartoes } from '../core/cartoes'
 import { ganharFolga, MAX_FOLGAS } from '../core/ofensiva'
 import { avaliarBaralho, type Avaliacao } from '../core/desempenho'
 import { EXEMPLOS, VERSAO_INSTRUCAO, montarCorrecao, montarInstrucao, montarInstrucaoFormatacao, montarMaisDoMaterial, type Mistura, type Origem } from '../core/ia/instrucao'
@@ -149,7 +149,7 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
     evento('ia_cartoes_salvos', { cartoes: escolhidos.length, desmarcados: validos.length - escolhidos.length, com_objetivo: comObjetivo, versao_instrucao: VERSAO_INSTRUCAO })
     const usados = new Set(escolhidos.map((c) => c.cartao.tema))
     const temasNovos = lida.temasNovos.filter((t) => usados.has(t.id) && !baralho.temas.some((x) => x.id === t.id))
-    await salvar({ ...baralho, temas: [...baralho.temas, ...temasNovos], cartoes: [...baralho.cartoes, ...escolhidos.map((c) => c.cartao)] })
+    await adicionarCartoes(baralho, escolhidos.map((c) => c.cartao), temasNovos)
     // Criar cartões com IA guarda uma folga da ofensiva (uma por dia, até 2).
     const folgas = await ganharFolga('ia').catch(() => null)
     if (folgas !== null) evento('folga_ganha', { motivo: 'ia' })
