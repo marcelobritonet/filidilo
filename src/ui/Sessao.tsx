@@ -14,6 +14,7 @@ import { fecharSessao, type Marco } from '../core/conquistas'
 import { concluirSessao, type Conclusao } from '../core/ofensiva'
 import { CompartilharImagem, urlApp, type OpcaoImagem } from './CompartilharImagem'
 import { Confete } from './Confete'
+import { Pavao } from './Leque'
 import { DesafiarModal } from './Desafio'
 import { podeDesafiar } from '../core/artes'
 import { nomeTema } from './estado'
@@ -407,7 +408,7 @@ function Fim(props: {
   return (
     <section class={`fim ${motivo ? 'comemorando' : ''}`}>
       {motivo && <Confete />}
-      <span class="icone-fim"><Icone nome="avancar" tamanho={48} /></span>
+      {motivo ? <Pavao /> : <span class="icone-fim"><Icone nome="avancar" tamanho={48} /></span>}
       <h2>{bateuMeta ? 'Meta atingida!' : motivo === 'acerto' ? 'Mandou bem!' : tempo === 'esgotado' ? 'Tempo esgotado' : 'Sessão concluída'}</h2>
       <p>
         {placar.certos} {placar.certos === 1 ? 'acerto' : 'acertos'}, {placar.errados} {placar.errados === 1 ? 'erro' : 'erros'}

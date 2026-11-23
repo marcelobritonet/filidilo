@@ -2,6 +2,13 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.18.0] — 2026-11-23
+
+**O pavão aparece mais**
+- A dança do pavão na abertura agora toca toda vez que você abre o Filidilo, não só na primeira vez do dia. Para pular, é só tocar na tela.
+- Quando você bate a meta, ganha uma conquista ou acerta 80% ou mais, o pavão comemora no fim da sessão: abre o leque e sacode a cauda junto com o confete.
+- Com "reduzir movimento" ligado no aparelho, o símbolo aparece pronto na abertura e, no fim da sessão, o leque já aparece aberto e parado.
+
 ## [3.17.0] — 2026-11-23
 
 **Passe por todos os cartões**

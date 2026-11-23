@@ -604,6 +604,7 @@ details.bloco > summary { font-weight: 650; }
 /* ---------- Comemorar e compartilhar ---------- */
 .fim { position: relative; }
 .fim.comemorando .icone-fim { color: var(--gold); animation: pulo .6s ease-out 1; }
+.fim .pavao { display: block; margin: -8px auto -4px; }
 .sequencia { margin: 0; font-weight: 700; color: var(--accent-text); }
 .conquista { display: grid; justify-items: center; gap: 2px; padding: 16px 32px; border-radius: var(--radius-md); background: var(--surface); border: 2px solid var(--gold); box-shadow: var(--shadow-card); }
 .conquista .selo-conquista { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-text); }
