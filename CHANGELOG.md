@@ -2,6 +2,15 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.17.0] — 2026-11-23
+
+**Passe por todos os cartões**
+- Toda sessão traz cartões que você ainda não viu: um a cada três, junto com os que você errou ou precisa revisar. Antes, quem errava muitos cartões quase nunca chegava nos novos.
+- A tela do baralho mostra por quantos cartões você já passou e quantos nunca viu. Quando você tiver passado por todos, aparece "✓ Você já passou por todos os cartões".
+- Meus baralhos e a lista de temas de "Como estudar?" também mostram quantos cartões você nunca viu.
+- Nova opção em "Como estudar?": **Só os que nunca vi**, para estudar apenas os cartões que ainda faltam.
+- No fim da sessão, o app diz quantos cartões você ainda não viu.
+
 ## [3.16.0] — 2026-11-23
 
 **Estudar sem meta: modo Livre**
