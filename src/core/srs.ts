@@ -30,3 +30,27 @@ export async function registrar(id: string, nota: Nota, modo: Revisao['modo']): 
 export const visto = (e?: Estado) => !!e
 export const dominado = (e?: Estado) => !!e && e.ultimaNota >= 3
 export const vencido = (e: Estado | undefined, agora = Date.now()) => !e || new Date(e.fsrs.due).getTime() <= agora
+
+/** Acertos seguidos para um cartão de alternativas passar a aparecer sem elas. */
+export const ACERTOS_SEM_ALTERNATIVAS = 2
+
+/**
+ * Cartões (chave "<baralho>/<cartão>") que já aparecem sem alternativas: as últimas
+ * `ACERTOS_SEM_ALTERNATIVAS` respostas foram acertos (nota 3 ou mais). Um erro ou um chute
+ * no meio traz as alternativas de volta.
+ */
+export function semAlternativas(revisoes: Pick<Revisao, 'cartao' | 'nota' | 'data'>[]): Set<string> {
+  const porCartao = new Map<string, Pick<Revisao, 'nota' | 'data'>[]>()
+  for (const r of revisoes) {
+    const l = porCartao.get(r.cartao)
+    if (l) l.push(r)
+    else porCartao.set(r.cartao, [r])
+  }
+  const s = new Set<string>()
+  for (const [cartao, l] of porCartao) {
+    if (l.length < ACERTOS_SEM_ALTERNATIVAS) continue
+    l.sort((a, b) => a.data - b.data)
+    if (l.slice(-ACERTOS_SEM_ALTERNATIVAS).every((r) => r.nota >= 3)) s.add(cartao)
+  }
+  return s
+}

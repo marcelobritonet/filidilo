@@ -5,7 +5,7 @@ import { ativos, arquivarCartao, desarquivarCartao } from '../core/cartoes'
 import { db, type Nota } from '../core/db'
 import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../core/fila'
 import { formaDaCerta, sortearAlternativas } from '../core/alternativas'
-import { chave, dominado, registrar } from '../core/srs'
+import { chave, registrar, semAlternativas } from '../core/srs'
 import { evento } from '../core/telemetria'
 import { temaComPoucosCartoes } from '../core/sugestao'
 import { formasAceitas, NIVEIS_COM_ALTERNATIVAS, partesDaFrente } from '../core/lacunas'
@@ -91,8 +91,8 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   // Primeira sessão do baralho (nenhum cartão estudado antes): no fim, sugere o tema com poucos cartões.
   const [primeira, setPrimeira] = useState(false)
   const [fila, setFila] = useState<Cartao[] | null>(null)
-  // Cartões de alternativas já dominados no início da sessão: aparecem sem alternativas.
-  const [dominados, setDominados] = useState<Set<string>>(new Set())
+  // Cartões de alternativas com 2 acertos seguidos no início da sessão: aparecem sem alternativas.
+  const [semAlt, setSemAlt] = useState<Set<string>>(new Set())
   // Cartões do baralho nunca vistos no início da sessão e os respondidos nela: no fim, diz quantos faltam.
   const [naoVistos, setNaoVistos] = useState<Set<string>>(new Set())
   const [respondidosIds, setRespondidosIds] = useState<Set<string>>(new Set())
@@ -124,14 +124,15 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   }, [porTempo, fimEm, esgotou])
 
   useEffect(() => {
-    db.estados.toArray().then((l) => {
+    Promise.all([db.estados.toArray(), db.revisoes.where('cartao').startsWith(`${baralho.id}/`).toArray()]).then(([l, revisoes]) => {
       const m = new Map(l.map((e) => [e.id, e]))
       if (rodada === 0) setPrimeira(!baralho.cartoes.some((c) => m.has(chave(baralho.id, c.id))))
       // Por tempo ou por acertos, a fila tem todos os cartões; o relógio ou a meta decidem o fim.
       const tamanho = limite ? TODOS : modo === 'calculo' ? 10 : 20
       const f = modo === 'espacada' ? filaEspacada(baralho, m, { ...opcoes, tamanho }, porTempo ? 100 : Math.min(tamanho, 15)) : filaProva(baralho, m, { ...opcoes, tamanho })
       setFila(f)
-      setDominados(new Set(baralho.cartoes.filter((c) => dominado(m.get(chave(baralho.id, c.id)))).map((c) => c.id)))
+      const sem = semAlternativas(revisoes)
+      setSemAlt(new Set(baralho.cartoes.filter((c) => sem.has(chave(baralho.id, c.id))).map((c) => c.id)))
       setNaoVistos(new Set(ativos(baralho).filter((c) => !m.has(chave(baralho.id, c.id))).map((c) => c.id)))
       setRespondidosIds(new Set())
       setPos(0)
@@ -160,7 +161,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
     } catch (e) {
       console.error('Não foi possível salvar o progresso', e) // a sessão continua mesmo assim
     }
-    evento('resposta', { tipo: cartao.tipo, nota, chute, sem_alternativas: dominados.has(cartao.id) })
+    evento('resposta', { tipo: cartao.tipo, nota, chute, sem_alternativas: semAlt.has(cartao.id) })
     setRespondidosIds((r) => new Set(r).add(cartao.id))
     setPlacar((p) => (nota === 1 ? { ...p, errados: p.errados + 1 } : chute ? { ...p, chutes: p.chutes + 1 } : { ...p, certos: p.certos + 1 }))
     if (nota === 1 || chute) {
@@ -339,7 +340,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
               <Icone nome="enviar" />
             </button>
           </div>
-          <CartaoView key={`${pos}-${vez}-${cartao.id}`} cartao={cartao} acoes={acoes} semAlternativas={dominados.has(cartao.id)} facil={!!baralho.objetivo?.nivel && (NIVEIS_COM_ALTERNATIVAS as readonly string[]).includes(baralho.objetivo.nivel)} distratores={respostasDoBaralho(baralho)} />
+          <CartaoView key={`${pos}-${vez}-${cartao.id}`} cartao={cartao} acoes={acoes} semAlternativas={semAlt.has(cartao.id)} facil={!!baralho.objetivo?.nivel && (NIVEIS_COM_ALTERNATIVAS as readonly string[]).includes(baralho.objetivo.nivel)} distratores={respostasDoBaralho(baralho)} />
           <div class="acoes-cartao">
             <button class="btn terciario" onClick={pular}>
               Pular
@@ -703,7 +704,7 @@ function Lacunas({ c, acoes, facil, distratores }: { c: CartaoLacunas; acoes: Ac
 
 /**
  * Alternativas: a cada vez, uma forma da certa e 3 erradas sorteadas.
- * Se o cartão já está dominado, aparece sem alternativas: pensar na resposta e conferir.
+ * Com 2 acertos seguidos, aparece sem alternativas: pensar na resposta e conferir.
  */
 function Associacao({ c, acoes, semAlternativas }: { c: CartaoAssociacao; acoes: Acoes; semAlternativas?: boolean }) {
   const sorteio = useMemo(() => sortearAlternativas(c), [c])

@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.20.3] — 2026-11-24
+
+### Corrigido
+- As perguntas de alternativas paravam de mostrar as alternativas cedo demais: um acerto bastava, e desde a 3.20.0 basta tocar em "Continuar". Agora as alternativas só somem depois de dois acertos seguidos. Se você errar ou chutar depois disso, elas voltam.
+
 ## [3.20.2] — 2026-11-24
 
 ### Corrigido
