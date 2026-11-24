@@ -21,7 +21,8 @@ O app não usa fogo. Nada de chama, 🔥, brasa ou "sequência de fogo". A ofens
 | 30 ou mais | Leque de 5 penas, aberto | `leque-5-penas.svg` |
 
 - **A pena do leque** é a gota do símbolo virada de ponta para baixo, com o ocelo em cima, como a pena da cauda do pavão. As penas saem do mesmo ponto, separadas por 36°, e cada uma tem um contorno de 4 unidades na cor do fundo (`fundo`) para não se fundirem.
-- **O número de dias** vem sempre ao lado do desenho, em Sora Bold. O desenho não substitui o número.
+- **O número de dias** vem ao lado do desenho, em Sora Bold, sempre que o selo está aberto. O desenho não substitui o número.
+- **Selo fechado e aberto** (Meus baralhos): parado, o selo fica fechado, uma pílula redonda de 40px só com o ocelo (aceso ou apagado). Ele abre sozinho na primeira vez do dia ou quando a ofensiva muda (dias, dia garantido ou folgas): cresce para a esquerda com quique (620ms, `cubic-bezier(.34, 1.56, .64, 1)`), mostra as folgas, o número e o ✓, e o ocelo vira o leque do estágio (7 dias ou mais). Uma luz na cor viva do tema (`--sel`) dá uma volta no contorno, e ele fecha depois de uns 3 s. O leitor de tela ouve sempre o selo inteiro (dias, dia garantido e folgas). Tocar abre a folha Minha semana. No estilo Suave, o selo não tem borda, tem sombra e, aberto, ganha o `--brilho`. No Clássico, mantém a borda.
 - **A semana** na ofensiva usa um ocelo pequeno por dia: aceso no dia com sessão; só o anel `conquista` (bronze em todos os temas) no dia salvo por folga; anel tracejado em `barra` no dia de hoje ainda aberto; contorno em `borda` nos dias vazios.
 - **Folga** é uma pena guardada: a gota do símbolo, cheia em `marca-turquesa` (a cor da gota na logo) quando a folga está guardada e só o contorno em `borda-controle` quando não está. Ela substitui o escudo.
 - **Dia garantido** (sessão de hoje feita): o selo ganha contorno na cor viva do tema (`--sel`), fundo `acao-suave` e um ✓ em `acao-texto`.

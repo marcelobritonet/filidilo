@@ -1,7 +1,7 @@
-// Ofensiva em Meus baralhos: selo (ocelo ou leque + folgas) no cabeçalho, fio do dia no topo e o cartão "Falta uma sessão hoje".
-import { useEffect, useState } from 'preact/hooks'
+// Ofensiva em Meus baralhos: selo (fechado no ocelo; abre com folgas, número e leque) no cabeçalho, fio do dia no topo e o cartão "Falta uma sessão hoje".
+import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks'
 import { db } from '../core/db'
-import { MAX_FOLGAS, diaLocal, fracaoRestante, painelOfensiva, textoRestante, urgente, type Painel } from '../core/ofensiva'
+import { MAX_FOLGAS, deveAbrirSelo, diaLocal, lerVistoSelo, vistoDoPainel, fracaoRestante, painelOfensiva, textoRestante, urgente, type Painel } from '../core/ofensiva'
 import { evento } from '../core/telemetria'
 import { DesenhoOfensiva, Ocelo, PenaFolga } from './Marca'
 
@@ -32,23 +32,103 @@ export function usePainelOfensiva(versao: number) {
   return { painel, agora, ultimoBaralho }
 }
 
-/** Ocelo ou leque com o número e as folgas guardadas, ao lado da marca. */
+const CHAVE_SELO = 'tatino-ofensiva-selo'
+/** Largura do selo fechado (a pílula redonda), em px; igual ao CSS. */
+const TAMANHO_SELO = 40
+/** Espera a tela assentar (e a abertura do app esmaecer) antes de abrir, e quanto tempo fica aberto. */
+const ESPERA_ABRIR = 450
+const TEMPO_ABERTO = 2800
+
+function lerVisto() {
+  try {
+    return lerVistoSelo(localStorage.getItem(CHAVE_SELO))
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Selo fechado: só o ocelo, numa pílula redonda. Na primeira vez do dia ou quando a ofensiva muda,
+ * abre para a esquerda (com quique) mostrando as folgas, o número e o ✓; o ocelo vira leque com 7 dias
+ * ou mais; uma luz dá a volta no contorno e ele fecha sozinho.
+ */
 export function SeloOfensiva({ painel, agora, abrir }: { painel: Painel; agora: number; abrir: () => void }) {
   const { sequencia, hojeFeito, folgas } = painel
+  const hoje = diaLocal(agora)
   const pisca = !hojeFeito && sequencia > 0 && urgente(agora)
   const rotulo = `${sequencia} ${sequencia === 1 ? 'dia' : 'dias'} de ofensiva${hojeFeito ? ', hoje garantido' : ''}. ${folgas} de ${MAX_FOLGAS} folgas guardadas.`
+  const [aberto, setAberto] = useState(false)
+  const [volta, setVolta] = useState(0)
+  const [largura, setLargura] = useState(0)
+  const extra = useRef<HTMLSpanElement>(null)
+
+  useLayoutEffect(() => setLargura(extra.current?.scrollWidth ?? 0), [sequencia, hojeFeito, folgas])
+
+  useEffect(() => {
+    const p = { sequencia, hojeFeito, folgas }
+    if (!deveAbrirSelo(lerVisto(), p, hoje)) return
+    let abre = 0
+    let fecha = 0
+    const comecar = () => {
+      abre = window.setTimeout(() => {
+        try {
+          localStorage.setItem(CHAVE_SELO, JSON.stringify(vistoDoPainel(p, hoje)))
+        } catch {
+          /* sem localStorage: abre toda vez */
+        }
+        setAberto(true)
+        setVolta((v) => v + 1)
+        fecha = window.setTimeout(() => setAberto(false), TEMPO_ABERTO)
+      }, ESPERA_ABRIR)
+    }
+    // Com a abertura do app na tela, espera ela sair para o selo abrir à vista.
+    const raiz = document.documentElement
+    const obs = new MutationObserver(() => {
+      if (raiz.classList.contains('abrindo')) return
+      obs.disconnect()
+      comecar()
+    })
+    if (raiz.classList.contains('abrindo')) obs.observe(raiz, { attributes: true, attributeFilter: ['class'] })
+    else comecar()
+    return () => {
+      obs.disconnect()
+      clearTimeout(abre)
+      clearTimeout(fecha)
+    }
+  }, [sequencia, hojeFeito, folgas, hoje])
+
   return (
-    <button class={`selo-ofensiva ${hojeFeito ? 'feito' : ''} ${pisca ? 'pisca' : ''}`} aria-label={rotulo} onClick={abrir}>
-      <span class="folgas" title={`${folgas} de ${MAX_FOLGAS} folgas`}>
-        {Array.from({ length: MAX_FOLGAS }, (_, i) => (
-          <PenaFolga cheia={i < folgas} />
-        ))}
+    <button
+      class={`selo-ofensiva ${hojeFeito ? 'feito' : ''} ${pisca ? 'pisca' : ''} ${aberto ? 'aberto' : ''}`}
+      style={{ width: aberto ? `${TAMANHO_SELO + largura}px` : undefined }}
+      aria-label={rotulo}
+      onClick={abrir}
+    >
+      <span class="selo-corpo">
+      <span class="selo-extra" ref={extra} aria-hidden="true">
+        <span class="folgas" title={`${folgas} de ${MAX_FOLGAS} folgas`}>
+          {Array.from({ length: MAX_FOLGAS }, (_, i) => (
+            <PenaFolga cheia={i < folgas} />
+          ))}
+        </span>
+        <span class="numero">{sequencia}</span>
+        {hojeFeito && <span class="garantido">✓</span>}
       </span>
-      <span class="chama">
-        <DesenhoOfensiva dias={sequencia} aceso={hojeFeito} />
-        {sequencia}
-        {hojeFeito && <span class="garantido"> ✓</span>}
+      <span class="selo-icone" aria-hidden="true">
+        <span class="fechado">
+          <Ocelo tamanho={24} apagado={!hojeFeito || sequencia === 0} />
+        </span>
+        <span class="aberto">
+          <DesenhoOfensiva dias={sequencia} aceso={hojeFeito} tamanho={sequencia >= 30 ? 20 : sequencia >= 7 ? 22 : 24} />
+        </span>
       </span>
+      </span>
+      {aberto && (
+        <svg class="selo-brilho" key={volta} aria-hidden="true" focusable="false">
+          {/* Em cima da borda: o svg cobre a caixa inteira do botão (borda de 1px) e o traço de 2px passa sobre ela. */}
+          <rect x="1" y="1" width={TAMANHO_SELO + largura - 2} height={TAMANHO_SELO - 2} rx={(TAMANHO_SELO - 2) / 2} pathLength={100} />
+        </svg>
+      )}
     </button>
   )
 }

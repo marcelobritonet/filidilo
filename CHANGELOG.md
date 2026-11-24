@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.27.0] — 2026-11-24
+
+### Novidades
+- **Selo de ofensiva mais discreto.** Em Meus baralhos, o selo do topo agora fica fechado, só com o ocelo. Na primeira vez do dia, ou quando a ofensiva muda (um dia a mais, dia garantido, folga ganha ou usada), ele abre sozinho para o lado, mostra as folgas, os dias seguidos e o ✓, e com 7 dias ou mais o ocelo vira o leque. Uma luz dá a volta no contorno e ele fecha depois de alguns segundos. Tocar nele continua abrindo Minha semana. Com "reduzir movimento" ligado, ele só aparece e some, sem pulo nem luz.
+
 ## [3.26.2] — 2026-11-24
 
 - O estilo Suave foi desligado por enquanto: todo mundo volta ao Clássico enquanto ele é refinado. Em Preferências → Estilo, o Suave aparece como "Em breve".

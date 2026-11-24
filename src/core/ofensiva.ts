@@ -229,3 +229,38 @@ export async function ganharFolga(motivo: MotivoFolga, agora = Date.now()): Prom
 export async function sequenciaAtual(agora = Date.now()): Promise<number> {
   return sequencia(await lerOfensiva(agora), diaLocal(agora))
 }
+
+// ── Selo de Meus baralhos ───────────────────────────────────────────────────
+
+/** O que o selo já mostrou aberto: ele fica fechado até o dia virar ou algo disto mudar. */
+export interface VistoSelo {
+  dia: string
+  sequencia: number
+  hojeFeito: boolean
+  folgas: number
+}
+
+export const vistoDoPainel = (p: Pick<Painel, 'sequencia' | 'hojeFeito' | 'folgas'>, hoje: string): VistoSelo => ({
+  dia: hoje,
+  sequencia: p.sequencia,
+  hojeFeito: p.hojeFeito,
+  folgas: p.folgas,
+})
+
+/** Abre na primeira vez do dia ou quando a sequência, o dia garantido ou as folgas mudaram. */
+export function deveAbrirSelo(visto: VistoSelo | null, p: Pick<Painel, 'sequencia' | 'hojeFeito' | 'folgas'>, hoje: string): boolean {
+  if (!visto) return true
+  return visto.dia !== hoje || visto.sequencia !== p.sequencia || visto.hojeFeito !== p.hojeFeito || visto.folgas !== p.folgas
+}
+
+/** Lê o registro do selo; formato errado conta como nunca visto. */
+export function lerVistoSelo(valor: string | null): VistoSelo | null {
+  if (!valor) return null
+  try {
+    const x = JSON.parse(valor) as Partial<VistoSelo>
+    if (typeof x.dia !== 'string' || typeof x.sequencia !== 'number' || typeof x.hojeFeito !== 'boolean' || typeof x.folgas !== 'number') return null
+    return { dia: x.dia, sequencia: x.sequencia, hojeFeito: x.hojeFeito, folgas: x.folgas }
+  } catch {
+    return null
+  }
+}

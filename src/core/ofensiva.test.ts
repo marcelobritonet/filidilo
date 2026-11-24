@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { atualizar, concluir, fracaoRestante, ganhar, juntar, lerRegistro, semana, sequencia, somarDias, urgente, vazia, type Ofensiva } from './ofensiva'
+import { atualizar, concluir, deveAbrirSelo, lerVistoSelo, vistoDoPainel, fracaoRestante, ganhar, juntar, lerRegistro, semana, sequencia, somarDias, urgente, vazia, type Ofensiva } from './ofensiva'
 
 const HOJE = '2026-11-21'
 const com = (o: Partial<Ofensiva>): Ofensiva => ({ ...vazia(), ...o })
@@ -106,5 +106,25 @@ describe('registro', () => {
     expect(j.concluidos).toEqual(['2026-11-19', '2026-11-20'])
     expect(j.salvos).toEqual([])
     expect(j.folgas).toBe(2)
+  })
+})
+
+describe('selo de Meus baralhos', () => {
+  const p = { sequencia: 4, hojeFeito: false, folgas: 1 }
+  const visto = vistoDoPainel(p, HOJE)
+  it('abre na primeira vez', () => expect(deveAbrirSelo(null, p, HOJE)).toBe(true))
+  it('fica fechado no mesmo dia sem mudança', () => expect(deveAbrirSelo(visto, p, HOJE)).toBe(false))
+  it('abre no dia seguinte', () => expect(deveAbrirSelo(visto, p, somarDias(HOJE, 1))).toBe(true))
+  it('abre ao garantir o dia', () => expect(deveAbrirSelo(visto, { ...p, sequencia: 5, hojeFeito: true }, HOJE)).toBe(true))
+  it('abre ao ganhar ou usar folga', () => {
+    expect(deveAbrirSelo(visto, { ...p, folgas: 2 }, HOJE)).toBe(true)
+    expect(deveAbrirSelo(visto, { ...p, folgas: 0 }, HOJE)).toBe(true)
+  })
+  it('abre ao perder a sequência', () => expect(deveAbrirSelo(visto, { ...p, sequencia: 0 }, HOJE)).toBe(true))
+  it('lê só o formato certo', () => {
+    expect(lerVistoSelo(JSON.stringify(visto))).toEqual(visto)
+    expect(lerVistoSelo('{"dia":1}')).toBeNull()
+    expect(lerVistoSelo('lixo')).toBeNull()
+    expect(lerVistoSelo(null)).toBeNull()
   })
 })
