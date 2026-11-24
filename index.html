@@ -24,6 +24,12 @@
         document.documentElement.dataset.theme = 'light'
         document.documentElement.dataset.paleta = 'areia'
       }
+      // Estilo: Suave (padrão) ou Clássico; igual a lerEstilo em src/ui/tema.ts
+      try {
+        document.documentElement.dataset.estilo = localStorage.getItem('tatino-estilo') === 'classico' ? 'classico' : 'suave'
+      } catch (e) {
+        document.documentElement.dataset.estilo = 'suave'
+      }
       // A abertura (src/ui/Abertura.tsx) começa em fundo Noite: pinta a página e a barra do navegador assim
       // desde o primeiro quadro; a cor do tema volta quando a abertura sai.
       document.documentElement.classList.add('abrindo')

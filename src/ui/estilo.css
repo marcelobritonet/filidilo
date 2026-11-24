@@ -65,6 +65,13 @@
   --overlay: rgba(11,30,63,.45);
   --shadow-sheet: 0 -8px 32px rgba(11, 30, 63, .16);
   --focus-ring: 0 0 0 3px var(--sel);
+  /* Meus baralhos (estilo Now brief): degradês com as cores da logo */
+  --tom-mistura: 16%;
+  --tom-4: var(--marca-noite);
+  --tom-5: var(--marca-nevoa);
+  --grad-destaque: linear-gradient(135deg, color-mix(in srgb, var(--marca-turquesa) 18%, var(--surface)), color-mix(in srgb, var(--marca-cobalto) 14%, var(--surface)));
+  --brilho: 0 10px 30px rgba(19, 163, 160, .16), 0 2px 8px rgba(31, 79, 209, .08);
+  --fundo-grad: linear-gradient(180deg, #ECE5D8 0, var(--bg) 420px);
 }
 
 /* Lagoa (claro) */
@@ -101,6 +108,13 @@
   --overlay: rgba(11,30,63,0.45);
   --shadow-sheet: 0 -8px 32px rgba(11, 30, 63, .16);
   --focus-ring: 0 0 0 3px var(--sel);
+  /* Meus baralhos (estilo Now brief): degradês com as cores da logo */
+  --tom-mistura: 16%;
+  --tom-4: var(--marca-noite);
+  --tom-5: var(--marca-nevoa);
+  --grad-destaque: linear-gradient(135deg, color-mix(in srgb, var(--marca-turquesa) 18%, var(--surface)), color-mix(in srgb, var(--marca-cobalto) 14%, var(--surface)));
+  --brilho: 0 10px 30px rgba(19, 163, 160, .16), 0 2px 8px rgba(31, 79, 209, .08);
+  --fundo-grad: linear-gradient(180deg, #DAEBEB 0, var(--bg) 420px);
 }
 
 /* Noite (escuro, padrão) */
@@ -137,6 +151,13 @@
   --overlay: rgba(4, 11, 26, 0.72);
   --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, .40);
   --focus-ring: 0 0 0 3px var(--sel);
+  /* Meus baralhos (estilo Now brief): degradês com as cores da logo */
+  --tom-mistura: 24%;
+  --tom-4: color-mix(in srgb, var(--marca-turquesa), var(--marca-cobalto));
+  --tom-5: color-mix(in srgb, var(--marca-nevoa) 50%, var(--surface)); /* Névoa mais fraca: com 24% o texto secundário ficava abaixo de 4,5:1 */
+  --grad-destaque: linear-gradient(135deg, color-mix(in srgb, var(--marca-turquesa) 30%, var(--surface)), color-mix(in srgb, var(--marca-cobalto) 34%, var(--surface)));
+  --brilho: 0 10px 34px rgba(19, 163, 160, .22), 0 2px 10px rgba(0, 0, 0, .25);
+  --fundo-grad: linear-gradient(180deg, #163463 0, var(--bg) 420px);
 }
 
 /* Cobalto (escuro) */
@@ -173,6 +194,13 @@
   --overlay: rgba(5, 12, 30, 0.72);
   --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, .40);
   --focus-ring: 0 0 0 3px var(--sel);
+  /* Meus baralhos (estilo Now brief): degradês com as cores da logo */
+  --tom-mistura: 24%;
+  --tom-4: color-mix(in srgb, var(--marca-turquesa), var(--marca-cobalto));
+  --tom-5: color-mix(in srgb, var(--marca-nevoa) 50%, var(--surface)); /* Névoa mais fraca: com 24% o texto secundário ficava abaixo de 4,5:1 */
+  --grad-destaque: linear-gradient(135deg, color-mix(in srgb, var(--marca-turquesa) 30%, var(--surface)), color-mix(in srgb, var(--marca-cobalto) 34%, var(--surface)));
+  --brilho: 0 10px 34px rgba(19, 163, 160, .22), 0 2px 10px rgba(0, 0, 0, .25);
+  --fundo-grad: linear-gradient(180deg, #1E2D52 0, var(--bg) 420px);
 }
 
 /* Pavão (escuro) */
@@ -209,6 +237,13 @@
   --overlay: rgba(1, 14, 15, 0.72);
   --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, .40);
   --focus-ring: 0 0 0 3px var(--sel);
+  /* Meus baralhos (estilo Now brief): degradês com as cores da logo */
+  --tom-mistura: 24%;
+  --tom-4: color-mix(in srgb, var(--marca-turquesa), var(--marca-cobalto));
+  --tom-5: color-mix(in srgb, var(--marca-nevoa) 50%, var(--surface)); /* Névoa mais fraca: com 24% o texto secundário ficava abaixo de 4,5:1 */
+  --grad-destaque: linear-gradient(135deg, color-mix(in srgb, var(--marca-turquesa) 30%, var(--surface)), color-mix(in srgb, var(--marca-cobalto) 34%, var(--surface)));
+  --brilho: 0 10px 34px rgba(19, 163, 160, .22), 0 2px 10px rgba(0, 0, 0, .25);
+  --fundo-grad: linear-gradient(180deg, #0F4241 0, var(--bg) 420px);
 }
 
 /* ---------- Base ---------- */
@@ -545,6 +580,7 @@ textarea { line-height: 1.5; resize: vertical; }
 /* ---------- Preferências (tela .aparencia) ---------- */
 .opcoes-tema { border: 0; margin: 0; padding: 0; display: grid; gap: 10px; }
 .opcoes-tema legend { padding: 0; margin-bottom: 8px; display: grid; gap: 4px; }
+.opcoes-tema + .opcoes-tema { margin-top: 28px; }
 .secao-titulo { font-size: 17px; }
 .opcao-tema {
   display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: 14px;
@@ -605,7 +641,53 @@ textarea { line-height: 1.5; resize: vertical; }
 .instalar-card h2, .instalar-bloco h2 { font-size: 17px; margin: 0; }
 .instalar-card .dica, .instalar-bloco .dica { margin: 0; }
 .instalar-passos { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--text-muted); }
-.instalar-acoes { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.instalar-pilulas { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 4px; }
+.instalar-pilulas .btn { padding: 12px 10px; white-space: nowrap; font-size: 16px; }
+.instalar-nunca { justify-self: center; font-size: 14px; color: var(--text-muted); min-height: 36px; padding: 6px 10px; }
+.instalar-card h2 { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; }
+.instalar-card h2 .brilho { flex: none; fill: var(--accent-text); }
+
+/* ---------- Meus baralhos: saudação e frases de seção (os dois estilos) ---------- */
+.meus-baralhos .cabecalho { gap: 6px; }
+.meus-baralhos .saudacao-frase { margin: 0; font-size: 17px; line-height: 1.45; color: var(--text-muted); }
+.meus-baralhos .secao-frase { margin: 24px 0 8px; font: 600 17px/1.4 var(--font-ui); letter-spacing: 0; color: var(--text); display: block; }
+.meus-baralhos .secao-linha { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 24px 0 8px; }
+.meus-baralhos .secao-linha .secao-frase, .meus-baralhos .secao-linha .organizar { margin: 0; }
+.meus-baralhos .secao-frase + .bloco, .meus-baralhos .secao-linha + .lista-baralhos { margin-top: 0; }
+
+/* ---------- Estilo Suave (padrão; P121) ----------
+   Jeito "Now brief": saudação grande, cartões sem borda com degradê das cores da logo, botões em pílula.
+   Vale com data-estilo="suave" (src/ui/tema.ts); no Clássico tudo fica como antes. */
+[data-estilo='suave'] .meus-baralhos { min-height: 100vh; min-height: 100dvh; }
+[data-estilo='suave'] body:has(.meus-baralhos) { background: var(--fundo-grad), var(--bg); background-repeat: no-repeat; }
+[data-estilo='suave'] .meus-baralhos .cabecalho { padding-bottom: 8px; }
+[data-estilo='suave'] .meus-baralhos .cabecalho h1 { font-size: clamp(36px, 10vw, 44px); line-height: 1.1; margin-top: 28px; }
+[data-estilo='suave'] .meus-baralhos .saudacao-frase { font-size: 19px; line-height: 1.4; }
+[data-estilo='suave'] .meus-baralhos .secao-frase { margin: 32px 0 12px; font-weight: 500; font-size: 18px; }
+[data-estilo='suave'] .meus-baralhos .secao-linha { margin: 32px 0 12px; }
+[data-estilo='suave'] .meus-baralhos .secao-linha .secao-frase { margin: 0; }
+
+[data-estilo='suave'] .meus-baralhos .bloco, [data-estilo='suave'] .meus-baralhos .instalar-card, [data-estilo='suave'] .meus-baralhos .baralho-item {
+  border: 0; border-radius: 28px; box-shadow: var(--shadow-card);
+}
+[data-estilo='suave'] .meus-baralhos .bloco.aprender, [data-estilo='suave'] .meus-baralhos .instalar-card {
+  background: var(--grad-destaque); box-shadow: var(--brilho); padding: 20px;
+}
+[data-estilo='suave'] .meus-baralhos .instalar-card { margin: 24px 0 0; gap: 12px; }
+[data-estilo='suave'] .meus-baralhos .instalar-card h2 { font-size: 19px; }
+[data-estilo='suave'] .meus-baralhos .bloco.ofensiva.em-risco { border: 0; box-shadow: var(--shadow-card), inset 0 0 0 2px var(--sel); }
+[data-estilo='suave'] .meus-baralhos .lista-baralhos { gap: 12px; }
+[data-estilo='suave'] .meus-baralhos .baralho-item {
+  padding: 20px 22px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--tom) var(--tom-mistura), var(--surface)) 0, var(--surface) 75%);
+}
+[data-estilo='suave'] .meus-baralhos .baralho-item:hover { border-color: transparent; box-shadow: var(--shadow-card), inset 0 0 0 2px var(--sel); }
+[data-estilo='suave'] .meus-baralhos .baralho-item .barra { border: 0; background: color-mix(in srgb, var(--text) 10%, transparent); }
+
+[data-estilo='suave'] .meus-baralhos .btn { border-radius: 999px; }
+[data-estilo='suave'] .meus-baralhos .btn.secundario { background: color-mix(in srgb, var(--text) 8%, var(--surface)); border-color: transparent; }
+[data-estilo='suave'] .meus-baralhos .acoes .btn.secundario { background: var(--surface); box-shadow: var(--shadow-card); }
+[data-estilo='suave'] .meus-baralhos .texto { border-radius: 18px; }
 
 /* ---------- Fórmulas ---------- */
 .katex { font-size: 1.05em; }

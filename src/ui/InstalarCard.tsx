@@ -24,18 +24,14 @@ export function InstalarCard() {
 
   return (
     <section class="instalar-card" aria-labelledby="instalar-titulo">
-      <h2 id="instalar-titulo">Quer o Filidilo na tela inicial?</h2>
+      <h2 id="instalar-titulo">
+        <svg class="brilho" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M10 2l1.8 5.2L17 9l-5.2 1.8L10 16l-1.8-5.2L3 9l5.2-1.8z" />
+          <path d="M18.5 13l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" />
+        </svg>
+        Quer o Filidilo na tela inicial?
+      </h2>
       <p class="dica">Abre com um toque, em tela cheia, e continua funcionando sem internet.</p>
-      {estado === 'pronto' && (
-        <button class="btn principal" onClick={instalar}>
-          Instalar
-        </button>
-      )}
-      {estado !== 'pronto' && !passos && (
-        <button class="btn secundario" onClick={() => setPassos(true)}>
-          Como instalar
-        </button>
-      )}
       {estado !== 'pronto' && passos && (
         <ol class="instalar-passos">
           {(estado === 'ios' ? PASSOS_IOS : PASSOS_MANUAL).map((p) => (
@@ -43,14 +39,24 @@ export function InstalarCard() {
           ))}
         </ol>
       )}
-      <div class="instalar-acoes">
-        <button class="link" onClick={() => fechar(false)}>
+      <div class="instalar-pilulas">
+        <button class="btn secundario" onClick={() => fechar(false)}>
           Agora não
         </button>
-        <button class="link" onClick={() => fechar(true)}>
-          Não perguntar mais
-        </button>
+        {estado === 'pronto' && (
+          <button class="btn principal" onClick={instalar}>
+            Instalar
+          </button>
+        )}
+        {estado !== 'pronto' && !passos && (
+          <button class="btn principal" onClick={() => setPassos(true)}>
+            Como instalar
+          </button>
+        )}
       </div>
+      <button class="link instalar-nunca" onClick={() => fechar(true)}>
+        Não perguntar mais
+      </button>
     </section>
   )
 }

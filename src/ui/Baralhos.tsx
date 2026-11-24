@@ -3,7 +3,8 @@ import { useEffect, useState } from 'preact/hooks'
 import { lerRecebido, planejar, type CartoesRecebidos, type PlanoImportacao } from '../core/compartilhar'
 import { DesafioRecebido } from './Desafio'
 import { ativos as cartoesAtivos } from '../core/cartoes'
-import { chave, dominado, visto } from '../core/srs'
+import { chave, dominado, vencido, visto } from '../core/srs'
+import { fraseDoDia, saudacao } from '../core/saudacao'
 import type { Baralho, Cartao } from '../core/types'
 import type { Navegacao } from './App'
 import { useEstados } from './estado'
@@ -21,6 +22,9 @@ import { ordenar } from '../core/baralhos'
 import { OrdenarBaralhos } from './OrdenarBaralhos'
 
 const SEM_INTERNET = 'Precisa de internet para falar com a IA.'
+
+/** Cor da logo de cada cartão de baralho, revezando pela posição (--tom-4 é a Noite nos claros e Turquesa+Cobalto nos escuros; --tom-5 é a Névoa, mais fraca nos escuros). */
+const TONS = ['var(--marca-turquesa)', 'var(--marca-cobalto)', 'var(--marca-bronze)', 'var(--tom-4)', 'var(--tom-5)']
 
 /** Faixa do texto digitado, só para o evento: curto, médio ou longo. */
 /** Título e texto do aviso quando o link (ou o arquivo compartilhado) não abre. */
@@ -112,6 +116,17 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   }, [versao])
 
   const semana = resumo?.semana
+  const agora = new Date()
+  const frase = fraseDoDia(
+    {
+      baralhos: estados
+        ? ativos.map((b) => ({ titulo: b.titulo, revisar: cartoesAtivos(b).filter((c) => estados.has(chave(b.id, c.id)) && vencido(estados.get(chave(b.id, c.id)), agora.getTime())).length }))
+        : ativos.map((b) => ({ titulo: b.titulo, revisar: 0 })),
+      hojeFeito: !!ofensiva.painel?.hojeFeito,
+      sequencia: ofensiva.painel?.sequencia ?? 0,
+    },
+    agora,
+  )
   // A semana para compartilhar abre pelo selo de ofensiva do topo (a tela inicial fica limpa).
   const abrirProgresso = (onde: 'rodape' | 'semana') => {
     evento('progresso_aberto', { onde })
@@ -165,14 +180,15 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
     )
 
   return (
-    <main class="tela inicio">
+    <main class="tela inicio meus-baralhos">
       {ofensiva.painel && !ofensiva.painel.hojeFeito && ofensiva.painel.sequencia > 0 && ativos.length > 0 && <FioDoDia agora={ofensiva.agora} />}
       <header class="cabecalho">
         <div class="cabecalho-ofensiva">
           <Marca />
           {ofensiva.painel && (ofensiva.painel.sequencia > 0 || ofensiva.painel.folgas > 0) && <SeloOfensiva painel={ofensiva.painel} agora={ofensiva.agora} abrir={abrirSemana} />}
         </div>
-        <h1>Meus baralhos</h1>
+        <h1>{saudacao(agora)}</h1>
+        <p class="saudacao-frase">{frase}</p>
       </header>
 
       {abrindoLink && (
@@ -193,9 +209,12 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         />
       )}
 
-      <section class="bloco aprender">
+      <p class="secao-frase" id="secao-aprender">
+        Aprenda uma coisa nova hoje.
+      </p>
+      <section class="bloco aprender" aria-labelledby="secao-aprender">
         <label class="campo">
-          Aprender uma coisa nova hoje
+          <span class="so-leitor">Aprender uma coisa nova hoje</span>
           <input class="texto" value={pedido} placeholder="Ex.: espanhol para viajar, revisão de Cálculo 1, história da arte" onInput={(e) => setPedido((e.target as HTMLInputElement).value)} />
         </label>
         <button class="btn principal" disabled={pedido.trim().length < 3} onClick={() => aprender('campo')}>
@@ -210,11 +229,16 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
 
       <InstalarCard />
 
-      {ativos.length >= 2 && (
-        <div class="organizar">
-          <button class="link" aria-pressed={!!organizando} onClick={alternarOrganizar}>
-            {organizando ? 'Pronto' : 'Organizar'}
-          </button>
+      {ativos.length > 0 && (
+        <div class="secao-linha">
+          <h2 class="secao-frase">Meus baralhos.</h2>
+          {ativos.length >= 2 && (
+            <div class="organizar">
+              <button class="link" aria-pressed={!!organizando} onClick={alternarOrganizar}>
+                {organizando ? 'Pronto' : 'Organizar'}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -222,14 +246,14 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         <OrdenarBaralhos baralhos={organizando} mudar={mudarOrdem} />
       ) : (
         <ul class="lista-baralhos">
-          {ativos.map((b) => {
+          {ativos.map((b, i) => {
             const cartoes = cartoesAtivos(b)
             const total = cartoes.length
             const dom = estados ? cartoes.filter((c) => dominado(estados.get(chave(b.id, c.id)))).length : 0
             const nunca = estados ? cartoes.filter((c) => !visto(estados.get(chave(b.id, c.id)))).length : 0
             return (
               <li>
-                <button class="baralho-item cartao-acao" onClick={() => nav.ir({ nome: 'baralho', id: b.id })}>
+                <button class="baralho-item cartao-acao" style={{ '--tom': TONS[i % TONS.length] }} onClick={() => nav.ir({ nome: 'baralho', id: b.id })}>
                   <span class="titulo">{b.titulo}</span>
                   <span class="detalhe">
                     {total} {total === 1 ? 'cartão' : 'cartões'}

@@ -69,3 +69,25 @@ export function salvarPreferencia(t: Tema) {
   }
   aplicarPreferencia(t)
 }
+
+// Estilo (P121): Suave (padrão: cantos redondos, degradês das cores da logo, botões em pílula) ou Clássico
+// (cartões com borda, cores chapadas). Independe do tema de cor. Vai em data-estilo; igual em index.html.
+export type Estilo = 'suave' | 'classico'
+const CHAVE_ESTILO = 'tatino-estilo'
+
+export function lerEstilo(): Estilo {
+  try {
+    return localStorage.getItem(CHAVE_ESTILO) === 'classico' ? 'classico' : 'suave'
+  } catch {
+    return 'suave'
+  }
+}
+
+export function salvarEstilo(e: Estilo) {
+  try {
+    localStorage.setItem(CHAVE_ESTILO, e)
+  } catch {
+    /* modo privado: vale só nesta sessão */
+  }
+  document.documentElement.dataset.estilo = e
+}

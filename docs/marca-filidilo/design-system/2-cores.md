@@ -80,4 +80,23 @@ Nos cinco temas, todo texto passa de 4,5:1 sobre o fundo em que aparece, e conto
 - Estado nunca só por cor: acerto leva ✓ e a palavra, erro leva ✕ e a palavra, aviso leva a frase inteira.
 - Turquesa e bronze nunca são cor de texto sobre fundo claro (2,7:1 a 3:1).
 - Cobalto não serve para texto sobre Noite (2,4:1): use `acao-texto`.
-- Sem degradês na interface. Os anéis do ocelo são cores chapadas lado a lado, nunca misturadas.
+- Sem degradês na interface, com uma exceção: o estilo Suave (seção abaixo). Os anéis do ocelo são cores chapadas lado a lado, nunca misturadas.
+
+## Estilo Suave (P121)
+
+Além do tema de cor, há o **estilo**, escolhido em Preferências → Estilo e gravado em `tatino-estilo` (`data-estilo` na raiz; `src/ui/tema.ts` e `index.html`): **Suave** (padrão) ou **Clássico** (cartões com borda e cores chapadas, o visual de antes). Qualquer estilo combina com qualquer tema. Por ora o Suave muda só a tela Meus baralhos (`[data-estilo='suave'] .meus-baralhos`), no jeito do "Now brief": saudação grande, frases de seção fora dos cartões, cartões sem borda com cantos de 28px, botões em pílula. A saudação e as frases de seção aparecem nos dois estilos.
+
+| Token | Claros (Areia, Lagoa) | Escuros (Noite, Cobalto, Pavão) | Uso |
+|---|---|---|---|
+| `tom-mistura` | 16% | 24% | quanto da cor do baralho entra no fundo do cartão |
+| `tom-4` | Noite | metade Turquesa, metade Cobalto | quarta cor do revezamento (a Noite some no fundo escuro) |
+| `tom-5` | Névoa | Névoa a 50% da superfície | quinta cor (com 24% cheia, o texto secundário ficava em 3,6:1) |
+| `grad-destaque` | Turquesa 18% → Cobalto 14% sobre a superfície | Turquesa 30% → Cobalto 34% | cartão Aprender e convite de instalar |
+| `brilho` | sombra Turquesa suave | sombra Turquesa mais forte | em volta do cartão de destaque |
+| `fundo-grad` | tom do tema no topo → `bg` em 420px | idem | fundo da tela |
+
+Regras:
+- Cartão de baralho: cor da logo pela posição na lista (Turquesa, Cobalto, Bronze, `tom-4`, `tom-5`), misturada à superfície em 160°, sumindo até 75% do cartão. Organizar muda a ordem e, com ela, as cores.
+- Texto e texto secundário conferidos por script sobre o ponto mais forte de cada degradê, nos cinco temas: todos ≥ 4,5:1.
+- A barra de domínio continua `barra`; o botão principal continua `acao`.
+

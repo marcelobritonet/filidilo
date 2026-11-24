@@ -4,7 +4,7 @@ import type { Navegacao } from './App'
 import { InstalarBloco } from './InstalarCard'
 import { pecaConvite } from '../core/artes'
 import { CompartilharImagem, urlApp } from './CompartilharImagem'
-import { lerPreferencia, salvarPreferencia, type Tema } from './tema'
+import { lerEstilo, lerPreferencia, salvarEstilo, salvarPreferencia, type Estilo, type Tema } from './tema'
 
 // Amostras: fundo, cartão e a cor viva de cada tema.
 const OPCOES: { valor: Tema; nome: string; descricao: string; cores: [string, string, string] }[] = [
@@ -15,9 +15,15 @@ const OPCOES: { valor: Tema; nome: string; descricao: string; cores: [string, st
   { valor: 'pavao', nome: 'Pavão', descricao: 'escuro verde-pavão, com turquesa clara', cores: ['#092525', '#0D3635', '#56D2D0'] },
 ]
 
+const ESTILOS: { valor: Estilo; nome: string; descricao: string }[] = [
+  { valor: 'suave', nome: 'Suave', descricao: 'cantos redondos, cores da logo em degradê, botões arredondados' },
+  { valor: 'classico', nome: 'Clássico', descricao: 'cartões com borda e cores chapadas' },
+]
+
 /** Escolha de aparência: salva e aplica na hora, sem botão de confirmar. */
 export function Aparencia({ nav }: { nav: Navegacao }) {
   const [pref, setPref] = useState<Tema>(lerPreferencia)
+  const [estilo, setEstilo] = useState<Estilo>(lerEstilo)
   const [estatisticas, setEstatisticas] = useState(telemetriaLigada)
   const [convidando, setConvidando] = useState(false)
 
@@ -25,6 +31,12 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
     setPref(p)
     salvarPreferencia(p)
     evento('tema_escolhido', { tema: p })
+  }
+
+  const escolherEstilo = (e: Estilo) => {
+    setEstilo(e)
+    salvarEstilo(e)
+    evento('estilo_escolhido', { estilo: e })
   }
 
   const alternarEstatisticas = (ligar: boolean) => {
@@ -52,6 +64,21 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
                 <span style={{ background: c }} />
               ))}
             </span>
+            <span class="textos">
+              <strong>{o.nome}</strong>
+              <small>{o.descricao}</small>
+            </span>
+          </label>
+        ))}
+      </fieldset>
+      <fieldset class="opcoes-tema">
+        <legend>
+          <strong class="secao-titulo">Estilo</strong>
+          <span class="dica">Por enquanto muda a tela Meus baralhos.</span>
+        </legend>
+        {ESTILOS.map((o) => (
+          <label class={`opcao-tema ${estilo === o.valor ? 'selecionada' : ''}`}>
+            <input type="radio" name="estilo" value={o.valor} checked={estilo === o.valor} onChange={() => escolherEstilo(o.valor)} />
             <span class="textos">
               <strong>{o.nome}</strong>
               <small>{o.descricao}</small>

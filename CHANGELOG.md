@@ -2,6 +2,13 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.25.0] — 2026-11-24
+
+- Meus baralhos ganhou um visual novo, o estilo **Suave**: uma saudação no topo ("Bom dia", "Boa tarde" ou "Boa noite") com uma frase sobre o seu dia de estudo, cartões com cantos bem arredondados e um degradê leve das cores da logo (cada baralho com a sua cor) e botões arredondados.
+- A saudação e a frase aparecem também no estilo antigo, agora chamado **Clássico**.
+- Em Preferências, a escolha nova **Estilo** troca entre Suave e Clássico. Ela vale com qualquer tema de cor e, por enquanto, muda só a tela Meus baralhos.
+- O convite para instalar o app ficou com "Agora não" e "Como instalar" lado a lado.
+
 ## [3.24.0] — 2026-11-24
 
 ### Estatísticas de uso
