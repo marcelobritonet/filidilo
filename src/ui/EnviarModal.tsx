@@ -14,6 +14,13 @@ function svgDoQr(url: string): string {
 
 const hora = (d: Date) => d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
+/** Texto que vai com o link no "Compartilhar" (WhatsApp etc.); a prévia com imagem vem das tags og: do index.html. */
+export function textoDoLink(c: Pick<ConteudoEnvio, 'o_que' | 'titulo' | 'cartoes'>, ate: string): string {
+  if (c.o_que !== 'baralho') return `${c.titulo}: toque para abrir. O link vale até ${ate}.`
+  const qtd = c.cartoes === 1 ? '1 cartão' : `${c.cartoes} cartões`
+  return `${c.titulo} no Filidilo, com ${qtd}: toque para estudar. O link vale até ${ate}.`
+}
+
 /** O mesmo baralho com o progresso de quem envia (null se ela ainda não estudou nada dele). */
 export type ComProgresso = () => Promise<{ conteudo: ConteudoEnvio; estudados: number } | null>
 
@@ -80,7 +87,7 @@ export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar
   const compartilhar = async () => {
     if (!link) return
     try {
-      await navigator.share({ title: conteudo.titulo, text: `${conteudo.titulo} no Filidilo (o link vale até ${hora(link.expiraEm)})`, url: link.url })
+      await navigator.share({ title: conteudo.titulo, text: textoDoLink(conteudo, hora(link.expiraEm)), url: link.url })
     } catch {
       /* cancelado */
     }

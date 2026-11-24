@@ -2,6 +2,12 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.28.0] — 2026-11-24
+
+### Novidades
+- **Link com prévia no WhatsApp.** O link de um baralho, de um cartão ou de um desafio chega com a imagem do Filidilo, o título e uma descrição, em vez de só o texto.
+- **Texto do link mais claro.** Ao compartilhar um baralho, a mensagem diz quantos cartões ele tem e convida a estudar.
+
 ## [3.27.0] — 2026-11-24
 
 ### Novidades

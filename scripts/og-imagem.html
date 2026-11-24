@@ -1,0 +1,33 @@
+<!doctype html>
+<!--
+  Fonte da prévia que o WhatsApp e outros apps mostram nos links do Filidilo (public/og-imagem.png, 1200×630).
+  Para gerar de novo, na raiz do projeto:
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --hide-scrollbars --window-size=1200,630 --screenshot=public/og-imagem.png scripts/og-imagem.html
+  Depois de trocar a imagem, suba o ?v= de og:image no index.html (o WhatsApp guarda a prévia em cache).
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<style>
+  @font-face { font-family: 'Inter'; font-weight: 400 700; src: url('../src/assets/fontes/inter-latin.woff2') format('woff2'); }
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: #0B1E3F; }
+  .tela { position: relative; width: 1200px; height: 630px; display: flex; align-items: center; gap: 64px; padding: 0 96px; box-sizing: border-box; }
+  .simbolo { width: 300px; height: 394px; flex: none; }
+  .textos { display: flex; flex-direction: column; gap: 32px; }
+  .textos p { margin: 0; font: 400 38px/1.35 'Inter', sans-serif; color: #B2C1DC; max-width: 640px; }
+  .textos p strong { color: #EEF3FB; font-weight: 600; }
+  .faixa { position: absolute; left: 0; right: 0; bottom: 0; height: 14px; display: flex; }
+  .faixa i { flex: 1; }
+</style>
+</head>
+<body>
+<div class="tela">
+  <svg class="simbolo" viewBox="18 6 64 84" xmlns="http://www.w3.org/2000/svg"><path d="M50 10C76 30 82 60 67 78C59 88 41 88 33 78C18 60 24 30 50 10Z" fill="#13A3A0"/><ellipse cx="50" cy="62" rx="16" ry="18" fill="#C9933A"/><ellipse cx="50" cy="63" rx="10.5" ry="12" fill="#1F4FD1"/><circle cx="50" cy="64" r="4.5" fill="#EEF3FB"/></svg>
+  <div class="textos">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -769 3132 789" width="600" height="151"><title>filidilo</title><path fill="#EEF3FB" d="M84 0V-559Q84 -654 137.5 -700.0Q191 -746 296 -746H350V-626H289Q262 -626 247.5 -611.0Q233 -596 233 -569V0ZM20 -426V-543H348V-426ZM456 0V-548H616V0ZM391 -430V-548H616V-430ZM518 -602Q473 -602 451.5 -625.5Q430 -649 430 -685Q430 -722 451.5 -745.5Q473 -769 518 -769Q564 -769 585.0 -745.5Q606 -722 606 -685Q606 -649 585.0 -625.5Q564 -602 518 -602Z M741.0 0V-730H902.0V0ZM676.0 -612V-730H902.0V-612Z M1045.0 0V-548H1205.0V0ZM972.0 -430V-548H1205.0V-430ZM1107.0 -602Q1062.0 -602 1040.5 -625.5Q1019.0 -649 1019.0 -685Q1019.0 -722 1040.5 -745.5Q1062.0 -769 1107.0 -769Q1152.0 -769 1173.5 -745.5Q1195.0 -722 1195.0 -685Q1195.0 -649 1173.5 -625.5Q1152.0 -602 1107.0 -602Z M1549.0 18Q1491.0 18 1443.5 -3.0Q1396.0 -24 1361.0 -61.5Q1326.0 -99 1307.5 -150.0Q1289.0 -201 1289.0 -260V-283Q1289.0 -342 1306.5 -393.0Q1324.0 -444 1357.5 -482.5Q1391.0 -521 1438.0 -542.5Q1485.0 -564 1543.0 -564Q1609.0 -564 1657.0 -535.5Q1705.0 -507 1732.0 -451.5Q1759.0 -396 1762.0 -315L1720.0 -354V-730H1881.0V0H1754.0V-227H1776.0Q1773.0 -149 1743.5 -94.0Q1714.0 -39 1664.0 -10.5Q1614.0 18 1549.0 18ZM1589.0 -116Q1626.0 -116 1656.5 -132.5Q1687.0 -149 1705.5 -181.0Q1724.0 -213 1724.0 -258V-295Q1724.0 -339 1705.0 -369.0Q1686.0 -399 1655.0 -415.0Q1624.0 -431 1588.0 -431Q1548.0 -431 1516.5 -410.5Q1485.0 -390 1467.0 -354.5Q1449.0 -319 1449.0 -272Q1449.0 -224 1467.0 -189.0Q1485.0 -154 1517.0 -135.0Q1549.0 -116 1589.0 -116Z M2022.0 0V-548H2182.0V0ZM1949.0 -430V-548H2182.0V-430ZM2084.0 -602Q2039.0 -602 2017.5 -625.5Q1996.0 -649 1996.0 -685Q1996.0 -722 2017.5 -745.5Q2039.0 -769 2084.0 -769Q2129.0 -769 2150.5 -745.5Q2172.0 -722 2172.0 -685Q2172.0 -649 2150.5 -625.5Q2129.0 -602 2084.0 -602Z M2307.0 0V-730H2468.0V0ZM2242.0 -612V-730H2468.0V-612Z"/><circle cx="2832.0" cy="-280.0" r="300.0" fill="#13A3A0"/><circle cx="2832.0" cy="-280.0" r="180.0" fill="#C9933A"/><circle cx="2832.0" cy="-280.0" r="120.0" fill="#1F4FD1"/><circle cx="2832.0" cy="-280.0" r="48.0" fill="#0B1E3F"/></svg>
+    <p><strong>Aprenda qualquer coisa.</strong><br />Flashcards com IA, estudados no seu ritmo, até sem internet.</p>
+  </div>
+</div>
+<div class="faixa"><i style="background:#13A3A0"></i><i style="background:#C9933A"></i><i style="background:#1F4FD1"></i></div>
+</body>
+</html>

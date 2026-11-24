@@ -47,6 +47,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,json}'],
+        // Prévia do link (index.html, og:image): só o WhatsApp e afins baixam; não pesa a instalação.
+        globIgnores: ['**/og-imagem.png'],
         navigateFallback: `${base}index.html`,
         importScripts: ['sw-receber.js'],
       },
