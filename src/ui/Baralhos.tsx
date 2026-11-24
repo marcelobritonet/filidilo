@@ -15,7 +15,7 @@ import { InstalarCard } from './InstalarCard'
 import { registrarAbertura } from './instalar'
 import { iniciarMarcos, painel, type Semana } from '../core/conquistas'
 import { CartaoOfensiva, FioDoDia, SeloOfensiva, usePainelOfensiva } from './Ofensiva'
-import { pecaConvite, pecaSemana } from '../core/artes'
+import { pecaSemana } from '../core/artes'
 import { CompartilharImagem, urlApp, type OpcaoImagem } from './CompartilharImagem'
 import { ordenar } from '../core/baralhos'
 import { OrdenarBaralhos } from './OrdenarBaralhos'
@@ -117,10 +117,6 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
     if (!semana || !semana.respostas) return
     evento('semana_aberta')
     setCompartilhar({ onde: 'semana', opcoes: [{ rotulo: 'Minha semana', peca: () => pecaSemana(semana, { urlApp: urlApp(), sequencia: resumo?.sequencia ?? 0 }) }] })
-  }
-  const convidar = () => {
-    evento('convite_aberto', { onde: 'baralhos' })
-    setCompartilhar({ onde: 'convite', opcoes: [{ rotulo: 'Convite', peca: () => pecaConvite({ urlApp: urlApp() }) }] })
   }
 
   const mudarOrdem = (lista: Baralho[]) => {
@@ -288,9 +284,6 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         </button>
         <button class="btn terciario" onClick={() => nav.ir({ nome: 'aparencia' })}>
           Aparência
-        </button>
-        <button class="btn terciario" onClick={convidar}>
-          Indicar o Filidilo
         </button>
       </nav>
       <p class="versao">Funciona sem internet · seus cartões ficam neste aparelho</p>
