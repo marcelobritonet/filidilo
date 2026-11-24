@@ -48,7 +48,7 @@
       // Aplica o tema antes de pintar a tela (evita piscar claro→escuro). Lógica completa em src/ui/tema.ts.
       try {
         // tema gravado → [tipo, paleta, especial]; igual a TEMAS em src/ui/tema.ts ('light' antigo = Areia)
-        var temas = { light: ['light', 'areia'], lagoa: ['light', 'lagoa'], plumagem: ['light', 'plumagem', 1], areia: ['light', 'areia'], dark: ['dark', 'noite'], cobalto: ['dark', 'cobalto'], pavao: ['dark', 'pavao'] }
+        var temas = { light: ['light', 'areia'], lagoa: ['light', 'lagoa'], plumagem: ['light', 'plumagem', 1], ocelo: ['light', 'ocelo', 1], areia: ['light', 'areia'], dark: ['dark', 'noite'], cobalto: ['dark', 'cobalto'], pavao: ['dark', 'pavao'] }
         var p = localStorage.getItem('tatino-theme')
         var t = temas.hasOwnProperty(p) ? temas[p] : null
         // tema especial bloqueado neste aparelho: volta ao tema do aparelho

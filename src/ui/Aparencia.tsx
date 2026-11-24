@@ -18,7 +18,8 @@ const OPCOES: OpcaoTema[] = [
 
 // Temas especiais (P127): terceiro grupo, além dos claros e dos escuros. Bloqueados por enquanto.
 const ESPECIAIS: OpcaoTema[] = [
-  { valor: 'plumagem', nome: 'Plumagem', descricao: 'o rosa, o verde e o azul do pavão de leque aberto', cores: ['#F5F0EC', '#B04A50', '#0457A8'] },
+  { valor: 'plumagem', nome: 'Plumagem', descricao: 'claro, cartões do coral ao azul do pavão de leque aberto', cores: ['#F5F0EC', '#B04A50', '#0457A8'] },
+  { valor: 'ocelo', nome: 'Ocelo', descricao: 'rosa, cartões no verde, turquesa e azul do olho da pena', cores: ['#E3A6A3', '#0A7470', '#0457A8'] },
 ]
 
 const ESTILOS: { valor: Estilo; nome: string; descricao: string }[] = [

@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.29.1] — 2026-11-24
+
+### Novidades
+- **Mais um tema especial: Ocelo.** Fundo rosa e cartões no verde, turquesa e azul do olho da pena do pavão. Por enquanto aparece bloqueado, como o Plumagem.
+
 ## [3.29.0] — 2026-11-24
 
 ### Novidades

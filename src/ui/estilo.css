@@ -120,7 +120,7 @@
 /* Plumagem (claro): tirado da foto do pavão de leque aberto (pedido do Marcelo, 24/11). Fundo rosado como
    o da foto, tinta azul-noite, ação no azul do peito do pavão, barras no verde das penas. Foge da regra
    "só as cinco cores da logo": o rosa e o verde são da foto. */
-:root[data-paleta='plumagem'] {
+:root:is([data-paleta='plumagem'], [data-paleta='ocelo']) {
   --bg: #F5F0EC;
   --surface: #FFFAF8;
   --surface-subtle: #EFE6E1;
@@ -164,26 +164,41 @@
   --grad-cartao: linear-gradient(150deg, color-mix(in srgb, #E9A8A2 55%, var(--surface)) 0%, color-mix(in srgb, #E9A8A2 12%, var(--surface)) 45%, color-mix(in srgb, #7FA23A 26%, var(--surface)) 78%, color-mix(in srgb, #0A62B8 24%, var(--surface)) 100%);
 }
 
-/* Plumagem (EXPERIMENTO, P125): cartões com as cores fortes da foto (coral do fundo → oliva das penas →
-   azul do peito), texto branco dentro deles; o fundo da tela fica liso. A versão suave anterior está no
-   scratchpad da sessão (estilo-plumagem-suave.css). */
+/* Temas especiais do pavão (P125/P127): cartões com as cores fortes da foto e texto branco dentro deles.
+   Plumagem (versão A): fundo liso claro, cartões coral do fundo → oliva das penas → azul do peito.
+   Ocelo (versão B): fundo rosa da foto, cartões nas cores do ocelo, verde → turquesa → azul do peito.
+   O Ocelo herda o resto do Plumagem. A versão suave anterior está no scratchpad da sessão. */
 :root[data-paleta='plumagem'] {
   --grad-forte: linear-gradient(150deg, #B04A50 0%, #7A6A2A 48%, #4E6E1A 66%, #0457A8 100%);
   --grad-destaque: var(--grad-forte);
 }
-:root[data-paleta='plumagem'] body { background: var(--bg); }
-:root[data-paleta='plumagem'][data-theme] :is(.bloco, .cartao-resumo, .instalar-card, .instalar-bloco, .baralho-item, .cartao, .opcao-estatisticas, .opcao-check, .folha, .modal) {
+:root[data-paleta='ocelo'] {
+  --bg: #E3A6A3;
+  --text-muted: #4A3638;
+  --accent-text: #0E2747;
+  --border-control: #6E4F4B;
+  --borda-campo: #6E4F4B;
+  --border: #CF8E8A;
+  --surface-subtle: #EDC2BF;
+  --barra: #2C4708;
+  --danger: #7E2420;
+  --grad-forte: linear-gradient(150deg, #4E6E1A 0%, #0A7470 50%, #0457A8 100%);
+  --grad-destaque: var(--grad-forte);
+  --shadow-card: 0 1px 2px rgba(90, 30, 35, .12), 0 4px 12px rgba(90, 30, 35, .10);
+}
+:root:is([data-paleta='plumagem'], [data-paleta='ocelo']) body { background: var(--bg); }
+:root:is([data-paleta='plumagem'], [data-paleta='ocelo'])[data-theme] :is(.bloco, .cartao-resumo, .instalar-card, .instalar-bloco, .baralho-item, .cartao, .opcao-estatisticas, .opcao-check, .folha, .modal) {
   background: var(--grad-forte); border-color: transparent; color: #FFFFFF;
   --text: #FFFFFF; --text-muted: #FBEDEA; --accent-text: #FFFFFF; --placeholder: #6F5D5E;
   --barra: #FFFFFF; --surface-subtle: rgba(255, 255, 255, .28); --border: rgba(255, 255, 255, .35);
   --accent: #FFFFFF; --accent-ink: #0E2747; --accent-off: #EADBD8; --accent-off-ink: #5B4A4C;
   --sel: #FFFFFF; --sel-ink: #0E2747; --accent-soft: rgba(255, 255, 255, .22);
 }
-:root[data-paleta='plumagem'][data-theme] :is(.bloco, .cartao-resumo, .instalar-card, .instalar-bloco, .baralho-item, .cartao, .folha, .modal) :is(input, textarea, select) { color: #0E2747; }
-:root[data-paleta='plumagem'][data-theme] :is(.bloco, .cartao-resumo, .instalar-card, .instalar-bloco, .baralho-item, .cartao, .folha, .modal) .btn.secundario:not(.perigo) {
+:root:is([data-paleta='plumagem'], [data-paleta='ocelo'])[data-theme] :is(.bloco, .cartao-resumo, .instalar-card, .instalar-bloco, .baralho-item, .cartao, .folha, .modal) :is(input, textarea, select) { color: #0E2747; }
+:root:is([data-paleta='plumagem'], [data-paleta='ocelo'])[data-theme] :is(.bloco, .cartao-resumo, .instalar-card, .instalar-bloco, .baralho-item, .cartao, .folha, .modal) .btn.secundario:not(.perigo) {
   background: rgba(255, 255, 255, .2); color: #FFFFFF; border-color: rgba(255, 255, 255, .45); box-shadow: none;
 }
-:root[data-paleta='plumagem'][data-theme] .baralho-item .barra { background: rgba(255, 255, 255, .3); }
+:root:is([data-paleta='plumagem'], [data-paleta='ocelo'])[data-theme] .baralho-item .barra { background: rgba(255, 255, 255, .3); }
 
 /* Noite (escuro, padrão) */
 :root[data-theme='dark'] {
