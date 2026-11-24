@@ -305,7 +305,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
           extra={
             compartilhar.onde === 'semana' ? (
               <button class="btn secundario" onClick={() => { setCompartilhar(null); abrirProgresso('semana') }}>
-                Ver meu progresso
+                Meu progresso
               </button>
             ) : undefined
           }

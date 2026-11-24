@@ -81,49 +81,66 @@ export function CompartilharImagem({ opcoes, onde, avisar, fechar, extra }: { op
   return (
     <div class="modal-fundo" onClick={(e) => e.target === e.currentTarget && fechar()}>
       <div class="modal compartilhar-imagem" role="dialog" aria-modal="true" aria-labelledby="titulo-compartilhar">
-        <h2 id="titulo-compartilhar">Compartilhar</h2>
-
-        {opcoes.length > 1 && (
-          <div class="segmentado" role="group" aria-label="Qual imagem">
-            {opcoes.map((o, k) => (
-              <button class={k === i ? 'ativo' : ''} aria-pressed={k === i} onClick={() => setI(k)}>
-                {o.rotulo}
-              </button>
-            ))}
+        {/* Celular: tudo numa coluna, com a prévia no meio (order no CSS). Tela larga: controles à esquerda, prévia à direita. */}
+        <div class="compartilhar-lado">
+          <div class="compartilhar-topo">
+            <h2 id="titulo-compartilhar">Compartilhar</h2>
+            <button class="fechar-x" aria-label="Fechar" onClick={fechar}>
+              ×
+            </button>
           </div>
-        )}
 
-        <div class="segmentado" role="group" aria-label="Formato">
-          <button class={formato === 'story' ? 'ativo' : ''} aria-pressed={formato === 'story'} onClick={() => setFormato('story')}>
-            Story
-          </button>
-          <button class={formato === 'quadrado' ? 'ativo' : ''} aria-pressed={formato === 'quadrado'} onClick={() => setFormato('quadrado')}>
-            Quadrado
-          </button>
+          {opcoes.length > 1 && (
+            <div class="segmentado" role="group" aria-label="Qual imagem">
+              {opcoes.map((o, k) => (
+                <button class={k === i ? 'ativo' : ''} aria-pressed={k === i} onClick={() => setI(k)}>
+                  {o.rotulo}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div class="segmentado" role="group" aria-label="Formato">
+            <button class={formato === 'story' ? 'ativo' : ''} aria-pressed={formato === 'story'} onClick={() => setFormato('story')}>
+              Story
+            </button>
+            <button class={formato === 'quadrado' ? 'ativo' : ''} aria-pressed={formato === 'quadrado'} onClick={() => setFormato('quadrado')}>
+              Quadrado
+            </button>
+          </div>
+
+          {temNome && (
+            <label class="opcao-check">
+              <input type="checkbox" checked={comNome} onChange={(e) => setComNome((e.target as HTMLInputElement).checked)} />
+              <span class="textos">
+                <strong>Mostrar o nome do baralho</strong>
+              </span>
+            </label>
+          )}
+
+          {/* Só na tela larga: o texto que vai junto com a imagem. */}
+          <div class="texto-junto">
+            <span class="rotulo">Texto que vai junto</span>
+            <p>{peca.texto}</p>
+          </div>
+
+          <div class="compartilhar-acoes">
+            <button class="btn principal" disabled={ocupado} onClick={compartilhar}>
+              {ocupado ? 'Gerando a imagem…' : 'Compartilhar imagem'}
+            </button>
+            <div class={extra ? 'acoes-par' : undefined}>
+              <button class="btn secundario" onClick={() => copiarTexto()}>
+                {copiado ? 'Copiado ✓' : 'Copiar texto'}
+              </button>
+              {extra}
+            </div>
+            <p class="dica">No Instagram, escolha Story e cole o link num adesivo de link.</p>
+          </div>
         </div>
 
-        <canvas ref={canvas} class={`previa ${formato}`} role="img" aria-label="Prévia da imagem" />
-
-        {temNome && (
-          <label class="opcao-check">
-            <input type="checkbox" checked={comNome} onChange={(e) => setComNome((e.target as HTMLInputElement).checked)} />
-            <span class="textos">
-              <strong>Mostrar o nome do baralho</strong>
-            </span>
-          </label>
-        )}
-
-        <button class="btn principal" disabled={ocupado} onClick={compartilhar}>
-          {ocupado ? 'Gerando a imagem…' : 'Compartilhar imagem'}
-        </button>
-        <button class="btn secundario" onClick={() => copiarTexto()}>
-          {copiado ? 'Texto copiado ✓' : 'Copiar o texto com o link'}
-        </button>
-        <p class="dica">No Instagram, escolha Story e cole o link num adesivo de link.</p>
-        {extra}
-        <button class="btn terciario" onClick={fechar}>
-          Fechar
-        </button>
+        <div class="previa-area">
+          <canvas ref={canvas} class={`previa ${formato}`} role="img" aria-label="Prévia da imagem" />
+        </div>
       </div>
     </div>
   )

@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.23.2] — 2026-11-24
+
+- A tela de compartilhar imagem cabe inteira na tela do celular: a prévia diminui para caber e os botões ficam sempre à vista, sem precisar rolar. O botão de fechar virou um X no topo.
+- No computador, a tela de compartilhar abre no centro, com a imagem à direita e as opções e os botões à esquerda, junto com o texto que vai com a imagem.
+
 ## [3.23.1] — 2026-11-24
 
 ### Corrigido

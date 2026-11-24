@@ -785,10 +785,45 @@ details.bloco > summary { font-weight: 650; }
   .confete { display: none; }
   .fim.comemorando .icone-fim { animation: none; }
 }
-.compartilhar-imagem .previa { justify-self: center; display: block; border-radius: var(--radius-sm); box-shadow: var(--shadow-card); background: var(--marca-noite); }
-.compartilhar-imagem .previa.story { height: min(46vh, 420px); width: auto; aspect-ratio: 9 / 16; }
-.compartilhar-imagem .previa.quadrado { height: min(40vh, 320px); width: auto; aspect-ratio: 1; }
+/* Folha de altura fixa: a prévia encolhe para caber e os botões ficam sempre à vista, sem rolar. */
+.modal.compartilhar-imagem { display: flex; flex-direction: column; height: min(92dvh, 860px); max-height: 92dvh; overflow: hidden; padding-top: 16px; gap: 10px; }
+.compartilhar-imagem > * { flex: none; }
+.compartilhar-lado { display: contents; }
+.compartilhar-lado > * { flex: none; }
+.compartilhar-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.fechar-x { width: 44px; height: 44px; margin-right: -8px; border: 0; border-radius: 50%; background: transparent; color: var(--text-muted); font-size: 30px; line-height: 1; cursor: pointer; display: grid; place-items: center; }
+.fechar-x:hover { background: var(--surface-subtle); color: var(--text); }
 .compartilhar-imagem .segmentado { margin-bottom: 0; }
+.compartilhar-imagem .previa-area { order: 1; flex: 1 1 0; min-height: 120px; display: flex; align-items: center; justify-content: center; }
+.compartilhar-imagem .previa { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-card); background: var(--marca-noite); }
+.compartilhar-imagem .opcao-check { margin: 0; order: 2; }
+.compartilhar-acoes { display: grid; gap: 8px; order: 2; }
+.compartilhar-acoes .acoes-par { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.compartilhar-acoes .acoes-par .btn { padding-inline: 8px; min-height: 48px; font-size: 16px; }
+.compartilhar-acoes .dica { margin: 0; font-size: 13px; text-align: center; }
+.texto-junto { display: none; }
+/* Tela larga (computador, tablet deitado): janela no centro, controles à esquerda e prévia à direita.
+   A largura da prévia sai da altura da janela, para a janela ter a largura da imagem. */
+@media (min-width: 760px) {
+  .modal-fundo:has(.compartilhar-imagem) { align-items: center; padding: 24px; }
+  .modal.compartilhar-imagem {
+    --alto: min(88dvh, 680px);
+    --previa-alto: calc(var(--alto) - 56px - 40px);
+    --previa-largo: calc(var(--previa-alto) * 9 / 16 + 40px);
+    display: grid; grid-template-columns: 340px var(--previa-largo); column-gap: 28px;
+    width: auto; max-width: calc(100vw - 48px); height: var(--alto); max-height: none;
+    border-radius: var(--radius-lg); padding: 28px;
+  }
+  .modal.compartilhar-imagem:has(.previa.quadrado) { --previa-largo: min(calc(var(--previa-alto) + 40px), 460px); }
+  .compartilhar-lado { display: flex; flex-direction: column; gap: 12px; min-height: 0; overflow-x: hidden; overflow-y: auto; }
+  .compartilhar-imagem .fechar-x { margin-right: 0; }
+  .compartilhar-acoes { margin-top: auto; }
+  .compartilhar-acoes .dica { text-align: left; }
+  .compartilhar-imagem .previa-area { height: 100%; min-height: 0; padding: 20px; border-radius: var(--radius-md); background: var(--surface-subtle); }
+  .texto-junto { display: grid; gap: 6px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-md); }
+  .texto-junto .rotulo { margin: 0; }
+  .texto-junto p { margin: 0; font-size: 15px; line-height: 1.45; white-space: pre-line; overflow-wrap: anywhere; }
+}
 .selo-sequencia { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--accent-text); font-weight: 700; font-size: 15px; }
 .cabecalho .selo-sequencia { justify-self: start; }
 .modal.enviar .desafiar { display: grid; gap: 4px; text-align: left; padding: 14px 16px; border-radius: var(--radius-md); border: 2px solid var(--sel); background: var(--accent-soft); color: var(--text); }
