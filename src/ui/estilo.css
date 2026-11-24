@@ -641,10 +641,6 @@ details.bloco > summary { font-weight: 650; }
 .compartilhar-imagem .previa.quadrado { height: min(40vh, 320px); width: auto; aspect-ratio: 1; }
 .compartilhar-imagem .segmentado { margin-bottom: 0; }
 .selo-sequencia { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--accent-text); font-weight: 700; font-size: 15px; }
-.semana { display: grid; gap: 10px; }
-.semana .dias { display: flex; gap: 6px; }
-.semana .dias span { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: var(--surface-subtle); color: var(--text-muted); }
-.semana .dias span.estudou { background: var(--gold); color: var(--gold-ink); }
 .cabecalho .selo-sequencia { justify-self: start; }
 .modal.enviar .desafiar { display: grid; gap: 4px; text-align: left; padding: 14px 16px; border-radius: var(--radius-md); border: 2px solid var(--accent); background: var(--accent-soft); color: var(--text); }
 .modal.enviar .desafiar small { color: var(--text-muted); font-size: 14px; }

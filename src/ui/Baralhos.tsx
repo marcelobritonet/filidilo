@@ -112,9 +112,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   }, [versao])
 
   const semana = resumo?.semana
-  // "Sua semana" aparece de domingo a terça, para fechar a semana que passou; o selo de dias abre a qualquer hora.
-  const diaDaSemana = new Date().getDay()
-  const mostrarSemana = !!semana && semana.diasEstudados >= 2 && diaDaSemana <= 2
+  // A semana para compartilhar abre pelo selo de ofensiva do topo (a tela inicial fica limpa).
   const abrirSemana = () => {
     if (!semana || !semana.respostas) return
     evento('semana_aberta')
@@ -211,25 +209,6 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
       </section>
 
       <InstalarCard />
-
-      {mostrarSemana && semana && (
-        <section class="bloco semana">
-          <strong>Sua semana</strong>
-          <div class="dias" aria-label={`Estudou ${semana.diasEstudados} de 7 dias`}>
-            {semana.dias.map((d) => (
-              <span class={d.estudou ? 'estudou' : ''} aria-hidden="true">
-                {d.rotulo}
-              </span>
-            ))}
-          </div>
-          <p class="dica">
-            {semana.diasEstudados} de 7 dias · {semana.respostas} {semana.respostas === 1 ? 'cartão respondido' : 'cartões respondidos'}
-          </p>
-          <button class="btn secundario" onClick={abrirSemana}>
-            Compartilhar minha semana
-          </button>
-        </section>
-      )}
 
       {ativos.length >= 2 && (
         <div class="organizar">
