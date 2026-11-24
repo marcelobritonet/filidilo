@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.20.2] — 2026-11-24
+
+### Corrigido
+- Abrir um baralho recebido por link ou pelo "Compartilhar" às vezes repetia a abertura e caía em Meus baralhos sem o baralho. Acontecia quando havia uma versão nova do app: ele se atualizava sozinho no meio e perdia o que tinha chegado. Agora o baralho abre normalmente e a versão nova fica no aviso "Atualizar" (ou entra na próxima vez que você abrir o app).
+
 ## [3.20.1] — 2026-11-24
 
 ### Correção

@@ -14,6 +14,7 @@ import { CriarComIA } from './CriarComIA'
 import { EditarCartao } from './EditarCartao'
 import { useBaralhos } from './estado'
 import { Inicio } from './Inicio'
+import { atualizarSozinho, chegouAlgo } from './recebido'
 import { Revisar } from './Revisar'
 import { Sessao, type Limite, type Modo } from './Sessao'
 
@@ -53,6 +54,8 @@ export function App() {
   const [versao, setVersao] = useState(0)
   const [aviso, setAviso] = useState<Aviso | null>(null)
   const [abrindo, setAbrindo] = useState(true)
+  // Lido no primeiro render, antes de a tela de baralhos consumir o link ou o arquivo e limpar a URL.
+  const [recebeu] = useState(chegouAlgo)
   const baralhos = useBaralhos(versao)
   const {
     needRefresh: [atualizar],
@@ -74,9 +77,10 @@ export function App() {
 
   // Na tela inicial não há nada a perder: aplica a versão nova sem esperar o toque em "Atualizar".
   // Nas outras telas (sessão, editor…) o aviso continua, para não recarregar no meio do uso.
+  // Se o app abriu trazendo um baralho, também: a recarga perderia o que chegou.
   const naInicial = pilha.length === 1 && pilha[0].nome === 'baralhos'
   useEffect(() => {
-    if (atualizar && naInicial) updateServiceWorker(true)
+    if (atualizarSozinho({ atualizar, naInicial, recebeu })) updateServiceWorker(true)
   }, [atualizar, naInicial])
 
   useEffect(() => {

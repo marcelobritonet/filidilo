@@ -10,6 +10,17 @@ const chave = () => `${import.meta.env.BASE_URL}__recebido`
 /** O app abriu por um link de baralho? (para mostrar "Abrindo…" enquanto baixa) */
 export const abriuPorLink = () => new URLSearchParams(location.search).has('b')
 
+/** O app abriu trazendo um baralho (link ou "Compartilhar")? Ler antes de `pegarRecebido` limpar a URL. */
+export const chegouAlgo = () => {
+  const p = new URLSearchParams(location.search)
+  return p.has('b') || p.has('receber')
+}
+
+/** Aplica a versão nova sem perguntar? Só na tela inicial e nunca quando o app abriu trazendo
+ *  um baralho: a recarga perderia o que chegou (a URL e o arquivo já foram consumidos). */
+export const atualizarSozinho = (s: { atualizar: boolean; naInicial: boolean; recebeu: boolean }) =>
+  s.atualizar && s.naInicial && !s.recebeu
+
 /** Se o app abriu por um compartilhamento ou link, devolve o conteúdo (uma vez só) e limpa a URL. */
 export async function pegarRecebido(): Promise<{ texto: string; via: 'arquivo' | 'link' } | { erro: string; via: 'arquivo' | 'link'; motivo?: MotivoLink } | null> {
   const params = new URLSearchParams(location.search)
