@@ -6,7 +6,7 @@ import type { Cartao } from './types'
 export type Formato = 'story' | 'quadrado'
 export const TAMANHO: Record<Formato, { w: number; h: number }> = { story: { w: 1080, h: 1920 }, quadrado: { w: 1080, h: 1080 } }
 
-export type Modelo = 'resultado' | 'marco' | 'desafio' | 'semana' | 'convite'
+export type Modelo = 'resultado' | 'marco' | 'desafio' | 'semana' | 'convite' | 'progresso'
 
 /** Peças da imagem, de cima para baixo; as ausentes não ocupam espaço. */
 export interface Arte {
@@ -22,6 +22,12 @@ export interface Arte {
   texto?: string
   linhas?: string[]
   dias?: { rotulo: string; estudou: boolean }[]
+  /** Barra de andamento larga (0 a 1), como a da meta da semana. */
+  fracao?: number
+  /** Colunas verticais (ritmo por dia, semana ou mês). */
+  barras?: { rotulo: string; valor: number; atual: boolean }[]
+  /** Lista com nome, número e barra fina (temas, baralhos). */
+  itens?: { nome: string; valor: string; fracao: number }[]
   /** Endereço para o QR code. */
   qr?: string
   /** Frase de chamada embaixo ("Responda no Filidilo."). */

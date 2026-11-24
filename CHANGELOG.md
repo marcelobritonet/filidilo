@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.23.0] — 2026-11-24
+
+### Novidades
+- **Compartilhe cada parte do seu progresso.** Em Seu progresso, cada bloco tem agora o botão de compartilhar: meta da semana, ritmo, acertos, temas que você mais estuda, onde mais erra, cartões dominados, metas das sessões e ofensiva. Cada um vira uma imagem própria, em Story ou Quadrado, com o texto e o link do Filidilo. Com um baralho escolhido no filtro, você decide se o nome dele aparece.
+
 ## [3.22.0] — 2026-11-24
 
 ### Novo

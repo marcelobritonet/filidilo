@@ -889,3 +889,7 @@ details.bloco > summary { font-weight: 650; }
 .painel-conquistas { gap: 6px; }
 .painel-conquistas li { font-size: 15px; padding-left: 18px; position: relative; }
 .painel-conquistas li::before { content: ''; position: absolute; left: 2px; top: .5em; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+
+/* Compartilhar cada bloco do painel (P118) */
+.painel-acoes { display: flex; align-items: center; gap: 4px; }
+.painel-topo .icone-btn { margin: -8px -10px -8px 0; }

@@ -5,9 +5,12 @@ import { andamento, gravarMetaSemana, lerMetaGravada, OPCOES_DIAS, OPCOES_MINUTO
 import { diaLocal, lerOfensiva, sequencia, type Ofensiva } from '../core/ofensiva'
 import { calcularPainel, ddmmDe, textoMinutos, type Barra, type Periodo, type TemaLinha } from '../core/painel'
 import { lerDominioGravado, type DominioDia } from '../core/sessoes'
+import { pecaAcertos, pecaDominio, pecaFracos, pecaMetas, pecaMetaSemana, pecaOfensiva, pecaRitmo, pecaTemas, type BlocoProgresso, type Contexto } from '../core/artesProgresso'
 import { evento } from '../core/telemetria'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
+import { CompartilharImagem, urlApp, type OpcaoImagem } from './CompartilharImagem'
+import { Icone } from './Icone'
 import { chaveEscolha, lerEscolha } from './Inicio'
 
 interface Dados {
@@ -46,6 +49,7 @@ export function Progresso({ baralhos, nav }: { baralhos: Baralho[]; nav: Navegac
   const [ver, setVer] = useState<'respostas' | 'tempo'>('respostas')
   const [todosTemas, setTodosTemas] = useState(false)
   const [editandoMeta, setEditandoMeta] = useState(false)
+  const [compartilhando, setCompartilhando] = useState<BlocoProgresso | null>(null)
   const ativosBaralhos = baralhos.filter((b) => !b.arquivadoEm)
   const baralho = ativosBaralhos.some((b) => b.id === filtro.baralho) ? filtro.baralho : ''
 
@@ -115,6 +119,42 @@ export function Progresso({ baralhos, nav }: { baralhos: Baralho[]; nav: Navegac
   const comTempo = painel.ritmo.minutos !== null
   const nomeBaralho = (id: string) => baralhos.find((b) => b.id === id)?.titulo ?? ''
 
+  const abrirCompartilhar = (bloco: BlocoProgresso) => {
+    evento('progresso_compartilhar', { bloco })
+    setCompartilhando(bloco)
+  }
+  const botaoCompartilhar = (bloco: BlocoProgresso, nome: string) => (
+    <button class="icone-btn" aria-label={`Compartilhar ${nome}`} title="Compartilhar" onClick={() => abrirCompartilhar(bloco)}>
+      <Icone nome="enviar" tamanho={20} />
+    </button>
+  )
+  /** A imagem de um bloco. O nome do baralho entra quando o filtro é de um baralho, e nos dominados (a lista dos baralhos). */
+  const opcaoImagem = (bloco: BlocoProgresso): OpcaoImagem => {
+    const usaNome = bloco === 'dominio' || (!!baralho && bloco !== 'meta' && bloco !== 'ofensiva')
+    const peca = (comNome: boolean) => {
+      const c: Contexto = { periodo: filtro.periodo, baralho: nomeBaralho(baralho), comNome, urlApp: urlApp() }
+      switch (bloco) {
+        case 'meta':
+          return pecaMetaSemana(metaAgora!, c)
+        case 'ritmo':
+          return pecaRitmo(painel, comTempo ? ver : 'respostas', c)
+        case 'acertos':
+          return pecaAcertos(painel, c)
+        case 'temas':
+          return pecaTemas(painel, c)
+        case 'fracos':
+          return pecaFracos(painel, c)
+        case 'dominio':
+          return pecaDominio(painel, c)
+        case 'metas':
+          return pecaMetas(painel.metas!, c)
+        case 'ofensiva':
+          return pecaOfensiva({ atual: sequencia(dados.ofensiva, hoje), maior: painel.ofensiva.maior, conquistas: dados.conquistas.length }, c)
+      }
+    }
+    return { rotulo: 'Seu progresso', usaNome, peca }
+  }
+
   return (
     <main class="tela progresso-tela">
       {cabecalho}
@@ -142,9 +182,12 @@ export function Progresso({ baralhos, nav }: { baralhos: Baralho[]; nav: Navegac
         <div class="painel-topo">
           <h2 id="t-meta">Meta da semana</h2>
           {metaAgora && (
-            <button class="link" onClick={() => setEditandoMeta(true)}>
-              Mudar
-            </button>
+            <span class="painel-acoes">
+              <button class="link" onClick={() => setEditandoMeta(true)}>
+                Mudar
+              </button>
+              {botaoCompartilhar('meta', 'a meta da semana')}
+            </span>
           )}
         </div>
         {metaAgora ? (
@@ -178,16 +221,19 @@ export function Progresso({ baralhos, nav }: { baralhos: Baralho[]; nav: Navegac
           <section class="bloco painel-bloco" aria-labelledby="t-ritmo">
             <div class="painel-topo">
               <h2 id="t-ritmo">Ritmo</h2>
-              {comTempo && (
-                <div class="segmentado mini" role="group" aria-label="Mostrar">
-                  <button class={ver === 'respostas' ? 'ativo' : ''} aria-pressed={ver === 'respostas'} onClick={() => setVer('respostas')}>
-                    Respostas
-                  </button>
-                  <button class={ver === 'tempo' ? 'ativo' : ''} aria-pressed={ver === 'tempo'} onClick={() => setVer('tempo')}>
-                    Tempo
-                  </button>
-                </div>
-              )}
+              <span class="painel-acoes">
+                {comTempo && (
+                  <div class="segmentado mini" role="group" aria-label="Mostrar">
+                    <button class={ver === 'respostas' ? 'ativo' : ''} aria-pressed={ver === 'respostas'} onClick={() => setVer('respostas')}>
+                      Respostas
+                    </button>
+                    <button class={ver === 'tempo' ? 'ativo' : ''} aria-pressed={ver === 'tempo'} onClick={() => setVer('tempo')}>
+                      Tempo
+                    </button>
+                  </div>
+                )}
+                {botaoCompartilhar('ritmo', 'o ritmo')}
+              </span>
             </div>
             <dl class="painel-numeros">
               <div>
@@ -215,7 +261,10 @@ export function Progresso({ baralhos, nav }: { baralhos: Baralho[]; nav: Navegac
 
           {/* 3 · Acertos */}
           <section class="bloco painel-bloco" aria-labelledby="t-acertos">
-            <h2 id="t-acertos">Acertos</h2>
+            <div class="painel-topo">
+              <h2 id="t-acertos">Acertos</h2>
+              {botaoCompartilhar('acertos', 'os acertos')}
+            </div>
             <p class="painel-numero">
               {pct(painel.acertos.taxa)}
               {painel.acertos.diferenca !== null && painel.acertos.diferenca !== 0 && (
@@ -233,7 +282,10 @@ export function Progresso({ baralhos, nav }: { baralhos: Baralho[]; nav: Navegac
           {/* 4 · Temas */}
           {painel.temas.length > 0 && (
             <section class="bloco painel-bloco" aria-labelledby="t-temas">
-              <h2 id="t-temas">Temas que você mais estuda</h2>
+              <div class="painel-topo">
+                <h2 id="t-temas">Temas que você mais estuda</h2>
+                {botaoCompartilhar('temas', 'os temas que você mais estuda')}
+              </div>
               <ul class="painel-temas">
                 {temas.map((t) => (
                   <li>
@@ -264,7 +316,10 @@ export function Progresso({ baralhos, nav }: { baralhos: Baralho[]; nav: Navegac
           {/* 5 · Onde você mais erra */}
           {painel.fracos.length > 0 && (
             <section class="bloco painel-bloco" aria-labelledby="t-fracos">
-              <h2 id="t-fracos">Onde você mais erra</h2>
+              <div class="painel-topo">
+                <h2 id="t-fracos">Onde você mais erra</h2>
+                {botaoCompartilhar('fracos', 'onde você mais erra')}
+              </div>
               <ul class="painel-fracos">
                 {painel.fracos.map((t) => (
                   <li>
@@ -288,7 +343,10 @@ export function Progresso({ baralhos, nav }: { baralhos: Baralho[]; nav: Navegac
       {/* 6 · Domínio */}
       {painel.dominio.length > 0 && (
         <section class="bloco painel-bloco" aria-labelledby="t-dominio">
-          <h2 id="t-dominio">Cartões dominados</h2>
+          <div class="painel-topo">
+            <h2 id="t-dominio">Cartões dominados</h2>
+            {botaoCompartilhar('dominio', 'os cartões dominados')}
+          </div>
           <ul class="painel-temas">
             {painel.dominio.map((b) => (
               <li>
@@ -312,7 +370,10 @@ export function Progresso({ baralhos, nav }: { baralhos: Baralho[]; nav: Navegac
       {/* 7 · Metas de sessão */}
       {painel.metas && painel.metas.total > 0 && (
         <section class="bloco painel-bloco" aria-labelledby="t-metas">
-          <h2 id="t-metas">Metas das sessões</h2>
+          <div class="painel-topo">
+            <h2 id="t-metas">Metas das sessões</h2>
+            {botaoCompartilhar('metas', 'as metas das sessões')}
+          </div>
           <p class="painel-numero">
             {painel.metas.batidas} de {plural(painel.metas.total, 'sessão', 'sessões')}
           </p>
@@ -322,7 +383,10 @@ export function Progresso({ baralhos, nav }: { baralhos: Baralho[]; nav: Navegac
 
       {/* 8 · Ofensiva e conquistas (gerais) */}
       <section class="bloco painel-bloco" aria-labelledby="t-ofensiva">
-        <h2 id="t-ofensiva">Ofensiva e conquistas</h2>
+        <div class="painel-topo">
+          <h2 id="t-ofensiva">Ofensiva e conquistas</h2>
+          {botaoCompartilhar('ofensiva', 'a ofensiva')}
+        </div>
         <dl class="painel-numeros">
           <div>
             <dt>dias seguidos</dt>
@@ -345,6 +409,10 @@ export function Progresso({ baralhos, nav }: { baralhos: Baralho[]; nav: Navegac
           </ul>
         )}
       </section>
+
+      {compartilhando && (
+        <CompartilharImagem opcoes={[opcaoImagem(compartilhando)]} onde={`progresso_${compartilhando}`} avisar={(texto) => nav.avisar({ texto })} fechar={() => setCompartilhando(null)} />
+      )}
 
       {editandoMeta && (
         <FolhaMeta

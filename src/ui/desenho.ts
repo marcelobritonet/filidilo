@@ -179,6 +179,83 @@ function blocos(ctx: CanvasRenderingContext2D, a: Arte, w: number, e: number, qu
       },
     })
   }
+  const trilho = (x: number, y: number, largura: number, alt: number, f: number, cor: string) => {
+    ctx.fillStyle = 'rgba(238,243,251,.12)'
+    ctx.beginPath()
+    ctx.roundRect(x, y, largura, alt, alt / 2)
+    ctx.fill()
+    if (f <= 0) return
+    ctx.fillStyle = cor
+    ctx.beginPath()
+    ctx.roundRect(x, y, Math.max(alt, largura * Math.min(1, f)), alt, alt / 2)
+    ctx.fill()
+  }
+  if (a.fracao !== undefined) {
+    espaco(40)
+    const alt = 34 * e
+    l.push({
+      altura: alt,
+      desenhar: (y) => trilho(cx - larg / 2, y, larg, alt, a.fracao!, MARCA.turquesa),
+    })
+  }
+  if (a.barras?.length) {
+    espaco(56)
+    const alt = (quadrado ? 220 : 300) * e
+    const rotuloPx = 32 * e
+    const gap = (a.barras.length > 8 ? 14 : 24) * e
+    const col = Math.min(110 * e, (larg - (a.barras.length - 1) * gap) / a.barras.length)
+    const total = a.barras.length * col + (a.barras.length - 1) * gap
+    const max = Math.max(1, ...a.barras.map((b) => b.valor))
+    l.push({
+      altura: alt + rotuloPx + 18 * e,
+      desenhar: (y) => {
+        a.barras!.forEach((b, i) => {
+          const x = cx - total / 2 + i * (col + gap)
+          ctx.fillStyle = 'rgba(238,243,251,.08)'
+          ctx.beginPath()
+          ctx.roundRect(x, y, col, alt, 14 * e)
+          ctx.fill()
+          if (b.valor) {
+            const h = Math.max(14 * e, (alt * b.valor) / max)
+            ctx.fillStyle = b.atual ? MARCA.bronze : MARCA.turquesa
+            ctx.beginPath()
+            ctx.roundRect(x, y + alt - h, col, h, 14 * e)
+            ctx.fill()
+          }
+          ctx.font = `${b.atual ? 700 : 500} ${rotuloPx}px ${SANS}`
+          ctx.fillStyle = b.atual ? COR.creme : COR.suave
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'top'
+          ctx.fillText(b.rotulo, x + col / 2, y + alt + 18 * e)
+        })
+      },
+    })
+  }
+  if (a.itens?.length) {
+    espaco(56)
+    const px = 44 * e
+    const alt = 16 * e
+    a.itens.forEach((it, i) => {
+      if (i) espaco(34)
+      l.push({
+        altura: px * 1.2 + 14 * e + alt,
+        desenhar: (y) => {
+          ctx.textBaseline = 'top'
+          ctx.font = `600 ${px}px ${SANS}`
+          ctx.textAlign = 'right'
+          ctx.fillStyle = COR.suave
+          ctx.fillText(it.valor, cx + larg / 2, y)
+          const valorL = ctx.measureText(it.valor).width
+          ctx.font = `700 ${px}px ${SANS}`
+          ctx.fillStyle = COR.creme
+          ctx.textAlign = 'left'
+          const [nomeCabe] = quebrar(it.nome, larg - valorL - 30 * e, (t) => ctx.measureText(t).width, 1)
+          ctx.fillText(nomeCabe ?? '', cx - larg / 2, y)
+          trilho(cx - larg / 2, y + px * 1.2 + 14 * e, larg, alt, it.fracao, MARCA.turquesa)
+        },
+      })
+    })
+  }
   if (a.linhas?.length) {
     espaco(44)
     a.linhas.forEach((ln, i) => {
