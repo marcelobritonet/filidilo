@@ -593,6 +593,8 @@ textarea { line-height: 1.5; resize: vertical; }
 .opcao-tema.selecionada { border: 2px solid var(--sel); background: var(--accent-soft); }
 .opcao-tema input { width: 22px; height: 22px; accent-color: var(--sel); margin: 0; }
 .opcao-tema:focus-within { box-shadow: var(--focus-ring); }
+.opcao-tema.desativada { opacity: .6; cursor: default; }
+.opcao-tema .tema-chip { margin-left: 6px; font-weight: 600; vertical-align: 2px; }
 .amostra { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
 .amostra span { width: 16px; height: 36px; }
 .textos { display: grid; gap: 2px; }

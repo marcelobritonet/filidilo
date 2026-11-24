@@ -75,7 +75,20 @@ export function salvarPreferencia(t: Tema) {
 export type Estilo = 'suave' | 'classico'
 const CHAVE_ESTILO = 'tatino-estilo'
 
+// Suave desligado por enquanto (P124): ainda está em refinamento. Todo mundo fica no Clássico; só um
+// aparelho liberado com ?suave=1 no endereço (index.html grava a chave; ?suave=0 tira) vê e escolhe o Suave.
+const CHAVE_SUAVE = 'tatino-suave-liberado'
+
+export function suaveLiberado(): boolean {
+  try {
+    return localStorage.getItem(CHAVE_SUAVE) === '1'
+  } catch {
+    return false
+  }
+}
+
 export function lerEstilo(): Estilo {
+  if (!suaveLiberado()) return 'classico'
   try {
     return localStorage.getItem(CHAVE_ESTILO) === 'classico' ? 'classico' : 'suave'
   } catch {
@@ -84,6 +97,7 @@ export function lerEstilo(): Estilo {
 }
 
 export function salvarEstilo(e: Estilo) {
+  if (e === 'suave' && !suaveLiberado()) return
   try {
     localStorage.setItem(CHAVE_ESTILO, e)
   } catch {

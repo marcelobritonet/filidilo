@@ -4,7 +4,7 @@ import type { Navegacao } from './App'
 import { InstalarBloco } from './InstalarCard'
 import { pecaConvite } from '../core/artes'
 import { CompartilharImagem, urlApp } from './CompartilharImagem'
-import { lerEstilo, lerPreferencia, salvarEstilo, salvarPreferencia, type Estilo, type Tema } from './tema'
+import { lerEstilo, lerPreferencia, salvarEstilo, salvarPreferencia, suaveLiberado, type Estilo, type Tema } from './tema'
 
 // Amostras: fundo, cartão e a cor viva de cada tema.
 const OPCOES: { valor: Tema; nome: string; descricao: string; cores: [string, string, string] }[] = [
@@ -24,6 +24,7 @@ const ESTILOS: { valor: Estilo; nome: string; descricao: string }[] = [
 export function Aparencia({ nav }: { nav: Navegacao }) {
   const [pref, setPref] = useState<Tema>(lerPreferencia)
   const [estilo, setEstilo] = useState<Estilo>(lerEstilo)
+  const liberado = suaveLiberado()
   const [estatisticas, setEstatisticas] = useState(telemetriaLigada)
   const [convidando, setConvidando] = useState(false)
 
@@ -74,17 +75,22 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
       <fieldset class="opcoes-tema">
         <legend>
           <strong class="secao-titulo">Estilo</strong>
-          <span class="dica">Muda o jeito de todas as telas; vale com qualquer tema.</span>
+          <span class="dica">{liberado ? 'Muda o jeito de todas as telas; vale com qualquer tema.' : 'O estilo Suave chega em breve.'}</span>
         </legend>
-        {ESTILOS.map((o) => (
-          <label class={`opcao-tema ${estilo === o.valor ? 'selecionada' : ''}`}>
-            <input type="radio" name="estilo" value={o.valor} checked={estilo === o.valor} onChange={() => escolherEstilo(o.valor)} />
-            <span class="textos">
-              <strong>{o.nome}</strong>
-              <small>{o.descricao}</small>
-            </span>
-          </label>
-        ))}
+        {ESTILOS.map((o) => {
+          const breve = o.valor === 'suave' && !liberado
+          return (
+            <label class={`opcao-tema ${estilo === o.valor ? 'selecionada' : ''} ${breve ? 'desativada' : ''}`}>
+              <input type="radio" name="estilo" value={o.valor} checked={estilo === o.valor} disabled={breve} onChange={() => escolherEstilo(o.valor)} />
+              <span class="textos">
+                <strong>
+                  {o.nome} {breve && <span class="tema-chip">Em breve</span>}
+                </strong>
+                <small>{o.descricao}</small>
+              </span>
+            </label>
+          )
+        })}
       </fieldset>
       <InstalarBloco />
       {telemetriaDisponivel() && (

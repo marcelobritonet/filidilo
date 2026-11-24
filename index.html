@@ -24,11 +24,22 @@
         document.documentElement.dataset.theme = 'light'
         document.documentElement.dataset.paleta = 'areia'
       }
-      // Estilo: Suave (padrão) ou Clássico; igual a lerEstilo em src/ui/tema.ts
+      // Estilo: igual a lerEstilo em src/ui/tema.ts. O Suave está desligado por enquanto (Clássico para todos);
+      // ?suave=1 no endereço libera neste aparelho e ?suave=0 tira. O parâmetro sai do endereço.
       try {
-        document.documentElement.dataset.estilo = localStorage.getItem('tatino-estilo') === 'classico' ? 'classico' : 'suave'
+        var q = new URLSearchParams(location.search)
+        var s = q.get('suave')
+        if (s === '1' || s === '0') {
+          if (s === '1') localStorage.setItem('tatino-suave-liberado', '1')
+          else localStorage.removeItem('tatino-suave-liberado')
+          q.delete('suave')
+          var resto = q.toString()
+          history.replaceState(history.state, '', location.pathname + (resto ? '?' + resto : '') + location.hash)
+        }
+        var liberado = localStorage.getItem('tatino-suave-liberado') === '1'
+        document.documentElement.dataset.estilo = liberado && localStorage.getItem('tatino-estilo') !== 'classico' ? 'suave' : 'classico'
       } catch (e) {
-        document.documentElement.dataset.estilo = 'suave'
+        document.documentElement.dataset.estilo = 'classico'
       }
       // A abertura (src/ui/Abertura.tsx) começa em fundo Noite: pinta a página e a barra do navegador assim
       // desde o primeiro quadro; a cor do tema volta quando a abertura sai.
