@@ -212,6 +212,10 @@
 }
 
 /* ---------- Base ---------- */
+/* Controles do navegador (botões de opção, caixas de seleção, listas, barras de rolagem) seguem o tema
+   escolhido, não o modo do aparelho. */
+:root[data-theme='light'] { color-scheme: light; }
+:root[data-theme='dark'] { color-scheme: dark; }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
@@ -498,6 +502,8 @@ textarea { line-height: 1.5; resize: vertical; }
 .previa .frente { font-size: 22px; }
 .problemas { list-style: none; margin: 10px 0; padding: 12px 14px; background: var(--danger-soft); color: var(--danger); border-radius: var(--radius-sm); display: grid; gap: 4px; font-size: 15px; }
 .previa-lista { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15px; }
+/* Quatro tipos de cartão: grade 2×2, para nenhum nome quebrar em várias linhas no celular. */
+.editar .segmentado { display: grid; grid-template-columns: 1fr 1fr; }
 .editar .segmentado button { font-size: 14px; padding: 8px 4px; }
 .arquivo { position: relative; overflow: hidden; }
 .arquivo input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
@@ -829,7 +835,8 @@ details.bloco > summary { font-weight: 650; }
 .fim .ofensiva-fim strong { display: inline-flex; align-items: center; gap: 8px; font: 700 22px/1.2 var(--font-display); color: var(--text); animation: pulo .6s ease-out 1; }
 .fim .sequencia { display: inline-flex; align-items: center; gap: 6px; }
 .fim .ofensiva-fim span { color: var(--text-muted); }
-.aviso-folga { margin: 0; padding: 8px 12px; border-radius: var(--radius-sm); background: var(--warning-soft); color: var(--warning); font-weight: 600; }
+/* Folga guardada: cor de destaque do tema (a folga é a gota Turquesa, não um aviso). */
+.aviso-folga { margin: 0; padding: 8px 12px; border-radius: var(--radius-sm); background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
 /* Nas últimas horas do dia: pisca devagar. Com "reduzir movimento", só a cor mais forte. */
 @keyframes piscar { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 .fio-dia.pisca > div { animation: piscar 1.6s ease-in-out infinite; background: var(--danger); }

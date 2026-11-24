@@ -2,6 +2,13 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.23.1] — 2026-11-24
+
+### Corrigido
+- Nos temas escuros, os botões de opção, as caixas de marcar e as listas apareciam claros quando o aparelho estava no modo claro. Agora seguem o tema escolhido.
+- No editor de cartão, os quatro tipos (Pergunta e resposta, Verdadeiro ou falso, Alternativas, Lacunas) ficam em duas linhas, sem nomes quebrados.
+- O aviso "+1 folga guardada" no fim da sessão usa as cores do tema, não mais o amarelo de alerta.
+
 ## [3.23.0] — 2026-11-24
 
 ### Novidades
