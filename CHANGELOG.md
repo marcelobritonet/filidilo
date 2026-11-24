@@ -2,6 +2,12 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.26.0] — 2026-11-24
+
+- O estilo **Suave** chegou a todas as telas: cantos mais arredondados, cartões sem borda com sombra leve, botões arredondados e fundo em degradê. A tela do baralho e a Meta da semana, em Seu progresso, ganharam um cartão de destaque.
+- Nos temas escuros, os destaques usam só a cor do próprio tema; antes, alguns puxavam para o verde.
+- Quem prefere o visual de antes escolhe **Clássico** em Preferências → Estilo.
+
 ## [3.25.0] — 2026-11-24
 
 - Meus baralhos ganhou um visual novo, o estilo **Suave**: uma saudação no topo ("Bom dia", "Boa tarde" ou "Boa noite") com uma frase sobre o seu dia de estudo, cartões com cantos bem arredondados e um degradê leve das cores da logo (cada baralho com a sua cor) e botões arredondados.

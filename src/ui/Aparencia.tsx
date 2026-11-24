@@ -74,7 +74,7 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
       <fieldset class="opcoes-tema">
         <legend>
           <strong class="secao-titulo">Estilo</strong>
-          <span class="dica">Por enquanto muda a tela Meus baralhos.</span>
+          <span class="dica">Muda o jeito de todas as telas; vale com qualquer tema.</span>
         </legend>
         {ESTILOS.map((o) => (
           <label class={`opcao-tema ${estilo === o.valor ? 'selecionada' : ''}`}>

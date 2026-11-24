@@ -71,7 +71,7 @@
   --tom-5: var(--marca-nevoa);
   --grad-destaque: linear-gradient(135deg, color-mix(in srgb, var(--marca-turquesa) 18%, var(--surface)), color-mix(in srgb, var(--marca-cobalto) 14%, var(--surface)));
   --brilho: 0 10px 30px rgba(19, 163, 160, .16), 0 2px 8px rgba(31, 79, 209, .08);
-  --fundo-grad: linear-gradient(180deg, #ECE5D8 0, var(--bg) 420px);
+  --fundo-grad: linear-gradient(180deg, color-mix(in srgb, var(--surface-subtle) 70%, var(--bg)) 0, var(--bg) 420px);
 }
 
 /* Lagoa (claro) */
@@ -114,7 +114,7 @@
   --tom-5: var(--marca-nevoa);
   --grad-destaque: linear-gradient(135deg, color-mix(in srgb, var(--marca-turquesa) 18%, var(--surface)), color-mix(in srgb, var(--marca-cobalto) 14%, var(--surface)));
   --brilho: 0 10px 30px rgba(19, 163, 160, .16), 0 2px 8px rgba(31, 79, 209, .08);
-  --fundo-grad: linear-gradient(180deg, #DAEBEB 0, var(--bg) 420px);
+  --fundo-grad: linear-gradient(180deg, color-mix(in srgb, var(--surface-subtle) 70%, var(--bg)) 0, var(--bg) 420px);
 }
 
 /* Noite (escuro, padrão) */
@@ -155,9 +155,10 @@
   --tom-mistura: 24%;
   --tom-4: color-mix(in srgb, var(--marca-turquesa), var(--marca-cobalto));
   --tom-5: color-mix(in srgb, var(--marca-nevoa) 50%, var(--surface)); /* Névoa mais fraca: com 24% o texto secundário ficava abaixo de 4,5:1 */
-  --grad-destaque: linear-gradient(135deg, color-mix(in srgb, var(--marca-turquesa) 30%, var(--surface)), color-mix(in srgb, var(--marca-cobalto) 34%, var(--surface)));
-  --brilho: 0 10px 34px rgba(19, 163, 160, .22), 0 2px 10px rgba(0, 0, 0, .25);
-  --fundo-grad: linear-gradient(180deg, #163463 0, var(--bg) 420px);
+  /* destaque com a cor viva do próprio tema (Turquesa no Noite e no Pavão, Cobalto no Cobalto): Turquesa→Cobalto puxava para o verde */
+  --grad-destaque: linear-gradient(135deg, color-mix(in srgb, var(--sel) 12%, var(--surface)), color-mix(in srgb, var(--sel) 26%, var(--surface)));
+  --brilho: 0 10px 34px color-mix(in srgb, var(--sel) 22%, transparent), 0 2px 10px rgba(0, 0, 0, .25);
+  --fundo-grad: linear-gradient(180deg, color-mix(in srgb, var(--surface) 55%, var(--bg)) 0, var(--bg) 420px);
 }
 
 /* Cobalto (escuro) */
@@ -198,9 +199,10 @@
   --tom-mistura: 24%;
   --tom-4: color-mix(in srgb, var(--marca-turquesa), var(--marca-cobalto));
   --tom-5: color-mix(in srgb, var(--marca-nevoa) 50%, var(--surface)); /* Névoa mais fraca: com 24% o texto secundário ficava abaixo de 4,5:1 */
-  --grad-destaque: linear-gradient(135deg, color-mix(in srgb, var(--marca-turquesa) 30%, var(--surface)), color-mix(in srgb, var(--marca-cobalto) 34%, var(--surface)));
-  --brilho: 0 10px 34px rgba(19, 163, 160, .22), 0 2px 10px rgba(0, 0, 0, .25);
-  --fundo-grad: linear-gradient(180deg, #1E2D52 0, var(--bg) 420px);
+  /* destaque com a cor viva do próprio tema (Turquesa no Noite e no Pavão, Cobalto no Cobalto): Turquesa→Cobalto puxava para o verde */
+  --grad-destaque: linear-gradient(135deg, color-mix(in srgb, var(--sel) 12%, var(--surface)), color-mix(in srgb, var(--sel) 26%, var(--surface)));
+  --brilho: 0 10px 34px color-mix(in srgb, var(--sel) 22%, transparent), 0 2px 10px rgba(0, 0, 0, .25);
+  --fundo-grad: linear-gradient(180deg, color-mix(in srgb, var(--surface) 55%, var(--bg)) 0, var(--bg) 420px);
 }
 
 /* Pavão (escuro) */
@@ -241,9 +243,10 @@
   --tom-mistura: 24%;
   --tom-4: color-mix(in srgb, var(--marca-turquesa), var(--marca-cobalto));
   --tom-5: color-mix(in srgb, var(--marca-nevoa) 50%, var(--surface)); /* Névoa mais fraca: com 24% o texto secundário ficava abaixo de 4,5:1 */
-  --grad-destaque: linear-gradient(135deg, color-mix(in srgb, var(--marca-turquesa) 30%, var(--surface)), color-mix(in srgb, var(--marca-cobalto) 34%, var(--surface)));
-  --brilho: 0 10px 34px rgba(19, 163, 160, .22), 0 2px 10px rgba(0, 0, 0, .25);
-  --fundo-grad: linear-gradient(180deg, #0F4241 0, var(--bg) 420px);
+  /* destaque com a cor viva do próprio tema (Turquesa no Noite e no Pavão, Cobalto no Cobalto): Turquesa→Cobalto puxava para o verde */
+  --grad-destaque: linear-gradient(135deg, color-mix(in srgb, var(--sel) 8%, var(--surface)), color-mix(in srgb, var(--sel) 17%, var(--surface))); /* Pavão: a Turquesa clara pesa mais; com 26% o texto secundário caía para 4,08:1 */
+  --brilho: 0 10px 34px color-mix(in srgb, var(--sel) 22%, transparent), 0 2px 10px rgba(0, 0, 0, .25);
+  --fundo-grad: linear-gradient(180deg, color-mix(in srgb, var(--surface) 55%, var(--bg)) 0, var(--bg) 420px);
 }
 
 /* ---------- Base ---------- */
@@ -688,6 +691,39 @@ textarea { line-height: 1.5; resize: vertical; }
 [data-estilo='suave'] .meus-baralhos .btn.secundario { background: color-mix(in srgb, var(--text) 8%, var(--surface)); border-color: transparent; }
 [data-estilo='suave'] .meus-baralhos .acoes .btn.secundario { background: var(--surface); box-shadow: var(--shadow-card); }
 [data-estilo='suave'] .meus-baralhos .texto { border-radius: 18px; }
+
+/* ---------- Estilo Suave nas outras telas (P122, em teste) ----------
+   Mesmo jeito de Meus baralhos no app todo: cantos maiores (os tokens de raio crescem), superfícies sem
+   borda com sombra suave, botões em pílula, fundo em degradê e um cartão de destaque por tela.
+   Bordas que dizem estado (resposta certa/errada, item selecionado, campo) continuam. */
+[data-estilo='suave'] { --radius-sm: 14px; --radius-md: 20px; --radius-lg: 28px; }
+/* Nos escuros, o destaque suave (número do passo, item selecionado, aviso) sai da cor viva do tema misturada
+   à superfície. O --accent-soft do Noite (#0F3E3D) puxava para o verde sobre o azul. */
+[data-estilo='suave'][data-theme='dark'] { --accent-soft: color-mix(in srgb, var(--sel) 22%, var(--surface)); }
+[data-estilo='suave'] body { background: var(--fundo-grad), var(--bg); background-repeat: no-repeat; }
+[data-estilo='suave'] .btn { border-radius: 999px; }
+[data-estilo='suave'] .btn.compacto, [data-estilo='suave'] .btn.pequeno { padding-inline: 16px; }
+[data-estilo='suave'] .btn.nota { border-radius: 22px; }
+[data-estilo='suave'] .btn.secundario { border-color: transparent; box-shadow: var(--shadow-card); }
+[data-estilo='suave'] :is(.bloco, .folha, .modal) .btn.perigo { box-shadow: none; }
+[data-estilo='suave'] :is(.bloco, .cartao-resumo, .instalar-bloco, .folha, .modal) .btn.secundario:not(.perigo) {
+  background: color-mix(in srgb, var(--text) 8%, var(--surface)); box-shadow: none;
+}
+[data-estilo='suave'] :is(.bloco, .cartao-resumo, .cartao-acao, .instalar-bloco, .opcao-estatisticas, .opcao-check, .cartao, .baralho-ordem) {
+  border-color: transparent;
+}
+[data-estilo='suave'] .opcao-tema:not(.selecionada) { border-color: transparent; box-shadow: var(--shadow-card); }
+[data-estilo='suave'] .cartao-acao { box-shadow: var(--shadow-card); }
+[data-estilo='suave'] .cartao-acao:hover { border-color: transparent; box-shadow: var(--shadow-card), inset 0 0 0 2px var(--sel); }
+[data-estilo='suave'] .segmentado { border-color: transparent; border-radius: 24px; }
+[data-estilo='suave'] .segmentado button { border-radius: 20px; }
+[data-estilo='suave'] .folha, [data-estilo='suave'] .modal { border-color: transparent; }
+[data-estilo='suave'] .barra { border: 0; background: color-mix(in srgb, var(--text) 10%, transparent); }
+[data-estilo='suave'] .fechar, [data-estilo='suave'] .icone-btn { border-color: transparent; }
+/* Cartão de destaque: o resumo da tela do baralho e a meta da semana do Progresso */
+[data-estilo='suave'] .inicio .cartao-resumo, [data-estilo='suave'] .painel-bloco[aria-labelledby='t-meta'] {
+  background: var(--grad-destaque); box-shadow: var(--brilho);
+}
 
 /* ---------- Fórmulas ---------- */
 .katex { font-size: 1.05em; }

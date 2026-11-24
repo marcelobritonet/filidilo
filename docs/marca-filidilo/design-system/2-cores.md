@@ -91,12 +91,14 @@ Além do tema de cor, há o **estilo**, escolhido em Preferências → Estilo e 
 | `tom-mistura` | 16% | 24% | quanto da cor do baralho entra no fundo do cartão |
 | `tom-4` | Noite | metade Turquesa, metade Cobalto | quarta cor do revezamento (a Noite some no fundo escuro) |
 | `tom-5` | Névoa | Névoa a 50% da superfície | quinta cor (com 24% cheia, o texto secundário ficava em 3,6:1) |
-| `grad-destaque` | Turquesa 18% → Cobalto 14% sobre a superfície | Turquesa 30% → Cobalto 34% | cartão Aprender e convite de instalar |
-| `brilho` | sombra Turquesa suave | sombra Turquesa mais forte | em volta do cartão de destaque |
-| `fundo-grad` | tom do tema no topo → `bg` em 420px | idem | fundo da tela |
+| `grad-destaque` | Turquesa 18% → Cobalto 14% sobre a superfície | a cor viva do tema (`sel`) 12% → 26% sobre a superfície (Pavão: 8% → 17%, porque a Turquesa clara pesa mais) | cartão de destaque |
+| `brilho` | sombra Turquesa suave | sombra da cor viva do tema | em volta do cartão de destaque |
+| `fundo-grad` | superfície sutil (70%) no topo → `bg` em 420px | superfície (55%) no topo → `bg` | fundo da tela, sempre da família de neutros do tema |
+| `accent-soft` (só no Suave, escuros) | — | a cor viva do tema 22% sobre a superfície | número do passo, item selecionado suave, avisos |
 
 Regras:
 - Cartão de baralho: cor da logo pela posição na lista (Turquesa, Cobalto, Bronze, `tom-4`, `tom-5`), misturada à superfície em 160°, sumindo até 75% do cartão. Organizar muda a ordem e, com ela, as cores.
+- Nos escuros, nada de Turquesa e Cobalto misturados no mesmo degradê nem cor de destaque fora da família do tema: puxava para o verde sobre o azul (relato do Marcelo, 24/11).
 - Texto e texto secundário conferidos por script sobre o ponto mais forte de cada degradê, nos cinco temas: todos ≥ 4,5:1.
 - A barra de domínio continua `barra`; o botão principal continua `acao`.
 
