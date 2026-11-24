@@ -5,6 +5,7 @@ import type { Filtro } from '../core/fila'
 import { chave, dominado, vencido, visto } from '../core/srs'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
+import { origemBaralho } from '../core/metricas'
 import { evento } from '../core/telemetria'
 import { conteudoBaralho, conteudoBaralhoComProgresso } from './enviar'
 import { EnviarModal } from './EnviarModal'
@@ -107,7 +108,7 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
     }
     setPerguntando(false)
     const todos = escolha.temas.length === temasComCartoes.length
-    evento('sessao_iniciada', { por: escolha.por, meta: escolha.por === 'tempo' ? escolha.minutos : escolha.por === 'livre' ? 0 : escolha.acertos, temas: escolha.temas.length, temas_total: temasComCartoes.length, cartoes: total, so_novos: soNovos, nunca_vistos: total - vistosTotal })
+    evento('sessao_iniciada', { por: escolha.por, meta: escolha.por === 'tempo' ? escolha.minutos : escolha.por === 'livre' ? 0 : escolha.acertos, temas: escolha.temas.length, temas_total: temasComCartoes.length, cartoes: total, so_novos: soNovos, nunca_vistos: total - vistosTotal, origem_baralho: origemBaralho(baralho) })
     nav.ir({
       nome: 'sessao',
       id,

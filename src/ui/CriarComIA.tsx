@@ -181,7 +181,10 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
           rotuloSalvar={`Salvar ${escolhidos.length} ${escolhidos.length === 1 ? 'cartão' : 'cartões'}`}
           podeSalvar={!!escolhidos.length && !salvando}
           salvar={adicionar}
-          descartar={() => conf.fechar(() => { setLida(null); setNaoConvertidos([]); setDesmarcados(new Set()) })}
+          descartar={() => {
+            evento('ia_cartoes_descartados', { onde: 'criar', cartoes: validos.length, com_erro: comErro.length })
+            conf.fechar(() => { setLida(null); setNaoConvertidos([]); setDesmarcados(new Set()) })
+          }}
         />
       ) : (
         <>

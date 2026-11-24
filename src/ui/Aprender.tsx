@@ -203,7 +203,11 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
   return (
     <main class="tela ia">
       <header class="barra-sessao">
-        <button class="fechar" aria-label="Voltar" onClick={() => (conf.conferindo ? conf.fechar() : nav.voltar())}>←</button>
+        <button class="fechar" aria-label="Voltar" onClick={() => {
+          if (!conf.conferindo) return nav.voltar()
+          evento('ia_cartoes_descartados', { onde: 'aprender', cartoes: validos.length, com_erro: comErro.length })
+          conf.fechar()
+        }}>←</button>
         <h1 class="titulo-barra">{conf.conferindo ? 'Confira os cartões' : 'Aprender'}</h1>
         <span />
       </header>

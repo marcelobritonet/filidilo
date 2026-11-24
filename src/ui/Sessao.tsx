@@ -6,7 +6,8 @@ import { db, type Nota } from '../core/db'
 import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../core/fila'
 import { formaDaCerta, sortearAlternativas } from '../core/alternativas'
 import { chave, registrar, semAlternativas } from '../core/srs'
-import { evento } from '../core/telemetria'
+import { origemBaralho } from '../core/metricas'
+import { evento, registrarErro } from '../core/telemetria'
 import { temaComPoucosCartoes } from '../core/sugestao'
 import { formasAceitas, NIVEIS_COM_ALTERNATIVAS, partesDaFrente } from '../core/lacunas'
 import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, CartaoLacunas, Objetivo } from '../core/types'
@@ -130,6 +131,16 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
     const p = placarRef.current
     const respostas = p.certos + p.errados + p.chutes
     if (!respostas) return
+    evento('sessao_fim', {
+      concluida,
+      por: porTempo ? 'tempo' : livre ? 'livre' : 'acertos',
+      meta: porTempo ? limite.minutos : meta,
+      bateu_meta: bateu,
+      segundos: Math.round(e.relogio.ativoMs / 1000),
+      respostas,
+      acertos: p.certos,
+      origem_baralho: origemBaralho(baralho),
+    })
     gravarSessao({
       baralho: baralho.id,
       inicio: e.inicio,
@@ -143,7 +154,10 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
       concluida,
     })
       .then(() => fotografarDominio(baralho, agoraMs))
-      .catch((x) => console.error('Não foi possível gravar a sessão', x))
+      .catch((x) => {
+        registrarErro('sessao_gravar', x)
+        console.error('Não foi possível gravar a sessão', x)
+      })
   }
   const fecharEstudoRef = useRef(fecharEstudo)
   fecharEstudoRef.current = fecharEstudo

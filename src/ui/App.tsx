@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useRef, useState } from 'preact/hooks'
 import { useRegisterSW } from 'virtual:pwa-register/preact'
 import { pedirPersistencia } from '../core/db'
-import { aparelhoDeTeste } from '../core/telemetria'
+import { registrarEstado } from '../core/metricas'
+import { aparelhoDeTeste, evento, registrarErro } from '../core/telemetria'
 import type { OpcoesFila } from '../core/fila'
 import { Abertura } from './Abertura'
 import { Aparencia } from './Aparencia'
@@ -82,8 +83,18 @@ export function App() {
   // Se o app abriu trazendo um baralho, também: a recarga perderia o que chegou.
   const naInicial = pilha.length === 1 && pilha[0].nome === 'baralhos'
   useEffect(() => {
-    if (atualizarSozinho({ atualizar, naInicial, recebeu })) updateServiceWorker(true)
+    if (!atualizarSozinho({ atualizar, naInicial, recebeu })) return
+    evento('atualizar_versao', { como: 'sozinho' })
+    updateServiceWorker(true)
   }, [atualizar, naInicial])
+
+  // Estatísticas: uma vez por abertura, quanto conteúdo a pessoa tem.
+  const estadoEnviado = useRef(false)
+  useEffect(() => {
+    if (!baralhos || estadoEnviado.current) return
+    estadoEnviado.current = true
+    registrarEstado(baralhos).catch((e) => registrarErro('app_estado', e))
+  }, [baralhos])
 
   useEffect(() => {
     history.replaceState({ n: 0 }, '')
@@ -166,7 +177,7 @@ export function App() {
       {atualizar && (
         <div class="aviso-atualizacao" role="status" aria-live="polite">
           <span>Nova versão disponível.</span>
-          <button class="btn pequeno" onClick={() => updateServiceWorker(true)}>
+          <button class="btn pequeno" onClick={() => { evento('atualizar_versao', { como: 'botao' }); updateServiceWorker(true) }}>
             Atualizar
           </button>
         </div>

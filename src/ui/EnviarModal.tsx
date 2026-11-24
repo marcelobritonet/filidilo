@@ -1,7 +1,7 @@
 import qrcode from 'qrcode-generator'
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import { criarLink, linkLigado, type LinkCriado } from '../core/link'
-import { evento } from '../core/telemetria'
+import { evento, registrarErro } from '../core/telemetria'
 import { enviarArquivo, type ConteudoEnvio } from './enviar'
 
 /** Gera o SVG do QR code no aparelho (o link é a única entrada). */
@@ -54,10 +54,11 @@ export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar
       .then((l) => {
         if (!vivo) return
         setLinks((m) => ({ ...m, [chave]: l }))
-        evento('enviar', { o_que: conteudo.o_que, onde, como: 'link', progresso: incluir })
+        evento('enviar', { o_que: conteudo.o_que, cartoes: conteudo.cartoes, onde, como: 'link', progresso: incluir })
       })
       .catch((e) => {
         if (!vivo) return
+        registrarErro('enviar_link', e)
         const msg = (e as Error).message
         setErro(incluir && msg.includes('grande demais') ? 'Com o progresso, o baralho fica grande demais para link. Envie como arquivo ou desmarque o progresso.' : msg)
       })
@@ -86,7 +87,7 @@ export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar
   }
 
   const comoArquivo = async () => {
-    evento('enviar', { o_que: conteudo.o_que, onde, como: 'arquivo', progresso: incluir })
+    evento('enviar', { o_que: conteudo.o_que, cartoes: conteudo.cartoes, onde, como: 'arquivo', progresso: incluir })
     const r = await enviarArquivo(conteudo.nome, conteudo.texto, conteudo.mensagem)
     if (r === 'baixado') avisar?.('Arquivo salvo em Downloads.')
     if (r !== 'cancelado') fechar()

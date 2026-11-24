@@ -28,7 +28,6 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
   }
 
   const alternarEstatisticas = (ligar: boolean) => {
-    if (!ligar) evento('estatisticas_desligadas')
     ligarTelemetria(ligar)
     setEstatisticas(ligar)
   }
@@ -77,7 +76,7 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
           Indicar o Filidilo
         </button>
       </section>
-      {convidando && <CompartilharImagem opcoes={[{ rotulo: 'Convite', peca: () => pecaConvite({ urlApp: urlApp() }) }]} onde="convite" avisar={(texto) => nav.avisar({ texto })} fechar={() => setConvidando(false)} />}
+      {convidando && <CompartilharImagem opcoes={[{ rotulo: 'Convite', peca: () => pecaConvite({ urlApp: urlApp('convite') }) }]} onde="convite" avisar={(texto) => nav.avisar({ texto })} fechar={() => setConvidando(false)} />}
     </main>
   )
 }

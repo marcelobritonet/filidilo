@@ -1,4 +1,4 @@
-import { evento } from '../core/telemetria'
+import { evento, registrarErro } from '../core/telemetria'
 import { useEffect, useState } from 'preact/hooks'
 import { exportar, importar } from '../core/backup'
 import { db } from '../core/db'
@@ -45,6 +45,7 @@ export function Backup({ sair }: { sair: () => void }) {
       setMsg(`✓ Backup restaurado: ${r.baralhos} baralhos, ${r.estados} cartões e ${r.revisoes} revisões atualizados.`)
       contar()
     } catch (err) {
+      registrarErro('backup_restaurar', err)
       setMsg(`✕ ${(err as Error).message}`)
     }
   }

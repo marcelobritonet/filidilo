@@ -146,5 +146,6 @@ export function CompartilharImagem({ opcoes, onde, avisar, fechar, extra }: { op
   )
 }
 
-/** Endereço do app, para o texto e o QR do convite. */
-export const urlApp = () => `${location.origin}${import.meta.env.BASE_URL}`
+/** Endereço do app, para o texto e o QR das imagens. A marca `?de=` diz às estatísticas que a pessoa chegou
+ *  por um convite ou por uma imagem compartilhada (resultado, conquista, semana, progresso); o app a tira do endereço. */
+export const urlApp = (de: 'convite' | 'imagem' = 'imagem') => `${location.origin}${import.meta.env.BASE_URL}?de=${de}`

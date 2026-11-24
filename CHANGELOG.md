@@ -2,6 +2,16 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.24.0] — 2026-11-24
+
+### Estatísticas de uso
+As estatísticas anônimas ficaram mais completas, para entender melhor como o Filidilo é usado. Continuam sem nome, sem e-mail e sem o texto dos cartões, e dá para desligar em Preferências.
+- Passam a dizer o tipo de aparelho (iPhone, Android ou computador), por onde a pessoa chegou (link, arquivo, convite, imagem compartilhada ou direto), quanto conteúdo tem, quanto tempo estuda em cada sessão, quantos cartões vão em cada envio e quando algo dá errado (só o tipo do erro).
+- O endereço nas imagens compartilhadas e no convite ganhou uma marca (`?de=convite` ou `?de=imagem`), que some assim que o app abre.
+
+### Corrigido
+- Desligar as estatísticas não avisava que foram desligadas, e um envio repetido ao fechar o app podia ser contado duas vezes.
+
 ## [3.23.2] — 2026-11-24
 
 - A tela de compartilhar imagem cabe inteira na tela do celular: a prévia diminui para caber e os botões ficam sempre à vista, sem precisar rolar. O botão de fechar virou um X no topo.
