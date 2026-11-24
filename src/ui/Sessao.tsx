@@ -13,6 +13,7 @@ import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, CartaoLacunas, O
 import { pecaMarco, pecaResultado } from '../core/artes'
 import { fecharSessao, type Marco } from '../core/conquistas'
 import { concluirSessao, type Conclusao } from '../core/ofensiva'
+import { Cronometro, fotografarDominio, gravarSessao } from '../core/sessoes'
 import { CompartilharImagem, urlApp, type OpcaoImagem } from './CompartilharImagem'
 import { Confete } from './Confete'
 import { Pavao } from './Leque'
@@ -116,6 +117,58 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   // Livre: tocou em Terminar com poucas respostas; pergunta se quer sair sem concluir.
   const [avisoSair, setAvisoSair] = useState(false)
 
+  // Tempo de estudo da sessão (painel Seu progresso): só com a tela visível; grava uma vez, no fim ou ao sair.
+  const estudo = useRef<{ relogio: Cronometro; inicio: number; gravada: boolean } | null>(null)
+  const placarRef = useRef(placar)
+  placarRef.current = placar
+  const fecharEstudo = (concluida: boolean, bateu: boolean) => {
+    const e = estudo.current
+    if (!e || e.gravada) return
+    e.gravada = true
+    const agoraMs = Date.now()
+    e.relogio.pausar(agoraMs)
+    const p = placarRef.current
+    const respostas = p.certos + p.errados + p.chutes
+    if (!respostas) return
+    gravarSessao({
+      baralho: baralho.id,
+      inicio: e.inicio,
+      fim: agoraMs,
+      ativoMs: e.relogio.ativoMs,
+      respostas,
+      acertos: p.certos,
+      por: porTempo ? 'tempo' : livre ? 'livre' : 'acertos',
+      meta: porTempo ? limite.minutos : meta || undefined,
+      bateuMeta: bateu,
+      concluida,
+    })
+      .then(() => fotografarDominio(baralho, agoraMs))
+      .catch((x) => console.error('Não foi possível gravar a sessão', x))
+  }
+  const fecharEstudoRef = useRef(fecharEstudo)
+  fecharEstudoRef.current = fecharEstudo
+  useEffect(() => {
+    const aoMudar = () => {
+      const r = estudo.current?.relogio
+      if (!r) return
+      if (document.visibilityState === 'hidden') r.pausar(Date.now())
+      else r.retomar(Date.now())
+    }
+    const aoFechar = () => fecharEstudoRef.current(false, false)
+    document.addEventListener('visibilitychange', aoMudar)
+    window.addEventListener('pagehide', aoFechar)
+    return () => {
+      document.removeEventListener('visibilitychange', aoMudar)
+      window.removeEventListener('pagehide', aoFechar)
+      // Saiu pelo ← (ou pelo voltar do aparelho): grava o que estudou, sem concluir.
+      fecharEstudoRef.current(false, false)
+    }
+  }, [])
+  const acabou = !!fila && fila.length > 0 && ((meta > 0 && placar.certos >= meta) || esgotou || terminou || pos >= fila.length)
+  useEffect(() => {
+    if (acabou) fecharEstudo(true, (meta > 0 && placar.certos >= meta) || !!esgotou)
+  }, [acabou])
+
   // Relógio da sessão por tempo: atualiza a cada segundo até acabar.
   useEffect(() => {
     if (!porTempo || !fimEm || esgotou) return
@@ -139,6 +192,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
       setPlacar({ certos: 0, errados: 0, chutes: 0, pulados: 0 })
       setFracos({})
       setTerminou(false)
+      estudo.current = { relogio: new Cronometro(Date.now()), inicio: Date.now(), gravada: false }
       if (porTempo) {
         setAgora(Date.now())
         setFimEm(Date.now() + totalMs)
@@ -161,6 +215,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
     } catch (e) {
       console.error('Não foi possível salvar o progresso', e) // a sessão continua mesmo assim
     }
+    estudo.current?.relogio.tocar(Date.now())
     evento('resposta', { tipo: cartao.tipo, nota, chute, sem_alternativas: semAlt.has(cartao.id) })
     setRespondidosIds((r) => new Set(r).add(cartao.id))
     setPlacar((p) => (nota === 1 ? { ...p, errados: p.errados + 1 } : chute ? { ...p, chutes: p.chutes + 1 } : { ...p, certos: p.certos + 1 }))
@@ -177,6 +232,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
 
   /** Pular: não registra nada; o cartão vai para o fim da sessão (se for o último, a sessão termina). */
   const pular = () => {
+    estudo.current?.relogio.tocar(Date.now())
     evento('cartao_pulado', { tipo: fila[pos]?.tipo })
     setPlacar((p) => ({ ...p, pulados: p.pulados + 1 }))
     if (pos < fila.length - 1) {

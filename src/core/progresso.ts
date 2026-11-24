@@ -1,10 +1,13 @@
-import { db, type Estado, type Marca, type Revisao } from './db'
+import { db, type Estado, type Marca, type Revisao, type SessaoGravada } from './db'
+import { filtrarSessoes, mesclarSessoes } from './sessoes'
 
 /** Progresso de um baralho: o que vai junto quando ela leva o baralho para outro aparelho dela. */
 export interface Progresso {
   estados: Estado[]
   revisoes: Revisao[]
   marcas: Marca[]
+  /** A partir da v3.21: sessões de estudo do baralho (tempo e metas no painel). */
+  sessoes?: SessaoGravada[]
 }
 
 const prefixo = (baralhoId: string) => `${baralhoId}/`
@@ -12,12 +15,13 @@ const prefixo = (baralhoId: string) => `${baralhoId}/`
 /** Lê o progresso de um baralho (estados, respostas e marcações dos cartões dele). */
 export async function progressoDoBaralho(baralhoId: string): Promise<Progresso> {
   const p = prefixo(baralhoId)
-  const [estados, revisoes, marcas] = await Promise.all([
+  const [estados, revisoes, marcas, sessoes] = await Promise.all([
     db.estados.where('id').startsWith(p).toArray(),
     db.revisoes.where('cartao').startsWith(p).toArray(),
     db.marcas.where('cartao').startsWith(p).toArray(),
+    db.sessoes.where('baralho').equals(baralhoId).toArray(),
   ])
-  return { estados, revisoes: revisoes.map(({ seq: _seq, ...r }) => r), marcas }
+  return { estados, revisoes: revisoes.map(({ seq: _seq, ...r }) => r), marcas, sessoes }
 }
 
 /** Só o que é deste baralho e tem o formato certo; o resto é descartado. */
@@ -28,8 +32,9 @@ export function filtrarProgresso(d: unknown, baralhoId: string): Progresso | und
   const estados = x.estados.filter((e) => typeof e?.id === 'string' && e.id.startsWith(p) && !!e.fsrs && typeof e.ultimaData === 'number')
   const revisoes = (Array.isArray(x.revisoes) ? x.revisoes : []).filter((r) => typeof r?.id === 'string' && typeof r.cartao === 'string' && r.cartao.startsWith(p))
   const marcas = (Array.isArray(x.marcas) ? x.marcas : []).filter((m) => typeof m?.cartao === 'string' && m.cartao.startsWith(p) && typeof m.data === 'number')
+  const sessoes = filtrarSessoes(x.sessoes, baralhoId)
   if (!estados.length && !revisoes.length && !marcas.length) return undefined
-  return { estados, revisoes, marcas }
+  return { estados, revisoes, marcas, sessoes }
 }
 
 /** Troca o baralho dos ids (para importar como baralho separado). */
@@ -41,6 +46,7 @@ export function trocarBaralho(p: Progresso, de: string, para: string): Progresso
     // Revisão com cartão novo é outra revisão: id novo para não colidir com a do original.
     revisoes: p.revisoes.map((r) => ({ ...r, id: `${r.id}@${para}`, cartao: t(r.cartao) })),
     marcas: p.marcas.map((m) => ({ ...m, cartao: t(m.cartao) })),
+    sessoes: p.sessoes?.map((s) => ({ ...s, id: `${s.id}@${para}`, baralho: s.baralho === de ? para : s.baralho })),
   }
 }
 
@@ -74,5 +80,6 @@ export async function mesclarProgresso(p: Progresso): Promise<{ estados: number;
       if (!atual || atual.data < m.data) await db.marcas.put(m)
     }
   })
+  await mesclarSessoes(p.sessoes ?? [])
   return { estados: nEst, revisoes: nRev }
 }

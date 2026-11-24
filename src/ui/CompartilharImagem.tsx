@@ -1,3 +1,4 @@
+import type { ComponentChildren } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import type { Formato, Peca } from '../core/artes'
 import { evento } from '../core/telemetria'
@@ -17,7 +18,7 @@ export interface OpcaoImagem {
  * o nome do baralho e Compartilhar (imagem + texto com o link). Sem compartilhar arquivo
  * (computador): baixa a imagem e copia o texto.
  */
-export function CompartilharImagem({ opcoes, onde, avisar, fechar }: { opcoes: OpcaoImagem[]; onde: string; avisar?: (texto: string) => void; fechar: () => void }) {
+export function CompartilharImagem({ opcoes, onde, avisar, fechar, extra }: { opcoes: OpcaoImagem[]; onde: string; avisar?: (texto: string) => void; fechar: () => void; extra?: ComponentChildren }) {
   const [i, setI] = useState(0)
   const [formato, setFormato] = useState<Formato>('story')
   const [comNome, setComNome] = useState(true)
@@ -119,6 +120,7 @@ export function CompartilharImagem({ opcoes, onde, avisar, fechar }: { opcoes: O
           {copiado ? 'Texto copiado ✓' : 'Copiar o texto com o link'}
         </button>
         <p class="dica">No Instagram, escolha Story e cole o link num adesivo de link.</p>
+        {extra}
         <button class="btn terciario" onClick={fechar}>
           Fechar
         </button>

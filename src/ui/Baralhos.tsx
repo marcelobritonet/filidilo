@@ -113,6 +113,10 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
 
   const semana = resumo?.semana
   // A semana para compartilhar abre pelo selo de ofensiva do topo (a tela inicial fica limpa).
+  const abrirProgresso = (onde: 'rodape' | 'semana') => {
+    evento('progresso_aberto', { onde })
+    nav.ir({ nome: 'progresso' })
+  }
   const abrirSemana = () => {
     if (!semana || !semana.respostas) return
     evento('semana_aberta')
@@ -279,6 +283,9 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
       </section>
 
       <nav class="rodape" aria-label="Mais opções">
+        <button class="btn terciario" onClick={() => abrirProgresso('rodape')}>
+          Progresso
+        </button>
         <button class="btn terciario" onClick={() => nav.ir({ nome: 'backup' })}>
           Backup
         </button>
@@ -289,7 +296,21 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
       <p class="versao">Funciona sem internet · seus cartões ficam neste aparelho</p>
       {aviso && <AvisoRecebido titulo={aviso.titulo} texto={aviso.texto} fechar={() => setAviso(null)} />}
       {plano && <Importar plano={plano} nav={nav} fechar={() => setPlano(null)} />}
-      {compartilhar && <CompartilharImagem opcoes={compartilhar.opcoes} onde={compartilhar.onde} avisar={(texto) => nav.avisar({ texto })} fechar={() => setCompartilhar(null)} />}
+      {compartilhar && (
+        <CompartilharImagem
+          opcoes={compartilhar.opcoes}
+          onde={compartilhar.onde}
+          avisar={(texto) => nav.avisar({ texto })}
+          fechar={() => setCompartilhar(null)}
+          extra={
+            compartilhar.onde === 'semana' ? (
+              <button class="btn secundario" onClick={() => { setCompartilhar(null); abrirProgresso('semana') }}>
+                Ver meu progresso
+              </button>
+            ) : undefined
+          }
+        />
+      )}
       {cartoesRecebidos && <ImportarCartoes recebido={cartoesRecebidos} baralhos={baralhos} nav={nav} fechar={() => setCartoesRecebidos(null)} />}
     </main>
   )

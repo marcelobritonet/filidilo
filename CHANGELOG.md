@@ -2,6 +2,13 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.21.0] — 2026-11-24
+
+### Novo
+- **Seu progresso.** Uma tela nova, no rodapé de Meus baralhos (e em "Ver meu progresso", na Minha semana), mostra como está o seu estudo: dias estudados, respostas e tempo de estudo, a porcentagem de acertos e se ela subiu, os temas que você mais estuda, onde mais erra (com um atalho para estudar o tema), os cartões dominados de cada baralho, as metas de sessão batidas, a ofensiva e as conquistas. Dá para ver os últimos 7 dias, 30 dias ou tudo, de todos os baralhos ou de um só.
+- **Meta da semana.** Em Seu progresso, escolha quantos dias ou minutos quer estudar por semana. Ao bater a meta, ela vira conquista no fim da sessão.
+- O tempo de estudo passa a ser contado a partir desta versão, só com o app aberto na tela. O backup leva as sessões, o tempo e a meta.
+
 ## [3.20.9] — 2026-11-24
 
 ### Mudou

@@ -40,6 +40,25 @@ export interface Marca {
   data: number
 }
 
+/** Uma sessão de estudo (a partir da v3.21): base do tempo de estudo e das metas no painel Seu progresso. */
+export interface SessaoGravada {
+  id: string // uuid
+  baralho: string
+  inicio: number
+  fim: number
+  /** Tempo de estudo de verdade: só com a tela visível, e no máximo 2 min entre um toque e outro. */
+  ativoMs: number
+  respostas: number
+  acertos: number
+  por: 'acertos' | 'tempo' | 'livre'
+  /** Acertos pedidos ou minutos escolhidos (ausente no Livre). */
+  meta?: number
+  bateuMeta: boolean
+  /** Chegou à tela de fim (sair pelo ← não conclui). */
+  concluida: boolean
+  aparelho: string
+}
+
 export interface Meta {
   chave: string
   valor: string
@@ -52,6 +71,7 @@ class FilidiloDB extends Dexie {
   marcas!: Table<Marca, string>
   meta!: Table<Meta, string>
   baralhos!: Table<Baralho, string>
+  sessoes!: Table<SessaoGravada, string>
 
   constructor() {
     // O banco continua com o nome antigo (o app se chamava tatino.): trocar apagaria os baralhos de quem já usa.
@@ -65,6 +85,8 @@ class FilidiloDB extends Dexie {
     })
     // Fase 2: baralhos passam a viver no aparelho.
     this.version(2).stores({ baralhos: 'id' })
+    // v3.21: sessões de estudo, para o painel Seu progresso.
+    this.version(3).stores({ sessoes: 'id, baralho, inicio' })
   }
 }
 

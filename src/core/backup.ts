@@ -1,6 +1,8 @@
-import { db, type Estado, type Marca, type Reporte, type Revisao } from './db'
+import { db, type Estado, type Marca, type Reporte, type Revisao, type SessaoGravada } from './db'
 import { CHAVE_OFENSIVA, juntar, lerOfensiva, lerRegistro, type Ofensiva } from './ofensiva'
 import { mesclarProgresso } from './progresso'
+import { filtrarSessoes, gravarDominio, lerDominio, lerDominioGravado, mesclarSessoes, type DominioDia } from './sessoes'
+import { CHAVE_META_SEMANA, lerMetaSemana, type MetaSemana } from './metaSemana'
 import type { Baralho, Cartao } from './types'
 
 interface Backup {
@@ -16,6 +18,10 @@ interface Backup {
   baralhos?: Baralho[]
   /** A partir da v3.12: dias da ofensiva e folgas. */
   ofensiva?: Ofensiva
+  /** A partir da v3.21: sessões de estudo, domínio por dia e meta da semana (painel Seu progresso). */
+  sessoes?: SessaoGravada[]
+  dominio?: DominioDia[]
+  metaSemana?: MetaSemana | null
 }
 
 export async function exportar(): Promise<Blob> {
@@ -29,6 +35,9 @@ export async function exportar(): Promise<Blob> {
     marcas: await db.marcas.toArray(),
     baralhos: await db.baralhos.toArray(),
     ofensiva: await lerOfensiva(),
+    sessoes: await db.sessoes.toArray(),
+    dominio: await lerDominioGravado(),
+    metaSemana: lerMetaSemana((await db.meta.get(CHAVE_META_SEMANA))?.valor),
   }
   return new Blob([JSON.stringify(dados)], { type: 'application/json' })
 }
@@ -40,7 +49,7 @@ export async function importar(texto: string): Promise<{ estados: number; reviso
   let nEst = 0
   let nRev = 0
   let nBar = 0
-  await db.transaction('rw', [db.estados, db.revisoes, db.reportes, db.marcas, db.baralhos], async () => {
+  await db.transaction('rw', [db.estados, db.revisoes, db.reportes, db.marcas, db.baralhos, db.sessoes], async () => {
     for (const b of d.baralhos ?? []) {
       const atual = await db.baralhos.get(b.id)
       if (!atual || (atual.atualizadoEm ?? 0) < (b.atualizadoEm ?? 0)) {
@@ -56,6 +65,13 @@ export async function importar(texto: string): Promise<{ estados: number; reviso
   // Ofensiva: junta os dias dos dois lados; das folgas, fica a maior.
   const recebida = d.ofensiva ? lerRegistro(JSON.stringify(d.ofensiva)) : null
   if (recebida) await db.meta.put({ chave: CHAVE_OFENSIVA, valor: JSON.stringify(juntar(await lerOfensiva(), recebida)) })
+  await mesclarSessoes(filtrarSessoes(d.sessoes))
+  // Domínio por dia: no mesmo dia, o daqui vence (é o mais recente neste aparelho).
+  const dominio = lerDominio(JSON.stringify(d.dominio ?? []))
+  if (dominio.length) await gravarDominio([...dominio, ...(await lerDominioGravado())])
+  // Meta da semana: só entra se aqui ainda não tem uma.
+  const meta = lerMetaSemana(JSON.stringify(d.metaSemana ?? null))
+  if (meta && !(await db.meta.get(CHAVE_META_SEMANA))) await db.meta.put({ chave: CHAVE_META_SEMANA, valor: JSON.stringify(meta) })
   return { estados: nEst, revisoes: nRev, baralhos: nBar }
 }
 

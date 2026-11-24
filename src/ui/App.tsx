@@ -14,6 +14,7 @@ import { CriarComIA } from './CriarComIA'
 import { EditarCartao } from './EditarCartao'
 import { useBaralhos } from './estado'
 import { Inicio } from './Inicio'
+import { Progresso } from './Progresso'
 import { atualizarSozinho, chegouAlgo } from './recebido'
 import { Revisar } from './Revisar'
 import { Sessao, type Limite, type Modo } from './Sessao'
@@ -28,6 +29,7 @@ export type Tela =
   | { nome: 'colar'; id: string }
   | { nome: 'backup' }
   | { nome: 'aparencia' }
+  | { nome: 'progresso' }
   | { nome: 'aprender'; pedido?: string }
   | { nome: 'ia'; id: string; assunto?: string; temaId?: string }
 
@@ -139,6 +141,7 @@ export function App() {
   else if (tela.nome === 'baralhos') conteudo = <Baralhos baralhos={baralhos} nav={nav} versao={versao} />
   else if (tela.nome === 'backup') conteudo = <Backup sair={nav.voltar} />
   else if (tela.nome === 'aparencia') conteudo = <Aparencia nav={nav} />
+  else if (tela.nome === 'progresso') conteudo = <Progresso key={versao} baralhos={baralhos} nav={nav} />
   else if (tela.nome === 'aprender') conteudo = <Aprender pedido={tela.pedido} nav={nav} />
   else if (carregando || !baralho)
     // Logo depois de criar um baralho a lista ainda está recarregando.

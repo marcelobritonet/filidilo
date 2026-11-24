@@ -1,6 +1,6 @@
 {
   "name": "filidilo",
-  "version": "3.20.9",
+  "version": "3.21.0",
   "description": "Flashcards offline (PWA) para aprender qualquer coisa",
   "scripts": {
     "dev": "vite",

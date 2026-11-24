@@ -2,7 +2,9 @@
 // As regras são puras (recebem os dados); as funções do fim do arquivo leem e gravam no aparelho.
 import { db, type Revisao } from './db'
 import { chave, dominado } from './srs'
-import { diaLocal, sequenciaAtual } from './ofensiva'
+import { diaLocal, lerOfensiva, sequenciaAtual } from './ofensiva'
+import { andamento, lerMetaGravada } from './metaSemana'
+import { aguardarGravacao } from './sessoes'
 import type { Baralho } from './types'
 
 export { diaLocal }
@@ -59,7 +61,7 @@ export function resumoSemana(revisoes: Pick<Revisao, 'data' | 'nota' | 'cartao'>
   }
 }
 
-export type TipoMarco = 'primeira_sessao' | 'sequencia' | 'respostas' | 'meta' | 'dominado'
+export type TipoMarco = 'primeira_sessao' | 'sequencia' | 'respostas' | 'meta' | 'dominado' | 'meta_semana'
 
 export interface Marco {
   id: string
@@ -83,6 +85,8 @@ export interface Situacao {
   bateuMeta: boolean
   /** Baralhos com todos os cartões dominados (só os com 5 ou mais cartões). */
   dominados: { id: string; titulo: string; cartoes: number }[]
+  /** Meta da semana batida (domingo da semana e a meta), se houver. */
+  metaSemana?: { semana: string; tipo: 'dias' | 'minutos'; n: number }
 }
 
 /** Todos os marcos atingidos, do mais importante para o menos. */
@@ -90,6 +94,10 @@ export function marcosAtingidos(s: Situacao): Marco[] {
   const l: Marco[] = []
   for (const b of s.dominados)
     l.push({ id: `dominado:${b.id}`, tipo: 'dominado', destaque: String(b.cartoes), legenda: 'cartões dominados', frase: `Dominei todos os ${b.cartoes} cartões de “${b.titulo}”` })
+  if (s.metaSemana) {
+    const { semana, tipo, n } = s.metaSemana
+    l.push({ id: `meta_semana:${semana}`, tipo: 'meta_semana', destaque: String(n), legenda: tipo === 'dias' ? 'dias de estudo na semana' : 'minutos de estudo na semana', frase: 'Bati minha meta da semana' })
+  }
   for (const n of [...SEQUENCIAS].reverse())
     if (s.sequencia >= n) l.push({ id: `sequencia:${n}`, tipo: 'sequencia', destaque: String(n), legenda: 'dias seguidos estudando', frase: `${n} dias seguidos estudando` })
   for (const n of [...RESPOSTAS].reverse())
@@ -125,7 +133,9 @@ async function lerComemorados(): Promise<Set<string> | null> {
 const gravarComemorados = (s: Set<string>) => db.meta.put({ chave: CHAVE_MARCOS, valor: JSON.stringify([...s]) })
 
 async function situacao(baralhos: Baralho[], bateuMeta = false): Promise<Situacao> {
-  const [revisoes, estados] = await Promise.all([db.revisoes.toArray(), db.estados.toArray()])
+  await aguardarGravacao() // a sessão que acabou de terminar conta nos minutos da semana
+  const [revisoes, estados, meta, ofensiva, sessoes] = await Promise.all([db.revisoes.toArray(), db.estados.toArray(), lerMetaGravada(), lerOfensiva(), db.sessoes.toArray()])
+  const semana = meta ? andamento(meta, ofensiva, sessoes, diaLocal(Date.now())) : undefined
   const m = new Map(estados.map((e) => [e.id, e]))
   return {
     // A sequência é a da ofensiva: dias com sessão concluída (ou salvos por folga).
@@ -135,6 +145,7 @@ async function situacao(baralhos: Baralho[], bateuMeta = false): Promise<Situaca
     dominados: baralhos
       .filter((b) => b.cartoes.length >= 5 && b.cartoes.every((c) => dominado(m.get(chave(b.id, c.id)))))
       .map((b) => ({ id: b.id, titulo: b.titulo, cartoes: b.cartoes.length })),
+    metaSemana: semana?.batida ? { semana: semana.semana, tipo: semana.meta.tipo, n: semana.meta.n } : undefined,
   }
 }
 
@@ -162,4 +173,16 @@ export async function painel(agora = Date.now()): Promise<{ sequencia: number; s
   // Sequências de mais de um ano contam até um ano: basta para a tela inicial.
   const revisoes = await db.revisoes.where('data').above(diaAntes(agora, 370)).toArray()
   return { sequencia: await sequenciaAtual(agora), semana: resumoSemana(revisoes, agora) }
+}
+
+/** Para o painel Seu progresso: o marco mais alto de cada tipo (e cada baralho dominado), sem as metas da semana. */
+export async function conquistasAtingidas(baralhos: Baralho[]): Promise<Marco[]> {
+  const vistos = new Set<string>()
+  return marcosAtingidos(await situacao(baralhos)).filter((m) => {
+    if (m.tipo === 'meta_semana') return false
+    const k = m.tipo === 'dominado' ? m.id : m.tipo
+    if (vistos.has(k)) return false
+    vistos.add(k)
+    return true
+  })
 }

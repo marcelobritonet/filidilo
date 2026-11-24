@@ -28,9 +28,9 @@ interface Escolha {
 const PADRAO: Escolha = { por: 'acertos', acertos: 10, minutos: 10, conteudo: 'tudo', temas: [], soNovos: false }
 const OPCOES_ACERTOS = [5, 10, 20, 30]
 const OPCOES_MINUTOS = [5, 10, 15, 20]
-const chaveEscolha = (id: string) => `tatino-ajuste-${id}`
+export const chaveEscolha = (id: string) => `tatino-ajuste-${id}`
 
-function lerEscolha(id: string): Escolha {
+export function lerEscolha(id: string): Escolha {
   try {
     const salvo = JSON.parse(localStorage.getItem(chaveEscolha(id)) ?? '{}') as Partial<Escolha> & { por?: string }
     return { ...PADRAO, ...salvo, por: salvo.por === 'tempo' || salvo.por === 'livre' ? salvo.por : 'acertos' }
