@@ -181,7 +181,7 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
 .versao { text-align: center; color: var(--text-muted); font-size: 14px; margin: 8px 0 0; }
 .rodape-versao {
   max-width: 640px; margin: 0 auto; padding: 8px 20px calc(24px + env(safe-area-inset-bottom));
-  text-align: center; color: var(--text-muted); font-size: 14px;
+  text-align: center; color: var(--text-muted); font-size: 13px;
 }
 
 .barra { display: block; height: 8px; background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
@@ -235,8 +235,6 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
 .arquivados li { display: flex; gap: 8px; align-items: baseline; justify-content: space-between; }
 .arquivados li .link { font-size: 15px; text-align: left; }
 .arquivados li .dica, .arquivado-aviso { margin: 0; font-size: 14px; }
-
-.rodape { display: grid; gap: 4px; margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--border); }
 
 .segmentado { display: flex; gap: 4px; background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 4px; margin-bottom: 10px; }
 .segmentado button { flex: 1; min-height: 44px; border: 1px solid transparent; background: transparent; padding: 8px 6px; border-radius: var(--radius-sm); font-size: 15px; color: var(--text-muted); }
@@ -557,9 +555,14 @@ details.bloco > summary { font-weight: 650; }
 .abrir-ia-opcoes .btn { width: 100%; }
 .campo-titulo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 
-/* ---------- Rodapé discreto: Backup e Aparência lado a lado ---------- */
-.rodape { grid-template-columns: 1fr 1fr; gap: 0; margin-top: 32px; padding-top: 4px; border-top: 0; }
-.rodape .btn.terciario { color: var(--text-muted); font-size: 14px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--border); }
+/* ---------- Rodapé discreto: Backup · Aparência · Indicar ---------- */
+/* Uma linha centrada, separada por pontos; quebra sozinha em tela estreita */
+.rodape { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0 2px; margin-top: 36px; padding-top: 12px; border-top: 1px solid var(--border); }
+.rodape .btn.terciario { width: auto; flex-direction: row; gap: 0; min-height: 40px; padding: 8px 10px; color: var(--text-muted); font-size: 14px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--border); }
+.rodape .btn.terciario + .btn.terciario { position: relative; margin-left: 10px; }
+.rodape .btn.terciario + .btn.terciario::before { content: '·'; position: absolute; left: -9px; color: var(--text-muted); pointer-events: none; }
+.rodape + .versao { margin-top: 4px; font-size: 13px; text-wrap: balance; }
+.tela:has(> .rodape + .versao) { padding-bottom: 8px; }
 .rodape .btn.terciario:hover { color: var(--text); }
 .cabecalho-linha .btn.compacto { white-space: nowrap; font-size: 14px; padding: 8px 6px; }
 

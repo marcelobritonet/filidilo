@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.20.4] — 2026-11-24
+
+### Corrigido
+- O rodapé de Meus baralhos estava desalinhado. Agora Backup, Aparência e Indicar o Filidilo ficam numa linha só, centrados, com o aviso de que funciona sem internet e a versão logo abaixo.
+
 ## [3.20.3] — 2026-11-24
 
 ### Corrigido
