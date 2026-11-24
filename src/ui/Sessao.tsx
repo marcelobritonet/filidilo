@@ -532,9 +532,10 @@ function Fonte({ c }: { c: Cartao }) {
 }
 
 /**
- * Como foi a resposta. Pergunta e resposta: as cinco opções.
- * Alternativas, V/F e cálculo já sabem se acertou: se acertou, só como; se errou, só Continuar.
- * Notas do agendamento: fácil = 3, com dificuldade = 2, no chute = 2 (não conta acerto), não sabia/errei = 1.
+ * Como foi a resposta. Pergunta e resposta: Acertei, Acertei no chute ou Errei ("Não sei" fica antes de revelar).
+ * Alternativas, V/F e cálculo já sabem se acertou: se acertou, Continuar ou Foi no chute; se errou, só Continuar.
+ * Notas do agendamento: acertou = 3, no chute = 2 (não conta acerto), não sabia/errei = 1.
+ * A nota 2 sem chute ("com dificuldade") saiu da tela; o histórico ainda tem notas 2.
  */
 function BotoesNota({ avaliar, acertou }: { avaliar: (n: Nota, chute?: boolean) => void; acertou?: boolean }) {
   if (acertou === false)
@@ -546,28 +547,38 @@ function BotoesNota({ avaliar, acertou }: { avaliar: (n: Nota, chute?: boolean) 
         </button>
       </div>
     )
+  if (acertou)
+    return (
+      <div class="notas duas" role="group" aria-label="Como foi?">
+        <button class="btn nota n4" onClick={() => avaliar(3)}>
+          Continuar
+        </button>
+        <button class="btn nota n2" onClick={() => avaliar(2, true)}>
+          Foi no chute
+        </button>
+      </div>
+    )
   return (
-    <div class="notas" role="group" aria-label="Como foi?">
+    <div class="notas tres" role="group" aria-label="Como foi?">
       <button class="btn nota n4" onClick={() => avaliar(3)}>
-        Acertei, foi fácil
-      </button>
-      <button class="btn nota n3" onClick={() => avaliar(2)}>
-        Acertei, com dificuldade
+        Acertei
       </button>
       <button class="btn nota n2" onClick={() => avaliar(2, true)}>
         Acertei no chute
       </button>
-      {acertou === undefined && (
-        <>
-          <button class="btn nota n1" onClick={() => avaliar(1)}>
-            Não sabia
-          </button>
-          <button class="btn nota n1" onClick={() => avaliar(1)}>
-            Errei
-          </button>
-        </>
-      )}
+      <button class="btn nota n1" onClick={() => avaliar(1)}>
+        Errei
+      </button>
     </div>
+  )
+}
+
+/** "Não sei": mostra a resposta e conta como erro. Fica fora da resposta, antes de revelar. */
+function BotaoNaoSei({ tipo, aoTocar }: { tipo: Cartao['tipo']; aoTocar: () => void }) {
+  return (
+    <button class="btn terciario nao-sei" onClick={() => { evento('nao_sei', { tipo }); aoTocar() }}>
+      Não sei
+    </button>
   )
 }
 
@@ -632,12 +643,19 @@ function Lacunas({ c, acoes, facil, distratores }: { c: CartaoLacunas; acoes: Ac
         <p class="rotulo">Complete a lacuna</p>
         {lacunas}
         {!virado && (
-          <button class="btn principal virar" onClick={mostrar}>
-            Mostrar resposta
-          </button>
+          <>
+            <button class="btn principal virar" onClick={mostrar}>
+              Mostrar resposta
+            </button>
+            <BotaoNaoSei tipo={c.tipo} aoTocar={() => { setNaoSabia(true); mostrar() }} />
+          </>
         )}
         {virado && (
-          <Folha titulo="Resposta" rodape={<><p class="dica centro">Como foi?</p><BotoesNota avaliar={acoes.avaliar} /></>}>
+          <Folha
+            titulo={naoSabia ? 'Tudo bem, veja a resposta' : 'Resposta'}
+            tom={naoSabia ? 'neutro' : undefined}
+            rodape={naoSabia ? <BotoesNota avaliar={acoes.avaliar} acertou={false} /> : <><p class="dica centro">Como foi?</p><BotoesNota avaliar={acoes.avaliar} /></>}
+          >
             {fraseComRespostas}
             {c.explicacao && <Explicacao texto={c.explicacao} />}
             <Fonte c={c} />
@@ -663,9 +681,7 @@ function Lacunas({ c, acoes, facil, distratores }: { c: CartaoLacunas; acoes: Ac
                 </button>
               ))}
             </div>
-            <button class="btn terciario nao-sei" onClick={() => { evento('nao_sei', { tipo: c.tipo }); setNaoSabia(true) }}>
-              Não sei
-            </button>
+            <BotaoNaoSei tipo={c.tipo} aoTocar={() => setNaoSabia(true)} />
           </>
         )
       })()}
@@ -698,17 +714,26 @@ function Associacao({ c, acoes, semAlternativas }: { c: CartaoAssociacao; acoes:
 
 function Conceito({ c, acoes, verso, rotulo = 'Pergunta' }: { c: Cartao & { frente: string }; acoes: Acoes; verso?: string; rotulo?: string }) {
   const [virado, setVirado] = useState(false)
+  const [naoSabia, setNaoSabia] = useState(false)
   return (
     <article class="cartao">
       <p class="rotulo">{rotulo}</p>
       <Tex class="frente" texto={c.frente} />
       {!virado && (
-        <button class="btn principal virar" onClick={() => setVirado(true)}>
-          Mostrar resposta
-        </button>
+        <>
+          <button class="btn principal virar" onClick={() => setVirado(true)}>
+            Mostrar resposta
+          </button>
+          <BotaoNaoSei tipo={c.tipo} aoTocar={() => { setNaoSabia(true); setVirado(true) }} />
+        </>
       )}
       {virado && (
-        <Folha titulo="Resposta" pergunta={<Tex texto={c.frente} />} rodape={<><p class="dica centro">Como foi?</p><BotoesNota avaliar={acoes.avaliar} /></>}>
+        <Folha
+          titulo={naoSabia ? 'Tudo bem, veja a resposta' : 'Resposta'}
+          tom={naoSabia ? 'neutro' : undefined}
+          pergunta={<Tex texto={c.frente} />}
+          rodape={naoSabia ? <BotoesNota avaliar={acoes.avaliar} acertou={false} /> : <><p class="dica centro">Como foi?</p><BotoesNota avaliar={acoes.avaliar} /></>}
+        >
           <Tex class="verso" texto={verso ?? (c.tipo === 'conceito' ? c.verso : '')} />
           {c.explicacao && <Explicacao texto={c.explicacao} />}
           <Fonte c={c} />
@@ -748,9 +773,7 @@ function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta
         })}
       </div>
       {!respondeu && (
-        <button class="btn terciario nao-sei" onClick={() => { evento('nao_sei', { tipo: c.tipo }); setEscolhida(-1) }}>
-          Não sei
-        </button>
+        <BotaoNaoSei tipo={c.tipo} aoTocar={() => setEscolhida(-1)} />
       )}
       {respondeu && (
         <Folha

@@ -297,6 +297,7 @@ hr { border: 0; border-top: 1px dashed var(--border); margin: 20px 0; }
 
 .notas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
 .notas.tres { grid-template-columns: repeat(3, 1fr); }
+.notas.duas { grid-template-columns: repeat(2, 1fr); }
 .notas .largo { grid-column: 1 / -1; }
 .nota { min-height: 56px; padding: 8px 4px; font-size: 16px; border-width: 1px; }
 .nota.n1 { background: var(--danger-soft); color: var(--danger); border-color: var(--danger); }

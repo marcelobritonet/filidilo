@@ -2,6 +2,13 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.20.0] — 2026-11-24
+
+### Estudar com menos botões
+- **"Não sei" antes da resposta, em todos os cartões.** Nos cartões de pergunta e resposta, o "Não sei" agora fica logo abaixo de "Mostrar resposta", como já era nas alternativas. Ele mostra a resposta e o cartão volta daqui a pouco.
+- **Três opções ao ver a resposta:** Acertei, Acertei no chute ou Errei.
+- **Acertou nas alternativas?** Agora é só Continuar ou, se foi no chute, Foi no chute.
+
 ## [3.19.0] — 2026-11-24
 
 **Arquive cartões sem perder nada**
