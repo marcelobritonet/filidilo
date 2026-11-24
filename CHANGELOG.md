@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.20.9] — 2026-11-24
+
+### Corrigido
+- No estudo, depois de tocar em Corrigir → "Corrigir eu mesmo", agora dá para mudar de ideia e usar "Corrigir com IA" na própria tela de edição. Ao salvar a correção, você volta ao estudo com o cartão corrigido.
+
 ## [3.20.8] — 2026-11-24
 
 ### Mudou

@@ -34,11 +34,14 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
     <main class="tela aparencia">
       <header class="barra-sessao">
         <button class="fechar" aria-label="Voltar" onClick={nav.voltar}>←</button>
-        <h1 class="titulo-barra">Aparência</h1>
+        <h1 class="titulo-barra">Preferências</h1>
         <span />
       </header>
       <fieldset class="opcoes-tema">
-        <legend class="dica">Escolha como o Filidilo aparece. A escolha fica salva neste aparelho.</legend>
+        <legend>
+          <strong class="secao-titulo">Aparência</strong>
+          <span class="dica">Escolha como o Filidilo aparece. A escolha fica salva neste aparelho.</span>
+        </legend>
         {OPCOES.map((o) => (
           <label class={`opcao-tema ${pref === o.valor ? 'selecionada' : ''}`}>
             <input type="radio" name="tema" value={o.valor} checked={pref === o.valor} onChange={() => escolher(o.valor)} />

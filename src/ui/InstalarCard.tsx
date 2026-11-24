@@ -55,7 +55,7 @@ export function InstalarCard() {
   )
 }
 
-/** Bloco fixo para a tela de Aparência: sempre disponível enquanto o app não estiver instalado. */
+/** Bloco fixo para a tela de Preferências: sempre disponível enquanto o app não estiver instalado. */
 export function InstalarBloco() {
   const [estado, setEstado] = useState<EstadoInstalar>(estadoInstalar)
   if (estado === 'instalado') return <p class="dica">O Filidilo já está instalado neste aparelho.</p>

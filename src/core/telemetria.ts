@@ -1,7 +1,7 @@
 // Estatísticas de uso anônimas, enviadas ao PostHog (servidor nos EUA).
 // Sem cookies, sem nome ou e-mail e sem o texto dos cartões: só o nome do evento e números.
 // Os eventos esperam numa fila neste aparelho e vão quando houver internet.
-// A pessoa pode desligar em Aparência.
+// A pessoa pode desligar em Preferências.
 
 /**
  * Chave pública do projeto no PostHog (começa com "phc_"), vinda da variável VITE_POSTHOG_KEY no build

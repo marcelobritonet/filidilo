@@ -24,7 +24,7 @@ export interface EdicaoNaSessao {
 
 /**
  * Criar ou editar um cartão de conceito, V/F ou alternativas. Cálculo: só tema e exclusão.
- * Com `naSessao`, é a correção manual durante o estudo: sem excluir, sem IA e sem navegar.
+ * Com `naSessao`, é a correção manual durante o estudo: sem excluir e sem navegar.
  */
 export function EditarCartao({ baralho, cartaoId, temaInicial, nav, naSessao }: { baralho: Baralho; cartaoId?: string; temaInicial?: string; nav?: Navegacao; naSessao?: EdicaoNaSessao }) {
   const original = cartaoId ? baralho.cartoes.find((c) => c.id === cartaoId) : undefined
@@ -302,7 +302,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav, naSessao }: 
         )}
       </div>
 
-      {original && !naSessao && (
+      {original && (
         <button class="btn secundario" onClick={() => setCorrigindo(true)}>
           Corrigir com IA
         </button>
@@ -312,7 +312,8 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav, naSessao }: 
           baralho={baralho}
           cartao={original}
           fechar={() => setCorrigindo(false)}
-          aoSalvar={() => {
+          aoSalvar={(c, b) => {
+            if (naSessao) return naSessao.aoSalvar(c, b)
             nav?.mudou()
             nav?.avisar({ texto: 'Cartão corrigido.' })
             nav?.voltar()

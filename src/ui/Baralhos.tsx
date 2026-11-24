@@ -283,7 +283,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
           Backup
         </button>
         <button class="btn terciario" onClick={() => nav.ir({ nome: 'aparencia' })}>
-          Aparência
+          Preferências
         </button>
       </nav>
       <p class="versao">Funciona sem internet · seus cartões ficam neste aparelho</p>

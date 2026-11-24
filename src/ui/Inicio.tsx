@@ -237,7 +237,7 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
           Backup
         </button>
         <button class="btn terciario" onClick={() => nav.ir({ nome: 'aparencia' })}>
-          Aparência
+          Preferências
         </button>
       </nav>
 
