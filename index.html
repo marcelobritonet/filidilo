@@ -25,30 +25,44 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png?v=3" />
     <title>Filidilo</title>
     <script>
+      // Liberações por aparelho, pelo endereço: ?suave=1|0 (estilo Suave, P124) e ?especiais=1|0 (temas
+      // especiais, P127). Grava ou tira a chave e o parâmetro sai do endereço.
+      try {
+        var q = new URLSearchParams(location.search)
+        var flags = { suave: 'tatino-suave-liberado', especiais: 'tatino-especiais-liberados' }
+        var mudou = false
+        for (var f in flags) {
+          var v = q.get(f)
+          if (v === '1' || v === '0') {
+            if (v === '1') localStorage.setItem(flags[f], '1')
+            else localStorage.removeItem(flags[f])
+            q.delete(f)
+            mudou = true
+          }
+        }
+        if (mudou) {
+          var resto = q.toString()
+          history.replaceState(history.state, '', location.pathname + (resto ? '?' + resto : '') + location.hash)
+        }
+      } catch (e) {}
       // Aplica o tema antes de pintar a tela (evita piscar claro→escuro). Lógica completa em src/ui/tema.ts.
       try {
-        // tema gravado → [tipo, paleta]; igual a TEMAS em src/ui/tema.ts ('light' antigo = Areia)
-        var temas = { light: ['light', 'areia'], lagoa: ['light', 'lagoa'], areia: ['light', 'areia'], dark: ['dark', 'noite'], cobalto: ['dark', 'cobalto'], pavao: ['dark', 'pavao'] }
+        // tema gravado → [tipo, paleta, especial]; igual a TEMAS em src/ui/tema.ts ('light' antigo = Areia)
+        var temas = { light: ['light', 'areia'], lagoa: ['light', 'lagoa'], plumagem: ['light', 'plumagem', 1], areia: ['light', 'areia'], dark: ['dark', 'noite'], cobalto: ['dark', 'cobalto'], pavao: ['dark', 'pavao'] }
         var p = localStorage.getItem('tatino-theme')
-        var t = temas.hasOwnProperty(p) ? temas[p] : matchMedia('(prefers-color-scheme: dark)').matches ? temas.dark : temas.areia
+        var t = temas.hasOwnProperty(p) ? temas[p] : null
+        // tema especial bloqueado neste aparelho: volta ao tema do aparelho
+        if (t && t[2] && localStorage.getItem('tatino-especiais-liberados') !== '1') t = null
+        if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? temas.dark : temas.areia
         document.documentElement.dataset.theme = t[0]
         document.documentElement.dataset.paleta = t[1]
       } catch (e) {
         document.documentElement.dataset.theme = 'light'
         document.documentElement.dataset.paleta = 'areia'
       }
-      // Estilo: igual a lerEstilo em src/ui/tema.ts. O Suave está desligado por enquanto (Clássico para todos);
-      // ?suave=1 no endereço libera neste aparelho e ?suave=0 tira. O parâmetro sai do endereço.
+      // Estilo: igual a lerEstilo em src/ui/tema.ts. O Suave está desligado por enquanto (Clássico para todos)
+      // e só vale nos aparelhos liberados com ?suave=1.
       try {
-        var q = new URLSearchParams(location.search)
-        var s = q.get('suave')
-        if (s === '1' || s === '0') {
-          if (s === '1') localStorage.setItem('tatino-suave-liberado', '1')
-          else localStorage.removeItem('tatino-suave-liberado')
-          q.delete('suave')
-          var resto = q.toString()
-          history.replaceState(history.state, '', location.pathname + (resto ? '?' + resto : '') + location.hash)
-        }
         var liberado = localStorage.getItem('tatino-suave-liberado') === '1'
         document.documentElement.dataset.estilo = liberado && localStorage.getItem('tatino-estilo') !== 'classico' ? 'suave' : 'classico'
       } catch (e) {

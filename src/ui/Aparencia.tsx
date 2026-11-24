@@ -4,15 +4,21 @@ import type { Navegacao } from './App'
 import { InstalarBloco } from './InstalarCard'
 import { pecaConvite } from '../core/artes'
 import { CompartilharImagem, urlApp } from './CompartilharImagem'
-import { lerEstilo, lerPreferencia, salvarEstilo, salvarPreferencia, suaveLiberado, type Estilo, type Tema } from './tema'
+import { lerEstilo, especiaisLiberados, lerPreferencia, salvarEstilo, salvarPreferencia, suaveLiberado, type Estilo, type Tema } from './tema'
 
 // Amostras: fundo, cartão e a cor viva de cada tema.
-const OPCOES: { valor: Tema; nome: string; descricao: string; cores: [string, string, string] }[] = [
+type OpcaoTema = { valor: Tema; nome: string; descricao: string; cores: [string, string, string] }
+const OPCOES: OpcaoTema[] = [
   { valor: 'areia', nome: 'Areia', descricao: 'claro e quente, papel creme com tinta noite', cores: ['#F6F2EA', '#FFFDF9', '#0B1E3F'] },
   { valor: 'lagoa', nome: 'Lagoa', descricao: 'claro, com turquesa', cores: ['#EBF4F4', '#FCFDFD', '#0D7776'] },
   { valor: 'dark', nome: 'Noite', descricao: 'escuro, com turquesa', cores: ['#0B1E3F', '#1A2E51', '#13A3A0'] },
   { valor: 'cobalto', nome: 'Cobalto', descricao: 'escuro azul-marinho, com cobalto', cores: ['#131C30', '#1C2740', '#1F4FD1'] },
   { valor: 'pavao', nome: 'Pavão', descricao: 'escuro verde-pavão, com turquesa clara', cores: ['#092525', '#0D3635', '#56D2D0'] },
+]
+
+// Temas especiais (P127): terceiro grupo, além dos claros e dos escuros. Bloqueados por enquanto.
+const ESPECIAIS: OpcaoTema[] = [
+  { valor: 'plumagem', nome: 'Plumagem', descricao: 'o rosa, o verde e o azul do pavão de leque aberto', cores: ['#F5F0EC', '#B04A50', '#0457A8'] },
 ]
 
 const ESTILOS: { valor: Estilo; nome: string; descricao: string }[] = [
@@ -25,6 +31,7 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
   const [pref, setPref] = useState<Tema>(lerPreferencia)
   const [estilo, setEstilo] = useState<Estilo>(lerEstilo)
   const liberado = suaveLiberado()
+  const especiais = especiaisLiberados()
   const [estatisticas, setEstatisticas] = useState(telemetriaLigada)
   const [convidando, setConvidando] = useState(false)
 
@@ -57,20 +64,14 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
           <strong class="secao-titulo">Temas</strong>
           <span class="dica">Escolha o tema do Filidilo. A escolha fica salva neste aparelho.</span>
         </legend>
-        {OPCOES.map((o) => (
-          <label class={`opcao-tema ${pref === o.valor ? 'selecionada' : ''}`}>
-            <input type="radio" name="tema" value={o.valor} checked={pref === o.valor} onChange={() => escolher(o.valor)} />
-            <span class="amostra" aria-hidden="true">
-              {o.cores.map((c) => (
-                <span style={{ background: c }} />
-              ))}
-            </span>
-            <span class="textos">
-              <strong>{o.nome}</strong>
-              <small>{o.descricao}</small>
-            </span>
-          </label>
-        ))}
+        {OPCOES.map((o) => opcaoTema(o, pref, escolher))}
+      </fieldset>
+      <fieldset class="opcoes-tema">
+        <legend>
+          <strong class="secao-titulo">Temas especiais</strong>
+          <span class="dica">{especiais ? 'Liberados neste aparelho para teste.' : 'Aparecem em ocasiões especiais. Em breve.'}</span>
+        </legend>
+        {ESPECIAIS.map((o) => opcaoTema(o, pref, escolher, !especiais))}
       </fieldset>
       <fieldset class="opcoes-tema">
         <legend>
@@ -111,5 +112,24 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
       </section>
       {convidando && <CompartilharImagem opcoes={[{ rotulo: 'Convite', peca: () => pecaConvite({ urlApp: urlApp('convite') }) }]} onde="convite" avisar={(texto) => nav.avisar({ texto })} fechar={() => setConvidando(false)} />}
     </main>
+  )
+}
+
+function opcaoTema(o: OpcaoTema, pref: Tema, escolher: (t: Tema) => void, bloqueado = false) {
+  return (
+    <label class={`opcao-tema ${pref === o.valor ? 'selecionada' : ''} ${bloqueado ? 'desativada' : ''}`}>
+      <input type="radio" name="tema" value={o.valor} checked={pref === o.valor} disabled={bloqueado} onChange={() => escolher(o.valor)} />
+      <span class="amostra" aria-hidden="true">
+        {o.cores.map((c) => (
+          <span style={{ background: c }} />
+        ))}
+      </span>
+      <span class="textos">
+        <strong>
+          {o.nome} {bloqueado && <span class="tema-chip">Bloqueado</span>}
+        </strong>
+        <small>{o.descricao}</small>
+      </span>
+    </label>
   )
 }

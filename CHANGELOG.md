@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.29.0] — 2026-11-24
+
+### Novidades
+- **Temas especiais.** Em Preferências, um grupo novo, além dos temas claros e escuros: temas que vão aparecer em ocasiões especiais. O primeiro é o **Plumagem**, com as cores do pavão de leque aberto. Por enquanto ele aparece bloqueado.
+
 ## [3.28.0] — 2026-11-24
 
 ### Novidades

@@ -4,7 +4,7 @@
 // gravado como 'dark'. O antigo 'light' (Claro, depois Névoa) vira Areia. Quem nunca escolheu abre no
 // Areia ou no Noite conforme o modo do aparelho.
 
-export type Tema = 'areia' | 'lagoa' | 'dark' | 'cobalto' | 'pavao'
+export type Tema = 'areia' | 'lagoa' | 'plumagem' | 'dark' | 'cobalto' | 'pavao'
 export type Tipo = 'light' | 'dark'
 
 interface DadosTema {
@@ -12,10 +12,13 @@ interface DadosTema {
   paleta: string
   /** Cor do fundo, usada também na barra do navegador. */
   fundo: string
+  /** Tema especial (P127): terceiro grupo, bloqueado até ser liberado (evento, hora do dia…). */
+  especial?: boolean
 }
 
 export const TEMAS: Record<Tema, DadosTema> = {
   lagoa: { tipo: 'light', paleta: 'lagoa', fundo: '#EBF4F4' },
+  plumagem: { tipo: 'light', paleta: 'plumagem', fundo: '#F5F0EC', especial: true },
   areia: { tipo: 'light', paleta: 'areia', fundo: '#F6F2EA' },
   dark: { tipo: 'dark', paleta: 'noite', fundo: '#0B1E3F' },
   cobalto: { tipo: 'dark', paleta: 'cobalto', fundo: '#131C30' },
@@ -30,11 +33,29 @@ export function ehTema(v: unknown): v is Tema {
   return typeof v === 'string' && Object.prototype.hasOwnProperty.call(TEMAS, v)
 }
 
-/** Tema gravado; sem escolha, Areia ou Noite conforme o modo do aparelho. */
+// Temas especiais (P127): ficam bloqueados por enquanto. A regra de liberação (modo evento, horas do dia)
+// ainda vai ser decidida; até lá, só um aparelho liberado com ?especiais=1 (index.html grava a chave;
+// ?especiais=0 tira) pode escolher um deles.
+const CHAVE_ESPECIAIS = 'tatino-especiais-liberados'
+
+export function especiaisLiberados(): boolean {
+  try {
+    return localStorage.getItem(CHAVE_ESPECIAIS) === '1'
+  } catch {
+    return false
+  }
+}
+
+/** Tema que pode ser usado agora neste aparelho. */
+export function temaDisponivel(t: Tema): boolean {
+  return !TEMAS[t].especial || especiaisLiberados()
+}
+
+/** Tema gravado; sem escolha (ou especial bloqueado), Areia ou Noite conforme o modo do aparelho. */
 export function lerPreferencia(): Tema {
   try {
     const v = localStorage.getItem(CHAVE)
-    if (ehTema(v)) return v
+    if (ehTema(v) && temaDisponivel(v)) return v
     if (v === 'light') return 'areia'
   } catch {
     /* sem localStorage: segue o aparelho */
@@ -62,6 +83,7 @@ export function terminarAbertura() {
 }
 
 export function salvarPreferencia(t: Tema) {
+  if (!temaDisponivel(t)) return
   try {
     localStorage.setItem(CHAVE, t)
   } catch {

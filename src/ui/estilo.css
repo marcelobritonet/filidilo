@@ -117,6 +117,74 @@
   --fundo-grad: linear-gradient(180deg, color-mix(in srgb, var(--surface-subtle) 70%, var(--bg)) 0, var(--bg) 420px);
 }
 
+/* Plumagem (claro): tirado da foto do pavão de leque aberto (pedido do Marcelo, 24/11). Fundo rosado como
+   o da foto, tinta azul-noite, ação no azul do peito do pavão, barras no verde das penas. Foge da regra
+   "só as cinco cores da logo": o rosa e o verde são da foto. */
+:root[data-paleta='plumagem'] {
+  --bg: #F5F0EC;
+  --surface: #FFFAF8;
+  --surface-subtle: #EFE6E1;
+  --campo: #FFFAF8;
+  --borda-campo: #8E6E68;
+  --border: #EBD3CE;
+  --border-control: #8E6E68;
+  --text: #0E2747;
+  --text-muted: #5B4A4C;
+  --placeholder: #6F5D5E;
+  --accent: #0A62B8;
+  --accent-ink: #FFFFFF;
+  --accent-off: #E8D5D1;
+  --accent-off-ink: #6A5759;
+  --accent-soft: #DDEBFA;
+  --accent-text: #0A5AA8;
+  --sel: #0A62B8;
+  --sel-ink: #FFFFFF;
+  --barra: #4A7214;
+  --gold: #C9933A;
+  --gold-ink: #0E2747;
+  --success: #2E6A3A;
+  --success-soft: #E4EEDD;
+  --danger: #A3322B;
+  --danger-soft: #F8E1DE;
+  --warning: #855200;
+  --warning-soft: #F6E9D2;
+  --simbolo-fundo: #0E2747;
+  --shadow-card: 0 1px 2px rgba(110, 50, 55, .08), 0 4px 12px rgba(110, 50, 55, .07);
+  --overlay: rgba(14, 39, 71, .45);
+  --shadow-sheet: 0 -8px 32px rgba(14, 39, 71, .16);
+  --focus-ring: 0 0 0 3px var(--sel);
+  /* Suave: o ocelo da pena (verde das penas → azul do peito) */
+  --tom-mistura: 16%;
+  --tom-4: var(--marca-noite);
+  --tom-5: var(--marca-nevoa);
+  --grad-destaque: var(--grad-cartao);
+  --brilho: 0 10px 30px rgba(10, 98, 184, .14), 0 2px 8px rgba(127, 162, 58, .10);
+  --fundo-grad: none; /* o degradê fica só nos cartões */
+  /* Cartões com as cores da foto: rosa do fundo → marfim → verde das penas → azul do peito */
+  --grad-cartao: linear-gradient(150deg, color-mix(in srgb, #E9A8A2 55%, var(--surface)) 0%, color-mix(in srgb, #E9A8A2 12%, var(--surface)) 45%, color-mix(in srgb, #7FA23A 26%, var(--surface)) 78%, color-mix(in srgb, #0A62B8 24%, var(--surface)) 100%);
+}
+
+/* Plumagem (EXPERIMENTO, P125): cartões com as cores fortes da foto (coral do fundo → oliva das penas →
+   azul do peito), texto branco dentro deles; o fundo da tela fica liso. A versão suave anterior está no
+   scratchpad da sessão (estilo-plumagem-suave.css). */
+:root[data-paleta='plumagem'] {
+  --grad-forte: linear-gradient(150deg, #B04A50 0%, #7A6A2A 48%, #4E6E1A 66%, #0457A8 100%);
+  --grad-destaque: var(--grad-forte);
+}
+:root[data-paleta='plumagem'] body { background: var(--bg); }
+:root[data-paleta='plumagem'][data-theme] :is(.bloco, .cartao-resumo, .instalar-card, .instalar-bloco, .baralho-item, .cartao, .opcao-estatisticas, .opcao-check, .folha, .modal) {
+  background: var(--grad-forte); border-color: transparent; color: #FFFFFF;
+  --text: #FFFFFF; --text-muted: #FBEDEA; --accent-text: #FFFFFF; --placeholder: #6F5D5E;
+  --barra: #FFFFFF; --surface-subtle: rgba(255, 255, 255, .28); --border: rgba(255, 255, 255, .35);
+  --accent: #FFFFFF; --accent-ink: #0E2747; --accent-off: #EADBD8; --accent-off-ink: #5B4A4C;
+  --sel: #FFFFFF; --sel-ink: #0E2747; --accent-soft: rgba(255, 255, 255, .22);
+}
+:root[data-paleta='plumagem'][data-theme] :is(.bloco, .cartao-resumo, .instalar-card, .instalar-bloco, .baralho-item, .cartao, .folha, .modal) :is(input, textarea, select) { color: #0E2747; }
+:root[data-paleta='plumagem'][data-theme] :is(.bloco, .cartao-resumo, .instalar-card, .instalar-bloco, .baralho-item, .cartao, .folha, .modal) .btn.secundario:not(.perigo) {
+  background: rgba(255, 255, 255, .2); color: #FFFFFF; border-color: rgba(255, 255, 255, .45); box-shadow: none;
+}
+:root[data-paleta='plumagem'][data-theme] .baralho-item .barra { background: rgba(255, 255, 255, .3); }
+
 /* Noite (escuro, padrão) */
 :root[data-theme='dark'] {
   --bg: #0B1E3F;
@@ -1026,6 +1094,9 @@ details.bloco > summary { font-weight: 650; }
 .fio-dia.pisca > div { animation: piscar 1.6s ease-in-out infinite; background: var(--danger); }
 .selo-ofensiva.pisca .selo-icone { animation: piscar 1.6s ease-in-out infinite; }
 .selo-ofensiva.pisca { border-color: var(--sel); }
+/* Suave: sem borda (nem no dia garantido nem no aviso), com sombra; aberto ganha o brilho Turquesa. Clássico: a borda de sempre. */
+[data-estilo='suave'] :is(.selo-ofensiva, .selo-ofensiva.feito, .selo-ofensiva.pisca) { border-color: transparent; box-shadow: var(--shadow-card); }
+[data-estilo='suave'] .selo-ofensiva.aberto { box-shadow: var(--shadow-card), var(--brilho); }
 @media (prefers-reduced-motion: reduce) {
   .fio-dia.pisca > div, .selo-ofensiva.pisca .selo-icone { animation: none; }
   .selo-ofensiva, .selo-ofensiva.aberto, .selo-ofensiva .selo-icone > span { transition: opacity .3s ease; }
@@ -1074,9 +1145,6 @@ details.bloco > summary { font-weight: 650; }
 .painel-tema-linha { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; }
 .painel-tema-nome { min-width: 0; overflow-wrap: anywhere; }
 .painel-tema-nome small { color: var(--text-muted); }
-/* Suave: sem borda (nem no dia garantido nem no aviso), com sombra; aberto ganha o brilho Turquesa. Clássico: a borda de sempre. */
-[data-estilo='suave'] :is(.selo-ofensiva, .selo-ofensiva.feito, .selo-ofensiva.pisca) { border-color: transparent; box-shadow: var(--shadow-card); }
-[data-estilo='suave'] .selo-ofensiva.aberto { box-shadow: var(--shadow-card), var(--brilho); }
 .painel-tema-num { flex: none; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .barra.fina { height: 6px; }
 .painel-fracos li { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
