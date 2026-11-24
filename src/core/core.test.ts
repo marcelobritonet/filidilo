@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { confere, formatar, lerNumero, preencher, sortear } from './calc'
 import { avaliar } from './expr'
-import { filaProva, intercalar } from './fila'
+import { filaEspacada, filaProva, intercalar } from './fila'
 import type { Estado } from './db'
 import type { Baralho, CartaoCalculo } from './types'
 
@@ -93,6 +93,13 @@ describe('fila do modo prova', () => {
     expect(filaProva(b, new Map()).length).toBe(4)
     const f = filaProva(b, new Map([est('o2', 1), est('p1', 3)]), { soNovos: true })
     expect(f.map((c) => c.id).sort()).toEqual(['o1', 'p2'])
+  })
+  it('cartão arquivado não entra em nenhuma fila', () => {
+    const comArquivado: Baralho = { ...b, cartoes: b.cartoes.map((c) => (c.id === 'o2' || c.id === 'p2' ? { ...c, arquivadoEm: 1 } : c)) }
+    const estados = new Map([est('o2', 1), est('p1', 3, passado)])
+    expect(filaProva(comArquivado, estados).map((c) => c.id).sort()).toEqual(['o1', 'p1'])
+    expect(filaProva(comArquivado, estados, { soNovos: true }).map((c) => c.id)).toEqual(['o1'])
+    expect(filaEspacada(comArquivado, estados).map((c) => c.id).sort()).toEqual(['o1', 'p1'])
   })
   it('intercalar: sobra de uma lista vai no fim', () => {
     expect(intercalar(['r1'], ['n1', 'n2', 'n3'], 3)).toEqual(['r1', 'n1', 'n2', 'n3'])

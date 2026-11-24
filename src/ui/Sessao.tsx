@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'preact/hooks'
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { confere, formatar, lerNumero, preencher, sortear, type Sorteio } from '../core/calc'
 import { embaralhar } from '../core/aleatorio'
+import { ativos, arquivarCartao, desarquivarCartao } from '../core/cartoes'
 import { db, type Nota } from '../core/db'
 import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../core/fila'
 import { formaDaCerta, sortearAlternativas } from '../core/alternativas'
@@ -26,6 +27,7 @@ import { Folha } from './Folha'
 import { Icone } from './Icone'
 import { DesenhoOfensiva } from './Marca'
 import { Tex } from './Tex'
+import type { Aviso } from './App'
 
 export type Modo = 'prova' | 'espacada' | 'calculo'
 /** Até onde vai a sessão: N cartões, X minutos ou livre (até a pessoa tocar em Terminar). */
@@ -61,7 +63,7 @@ function BotaoCorrigir({ acoes }: { acoes: Acoes }) {
   )
 }
 
-export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais, mudou }: { baralho: Baralho; modo: Modo; opcoes: OpcoesFila; limite?: Limite; sair: () => void; criarMais: (assunto?: string, temaId?: string) => void; mudou?: () => void }) {
+export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais, mudou, avisar }: { baralho: Baralho; modo: Modo; opcoes: OpcoesFila; limite?: Limite; sair: () => void; criarMais: (assunto?: string, temaId?: string) => void; mudou?: () => void; avisar?: (a: Aviso) => void }) {
   // Cópia local: correções feitas durante a sessão entram aqui sem reiniciar a sessão.
   const [baralho, setBaralho] = useState(inicial)
   const [corrigindo, setCorrigindo] = useState(false)
@@ -95,6 +97,9 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   const [naoVistos, setNaoVistos] = useState<Set<string>>(new Set())
   const [respondidosIds, setRespondidosIds] = useState<Set<string>>(new Set())
   const [pos, setPos] = useState(0)
+  // Posição atual para o "Desfazer" do arquivar, que roda depois de a sessão ter andado.
+  const posAtual = useRef(0)
+  posAtual.current = pos
   const [placar, setPlacar] = useState({ certos: 0, errados: 0, chutes: 0, pulados: 0 })
   const [rodada, setRodada] = useState(0)
   const [vez, setVez] = useState(0) // força remontar o cartão ao pular
@@ -127,7 +132,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
       const f = modo === 'espacada' ? filaEspacada(baralho, m, { ...opcoes, tamanho }, porTempo ? 100 : Math.min(tamanho, 15)) : filaProva(baralho, m, { ...opcoes, tamanho })
       setFila(f)
       setDominados(new Set(baralho.cartoes.filter((c) => dominado(m.get(chave(baralho.id, c.id)))).map((c) => c.id)))
-      setNaoVistos(new Set(baralho.cartoes.filter((c) => !m.has(chave(baralho.id, c.id))).map((c) => c.id)))
+      setNaoVistos(new Set(ativos(baralho).filter((c) => !m.has(chave(baralho.id, c.id))).map((c) => c.id)))
       setRespondidosIds(new Set())
       setPos(0)
       setPlacar({ certos: 0, errados: 0, chutes: 0, pulados: 0 })
@@ -195,6 +200,34 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
     } else setAvisoSair(true)
   }
   const falta = MINIMO_LIVRE - respondidos
+
+  /** Arquivar: o cartão sai desta sessão e das próximas, sem apagar nada; o aviso permite desfazer. */
+  const arquivar = async () => {
+    if (!cartao) return
+    const c = cartao
+    const b = await arquivarCartao(baralho, c.id)
+    setBaralho(b)
+    mudou?.()
+    evento('cartao_arquivado', { onde: 'estudo', tipo: c.tipo })
+    // Sai da posição atual e das vezes que ia voltar (errado ou pulado); as já respondidas ficam.
+    setFila(fila.filter((x, i) => i < pos || x.id !== c.id))
+    setNaoVistos((n) => {
+      const s = new Set(n)
+      s.delete(c.id)
+      return s
+    })
+    setVez((v) => v + 1)
+    window.scrollTo(0, 0)
+    avisar?.({
+      texto: 'Cartão arquivado. Ele não volta mais no estudo.',
+      desfazer: async () => {
+        setBaralho(await desarquivarCartao(b, c.id))
+        mudou?.()
+        evento('cartao_desarquivado', { onde: 'estudo' })
+        setFila((f) => (f ? [...f.slice(0, posAtual.current), c, ...f.slice(posAtual.current)] : f))
+      },
+    })
+  }
 
   /** Cartão corrigido: troca na sessão e mostra de novo, para responder já com o conteúdo certo. */
   const corrigido = (c: Cartao, b: Baralho) => {
@@ -312,7 +345,10 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
               Pular
             </button>
             <button class="btn terciario" onClick={() => setCorrigindo(true)}>
-              Corrigir cartão
+              Corrigir
+            </button>
+            <button class="btn terciario" onClick={arquivar}>
+              Arquivar
             </button>
           </div>
           {corrigindo && <CorrigirCartao baralho={baralho} cartao={cartao} aoSalvar={corrigido} fechar={() => setCorrigindo(false)} corrigirEuMesmo={abrirEditor} />}

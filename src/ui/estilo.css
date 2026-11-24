@@ -367,6 +367,8 @@ textarea { line-height: 1.5; resize: vertical; }
 .chip.ativo.ok { border-color: var(--success); background: var(--success-soft); }
 .chip.ativo.erro { border-color: var(--danger); background: var(--danger-soft); }
 .lista-revisao { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 10px; }
+.lista-revisao .item.arquivado > :not(.cab):not(.linha) { opacity: .6; }
+.etiqueta-arquivado { font-size: 13px; color: var(--text-muted); border: 1px dashed var(--border); padding: 2px 10px; border-radius: 999px; }
 .item {
   background: var(--surface); border: 1px solid var(--border); border-left: 5px solid var(--border);
   border-radius: var(--radius-md); padding: 14px 16px; display: grid; gap: 8px;
@@ -375,6 +377,7 @@ textarea { line-height: 1.5; resize: vertical; }
 .item.erro { border-left-color: var(--danger); border-left-style: double; }
 .item.nota { border-left-color: var(--gold); border-left-style: dashed; }
 .item .cab { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--text-muted); }
+.lista-revisao .item .linha { grid-auto-flow: column; grid-auto-columns: 1fr; grid-template-columns: none; }
 .item .linha .btn { width: 100%; }
 .item .frente { font-family: var(--font-ui); font-size: 17px; font-weight: 650; line-height: 1.45; }
 .item .verso { font-size: 16px; }
@@ -478,7 +481,7 @@ textarea.instrucao { font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monosp
 .passo h2 { flex-wrap: nowrap; }
 
 /* ---------- Sessão: pular e folha de resultado ---------- */
-.acoes-cartao { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.acoes-cartao { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
 .acoes-cartao .btn small { color: var(--text-muted); }
 .etapa-feita summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--text-muted); font-size: 15px; }
 .resposta-certa { margin: 0; font-size: 18px; }

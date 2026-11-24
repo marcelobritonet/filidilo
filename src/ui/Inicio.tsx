@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'preact/hooks'
 import { desarquivar } from '../core/baralhos'
+import { ativos } from '../core/cartoes'
 import type { Filtro } from '../core/fila'
 import { chave, dominado, vencido, visto } from '../core/srs'
 import type { Baralho } from '../core/types'
@@ -45,10 +46,14 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
   const [escolha, setEscolha] = useState<Escolha>(() => lerEscolha(id))
   const [perguntando, setPerguntando] = useState(false)
 
+  // Cartões arquivados ficam fora do estudo e das contagens.
+  const cartoes = useMemo(() => ativos(baralho), [baralho])
+  const nArquivados = baralho.cartoes.length - cartoes.length
+
   const porTema = useMemo(() => {
     const m = new Map<string, { total: number; dominados: number; vistos: number }>()
     for (const t of baralho.temas) m.set(t.id, { total: 0, dominados: 0, vistos: 0 })
-    for (const c of baralho.cartoes) {
+    for (const c of cartoes) {
       const r = m.get(c.tema)
       if (!r) continue
       r.total++
@@ -57,14 +62,14 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
       if (visto(e)) r.vistos++
     }
     return m
-  }, [estados, baralho])
+  }, [estados, baralho, cartoes])
 
   const temasComCartoes = baralho.temas.filter((t) => porTema.get(t.id)?.total)
-  const total = baralho.cartoes.length
-  const dominadosTotal = estados ? baralho.cartoes.filter((c) => dominado(estados.get(chave(id, c.id)))).length : 0
-  const vistosTotal = estados ? baralho.cartoes.filter((c) => visto(estados.get(chave(id, c.id)))).length : 0
-  const paraHoje = estados ? baralho.cartoes.filter((c) => estados.has(chave(id, c.id)) && vencido(estados.get(chave(id, c.id)))).length : 0
-  const temCalculo = baralho.cartoes.some((c) => c.tipo === 'calculo')
+  const total = cartoes.length
+  const dominadosTotal = estados ? cartoes.filter((c) => dominado(estados.get(chave(id, c.id)))).length : 0
+  const vistosTotal = estados ? cartoes.filter((c) => visto(estados.get(chave(id, c.id)))).length : 0
+  const paraHoje = estados ? cartoes.filter((c) => estados.has(chave(id, c.id)) && vencido(estados.get(chave(id, c.id)))).length : 0
+  const temCalculo = cartoes.some((c) => c.tipo === 'calculo')
   // Quase tudo dominado (80% ou mais, com pelo menos 10 cartões): sugere cartões de um nível acima.
   const subirNivel = total >= 10 && dominadosTotal >= 0.8 * total
 
@@ -82,7 +87,7 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
   // Nunca vistos nos temas marcados e no conteúdo escolhido: é o que "Só os que nunca vi" vai estudar.
   const filtroAtual: Filtro = temCalculo ? escolha.conteudo : 'tudo'
   const novosMarcados = estados
-    ? baralho.cartoes.filter(
+    ? cartoes.filter(
         (c) =>
           escolha.temas.includes(c.tema) &&
           (filtroAtual === 'calculo' ? c.tipo === 'calculo' : filtroAtual === 'teoria' ? c.tipo !== 'calculo' : true) &&
@@ -133,7 +138,7 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
         </div>
         <div class="titulo-acoes">
           <h1>{baralho.titulo}</h1>
-          {total > 0 && (
+          {baralho.cartoes.length > 0 && (
             <button class="icone-btn" aria-label="Enviar baralho" title="Enviar baralho" onClick={enviar}>
               <Icone nome="enviar" />
             </button>
@@ -149,7 +154,17 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
         )}
       </header>
 
-      {total === 0 ? (
+      {total === 0 && nArquivados > 0 ? (
+        <section class="bloco">
+          <p>Todos os cartões deste baralho estão arquivados.</p>
+          <button class="btn principal" onClick={() => nav.ir({ nome: 'revisar', id, arquivados: true })}>
+            Ver arquivados
+          </button>
+          <button class="btn secundario" onClick={() => nav.ir({ nome: 'ia', id })}>
+            Criar com IA
+          </button>
+        </section>
+      ) : total === 0 ? (
         <section class="bloco">
           <p>Ainda não há cartões.</p>
           <button class="btn principal" onClick={() => nav.ir({ nome: 'ia', id })}>
@@ -180,6 +195,14 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
                     Já passou por <strong>{vistosTotal}</strong> de {total} · {total - vistosTotal} {total - vistosTotal === 1 ? 'nunca visto' : 'nunca vistos'}
                   </>
                 )}
+              </p>
+            )}
+            {nArquivados > 0 && (
+              <p class="dica">
+                {nArquivados} {nArquivados === 1 ? 'cartão arquivado' : 'cartões arquivados'} ·{' '}
+                <button class="link" onClick={() => nav.ir({ nome: 'revisar', id, arquivados: true })}>
+                  Ver
+                </button>
               </p>
             )}
           </section>

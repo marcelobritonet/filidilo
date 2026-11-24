@@ -17,6 +17,7 @@ export interface OpcoesFila {
 function candidatos(b: Baralho, o: OpcoesFila, estados?: Map<string, Estado>): Cartao[] {
   return b.cartoes.filter(
     (c) =>
+      !c.arquivadoEm &&
       (!o.temas?.length || o.temas.includes(c.tema)) &&
       (!o.soNovos || !estados?.has(chave(b.id, c.id))) &&
       (o.filtro === 'calculo' ? c.tipo === 'calculo' : o.filtro === 'teoria' ? c.tipo !== 'calculo' : true),

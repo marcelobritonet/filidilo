@@ -89,6 +89,17 @@ describe('baralhos no aparelho', () => {
     expect(c.tipo === 'vf' && c.frente).toBe('minha versão')
   })
 
+  it('versão nova de fábrica atualiza o cartão arquivado sem desarquivar', async () => {
+    const v1 = { id: 'y', titulo: 'Y', versao: 1, temas: [{ id: 'a', nome: 'A' }], cartoes: [{ id: 'c', tipo: 'vf' as const, tema: 'a', frente: 'original', resposta: true }] }
+    await semear([() => ({ baralho: structuredClone(v1) })])
+    const b1 = (await listar())[0]
+    await salvar({ ...b1, cartoes: [{ ...b1.cartoes[0], arquivadoEm: 123 }] })
+    await semear([() => ({ baralho: { ...structuredClone(v1), versao: 2, cartoes: [{ ...v1.cartoes[0], frente: 'fábrica v2' }] } })])
+    const c = (await listar())[0].cartoes[0]
+    expect(c.tipo === 'vf' && c.frente).toBe('fábrica v2')
+    expect(c.arquivadoEm).toBe(123)
+  })
+
   it('cria, duplica (sem progresso), exclui e restaura', async () => {
     const b = await criar('Física 1')
     expect(b.id).toMatch(/^fisica-1-[a-z0-9]{1,4}$/)

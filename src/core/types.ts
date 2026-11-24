@@ -101,6 +101,8 @@ interface CartaoBase {
   /** Editado pela estudante: atualizações importadas não sobrescrevem. */
   editado?: boolean
   atualizadoEm?: number
+  /** Quando foi arquivado: sai do estudo e das contagens; o texto e o progresso ficam guardados. */
+  arquivadoEm?: number
 }
 
 export interface CartaoConceito extends CartaoBase {

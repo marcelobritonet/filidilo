@@ -22,10 +22,18 @@ interface ArquivoBaralho {
  */
 export function arquivoDoBaralho(b: Baralho, progresso?: Progresso, desafio?: string): { nome: string; texto: string } {
   // Arquivar é só deste aparelho: quem recebe ganha o baralho na lista principal.
-  const { arquivadoEm: _arq, ...baralho } = b
+  // Com progresso (outro aparelho dela), os cartões arquivados continuam arquivados; sem, vão como cartões comuns.
+  const { arquivadoEm: _arq, ...resto } = b
+  const baralho = progresso ? resto : { ...resto, cartoes: b.cartoes.map(semArquivo) }
   const envelope: ArquivoBaralho = { app: 'tatino', tipo: 'baralho', formato: 2, baralho, ...(progresso && { progresso }), ...(desafio && { desafio }) }
   const titulo = nomeArquivo(b.titulo) || 'baralho'
   return { nome: `${titulo}${progresso ? ' com progresso' : ''} (Filidilo).txt`, texto: JSON.stringify(envelope) }
+}
+
+/** Tira a marca de arquivado do cartão: arquivar é escolha de quem estuda. */
+const semArquivo = (c: Cartao): Cartao => {
+  const { arquivadoEm: _arq, ...resto } = c
+  return resto as Cartao
 }
 
 const nomeArquivo = (s: string) => s.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim()
@@ -52,7 +60,7 @@ export interface CartoesRecebidos {
 /** Arquivo para enviar um ou mais cartões de um baralho. */
 export function arquivoDosCartoes(b: Baralho, cartoes: Cartao[], desafio?: string): { nome: string; texto: string } {
   const usados = new Set(cartoes.map((c) => c.tema))
-  const envelope: ArquivoCartoes = { app: 'tatino', tipo: 'cartoes', formato: 2, origem: { titulo: b.titulo }, temas: b.temas.filter((t) => usados.has(t.id)), cartoes, ...(desafio && { desafio }) }
+  const envelope: ArquivoCartoes = { app: 'tatino', tipo: 'cartoes', formato: 2, origem: { titulo: b.titulo }, temas: b.temas.filter((t) => usados.has(t.id)), cartoes: cartoes.map(semArquivo), ...(desafio && { desafio }) }
   const c = cartoes[0]
   const resumo = nomeArquivo(('frente' in c ? c.frente : c.titulo).replace(/[$*]/g, '')).slice(0, 40)
   return { nome: `${cartoes.length === 1 ? `Cartão - ${resumo}` : `${cartoes.length} cartões - ${nomeArquivo(b.titulo)}`} (Filidilo).txt`, texto: JSON.stringify(envelope) }
@@ -161,7 +169,7 @@ export interface PlanoImportacao {
 }
 
 const semMeta = (c: Cartao) => {
-  const { atualizadoEm: _a, editado: _e, origem: _o, ...resto } = c
+  const { atualizadoEm: _a, editado: _e, origem: _o, arquivadoEm: _arq, ...resto } = c
   return JSON.stringify(resto)
 }
 
@@ -209,7 +217,13 @@ export async function aplicarSoProgresso(p: PlanoImportacao): Promise<void> {
 async function aplicarCartoes(p: PlanoImportacao): Promise<Baralho> {
   if (!p.atual) return salvar({ ...p.recebido, cartoes: p.recebido.cartoes.map(marcarImportado), criadoEm: undefined })
   const trocar = new Map(p.atualizados.map((c) => [c.id, c]))
-  const cartoes = [...p.atual.cartoes.map((c) => (trocar.has(c.id) ? marcarImportado(trocar.get(c.id)!) : c)), ...p.novos.map(marcarImportado)]
+  // Arquivado de um lado fica arquivado (o recebido só traz a marca quando veio com progresso, de outro aparelho dela).
+  const arquivadoNoRecebido = new Map(p.recebido.cartoes.filter((c) => c.arquivadoEm).map((c) => [c.id, c.arquivadoEm]))
+  const comArquivo = (local: Cartao, c: Cartao): Cartao => {
+    const arquivadoEm = local.arquivadoEm ?? arquivadoNoRecebido.get(local.id)
+    return arquivadoEm ? { ...c, arquivadoEm } : c
+  }
+  const cartoes = [...p.atual.cartoes.map((c) => comArquivo(c, trocar.has(c.id) ? marcarImportado(trocar.get(c.id)!) : c)), ...p.novos.map(marcarImportado)]
   // Nome, objetivo e temas que ela já tem continuam os dela; só entram os temas novos e um objetivo que ela não tenha.
   return salvar({ ...p.atual, cartoes, temas: [...p.atual.temas, ...p.temasNovos], objetivo: p.atual.objetivo ?? p.recebido.objetivo })
 }

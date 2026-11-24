@@ -1,6 +1,6 @@
 import { evento } from '../core/telemetria'
 import { useState } from 'preact/hooks'
-import { excluirCartao, gravarCartao, novoIdCartao, problemasDoCartao, reinserirCartao } from '../core/cartoes'
+import { arquivarCartao, desarquivarCartao, excluirCartao, gravarCartao, novoIdCartao, problemasDoCartao, reinserirCartao } from '../core/cartoes'
 import { contarLacunas, MARCADOR } from '../core/lacunas'
 import type { Baralho, Cartao } from '../core/types'
 import type { Navegacao } from './App'
@@ -101,6 +101,28 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav, naSessao }: 
       nav.avisar({ texto: original ? 'Cartão atualizado.' : 'Cartão criado.' })
       nav.voltar()
     }
+  }
+
+  const alternarArquivo = async () => {
+    if (!nav || !original) return
+    if (original.arquivadoEm) {
+      evento('cartao_desarquivado', { onde: 'editar' })
+      await desarquivarCartao(baralho, original.id)
+      nav.mudou()
+      nav.avisar({ texto: 'Cartão de volta ao estudo.' })
+    } else {
+      evento('cartao_arquivado', { onde: 'editar', tipo: original.tipo })
+      const b = await arquivarCartao(baralho, original.id)
+      nav.mudou()
+      nav.avisar({
+        texto: 'Cartão arquivado. Ele não volta mais no estudo.',
+        desfazer: async () => {
+          await desarquivarCartao(b, original.id)
+          nav.mudou()
+        },
+      })
+    }
+    nav.voltar()
   }
 
   const apagar = async () => {
@@ -299,6 +321,12 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav, naSessao }: 
       )}
       {original && !naSessao && (
         <section class="bloco">
+          <button class="btn secundario" onClick={alternarArquivo}>
+            {original.arquivadoEm ? 'Desarquivar cartão' : 'Arquivar cartão'}
+          </button>
+          <p class="dica">
+            {original.arquivadoEm ? 'Este cartão está arquivado: não aparece no estudo.' : 'Arquivar tira o cartão do estudo sem apagar. Dá para desarquivar na lista de cartões.'}
+          </p>
           {!confirmar ? (
             <button class="btn secundario perigo" onClick={() => setConfirmar(true)}>
               Excluir cartão
@@ -306,6 +334,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav, naSessao }: 
           ) : (
             <div class="confirmar">
               <p>Excluir este cartão?</p>
+              {!original.arquivadoEm && <p class="dica">Se só não quer mais vê-lo no estudo, arquive: o cartão fica guardado.</p>}
               <div class="linha">
                 <button class="btn secundario" onClick={() => setConfirmar(false)}>
                   Cancelar

@@ -21,7 +21,7 @@ export type Tela =
   | { nome: 'baralhos' }
   | { nome: 'baralho'; id: string }
   | { nome: 'sessao'; id: string; modo: Modo; opcoes: OpcoesFila; limite?: Limite }
-  | { nome: 'revisar'; id: string }
+  | { nome: 'revisar'; id: string; arquivados?: boolean }
   | { nome: 'config'; id: string }
   | { nome: 'cartao'; id: string; cartaoId?: string; tema?: string }
   | { nome: 'colar'; id: string }
@@ -146,8 +146,8 @@ export function App() {
     )
   else if (tela.nome === 'baralho') conteudo = <Inicio baralho={baralho} nav={nav} versao={versao} />
   else if (tela.nome === 'ia') conteudo = <CriarComIA baralho={baralho} assuntoInicial={tela.assunto} temaId={tela.temaId} nav={nav} />
-  else if (tela.nome === 'sessao') conteudo = <Sessao baralho={baralho} modo={tela.modo} opcoes={tela.opcoes} limite={tela.limite} sair={nav.voltar} criarMais={(assunto, temaId) => nav.substituir({ nome: 'ia', id: baralho.id, assunto, temaId })} mudou={nav.mudou} />
-  else if (tela.nome === 'revisar') conteudo = <Revisar baralho={baralho} nav={nav} />
+  else if (tela.nome === 'sessao') conteudo = <Sessao baralho={baralho} modo={tela.modo} opcoes={tela.opcoes} limite={tela.limite} sair={nav.voltar} criarMais={(assunto, temaId) => nav.substituir({ nome: 'ia', id: baralho.id, assunto, temaId })} mudou={nav.mudou} avisar={nav.avisar} />
+  else if (tela.nome === 'revisar') conteudo = <Revisar baralho={baralho} nav={nav} arquivados={tela.arquivados} />
   else if (tela.nome === 'cartao') conteudo = <EditarCartao key={tela.cartaoId ?? 'novo'} baralho={baralho} cartaoId={tela.cartaoId} temaInicial={tela.tema} nav={nav} />
   else if (tela.nome === 'colar') conteudo = <ColarLista baralho={baralho} nav={nav} />
   // A chave remonta o formulário quando o baralho muda (ex.: cartões e temas criados com IA);

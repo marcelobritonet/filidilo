@@ -31,7 +31,9 @@ export async function gravarCartao(b: Baralho, c: Cartao): Promise<Baralho> {
   return mudarCartoes(b, (atual) => {
     const i = atual.cartoes.findIndex((x) => x.id === c.id)
     const cartoes = [...atual.cartoes]
-    if (i >= 0) cartoes[i] = { ...c, editado: true, atualizadoEm: agora }
+    // Arquivar não é conteúdo: editar um cartão arquivado o mantém arquivado.
+    const arquivadoEm = i >= 0 ? atual.cartoes[i].arquivadoEm : undefined
+    if (i >= 0) cartoes[i] = { ...c, editado: true, atualizadoEm: agora, ...(arquivadoEm && { arquivadoEm }) }
     else cartoes.push({ ...c, origem: c.origem ?? 'manual', atualizadoEm: agora })
     return { ...atual, cartoes }
   })
@@ -59,6 +61,20 @@ export async function excluirCartao(b: Baralho, id: string): Promise<{ baralho: 
   })
   return { baralho, cartao, pos }
 }
+
+/** Cartões que entram no estudo e nas contagens (os arquivados ficam de fora). */
+export const ativos = (b: Baralho): Cartao[] => b.cartoes.filter((c) => !c.arquivadoEm)
+
+export const arquivados = (b: Baralho): Cartao[] => b.cartoes.filter((c) => c.arquivadoEm)
+
+/** Arquiva ou desarquiva um cartão. Não conta como edição: atualizações importadas continuam valendo. */
+async function marcarArquivado(b: Baralho, id: string, arquivadoEm: number | undefined): Promise<Baralho> {
+  return mudarCartoes(b, (atual) => ({ ...atual, cartoes: atual.cartoes.map((c) => (c.id === id ? { ...c, arquivadoEm } : c)) }))
+}
+
+export const arquivarCartao = (b: Baralho, id: string) => marcarArquivado(b, id, Date.now())
+
+export const desarquivarCartao = (b: Baralho, id: string) => marcarArquivado(b, id, undefined)
 
 export async function reinserirCartao(b: Baralho, c: Cartao, pos: number): Promise<Baralho> {
   return mudarCartoes(b, (atual) => {

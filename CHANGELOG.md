@@ -2,6 +2,15 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.19.0] — 2026-11-24
+
+**Arquive cartões sem perder nada**
+- Tem um cartão que volta demais e não quer mais vê-lo? Toque em **Arquivar** embaixo dele durante o estudo. Ele sai do estudo na hora, e o aviso permite desfazer.
+- O cartão arquivado não aparece mais no estudo nem nas contagens do baralho, mas o texto e o progresso continuam guardados.
+- Na tela do baralho aparece "N cartões arquivados · Ver". Em Configurar baralho → Ver e editar, escolha **Arquivados** para ver esses cartões e desarquivar quando quiser.
+- Também dá para arquivar pela lista de cartões e pelo Editar cartão.
+- Ao enviar o baralho para outra pessoa, os cartões arquivados vão como cartões comuns.
+
 ## [3.18.0] — 2026-11-23
 
 **O pavão aparece mais**

@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { criar, obter } from './baralhos'
-import { adicionarCartoes, excluirCartao, gravarCartao, lerLista, problemasDoCartao, reinserirCartao } from './cartoes'
+import { adicionarCartoes, arquivarCartao, ativos, desarquivarCartao, excluirCartao, gravarCartao, lerLista, problemasDoCartao, reinserirCartao } from './cartoes'
 import { db } from './db'
 import type { Cartao } from './types'
 
@@ -72,5 +72,21 @@ describe('edição de cartões', () => {
     const b = await criar('T')
     expect(problemasDoCartao(b, { id: 'a', tipo: 'associacao', tema: 'geral', frente: 'x', opcoes: ['só uma'], correta: 0 })).toEqual(['precisa de 2 ou mais opções'])
     expect(problemasDoCartao(b, { id: 'a', tipo: 'conceito', tema: 'geral', frente: 'x', verso: 'y' })).toEqual([])
+  })
+  it('arquivar tira o cartão dos ativos sem apagar nem marcar edição, e não desfaz correção feita numa cópia velha', async () => {
+    const velho = await gravarCartao(await criar('Teste'), { id: 'x1', tipo: 'conceito', tema: 'geral', frente: 'Pergunta', verso: 'errada' })
+    await gravarCartao(velho, { id: 'x1', tipo: 'conceito', tema: 'geral', frente: 'Pergunta', verso: 'certa' })
+    const novo = await gravarCartao(velho, { id: 'x2', tipo: 'conceito', tema: 'geral', frente: 'Outra', verso: 'resposta' })
+    const arq = await arquivarCartao(velho, 'x2')
+    expect(arq.cartoes.map((c) => c.id)).toEqual(['x1', 'x2'])
+    expect(ativos(arq).map((c) => c.id)).toEqual(['x1'])
+    const x2 = arq.cartoes.find((c) => c.id === 'x2')!
+    expect(x2.arquivadoEm).toBeGreaterThan(0)
+    expect(x2.editado).toBe(novo.cartoes.find((c) => c.id === 'x2')!.editado)
+    expect(arq.cartoes[0].tipo === 'conceito' && arq.cartoes[0].verso).toBe('certa')
+    const editado = await gravarCartao(velho, { id: 'x2', tipo: 'conceito', tema: 'geral', frente: 'Outra', verso: 'resposta nova' })
+    expect(ativos(editado).map((c) => c.id)).toEqual(['x1'])
+    const volta = await desarquivarCartao(velho, 'x2')
+    expect(ativos(volta).map((c) => c.id)).toEqual(['x1', 'x2'])
   })
 })

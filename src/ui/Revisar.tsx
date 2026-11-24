@@ -2,6 +2,8 @@ import { formasAceitas } from '../core/lacunas'
 import { useState } from 'preact/hooks'
 import { formatar, preencher, sortear } from '../core/calc'
 import type { Baralho, Cartao } from '../core/types'
+import { arquivarCartao, desarquivarCartao } from '../core/cartoes'
+import { evento } from '../core/telemetria'
 import type { Navegacao } from './App'
 import { conteudoCartao } from './enviar'
 import { EnviarModal } from './EnviarModal'
@@ -11,9 +13,35 @@ import { nomeTema } from './estado'
 import { Tex } from './Tex'
 
 /** Lista dos cartões do baralho: escrever, colar lista, editar e enviar. */
-export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) {
-  const [tema, setTema] = useState('')
-  const lista = baralho.cartoes.filter((c) => !tema || c.tema === tema)
+const ARQUIVADOS = '__arquivados'
+
+export function Revisar({ baralho, nav, arquivados: abrirArquivados }: { baralho: Baralho; nav: Navegacao; arquivados?: boolean }) {
+  const nArquivados = baralho.cartoes.filter((c) => c.arquivadoEm).length
+  const [escolhido, setTema] = useState(abrirArquivados && nArquivados ? ARQUIVADOS : '')
+  // Sem arquivados (desarquivou o último), volta para Todos.
+  const tema = escolhido === ARQUIVADOS && !nArquivados ? '' : escolhido
+  const vendoArquivados = tema === ARQUIVADOS
+  const ativos = baralho.cartoes.filter((c) => !c.arquivadoEm)
+  const lista = vendoArquivados ? baralho.cartoes.filter((c) => c.arquivadoEm) : ativos.filter((c) => !tema || c.tema === tema)
+
+  const arquivar = async (c: Cartao) => {
+    evento('cartao_arquivado', { onde: 'lista', tipo: c.tipo })
+    const b = await arquivarCartao(baralho, c.id)
+    nav.mudou()
+    nav.avisar({
+      texto: 'Cartão arquivado. Ele não volta mais no estudo.',
+      desfazer: async () => {
+        await desarquivarCartao(b, c.id)
+        nav.mudou()
+      },
+    })
+  }
+  const desarquivar = async (c: Cartao) => {
+    evento('cartao_desarquivado', { onde: 'lista' })
+    await desarquivarCartao(baralho, c.id)
+    nav.mudou()
+    nav.avisar({ texto: 'Cartão de volta ao estudo.' })
+  }
 
   const [enviando, setEnviando] = useState<Cartao | null>(null)
   const enviar = (c: Cartao) => setEnviando(c)
@@ -36,26 +64,30 @@ export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) 
           Colar lista
         </button>
       </div>
-      {baralho.temas.length > 1 && (
+      {(baralho.temas.length > 1 || nArquivados > 0) && (
         <label class="campo">
-          Tema
+          Mostrar
           <select value={tema} onChange={(e) => setTema((e.target as HTMLSelectElement).value)}>
-            <option value="">Todos ({baralho.cartoes.length})</option>
-            {baralho.temas
-              .filter((t) => baralho.cartoes.some((c) => c.tema === t.id))
-              .map((t) => (
-                <option value={t.id}>
-                  {t.nome} ({baralho.cartoes.filter((c) => c.tema === t.id).length})
-                </option>
-              ))}
+            <option value="">Todos ({ativos.length})</option>
+            {baralho.temas.length > 1 &&
+              baralho.temas
+                .filter((t) => ativos.some((c) => c.tema === t.id))
+                .map((t) => (
+                  <option value={t.id}>
+                    {t.nome} ({ativos.filter((c) => c.tema === t.id).length})
+                  </option>
+                ))}
+            {nArquivados > 0 && <option value={ARQUIVADOS}>Arquivados ({nArquivados})</option>}
           </select>
         </label>
       )}
+      {vendoArquivados && <p class="dica">Arquivados não aparecem no estudo nem nas contagens. O progresso deles continua guardado.</p>}
       <ul class="lista-revisao">
         {lista.map((c) => (
-          <li class="item">
+          <li class={`item ${c.arquivadoEm ? 'arquivado' : ''}`}>
             <div class="cab">
               <span class="tema-chip">{nomeTema(baralho, c.tema)}</span>
+              {c.arquivadoEm && <span class="etiqueta-arquivado">Arquivado</span>}
             </div>
             <Conteudo c={c} />
             {c.fonte && (
@@ -64,14 +96,28 @@ export function Revisar({ baralho, nav }: { baralho: Baralho; nav: Navegacao }) 
                 {c.fonte.pagina !== undefined && `, p. ${c.fonte.pagina}`}
               </p>
             )}
-            <div class="linha">
-              <button class="btn secundario compacto" onClick={() => nav.ir({ nome: 'cartao', id: baralho.id, cartaoId: c.id })}>
-                Editar
-              </button>
-              <button class="btn secundario compacto" onClick={() => enviar(c)}>
-                Enviar
-              </button>
-            </div>
+            {c.arquivadoEm ? (
+              <div class="linha">
+                <button class="btn secundario compacto" onClick={() => desarquivar(c)}>
+                  Desarquivar
+                </button>
+                <button class="btn secundario compacto" onClick={() => nav.ir({ nome: 'cartao', id: baralho.id, cartaoId: c.id })}>
+                  Editar
+                </button>
+              </div>
+            ) : (
+              <div class="linha">
+                <button class="btn secundario compacto" onClick={() => nav.ir({ nome: 'cartao', id: baralho.id, cartaoId: c.id })}>
+                  Editar
+                </button>
+                <button class="btn secundario compacto" onClick={() => enviar(c)}>
+                  Enviar
+                </button>
+                <button class="btn secundario compacto" onClick={() => arquivar(c)}>
+                  Arquivar
+                </button>
+              </div>
+            )}
           </li>
         ))}
         {!lista.length && <p class="dica centro">Nenhum cartão.</p>}

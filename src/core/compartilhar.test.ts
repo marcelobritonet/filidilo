@@ -46,6 +46,24 @@ describe('compartilhar baralho', () => {
     expect(b.cartoes.length).toBe(4)
   })
 
+  it('cartão arquivado vai como comum sem progresso e arquivado com progresso; atualizar mantém o arquivado daqui', async () => {
+    const comArquivado = { ...base(), cartoes: base().cartoes.map((c) => (c.id === 'b' ? { ...c, arquivadoEm: 123 } : c)) }
+    expect(lerBaralho(arquivoDoBaralho(comArquivado).texto).cartoes.every((c) => !c.arquivadoEm)).toBe(true)
+    const progresso = { estados: [], revisoes: [], marcas: [] }
+    expect(lerBaralho(arquivoDoBaralho(comArquivado, progresso).texto).cartoes[1].arquivadoEm).toBe(123)
+    expect(JSON.parse(arquivoDosCartoes(comArquivado, [comArquivado.cartoes[1]]).texto).cartoes[0].arquivadoEm).toBeUndefined()
+    await salvar(comArquivado)
+    // Igual ao daqui, só sem a marca: não conta como atualização.
+    expect((await planejar(base())).iguais).toBe(3)
+    const recebido = { ...base(), cartoes: base().cartoes.map((c) => (c.id === 'b' ? { ...c, verso: 'b novo' } : c)) }
+    const plano = await planejar(recebido)
+    expect(plano.atualizados.map((c) => c.id)).toEqual(['b'])
+    const b = await aplicar(plano)
+    const cb = b.cartoes.find((c) => c.id === 'b')!
+    expect(cb.tipo === 'conceito' && cb.verso).toBe('b novo')
+    expect(cb.arquivadoEm).toBe(123)
+  })
+
   it('baralho novo entra inteiro, marcado como importado', async () => {
     const p = await planejar(base())
     expect(p.atual).toBeUndefined()
