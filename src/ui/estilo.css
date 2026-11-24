@@ -580,16 +580,17 @@ details.bloco > summary { font-weight: 650; }
 
 /* ---------- Fim da sessão: incentivo a criar mais cartões ---------- */
 .incentivo-ia {
-  display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%; max-width: 420px;
+  display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start;
+  text-align: left; width: 100%; max-width: 420px;
   padding: 16px; border-radius: var(--radius-md); background: var(--accent-soft); border: 1px solid var(--accent);
 }
-.incentivo-ia > .icone-linha { flex: none; color: var(--accent-text); margin-top: 2px; }
+.incentivo-ia > .icone-linha { color: var(--accent-text); margin-top: 2px; }
 .incentivo-ia > div { display: grid; gap: 6px; }
 .incentivo-ia p { margin: 0; font-size: 15px; color: var(--text); }
-.incentivo-ia .btn { margin-top: 4px; }
+/* O botão ocupa a largura toda da caixa, alinhado com os botões de fora (não com o texto). */
+.incentivo-ia > .btn { grid-column: 1 / -1; margin-top: 4px; }
 /* Na tela do baralho ("subir de nível"): ocupa a largura toda e se separa do Estudar. */
 .inicio .incentivo-ia { max-width: none; margin-top: 16px; }
-.inicio .incentivo-ia > div { flex: 1; }
 
 /* Enviar por link: QR code sempre em fundo branco, para a câmera ler também no tema escuro. */
 .modal.enviar .qr { justify-self: center; width: min(240px, 70vw); aspect-ratio: 1; background: #fff; border-radius: var(--radius-sm); padding: 8px; }

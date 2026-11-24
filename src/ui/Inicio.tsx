@@ -217,16 +217,16 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
               <Icone nome="entender" />
               <div>
                 <p>Você já domina quase tudo. Quer subir de nível?</p>
-                <button
-                  class="btn secundario"
-                  onClick={() => {
-                    evento('sugestao_subir_nivel')
-                    nav.ir({ nome: 'ia', id, assunto: 'Cartões um nível acima do atual' })
-                  }}
-                >
-                  Criar cartões um nível acima
-                </button>
               </div>
+              <button
+                class="btn secundario"
+                onClick={() => {
+                  evento('sugestao_subir_nivel')
+                  nav.ir({ nome: 'ia', id, assunto: 'Cartões um nível acima do atual' })
+                }}
+              >
+                Criar cartões um nível acima
+              </button>
             </section>
           )}
         </>

@@ -496,10 +496,10 @@ function Fim(props: {
                 ? `Quer avançar em ${objetivo.resumo}? A IA cria mais cartões em poucos minutos.`
                 : 'Variar as perguntas ajuda a fixar. Use outra aula ou um resumo para a IA criar cartões novos.'}
           </p>
-          <button class="btn secundario" onClick={() => { evento('sugestao_mais_cartoes', { motivo: temaPoucos ? 'poucos' : temaFraco ? 'fraco' : 'objetivo' }); criarMais(assuntoSugerido, temaId) }}>
-            {tema ? `Criar cartões sobre ${tema}` : 'Criar mais cartões com IA'}
-          </button>
         </div>
+        <button class="btn secundario" onClick={() => { evento('sugestao_mais_cartoes', { motivo: temaPoucos ? 'poucos' : temaFraco ? 'fraco' : 'objetivo' }); criarMais(assuntoSugerido, temaId) }}>
+          {tema ? `Criar cartões sobre ${tema}` : 'Criar mais cartões com IA'}
+        </button>
       </section>
       <button class="btn principal" onClick={outra}>
         <span class="com-icone"><Icone nome="praticar" /> Mais uma rodada</span>
