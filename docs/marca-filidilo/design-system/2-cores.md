@@ -58,7 +58,7 @@ A interface usa só estes nomes (em `src/ui/estilo.css`); cada um muda de valor 
 | `--accent-off` | `#DDD8CE` | `#D0E1E1` | `#2C3E5E` | `#33405B` | `#274948` | Botão principal desativado |
 | `--accent-off-ink` | `#4F5A6E` | `#476665` | `#A0B0CA` | `#A3ADC2` | `#99B8B7` | Texto do botão desativado |
 | `--accent-soft` | `#E5E2DB` | `#D9F2F1` | `#0F3E3D` | `#1E3466` | `#114A49` | Fundo de caixa de destaque |
-| `--accent-text` | `#22407A` | `#096D6B` | `#4FD1CC` | `#8AA6F2` | `#85E0DF` | Links |
+| `--accent-text` | `#0B1E3F` | `#096D6B` | `#4FD1CC` | `#8AA6F2` | `#85E0DF` | Links |
 | `--sel` | `#0B1E3F` | `#0D7776` | `#13A3A0` | `#3A68E6` | `#56D2D0` | Seleção cheia, foco, contorno de destaque |
 | `--sel-ink` | `#EEF3FB` | `#FFFFFF` | `#0B1E3F` | `#FFFFFF` | `#071D1D` | Texto sobre a seleção |
 | `--barra` | `#0E7F7C` | `#118D8B` | `#4FD1CC` | `#2FBFBB` | `#56D2D0` | Barras de progresso, "hoje" da ofensiva |

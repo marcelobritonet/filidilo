@@ -2,6 +2,10 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.26.1] — 2026-11-24
+
+- No tema Areia, links e botões de texto (como "Configurar baralho") passam a usar o mesmo azul-noite do resto da tela, em vez de um azul fora da paleta.
+
 ## [3.26.0] — 2026-11-24
 
 - O estilo **Suave** chegou a todas as telas: cantos mais arredondados, cartões sem borda com sombra leve, botões arredondados e fundo em degradê. A tela do baralho e a Meta da semana, em Seu progresso, ganharam um cartão de destaque.
