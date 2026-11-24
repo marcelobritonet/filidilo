@@ -12,10 +12,7 @@
   .cobalto { fill: var(--marca-cobalto); }
   .turquesa { fill: var(--marca-turquesa); }
   .bronze { fill: var(--marca-bronze); }
-  .mel { fill: var(--marca-mel); }
-  .ceu { fill: var(--marca-ceu); }
   .noite { fill: var(--marca-noite); }
-  .anil { fill: var(--marca-anil); }
   .bloco { rx: var(--raio-lg); ry: var(--raio-lg); }
   .texto { position: absolute; left: 40px; bottom: 40px; max-width: 440px; }
   .nome { margin: 0; font: 700 88px/.95 var(--font-display, "Sora", system-ui, sans-serif); letter-spacing: -0.03em; color: var(--texto); }
@@ -26,7 +23,7 @@
 <div class="capa">
   <svg width="960" height="288" viewBox="0 0 960 288" aria-hidden="true">
     <!--
-      blocos: marca-cobalto 208×240, marca-turquesa 216×112, marca-mel 96×112, marca-anil 104×112 — cantos raio-lg (24px)
+      blocos: marca-cobalto 208×240, marca-turquesa 216×112, marca-bronze 96×112, marca-noite 104×112 (só as cinco cores da logo) — cantos raio-lg (24px)
       arranjo: uma laje alta à esquerda e dois andares de blocos à direita, tudo de x=496 a 936, margem espaco-6 (24px)
       padrão: motivo literal, o ocelo — anéis concêntricos (turquesa, bronze, cobalto, noite) sobre a laje cobalto, porque a marca é a pena do pavão
       escalas: espaco-6 (24) nas margens, espaco-4 (16) entre blocos, raio-lg nos cantos
@@ -37,8 +34,8 @@
     <circle class="cobalto" cx="600" cy="168" r="29"/>
     <circle class="noite" cx="600" cy="168" r="12"/>
     <rect class="turquesa bloco" x="720" y="24" width="216" height="112"/>
-    <rect class="mel bloco" x="720" y="152" width="96" height="112"/>
-    <rect class="anil bloco" x="832" y="152" width="104" height="112"/>
+    <rect class="bronze bloco" x="720" y="152" width="96" height="112"/>
+    <rect class="noite bloco" x="832" y="152" width="104" height="112"/>
   </svg>
   <div class="texto">
     <p class="nome">Filidilo</p>

@@ -22,8 +22,9 @@ O app não usa fogo. Nada de chama, 🔥, brasa ou "sequência de fogo". A ofens
 
 - **A pena do leque** é a gota do símbolo virada de ponta para baixo, com o ocelo em cima, como a pena da cauda do pavão. As penas saem do mesmo ponto, separadas por 36°, e cada uma tem um contorno de 4 unidades na cor do fundo (`fundo`) para não se fundirem.
 - **O número de dias** vem sempre ao lado do desenho, em Sora Bold. O desenho não substitui o número.
-- **A semana** na ofensiva usa um ocelo pequeno por dia: aceso no dia com sessão; só o anel `conquista` (bronze no tema Noite, mel no Dia) no dia salvo por folga; anel tracejado em `acao` no dia de hoje ainda aberto; contorno em `borda` nos dias vazios.
-- **Folga** é uma pena guardada: o contorno da gota, cheio em `conquista` quando a folga está guardada e vazio quando não está. Ela substitui o escudo.
+- **A semana** na ofensiva usa um ocelo pequeno por dia: aceso no dia com sessão; só o anel `conquista` (bronze em todos os temas) no dia salvo por folga; anel tracejado em `barra` no dia de hoje ainda aberto; contorno em `borda` nos dias vazios.
+- **Folga** é uma pena guardada: a gota do símbolo, cheia em `marca-turquesa` (a cor da gota na logo) quando a folga está guardada e só o contorno em `borda-controle` quando não está. Ela substitui o escudo.
+- **Dia garantido** (sessão de hoje feita): o selo ganha contorno na cor viva do tema (`--sel`), fundo `acao-suave` e um ✓ em `acao-texto`.
 - **Em risco** (falta a sessão de hoje): o desenho do selo fica apagado, mas mantém a forma do estágio, e o número continua visível. Nada pisca em vermelho.
 - **Ao terminar a sessão do dia**, o ocelo acende do centro para fora (600ms). Ao mudar de estágio (7 e 30 dias), as penas novas abrem a partir do centro (400ms).
 - O leque é desenho da ofensiva, não é logo: não o use no lugar do símbolo nem com o nome.

@@ -28,7 +28,7 @@ Construção, numa grade de 100 × 100:
 - O f e o i usam a ligadura fi da Sora: sem ela, a barra do f encosta no i.
 - Sem ponto final (o tatino. tinha; o Filidilo não tem).
 - Arquivos prontos, com as letras em curvas: `nome-noite.svg` (fundos claros) e `nome-nevoa.svg` (fundos escuros). Prefira eles a digitar o nome em Sora.
-- Cor do nome: `marca-nevoa` sobre `marca-noite`; `marca-noite` sobre `marca-neve` ou branco. O ocelo mantém as cores dele nos dois casos.
+- Cor do nome: `marca-nevoa` sobre `marca-noite`; `marca-noite` sobre `marca-nevoa` ou branco. O ocelo mantém as cores dele nos dois casos.
 
 ## Versões
 

@@ -5,7 +5,7 @@
 - Arquivo `simbolo-app.svg`: fundo `marca-noite`, símbolo em 72% do quadrado, canto `raio-icone`.
 - Versão "maskable" (Android): o mesmo fundo até a borda, símbolo em 60% do quadrado para caber em qualquer recorte.
 - Tamanhos gerados: 512, 192, 180 (Apple), 32 e 16 (favicon). Em 16px o brilho central pode sumir.
-- O ícone é o mesmo nos dois temas: a Noite é a cor de identidade.
+- O ícone é o mesmo em todos os temas: a Noite é a cor de identidade.
 
 ## Tela de abertura
 
@@ -13,7 +13,7 @@ Fundo `marca-noite`, símbolo centralizado com 96px de altura, nome abaixo em `m
 
 ## Cabeçalho do app
 
-O nome **filidilo** em `nome-marca` reduzido a 22px, à esquerda; à direita, o selo da ofensiva com o desenho do estágio (ocelo ou leque) e o número de dias. No tema Dia, o nome vai em `marca-noite`.
+O símbolo e o nome **filidilo** em `nome-marca` reduzido a 22px, à esquerda; à direita, o selo da ofensiva com o desenho do estágio (ocelo ou leque) e o número de dias. O nome vai na cor `texto` do tema (Noite nos claros, Névoa nos escuros). O quadrado atrás do símbolo usa `simbolo-fundo`: Noite, ou o tom mais escuro do tema quando o fundo não é Noite (Cobalto e Pavão).
 
 ## Imagem de compartilhar
 
@@ -22,7 +22,7 @@ O nome **filidilo** em `nome-marca` reduzido a 22px, à esquerda; à direita, o 
 | Story | 1080 × 1920 | Fundo `marca-noite`, anéis grandes do ocelo saindo pela borda de baixo, número em `numero-destaque` ampliado, frase de uma linha e o logo horizontal no pé |
 | Mensagem e link | 1200 × 630 | Fundo `marca-noite`, símbolo à esquerda, frase e número à direita, endereço do app em `legenda` |
 
-Use sempre a paleta Noite nas imagens de compartilhar, mesmo com o app no tema Dia: é a cor que as pessoas vão reconhecer.
+Use sempre a paleta Noite nas imagens de compartilhar, qualquer que seja o tema do app: é a cor que as pessoas vão reconhecer.
 
 ## Lojas e páginas
 

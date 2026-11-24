@@ -4,21 +4,24 @@ import type { Navegacao } from './App'
 import { InstalarBloco } from './InstalarCard'
 import { pecaConvite } from '../core/artes'
 import { CompartilharImagem, urlApp } from './CompartilharImagem'
-import { lerPreferencia, salvarPreferencia, type PreferenciaTema } from './tema'
+import { lerPreferencia, salvarPreferencia, type Tema } from './tema'
 
-const OPCOES: { valor: PreferenciaTema; nome: string; descricao: string; cores: [string, string, string] }[] = [
-  { valor: 'system', nome: 'Usar tema do aparelho', descricao: 'acompanha o modo claro ou escuro do seu dispositivo', cores: ['#F7F9FF', '#0B1E3F', '#13A3A0'] },
-  { valor: 'light', nome: 'Claro', descricao: 'papel claro e texto escuro', cores: ['#F7F9FF', '#FFFFFF', '#3A5BD9'] },
-  { valor: 'dark', nome: 'Escuro', descricao: 'fundo grafite e texto suave para ambientes com pouca luz', cores: ['#0B1E3F', '#12295A', '#EEF3FB'] },
+// Amostras: fundo, cartão e a cor viva de cada tema.
+const OPCOES: { valor: Tema; nome: string; descricao: string; cores: [string, string, string] }[] = [
+  { valor: 'areia', nome: 'Areia', descricao: 'claro e quente, papel creme com tinta noite', cores: ['#F6F2EA', '#FFFDF9', '#0B1E3F'] },
+  { valor: 'lagoa', nome: 'Lagoa', descricao: 'claro, com turquesa', cores: ['#EBF4F4', '#FCFDFD', '#0D7776'] },
+  { valor: 'dark', nome: 'Noite', descricao: 'escuro, com turquesa', cores: ['#0B1E3F', '#1A2E51', '#13A3A0'] },
+  { valor: 'cobalto', nome: 'Cobalto', descricao: 'escuro azul-marinho, com cobalto', cores: ['#131C30', '#1C2740', '#1F4FD1'] },
+  { valor: 'pavao', nome: 'Pavão', descricao: 'escuro verde-pavão, com turquesa clara', cores: ['#092525', '#0D3635', '#56D2D0'] },
 ]
 
 /** Escolha de aparência: salva e aplica na hora, sem botão de confirmar. */
 export function Aparencia({ nav }: { nav: Navegacao }) {
-  const [pref, setPref] = useState<PreferenciaTema>(lerPreferencia)
+  const [pref, setPref] = useState<Tema>(lerPreferencia)
   const [estatisticas, setEstatisticas] = useState(telemetriaLigada)
   const [convidando, setConvidando] = useState(false)
 
-  const escolher = (p: PreferenciaTema) => {
+  const escolher = (p: Tema) => {
     setPref(p)
     salvarPreferencia(p)
     evento('tema_escolhido', { tema: p })
@@ -39,8 +42,8 @@ export function Aparencia({ nav }: { nav: Navegacao }) {
       </header>
       <fieldset class="opcoes-tema">
         <legend>
-          <strong class="secao-titulo">Aparência</strong>
-          <span class="dica">Escolha como o Filidilo aparece. A escolha fica salva neste aparelho.</span>
+          <strong class="secao-titulo">Temas</strong>
+          <span class="dica">Escolha o tema do Filidilo. A escolha fica salva neste aparelho.</span>
         </legend>
         {OPCOES.map((o) => (
           <label class={`opcao-tema ${pref === o.valor ? 'selecionada' : ''}`}>

@@ -7,7 +7,7 @@ import { GOTA, NOME } from './marcaFormas'
 export function Simbolo({ tamanho = 32 }: { tamanho?: number }) {
   return (
     <svg class="simbolo" width={tamanho} height={tamanho} viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-      <rect width="100" height="100" rx="22.6" fill="#0B1E3F" />
+      <rect class="simbolo-fundo" width="100" height="100" rx="22.6" fill="#0B1E3F" />
       <g transform="translate(14 13) scale(.72)">
         <path d={GOTA} fill="#13A3A0" />
         <ellipse cx="50" cy="62" rx="16" ry="18" fill="#C9933A" />

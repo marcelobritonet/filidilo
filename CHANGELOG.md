@@ -2,6 +2,18 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.22.0] — 2026-11-24
+
+### Novo
+- **Temas.** Em Preferências, a seção Aparência virou **Temas**, com cinco opções feitas só com as cores da pena do Filidilo: **Areia** (claro, papel creme), **Lagoa** (claro, turquesa), **Noite** (escuro, o de sempre), **Cobalto** (escuro, azul-marinho) e **Pavão** (escuro, verde-pavão).
+- Cada tema tem uma cor viva para os detalhes: o que está selecionado fica preenchido, e o foco, as barras de progresso e o "hoje" da ofensiva ganham cor.
+
+### Mudou
+- O tema claro ficou mais quente e firme: o azul antigo, que não era da marca, saiu.
+- A folga guardada aparece como a gota turquesa do símbolo, e o selo da ofensiva com o dia garantido usa a cor do tema.
+- Os campos de texto, o texto de exemplo dentro deles e os botões desativados ganharam cores do próprio tema.
+- Quem usava o tema Claro passa para o Areia. Quem usava o Escuro continua no Noite. Quem nunca escolheu abre no Areia ou no Noite, conforme o modo do aparelho. A opção "Usar tema do aparelho" saiu: depois de escolher, o tema fica fixo.
+
 ## [3.21.0] — 2026-11-24
 
 ### Novo

@@ -1,46 +1,58 @@
-// Preferência de aparência: sistema, claro ou escuro. Guardada só neste aparelho.
-// Não toca em nenhum dado de estudo.
+// Tema do app: um dos cinco, guardado só neste aparelho. Não toca em nenhum dado de estudo.
+//
+// Cada tema tem um tipo (claro ou escuro, em data-theme) e uma paleta (data-paleta). O Noite continua
+// gravado como 'dark'. O antigo 'light' (Claro, depois Névoa) vira Areia. Quem nunca escolheu abre no
+// Areia ou no Noite conforme o modo do aparelho.
 
-export type PreferenciaTema = 'system' | 'light' | 'dark'
-export type Tema = 'light' | 'dark'
+export type Tema = 'areia' | 'lagoa' | 'dark' | 'cobalto' | 'pavao'
+export type Tipo = 'light' | 'dark'
+
+interface DadosTema {
+  tipo: Tipo
+  paleta: string
+  /** Cor do fundo, usada também na barra do navegador. */
+  fundo: string
+}
+
+export const TEMAS: Record<Tema, DadosTema> = {
+  lagoa: { tipo: 'light', paleta: 'lagoa', fundo: '#EBF4F4' },
+  areia: { tipo: 'light', paleta: 'areia', fundo: '#F6F2EA' },
+  dark: { tipo: 'dark', paleta: 'noite', fundo: '#0B1E3F' },
+  cobalto: { tipo: 'dark', paleta: 'cobalto', fundo: '#131C30' },
+  pavao: { tipo: 'dark', paleta: 'pavao', fundo: '#092525' },
+}
 
 // Chave do nome antigo (tatino.), mantida para não perder a escolha de quem já usa. Igual em index.html.
 const CHAVE = 'tatino-theme'
-const COR_NAVEGADOR: Record<Tema, string> = { light: '#F7F9FF', dark: '#0B1E3F' }
 const consultaEscuro = () => window.matchMedia('(prefers-color-scheme: dark)')
 
-export function lerPreferencia(): PreferenciaTema {
-  try {
-    const v = localStorage.getItem(CHAVE)
-    return v === 'light' || v === 'dark' ? v : 'system'
-  } catch {
-    return 'system'
-  }
+export function ehTema(v: unknown): v is Tema {
+  return typeof v === 'string' && Object.prototype.hasOwnProperty.call(TEMAS, v)
 }
 
-export function temaResolvido(p: PreferenciaTema): Tema {
-  if (p !== 'system') return p
-  return consultaEscuro().matches ? 'dark' : 'light'
+/** Tema gravado; sem escolha, Areia ou Noite conforme o modo do aparelho. */
+export function lerPreferencia(): Tema {
+  try {
+    const v = localStorage.getItem(CHAVE)
+    if (ehTema(v)) return v
+    if (v === 'light') return 'areia'
+  } catch {
+    /* sem localStorage: segue o aparelho */
+  }
+  return consultaEscuro().matches ? 'dark' : 'areia'
 }
 
 function aplicar(t: Tema) {
-  document.documentElement.dataset.theme = t
-  const cor = document.documentElement.classList.contains('abrindo') ? COR_NAVEGADOR.dark : COR_NAVEGADOR[t]
+  const { tipo, paleta, fundo } = TEMAS[t]
+  const raiz = document.documentElement
+  raiz.dataset.theme = tipo
+  raiz.dataset.paleta = paleta
+  const cor = raiz.classList.contains('abrindo') ? TEMAS.dark.fundo : fundo
   document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute('content', cor)
 }
 
-let ouvinte: (() => void) | null = null
-
-/** Aplica a preferência e, em "sistema", acompanha a mudança do aparelho. */
-export function aplicarPreferencia(p: PreferenciaTema) {
-  aplicar(temaResolvido(p))
-  const mq = consultaEscuro()
-  if (ouvinte) mq.removeEventListener('change', ouvinte)
-  ouvinte = null
-  if (p === 'system') {
-    ouvinte = () => aplicar(temaResolvido('system'))
-    mq.addEventListener('change', ouvinte)
-  }
+export function aplicarPreferencia(t: Tema) {
+  aplicar(t)
 }
 
 /** Fim da abertura: a página e a barra do navegador voltam para as cores do tema. */
@@ -49,12 +61,11 @@ export function terminarAbertura() {
   aplicarPreferencia(lerPreferencia())
 }
 
-export function salvarPreferencia(p: PreferenciaTema) {
+export function salvarPreferencia(t: Tema) {
   try {
-    if (p === 'system') localStorage.removeItem(CHAVE)
-    else localStorage.setItem(CHAVE, p)
+    localStorage.setItem(CHAVE, t)
   } catch {
     /* modo privado: vale só nesta sessão */
   }
-  aplicarPreferencia(p)
+  aplicarPreferencia(t)
 }

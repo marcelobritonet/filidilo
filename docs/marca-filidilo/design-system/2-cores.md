@@ -1,71 +1,83 @@
 # Cores
 
-Duas paletas, as duas azuis. A **Noite** veste o tema escuro e é a cor de identidade da marca (o ícone do app é sempre Noite). O **Dia** veste o tema claro, mais macio e pastel.
+Uma paleta, cinco temas. As cores são só as cinco da logo; cada tema troca qual delas é fundo e qual é a cor viva. O ícone do app é sempre Noite.
 
-## Paleta Noite
-
-| Cor | Hex | Token | Papel |
-|---|---|---|---|
-| Noite | `#0B1E3F` | `marca-noite` | Fundo do tema escuro e do ícone do app |
-| Cobalto | `#1F4FD1` | `marca-cobalto` | Anel do ocelo; grandes áreas em divulgação |
-| Turquesa | `#13A3A0` | `marca-turquesa` | A gota do símbolo; ação no tema escuro |
-| Bronze | `#C9933A` | `marca-bronze` | Anel do ocelo; conquistas |
-| Névoa | `#EEF3FB` | `marca-nevoa` | Texto sobre Noite; brilho do ocelo |
-
-Proporção numa tela escura: cerca de 70% noite, 20% das superfícies azuladas, 7% turquesa, 3% bronze.
-
-## Paleta Dia
+## Paleta da logo
 
 | Cor | Hex | Token | Papel |
 |---|---|---|---|
-| Anil | `#3A5BD9` | `marca-anil` | Ação no tema claro |
-| Céu pastel | `#BFD6FF` | `marca-ceu` | Preenchimentos de apoio |
-| Água | `#8FE0D6` | `marca-agua` | Progresso e acerto em áreas grandes |
-| Mel | `#FFD27A` | `marca-mel` | Conquistas |
-| Ardósia | `#2B3350` | `marca-ardosia` | Texto |
-| Neve | `#F7F9FF` | `marca-neve` | Fundo do tema claro |
+| Noite | `#0B1E3F` | `marca-noite` | Fundo do tema Noite e do ícone do app; texto nos temas claros |
+| Cobalto | `#1F4FD1` | `marca-cobalto` | Anel do ocelo; ação no tema Cobalto |
+| Turquesa | `#13A3A0` | `marca-turquesa` | A gota do símbolo; ação no Noite e no Lagoa; barras de progresso; folgas da ofensiva |
+| Bronze | `#C9933A` | `marca-bronze` | Anel do ocelo; conquistas em todos os temas |
+| Névoa | `#EEF3FB` | `marca-nevoa` | Texto nos temas escuros; brilho do ocelo |
 
-Proporção numa tela clara: cerca de 75% neve e branco, 15% céu e água, 7% anil, 3% mel.
+## Temas
+
+Escolhidos em Preferências → Temas; a escolha fica fixa. Quem nunca escolheu abre no Areia ou no Noite, conforme o modo claro ou escuro do aparelho.
+
+| Tema | Tipo | Família dos neutros | Botão e seleção | Barras | Quadrado da logo |
+|---|---|---|---|---|---|
+| **Lagoa** | claro | Turquesa quase cinza (fundo `#EBF4F4`) | Turquesa escura `#0D7776` | `#118D8B` | Noite |
+| **Areia** (padrão claro) | claro | Creme na matiz do Bronze (fundo `#F6F2EA`) | Noite `#0B1E3F` | Turquesa escura `#0E7F7C` | Noite |
+| **Noite** (padrão escuro) | escuro | Noite (fundo `#0B1E3F`) | Turquesa `#13A3A0` | `#4FD1CC` | Noite (some no fundo, de propósito) |
+| **Cobalto** | escuro | Azul-marinho entre Noite e Cobalto (fundo `#131C30`) | Cobalto `#1F4FD1` (seleção `#3A68E6`) | Turquesa `#2FBFBB` | `#081121` (Noite mais escura) |
+| **Pavão** | escuro | Turquesa até quase preto (fundo `#092525`) | Turquesa clara `#56D2D0` | a mesma | `#051514` (o tom mais escuro do tema) |
+
+Regras de cada tema (revisão de 24/11/2026):
+- Toda cor é uma das cinco da logo ou um tom dela (mesma matiz, só muda claridade e saturação). Fora disso, só os estados (acerto, erro, atenção).
+- Uma família de neutros por tema: fundo, cartão, área recuada, campo e bordas mudam só a claridade. Nada de "três azuis".
+- Uma cor de ação por tema (botão, seleção, foco, links). Turquesa pode aparecer na barra. Bronze só em conquistas.
+- Placeholder (`--placeholder`) e botão desativado (`--accent-off`) têm cores próprias, da família do tema, sem transparência.
+- O quadrado atrás do símbolo (`--simbolo-fundo`) é Noite, ou o tom mais escuro do tema quando o fundo não é Noite. O ícone do app instalado continua Noite.
+
+Valores completos de cada tema: `src/ui/estilo.css`.
+
+**Cor viva (`--sel`)**: item selecionado (preenchido, com `--sel-ink` por cima), anel de foco, contorno das caixas de destaque e do selo da ofensiva com o dia garantido. É ela que dá vida aos detalhes: sem cor viva, o tema fica lavado.
+
+O tema Névoa (fundo Névoa, ação Cobalto) foi testado e retirado em 24/11/2026. A paleta Dia antiga (Anil `#3A5BD9`, Céu `#BFD6FF`, Água `#8FE0D6`, Mel `#FFD27A`, Ardósia `#2B3350`, Neve `#F7F9FF`) saiu da interface em 24/11/2026: não é da logo. Os tokens continuam em `tokens.json` só para peças de divulgação antigas.
 
 ## Tokens de função
 
-A interface usa estes nomes; cada um muda de valor com o tema.
+A interface usa só estes nomes (em `src/ui/estilo.css`); cada um muda de valor com o tema.
 
-| Token | Noite | Dia | Uso |
-|---|---|---|---|
-| `fundo` | `#0B1E3F` | `#F7F9FF` | Fundo da tela |
-| `superficie` | `#12295A` | `#FFFFFF` | Cartões, blocos, folhas |
-| `superficie-sutil` | `#0F244D` | `#EEF3FB` | Áreas recuadas |
-| `texto` | `#EEF3FB` | `#2B3350` | Texto principal |
-| `texto-suave` | `#A9B8D9` | `#5A6480` | Texto secundário |
-| `acao` / `sobre-acao` | `#13A3A0` / `#06142B` | `#3A5BD9` / `#FFFFFF` | Botão principal e o texto dele |
-| `acao-texto` | `#4FD1CC` | `#3A5BD9` | Links |
-| `conquista` / `sobre-conquista` | `#C9933A` / `#06142B` | `#FFD27A` / `#2B3350` | Selos e recordes |
-| `foco` | `#4FD1CC` | `#3A5BD9` | Anel de foco |
-| `sucesso` | `#7DD3A8` | `#1F7A5C` | Acerto |
-| `perigo` | `#F2A08F` | `#B4402F` | Erro, apagar |
-| `atencao` | `#E8C26A` | `#8A5A00` | Prazo, folgas |
+| Token CSS | Areia | Lagoa | Noite | Cobalto | Pavão | Uso |
+|---|---|---|---|---|---|---|
+| `--bg` | `#F6F2EA` | `#EBF4F4` | `#0B1E3F` | `#131C30` | `#092525` | Fundo da tela |
+| `--surface` | `#FFFDF9` | `#FCFDFD` | `#1A2E51` | `#1C2740` | `#0D3635` | Cartões, blocos, folhas |
+| `--surface-subtle` | `#EEE8DD` | `#DCEAEA` | `#122544` | `#263350` | `#0B2D2D` | Áreas recuadas, trilho das barras, alternativas |
+| `--campo` | `#FFFDF9` | `#FCFDFD` | `#081730` | `#131C30` | `#071D1D` | Fundo de campo de texto |
+| `--borda-campo` | `#8C8270` | `#628D8C` | `#607BA9` | `#5E73A1` | `#318C8A` | Contorno de campo de texto |
+| `--border` | `#E3DBCC` | `#CADDDD` | `#2E4266` | `#324162` | `#174F4E` | Contorno decorativo de cartões |
+| `--border-control` | `#8C8270` | `#628D8C` | `#607BA9` | `#5E73A1` | `#318C8A` | Contorno de botões secundários e caixas de seleção |
+| `--text` | `#0B1E3F` | `#0B1E3F` | `#EEF3FB` | `#EBEFFA` | `#EAF6F6` | Texto principal |
+| `--text-muted` | `#4A566C` | `#3B4D6D` | `#B2C1DC` | `#ADB9D1` | `#A8C7C7` | Texto secundário |
+| `--placeholder` | `#5E6779` | `#58667E` | `#8B9DBB` | `#8F9CB7` | `#8DB0AF` | Texto de exemplo nos campos |
+| `--accent` | `#0B1E3F` | `#0D7776` | `#13A3A0` | `#1F4FD1` | `#56D2D0` | Botão principal |
+| `--accent-ink` | `#EEF3FB` | `#FFFFFF` | `#0B1E3F` | `#FFFFFF` | `#071D1D` | Texto do botão principal |
+| `--accent-off` | `#DDD8CE` | `#D0E1E1` | `#2C3E5E` | `#33405B` | `#274948` | Botão principal desativado |
+| `--accent-off-ink` | `#4F5A6E` | `#476665` | `#A0B0CA` | `#A3ADC2` | `#99B8B7` | Texto do botão desativado |
+| `--accent-soft` | `#E5E2DB` | `#D9F2F1` | `#0F3E3D` | `#1E3466` | `#114A49` | Fundo de caixa de destaque |
+| `--accent-text` | `#22407A` | `#096D6B` | `#4FD1CC` | `#8AA6F2` | `#85E0DF` | Links |
+| `--sel` | `#0B1E3F` | `#0D7776` | `#13A3A0` | `#3A68E6` | `#56D2D0` | Seleção cheia, foco, contorno de destaque |
+| `--sel-ink` | `#EEF3FB` | `#FFFFFF` | `#0B1E3F` | `#FFFFFF` | `#071D1D` | Texto sobre a seleção |
+| `--barra` | `#0E7F7C` | `#118D8B` | `#4FD1CC` | `#2FBFBB` | `#56D2D0` | Barras de progresso, "hoje" da ofensiva |
+| `--gold` | `#C9933A` | `#C9933A` | `#C9933A` | `#D4A24F` | `#C9933A` | Conquistas |
+| `--gold-ink` | `#0B1E3F` | `#0B1E3F` | `#0B1E3F` | `#131C30` | `#1E1405` | Texto sobre conquista |
+| `--success` | `#2E6A3A` | `#1F6B3F` | `#6FD39A` | `#6FD39A` | `#7FD9A0` | Acerto |
+| `--danger` | `#A3322B` | `#A8242D` | `#F2928F` | `#F29A9A` | `#FF9C8F` | Erro, apagar |
+| `--warning` | `#855200` | `#885207` | `#EBBD62` | `#E8BE6A` | `#E9C26E` | Prazo, folgas |
+| `--simbolo-fundo` | `#0B1E3F` | `#0B1E3F` | `#0B1E3F` | `#081121` | `#051514` | Quadrado atrás do símbolo |
 
 ## Contraste
 
-Todos os pares de texto passam de 4,5:1 nos dois temas.
-
-| Par | Noite | Dia |
-|---|---|---|
-| `texto` sobre `fundo` | 14,8:1 | 11,8:1 |
-| `texto` sobre `superficie` | 12,7:1 | 12,4:1 |
-| `texto-suave` sobre `superficie` | 7,1:1 | 5,9:1 |
-| `sobre-acao` sobre `acao` | 5,9:1 | 5,7:1 |
-| `acao-texto` sobre `superficie` | 7,6:1 | 5,7:1 |
-| `sobre-conquista` sobre `conquista` | 6,8:1 | 8,7:1 |
-| `sucesso` sobre `sucesso-suave` | 6,5:1 | 4,6:1 |
-| `perigo` sobre `perigo-suave` | 6,1:1 | 4,7:1 |
+Nos cinco temas, todo texto passa de 4,5:1 sobre o fundo em que aparece, e contornos de controle, seleção e barras passam de 3:1. Conferido com script em 24/11/2026 (pares: texto, texto secundário e placeholder sobre fundo, cartão, área recuada e campo; texto de botão, de botão desativado, de seleção e de conquista; links sobre fundo, cartão e destaque; estados sobre o fundo suave deles e sobre o cartão).
 
 ## Regras
 
 - `acao` aparece uma vez por tela, no botão que a pessoa mais provavelmente vai tocar.
-- `conquista` só para o que foi conquistado. Não use bronze ou mel em botões, links ou avisos.
+- `conquista` só para o que foi conquistado. Não use bronze em botões, links ou avisos.
 - Estado nunca só por cor: acerto leva ✓ e a palavra, erro leva ✕ e a palavra, aviso leva a frase inteira.
-- Água, céu e turquesa nunca são cor de texto sobre fundo claro.
+- Turquesa e bronze nunca são cor de texto sobre fundo claro (2,7:1 a 3:1).
 - Cobalto não serve para texto sobre Noite (2,4:1): use `acao-texto`.
 - Sem degradês na interface. Os anéis do ocelo são cores chapadas lado a lado, nunca misturadas.
