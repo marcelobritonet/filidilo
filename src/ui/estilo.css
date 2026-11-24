@@ -161,10 +161,14 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
 .btn:disabled { opacity: .5; cursor: default; }
 .btn:active:not(:disabled) { transform: scale(.985); }
 .com-icone { display: inline-flex; align-items: center; gap: 8px; }
+/* Link (botão de texto): sem o sublinhado azul de HTML puro; peso, cor da marca e um fundo suave ao tocar/passar o mouse */
 .link {
-  background: none; border: 0; padding: 10px 4px; min-height: 44px;
-  color: var(--accent-text); font-size: 15px; text-decoration: underline; text-underline-offset: 3px;
+  background: none; border: 0; padding: 10px 10px; min-height: 44px; border-radius: var(--radius-sm);
+  color: var(--accent-text); font: inherit; font-size: 15px; font-weight: 600; text-decoration: none; cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
 }
+@media (hover: hover) { .link:hover { background: var(--accent-soft); } }
+.link:active { background: var(--accent-soft); transform: scale(.98); }
 
 /* ---------- Superfícies ---------- */
 .bloco, .cartao-resumo {
@@ -428,6 +432,7 @@ textarea { line-height: 1.5; resize: vertical; }
   padding: 12px 16px; border-radius: var(--radius-md); background: var(--text); color: var(--bg); box-shadow: var(--shadow-card);
 }
 .toast .link { color: var(--bg); font-weight: 700; }
+.toast .link:hover, .toast .link:active { background: color-mix(in srgb, var(--bg) 16%, transparent); }
 
 /* ---------- Quanto você já sabe (Aprender) ---------- */
 .opcoes-nivel { display: grid; gap: 8px; }
@@ -548,7 +553,7 @@ details.bloco > summary { font-weight: 650; }
 .abrir-ia { display: grid; gap: 6px; }
 .como-anexar { display: grid; gap: 4px; margin: 4px 0 12px; }
 .como-anexar .dica { margin: 0; }
-.como-anexar summary { cursor: pointer; width: fit-content; color: var(--accent-text); font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.como-anexar summary { cursor: pointer; width: fit-content; color: var(--accent-text); font-size: 14px; font-weight: 600; }
 .como-anexar ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; color: var(--text-muted); font-size: 14px; line-height: 1.45; }
 .abrir-ia .dica { margin: 0; }
 .abrir-ia-opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }

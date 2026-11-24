@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.20.5] — 2026-11-24
+
+### Mudou
+- Os links de texto ("Agora não", "Não perguntar mais", "Voltar", "Desfazer" e outros) perderam o sublinhado azul: agora aparecem em negrito, na cor do Filidilo, com um fundo suave ao tocar.
+
 ## [3.20.4] — 2026-11-24
 
 ### Corrigido
