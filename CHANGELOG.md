@@ -4,6 +4,9 @@ Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As ve
 
 ## [3.20.9] — 2026-11-24
 
+### Mudou
+- **Aparência agora se chama Preferências.** A tela reúne o tema, Instalar o app, Enviar estatísticas de uso e Indicar o Filidilo, e o nome antigo só falava do tema. O botão do rodapé e o título da tela mudaram; o tema fica na seção Aparência, dentro dela.
+
 ### Corrigido
 - No estudo, depois de tocar em Corrigir → "Corrigir eu mesmo", agora dá para mudar de ideia e usar "Corrigir com IA" na própria tela de edição. Ao salvar a correção, você volta ao estudo com o cartão corrigido.
 
