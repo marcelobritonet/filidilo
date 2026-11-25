@@ -11,7 +11,7 @@ import { evento, registrarErro } from '../core/telemetria'
 import { temaComPoucosCartoes } from '../core/sugestao'
 import { formasAceitas, NIVEIS_COM_ALTERNATIVAS, partesDaFrente } from '../core/lacunas'
 import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, CartaoLacunas, Objetivo } from '../core/types'
-import { pecaMarco, pecaResultado } from '../core/artes'
+import { LAYOUTS_FIM, pecaFimSessao } from '../core/artes'
 import { fecharSessao, type Marco } from '../core/conquistas'
 import { concluirSessao, type Conclusao } from '../core/ofensiva'
 import { Cronometro, fotografarDominio, gravarSessao } from '../core/sessoes'
@@ -504,14 +504,13 @@ function Fim(props: {
     )
   const sequencia = conquista?.sequencia ?? 0
   const marco = conquista?.marco
-  const opcoesImagem: OpcaoImagem[] = [
-    {
-      rotulo: 'Resultado',
-      usaNome: true,
-      peca: (comNome) => pecaResultado({ ...placar, baralho: baralho.titulo, comNome, bateuMeta, tempo: tempo && tempo !== 'esgotado' ? tempo : undefined, sequencia, urlApp: urlApp() }),
-    },
-    ...(marco ? [{ rotulo: 'Conquista', usaNome: marco.tipo === 'dominado', peca: (comNome: boolean) => pecaMarco(marco, { comNome, urlApp: urlApp() }) }] : []),
-  ]
+  // Três layouts no visual claro da tela (a usuária mandou a tela como referência).
+  const opcoesImagem: OpcaoImagem[] = LAYOUTS_FIM.map(({ layout, rotulo }) => ({
+    rotulo,
+    usaNome: true,
+    peca: (comNome) =>
+      pecaFimSessao({ ...placar, baralho: baralho.titulo, comNome, bateuMeta, tempo: tempo && tempo !== 'esgotado' ? tempo : undefined, sequencia: ofensiva?.sequencia ?? sequencia, urlApp: urlApp(), marco }, layout),
+  }))
   return (
     <section class={`fim ${motivo ? 'comemorando' : ''}`}>
       {motivo && <Confete />}
@@ -575,7 +574,7 @@ function Fim(props: {
         <span class="com-icone"><Icone nome="praticar" /> Mais uma rodada</span>
       </button>
       <button class="btn secundario" onClick={sair}>Voltar ao início</button>
-      {compartilhando && <CompartilharImagem opcoes={marco ? [opcoesImagem[1], opcoesImagem[0]] : opcoesImagem} onde="fim_sessao" fechar={() => setCompartilhando(false)} />}
+      {compartilhando && <CompartilharImagem opcoes={opcoesImagem} onde="fim_sessao" fechar={() => setCompartilhando(false)} />}
     </section>
   )
 }

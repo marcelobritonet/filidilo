@@ -33,6 +33,33 @@ export interface Arte {
   /** Frase de chamada embaixo ("Responda no Filidilo."). */
   chamada?: string
   confete?: boolean
+  /** Fim de sessão no visual claro da tela (desenho próprio, um dos três layouts). */
+  fim?: FimSessao
+}
+
+/** Os três layouts da imagem do fim de sessão (pedido de uma usuária, com a tela como referência). */
+export type LayoutFim = 'tela' | 'conquista' | 'painel'
+export const LAYOUTS_FIM: { layout: LayoutFim; rotulo: string }[] = [
+  { layout: 'tela', rotulo: 'Tela' },
+  { layout: 'conquista', rotulo: 'Conquista' },
+  { layout: 'painel', rotulo: 'Painel' },
+]
+
+export interface FimSessao {
+  layout: LayoutFim
+  /** "Sessão concluída", "Meta atingida!" ou "Mandei bem!". */
+  titulo: string
+  /** "15 acertos, 4 erros em 19 respostas". */
+  placar: string
+  pct: number
+  certos: number
+  total: number
+  /** "em 5:32", quando terminou antes do tempo. */
+  tempo?: string
+  baralho?: string
+  /** Dias seguidos da ofensiva (0: não mostra). */
+  dias: number
+  conquista?: { destaque: string; legenda: string }
 }
 
 export interface Peca {
@@ -75,6 +102,41 @@ export function pecaMarco(m: Marco, d: { comNome: boolean; urlApp: string }): Pe
     // Sequência e respostas: o número e a legenda já dizem tudo; nos outros, a frase completa.
     arte: { modelo: 'marco', selo: 'Conquista!', destaque: m.destaque, legenda: m.legenda, linhas: m.tipo === 'sequencia' || m.tipo === 'respostas' ? [] : [frase], confete: true, chamada: 'Aprenda qualquer coisa.' },
     texto: `${frase} no Filidilo. Aprenda qualquer coisa: ${d.urlApp}`,
+  }
+}
+
+export interface DadosFim extends DadosResultado {
+  marco?: Marco
+}
+
+/** A imagem do fim de sessão num dos três layouts; o texto com o link é o mesmo nos três. */
+export function pecaFimSessao(d: DadosFim, layout: LayoutFim): Peca {
+  const total = d.certos + d.errados + d.chutes
+  const pct = total ? Math.round((100 * d.certos) / total) : 0
+  const placar = `${n(d.certos, 'acerto', 'acertos')}, ${n(d.errados, 'erro', 'erros')}${d.chutes ? ` e ${n(d.chutes, 'chute', 'chutes')}` : ''} em ${n(total, 'resposta', 'respostas')}`
+  const titulo = d.bateuMeta ? 'Meta atingida!' : total >= 10 && pct >= 80 ? 'Mandei bem!' : 'Sessão concluída'
+  const m = d.marco
+  const frase = m && (m.tipo === 'dominado' && !d.comNome ? `Dominei todos os ${m.destaque} cartões de um baralho` : m.frase)
+  const resultado = pecaResultado(d)
+  return {
+    arte: {
+      modelo: m ? 'marco' : 'resultado',
+      selo: titulo,
+      confete: !!m || !!d.bateuMeta || (total >= 10 && pct >= 80),
+      fim: {
+        layout,
+        titulo,
+        placar,
+        pct,
+        certos: d.certos,
+        total,
+        tempo: d.tempo ? `em ${d.tempo}` : undefined,
+        baralho: d.comNome ? d.baralho : undefined,
+        dias: d.sequencia,
+        conquista: m ? { destaque: m.destaque, legenda: m.legenda } : undefined,
+      },
+    },
+    texto: frase ? `${frase} no Filidilo. Aprenda qualquer coisa: ${d.urlApp}` : resultado.texto,
   }
 }
 

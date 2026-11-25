@@ -32,8 +32,8 @@ export function CompartilharImagem({ opcoes, onde, avisar, fechar, extra }: { op
     if (canvas.current) desenhar(canvas.current, peca.arte, formato)
   }, [i, formato, comNome])
 
-  const nome = `filidilo-${peca.arte.modelo}-${formato}.png`
-  const registrar = (como: string) => evento('compartilhar_imagem', { modelo: peca.arte.modelo, formato, como, com_nome: temNome && comNome, onde })
+  const nome = `filidilo-${peca.arte.fim?.layout ?? peca.arte.modelo}-${formato}.png`
+  const registrar = (como: string) => evento('compartilhar_imagem', { modelo: peca.arte.modelo, ...(peca.arte.fim ? { layout: peca.arte.fim.layout } : {}), formato, como, com_nome: temNome && comNome, onde })
 
   const compartilhar = async () => {
     setOcupado(true)

@@ -2,6 +2,12 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.31.0] — 2026-11-25
+
+### Novidades
+
+- **Imagem de compartilhar com a cara da tela de fim de sessão.** Ao terminar uma sessão, "Compartilhar" agora mostra imagens claras, como a própria tela: o leque do pavão, o seu % de acerto, os dias seguidos e a conquista no cartão de borda dourada. Escolha entre três jeitos: **Tela** (igual à tela do app), **Conquista** (a conquista em destaque) e **Painel** (seus números lado a lado). Funciona no Story e no Quadrado, com ou sem o nome do baralho.
+
 ## [3.30.0] — 2026-11-25
 
 ### Novidades

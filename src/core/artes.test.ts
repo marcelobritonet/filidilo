@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { pecaDesafio, pecaResultado, pecaSemana, podeDesafiar, quebrar, textoSimples } from './artes'
+import { LAYOUTS_FIM, pecaDesafio, pecaFimSessao, pecaResultado, pecaSemana, podeDesafiar, quebrar, textoSimples } from './artes'
 
 const URL = 'https://app.example/filidilo/'
 
@@ -13,6 +13,23 @@ describe('artes', () => {
     expect(sem.texto).not.toContain('Derivadas')
     expect(sem.texto).not.toContain('dias seguidos')
     expect(sem.arte.confete).toBe(false)
+  })
+
+  it('fim de sessão: três layouts claros com placar, ofensiva e conquista', () => {
+    expect(LAYOUTS_FIM.map((l) => l.layout)).toEqual(['tela', 'conquista', 'painel'])
+    const marco = { id: 'dominado:m', tipo: 'dominado' as const, destaque: '42', legenda: 'cartões dominados', frase: 'Dominei todos os 42 cartões de “Motivação”' }
+    const d = { certos: 15, errados: 4, chutes: 0, baralho: 'Motivação', comNome: false, sequencia: 1, urlApp: URL, marco }
+    for (const { layout } of LAYOUTS_FIM) {
+      const p = pecaFimSessao(d, layout)
+      expect(p.arte.fim).toMatchObject({ layout, titulo: 'Sessão concluída', placar: '15 acertos, 4 erros em 19 respostas', pct: 79, dias: 1, conquista: { destaque: '42', legenda: 'cartões dominados' } })
+      expect(p.arte.fim?.baralho).toBeUndefined()
+      expect(p.arte.confete).toBe(true)
+      expect(p.texto).toBe(`Dominei todos os 42 cartões de um baralho no Filidilo. Aprenda qualquer coisa: ${URL}`)
+    }
+    const sem = pecaFimSessao({ ...d, marco: undefined, comNome: true, chutes: 1, bateuMeta: true }, 'painel')
+    expect(sem.arte.fim).toMatchObject({ titulo: 'Meta atingida!', baralho: 'Motivação', placar: '15 acertos, 4 erros e 1 chute em 20 respostas' })
+    expect(sem.arte.fim?.conquista).toBeUndefined()
+    expect(sem.texto).toContain('“Motivação”')
   })
 
   it('desafio mostra a pergunta e nunca a resposta', () => {
