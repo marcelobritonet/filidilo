@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { paginaWorker, tituloDaPrevia, type EnvPagina } from './pagina'
+import { ehRobo, paginaWorker, tituloDaPrevia, type EnvPagina } from './pagina'
 
 const baralho = (titulo: string, n: number) => JSON.stringify({ app: 'tatino', tipo: 'baralho', baralho: { titulo, cartoes: Array.from({ length: n }, () => ({})) } })
 
@@ -15,7 +15,9 @@ function env(dados: Record<string, string> = {}): EnvPagina {
   }
 }
 
-const pedir = (caminho: string, e: EnvPagina) => paginaWorker.fetch(new Request(`https://filidilo.britin.workers.dev${caminho}`), e)
+const WHATSAPP = 'WhatsApp/2.23.20.0 A'
+const CHROME_ANDROID = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36'
+const pedir = (caminho: string, e: EnvPagina, ua = WHATSAPP) => paginaWorker.fetch(new Request(`https://filidilo.britin.workers.dev${caminho}`, { headers: { 'user-agent': ua } }), e)
 
 describe('página pública do link', () => {
   it('título da prévia: baralho com o número de cartões, cartão solto, sem conteúdo', () => {
@@ -54,6 +56,21 @@ describe('página pública do link', () => {
     expect(html).toContain('og:title" content="Filidilo: flashcards com IA"')
     expect(html).toContain('location.replace("https://app.example/filidilo/?de=convite")')
     expect(await (await pedir('/', env())).text()).toContain('location.replace("https://app.example/filidilo/")')
+  })
+
+  it('pessoas vão direto ao app por 302 (o Android abre o app instalado)', async () => {
+    const r = await pedir('/Ab12345678', env({ Ab12345678: baralho('Química', 24) }), CHROME_ANDROID)
+    expect(r.status).toBe(302)
+    expect(r.headers.get('location')).toBe('https://app.example/filidilo/?b=Ab12345678')
+    const raiz = await pedir('/?de=convite', env(), 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1')
+    expect(raiz.status).toBe(302)
+    expect(raiz.headers.get('location')).toBe('https://app.example/filidilo/?de=convite')
+  })
+
+  it('robôs de prévia', () => {
+    for (const ua of [WHATSAPP, 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)', 'TelegramBot (like TwitterBot)', 'Mozilla/5.0 (compatible; Discordbot/2.0)', 'Slackbot-LinkExpanding 1.0', 'LinkedInBot/1.0', 'Twitterbot/1.0', null, ''])
+      expect(ehRobo(ua)).toBe(true)
+    expect(ehRobo(CHROME_ANDROID)).toBe(false)
   })
 
   it('código malformado e outros caminhos vão para o app', async () => {

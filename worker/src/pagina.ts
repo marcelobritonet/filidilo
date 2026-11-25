@@ -1,6 +1,7 @@
 // Worker "filidilo": a página pública do link (https://filidilo.britin.workers.dev/<codigo>).
 // Mostra ao WhatsApp (e a outros apps de conversa) a prévia com o nome do baralho, pelas tags og:,
-// e leva quem toca na hora ao app (APP_URL?b=<codigo>), que baixa o conteúdo pelo worker de links.
+// e leva quem toca ao app (APP_URL?b=<codigo>), que baixa o conteúdo pelo worker de links. Pessoas recebem
+// um 302 direto (o Android abre o app instalado); só os robôs de prévia recebem a página (ver ehRobo).
 // O app continua no mesmo endereço: os dados das pessoas ficam onde sempre estiveram.
 // Link vencido ou inexistente também leva ao app, que mostra o aviso "Este link expirou".
 // A raiz (filidilo.britin.workers.dev/?de=convite etc.) é o endereço público do app: prévia da marca e leva
@@ -66,19 +67,35 @@ export function paginaDoLink(titulo: string, destino: string, proprio: string, i
 </html>`
 }
 
+/**
+ * Robôs que montam a prévia do link (WhatsApp, Facebook/Instagram/iMessage, Telegram, X, Slack, Discord,
+ * LinkedIn, buscadores…). Só eles recebem a página com as tags og:; as pessoas vão direto ao app.
+ */
+const RE_ROBO = /whatsapp|facebookexternalhit|facebot|meta-externalagent|twitterbot|telegrambot|slackbot|discordbot|linkedinbot|skypeuripreview|pinterest|redditbot|embedly|iframely|vkshare|googlebot|bingbot|applebot|yandex|duckduckbot|bot\b|crawler|spider|preview/i
+
+/** Sem user-agent também é tratado como robô: a página serve aos dois. */
+export const ehRobo = (ua: string | null): boolean => !ua || RE_ROBO.test(ua)
+
 export const paginaWorker = {
   async fetch(req: Request, env: EnvPagina): Promise<Response> {
     const { pathname, origin, search } = new URL(req.url)
     const app = env.APP_URL.endsWith('/') ? env.APP_URL : `${env.APP_URL}/`
     if (req.method !== 'GET' && req.method !== 'HEAD') return new Response(null, { status: 405 })
-    const imagem = `${app}og-imagem.png?v=1`
-    const cabecalhos = { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=300', 'referrer-policy': 'no-referrer', 'x-content-type-options': 'nosniff' }
-    if (pathname === '/') return new Response(req.method === 'HEAD' ? null : paginaDoLink(tituloDaPrevia(null), `${app}${search}`, `${origin}/`, imagem), { status: 200, headers: cabecalhos })
     const m = /^\/([^/]+)\/?$/.exec(pathname)
-    if (!m || !RE_CODIGO.test(m[1])) return Response.redirect(app, 302)
-    const codigo = m[1]
-    const texto = await env.LINKS.get(codigo)
-    const html = paginaDoLink(tituloDaPrevia(texto), `${app}?b=${codigo}`, `${origin}/${codigo}`, imagem)
-    return new Response(req.method === 'HEAD' ? null : html, { status: 200, headers: cabecalhos })
+    const codigo = m && RE_CODIGO.test(m[1]) ? m[1] : null
+    if (pathname !== '/' && !codigo) return Response.redirect(app, 302)
+    const destino = codigo ? `${app}?b=${codigo}` : `${app}${search}`
+
+    // Pessoas: redirecionamento do servidor (302). Assim o Android pode abrir o app instalado (o Chrome
+    // entrega ao app um redirecionamento vindo de um link externo; um redirecionamento feito pela página, não).
+    if (!ehRobo(req.headers.get('user-agent')))
+      return new Response(null, { status: 302, headers: { location: destino, 'cache-control': 'private, no-store', 'referrer-policy': 'no-referrer', vary: 'user-agent' } })
+
+    const texto = codigo ? await env.LINKS.get(codigo) : null
+    const html = paginaDoLink(tituloDaPrevia(texto), destino, `${origin}/${codigo ?? ''}`, `${app}og-imagem.png?v=1`)
+    return new Response(req.method === 'HEAD' ? null : html, {
+      status: 200,
+      headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=300', 'referrer-policy': 'no-referrer', 'x-content-type-options': 'nosniff', vary: 'user-agent' },
+    })
   },
 }
