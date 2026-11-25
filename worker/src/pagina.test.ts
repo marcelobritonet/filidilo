@@ -49,8 +49,15 @@ describe('página pública do link', () => {
     expect(html).toContain('?b=Ab12345678')
   })
 
-  it('raiz e código malformado vão para o app', async () => {
-    for (const c of ['/', '/..%2F', '/abc', '/Ab12345678/x']) {
+  it('raiz: endereço público do app, com a prévia da marca e os mesmos parâmetros', async () => {
+    const html = await (await pedir('/?de=convite', env())).text()
+    expect(html).toContain('og:title" content="Filidilo: flashcards com IA"')
+    expect(html).toContain('location.replace("https://app.example/filidilo/?de=convite")')
+    expect(await (await pedir('/', env())).text()).toContain('location.replace("https://app.example/filidilo/")')
+  })
+
+  it('código malformado e outros caminhos vão para o app', async () => {
+    for (const c of ['/..%2F', '/abc', '/Ab12345678/x']) {
       const r = await pedir(c, env())
       expect(r.status).toBe(302)
       expect(r.headers.get('location')).toBe('https://app.example/filidilo/')

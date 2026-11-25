@@ -1,7 +1,7 @@
 # Links do Filidilo: guarda um baralho ou cartões (30 dias; 2h para apps antigos) e devolve por um código.
 # A página pública do link, com a prévia do WhatsApp, é o worker "filidilo" (wrangler.pagina.toml), no mesmo KV.
 # Publicado pelo .github/workflows/deploy-worker.yml (segredos CLOUDFLARE_API_TOKEN e CLOUDFLARE_ACCOUNT_ID).
-# Antes "tatino-links": o worker antigo continua no ar para apps e versões antigas, usando o mesmo KV.
+# Antes "tatino-links" (apagado em 25/11/2026). O KV continua o mesmo.
 name = "filidilo-links"
 main = "src/index.ts"
 compatibility_date = "2026-11-01"

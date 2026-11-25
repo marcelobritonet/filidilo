@@ -3,6 +3,8 @@
 // e leva quem toca na hora ao app (APP_URL?b=<codigo>), que baixa o conteúdo pelo worker de links.
 // O app continua no mesmo endereço: os dados das pessoas ficam onde sempre estiveram.
 // Link vencido ou inexistente também leva ao app, que mostra o aviso "Este link expirou".
+// A raiz (filidilo.britin.workers.dev/?de=convite etc.) é o endereço público do app: prévia da marca e leva
+// ao app com os mesmos parâmetros (?de=, ?teste=…), para o endereço com o nome do Marcelo não aparecer.
 import { RE_CODIGO, type KV } from './links'
 
 export interface EnvPagina {
@@ -66,17 +68,17 @@ export function paginaDoLink(titulo: string, destino: string, proprio: string, i
 
 export const paginaWorker = {
   async fetch(req: Request, env: EnvPagina): Promise<Response> {
-    const { pathname, origin } = new URL(req.url)
+    const { pathname, origin, search } = new URL(req.url)
     const app = env.APP_URL.endsWith('/') ? env.APP_URL : `${env.APP_URL}/`
     if (req.method !== 'GET' && req.method !== 'HEAD') return new Response(null, { status: 405 })
+    const imagem = `${app}og-imagem.png?v=1`
+    const cabecalhos = { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=300', 'referrer-policy': 'no-referrer', 'x-content-type-options': 'nosniff' }
+    if (pathname === '/') return new Response(req.method === 'HEAD' ? null : paginaDoLink(tituloDaPrevia(null), `${app}${search}`, `${origin}/`, imagem), { status: 200, headers: cabecalhos })
     const m = /^\/([^/]+)\/?$/.exec(pathname)
     if (!m || !RE_CODIGO.test(m[1])) return Response.redirect(app, 302)
     const codigo = m[1]
     const texto = await env.LINKS.get(codigo)
-    const html = paginaDoLink(tituloDaPrevia(texto), `${app}?b=${codigo}`, `${origin}/${codigo}`, `${app}og-imagem.png?v=1`)
-    return new Response(req.method === 'HEAD' ? null : html, {
-      status: 200,
-      headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=300', 'referrer-policy': 'no-referrer', 'x-content-type-options': 'nosniff' },
-    })
+    const html = paginaDoLink(tituloDaPrevia(texto), `${app}?b=${codigo}`, `${origin}/${codigo}`, imagem)
+    return new Response(req.method === 'HEAD' ? null : html, { status: 200, headers: cabecalhos })
   },
 }
