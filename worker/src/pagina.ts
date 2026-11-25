@@ -62,7 +62,7 @@ export function paginaDoLink(titulo: string, destino: string, proprio: string, i
 </head>
 <body>
 <p>Abrindo o Filidilo… <a href="${d}">Abrir</a></p>
-<script>location.replace(${JSON.stringify(destino).replace(/</g, '\\u003c')})</script>
+<script>location.replace(${JSON.stringify(destino).replace(/</g, '\\u003c')} + location.hash)</script>
 </body>
 </html>`
 }

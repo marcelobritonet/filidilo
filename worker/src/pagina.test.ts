@@ -36,7 +36,7 @@ describe('página pública do link', () => {
     expect(html).toContain('og:image" content="https://app.example/filidilo/og-imagem.png?v=1"')
     expect(html).toContain('og:url" content="https://filidilo.britin.workers.dev/Ab12345678"')
     expect(html).toContain('url=https://app.example/filidilo/?b=Ab12345678')
-    expect(html).toContain('location.replace("https://app.example/filidilo/?b=Ab12345678")')
+    expect(html).toContain('location.replace("https://app.example/filidilo/?b=Ab12345678" + location.hash)')
   })
 
   it('escapa o nome do baralho', async () => {
@@ -54,8 +54,8 @@ describe('página pública do link', () => {
   it('raiz: endereço público do app, com a prévia da marca e os mesmos parâmetros', async () => {
     const html = await (await pedir('/?de=convite', env())).text()
     expect(html).toContain('og:title" content="Filidilo: flashcards com IA"')
-    expect(html).toContain('location.replace("https://app.example/filidilo/?de=convite")')
-    expect(await (await pedir('/', env())).text()).toContain('location.replace("https://app.example/filidilo/")')
+    expect(html).toContain('location.replace("https://app.example/filidilo/?de=convite" + location.hash)')
+    expect(await (await pedir('/', env())).text()).toContain('location.replace("https://app.example/filidilo/" + location.hash)')
   })
 
   it('pessoas vão direto ao app por 302 (o Android abre o app instalado)', async () => {
@@ -65,6 +65,8 @@ describe('página pública do link', () => {
     const raiz = await pedir('/?de=convite', env(), 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1')
     expect(raiz.status).toBe(302)
     expect(raiz.headers.get('location')).toBe('https://app.example/filidilo/?de=convite')
+    // Sem query: o Location sai sem # e o navegador mantém o hash do endereço original (#sync=…).
+    expect((await pedir('/', env(), CHROME_ANDROID)).headers.get('location')).toBe('https://app.example/filidilo/')
   })
 
   it('robôs de prévia', () => {
