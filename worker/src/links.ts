@@ -8,6 +8,8 @@
 // (devolvida uma vez, na criação; o KV guarda só o hash dela) muda ou apaga. Assim o app reaproveita
 // um link por baralho em vez de criar um novo a cada envio.
 // A página pública do link (filidilo.britin.workers.dev/<codigo>, com a prévia do WhatsApp) fica em pagina.ts.
+// /s/<id> é o cofre de sincronização entre aparelhos (P131), em sync.ts.
+import { rotaSync } from './sync'
 
 /** O que o KV guarda junto de cada link: o hash da chave de quem criou (links antigos não têm). */
 export interface Metadados {
@@ -109,6 +111,8 @@ export const worker = {
     const h = cabecalhos(req, env)
     const { pathname, searchParams } = new URL(req.url)
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: h })
+    // Cofre de sincronização entre aparelhos (P131): sync.ts.
+    if (pathname.startsWith('/s/')) return rotaSync(req, env, h, json)
 
     if (req.method === 'POST' && pathname === '/l') {
       if (!(await dentroDoLimite(req, env))) return json({ erro: 'muitos_envios' }, 429, h)
