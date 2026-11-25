@@ -1,5 +1,6 @@
 import { salvar } from './baralhos'
 import { db } from './db'
+import { desmarcarCartao, marcarCartaoExcluido } from './excluidos'
 import type { Baralho, Cartao, CartaoConceito, Tema } from './types'
 import { validar } from './validar'
 
@@ -59,6 +60,7 @@ export async function excluirCartao(b: Baralho, id: string): Promise<{ baralho: 
     cartao = atual.cartoes[pos]
     return { ...atual, cartoes: atual.cartoes.filter((c) => c.id !== id) }
   })
+  if (cartao) await marcarCartaoExcluido(baralho.id, id)
   return { baralho, cartao, pos }
 }
 
@@ -67,21 +69,29 @@ export const ativos = (b: Baralho): Cartao[] => b.cartoes.filter((c) => !c.arqui
 
 export const arquivados = (b: Baralho): Cartao[] => b.cartoes.filter((c) => c.arquivadoEm)
 
-/** Arquiva ou desarquiva um cartão. Não conta como edição: atualizações importadas continuam valendo. */
+/**
+ * Arquiva ou desarquiva um cartão. Não conta como edição (`editado` não muda: atualizações importadas
+ * continuam valendo), mas a data muda, para o arquivamento valer ao juntar com outro aparelho.
+ */
 async function marcarArquivado(b: Baralho, id: string, arquivadoEm: number | undefined): Promise<Baralho> {
-  return mudarCartoes(b, (atual) => ({ ...atual, cartoes: atual.cartoes.map((c) => (c.id === id ? { ...c, arquivadoEm } : c)) }))
+  const agora = Date.now()
+  return mudarCartoes(b, (atual) => ({ ...atual, cartoes: atual.cartoes.map((c) => (c.id === id ? { ...c, arquivadoEm, atualizadoEm: agora } : c)) }))
 }
 
 export const arquivarCartao = (b: Baralho, id: string) => marcarArquivado(b, id, Date.now())
 
 export const desarquivarCartao = (b: Baralho, id: string) => marcarArquivado(b, id, undefined)
 
+/** Desfaz a exclusão de um cartão. Conta como mexido agora, para vencer a exclusão que outro aparelho já tenha recebido. */
 export async function reinserirCartao(b: Baralho, c: Cartao, pos: number): Promise<Baralho> {
-  return mudarCartoes(b, (atual) => {
+  const agora = Date.now()
+  const r = await mudarCartoes(b, (atual) => {
     const cartoes = atual.cartoes.filter((x) => x.id !== c.id)
-    cartoes.splice(pos < 0 ? cartoes.length : Math.min(pos, cartoes.length), 0, c)
+    cartoes.splice(pos < 0 ? cartoes.length : Math.min(pos, cartoes.length), 0, { ...c, atualizadoEm: agora })
     return { ...atual, cartoes }
   })
+  await desmarcarCartao(b.id, c.id)
+  return r
 }
 
 // ---------- Colar lista ----------

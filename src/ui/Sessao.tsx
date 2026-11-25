@@ -15,6 +15,7 @@ import { LAYOUTS_FIM, pecaFimSessao } from '../core/artes'
 import { fecharSessao, type Marco } from '../core/conquistas'
 import { concluirSessao, type Conclusao } from '../core/ofensiva'
 import { Cronometro, fotografarDominio, gravarSessao } from '../core/sessoes'
+import { sincronizar } from '../core/sync'
 import { CompartilharImagem, urlApp, type OpcaoImagem } from './CompartilharImagem'
 import { Confete } from './Confete'
 import { Pavao } from './Leque'
@@ -154,6 +155,8 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
       concluida,
     })
       .then(() => fotografarDominio(baralho, agoraMs))
+      // Leva a sessão para os outros aparelhos (se este estiver ligado; sem internet, fica pendente).
+      .then(() => void sincronizar('sessao'))
       .catch((x) => {
         registrarErro('sessao_gravar', x)
         console.error('Não foi possível gravar a sessão', x)

@@ -20,6 +20,8 @@ import { Progresso } from './Progresso'
 import { atualizarSozinho, chegouAlgo } from './recebido'
 import { Revisar } from './Revisar'
 import { Sessao, type Limite, type Modo } from './Sessao'
+import { Sincronizar, type DeOndeSync } from './Sincronizar'
+import { pegarCodigoDaUrl, sincronizar } from '../core/sync'
 
 export type Tela =
   | { nome: 'baralhos' }
@@ -30,6 +32,7 @@ export type Tela =
   | { nome: 'cartao'; id: string; cartaoId?: string; tema?: string }
   | { nome: 'colar'; id: string }
   | { nome: 'backup' }
+  | { nome: 'sincronizar'; de: DeOndeSync; codigo?: string }
   | { nome: 'aparencia' }
   | { nome: 'progresso' }
   | { nome: 'aprender'; pedido?: string }
@@ -61,6 +64,8 @@ export function App() {
   // Lido no primeiro render, antes de a tela de baralhos consumir o link ou o arquivo e limpar a URL.
   const [recebeu] = useState(chegouAlgo)
   const baralhos = useBaralhos(versao)
+  // Link de outro aparelho (…/#sync=<código>): lido e tirado do endereço logo no primeiro render.
+  const [codigoSync] = useState(pegarCodigoDaUrl)
   const {
     needRefresh: [atualizar],
     updateServiceWorker,
@@ -112,7 +117,19 @@ export function App() {
     }
     window.addEventListener('popstate', aoVoltar)
     pedirPersistencia()
-    return () => window.removeEventListener('popstate', aoVoltar)
+    if (codigoSync) nav.ir({ nome: 'sincronizar', de: 'link', codigo: codigoSync })
+    // Sincroniza ao abrir e ao voltar para o app (se este aparelho estiver ligado e houver internet).
+    const sync = (gatilho: 'abrir') =>
+      void sincronizar(gatilho).then((r) => {
+        if (r.baixou) setVersao((v) => v + 1)
+      })
+    sync('abrir')
+    const aoOnline = () => sync('abrir')
+    window.addEventListener('online', aoOnline)
+    return () => {
+      window.removeEventListener('popstate', aoVoltar)
+      window.removeEventListener('online', aoOnline)
+    }
   }, [])
 
   // O app se chamava tatino.: avisa uma vez quem já tinha baralhos que o nome mudou (depois da abertura, para ser visto).
@@ -157,7 +174,8 @@ export function App() {
   let conteudo
   if (!baralhos) conteudo = <main class="tela"><p>Carregando…</p></main>
   else if (tela.nome === 'baralhos') conteudo = <Baralhos baralhos={baralhos} nav={nav} versao={versao} />
-  else if (tela.nome === 'backup') conteudo = <Backup sair={nav.voltar} />
+  else if (tela.nome === 'backup') conteudo = <Backup sair={nav.voltar} abrirSync={() => nav.ir({ nome: 'sincronizar', de: 'backup' })} />
+  else if (tela.nome === 'sincronizar') conteudo = <Sincronizar nav={nav} de={tela.de} codigoRecebido={tela.codigo} />
   else if (tela.nome === 'aparencia') conteudo = <Aparencia nav={nav} />
   else if (tela.nome === 'progresso') conteudo = <Progresso key={versao} baralhos={baralhos} nav={nav} />
   else if (tela.nome === 'aprender') conteudo = <Aprender pedido={tela.pedido} nav={nav} />

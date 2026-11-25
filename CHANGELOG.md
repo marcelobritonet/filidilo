@@ -2,6 +2,15 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.33.0] — 2026-11-25
+
+### Novidades
+
+- **Sincronize seus aparelhos, sem conta e sem senha.** Toque no ⟳ no alto de Meus baralhos (ou em Sincronizar, no rodapé) e em "Começar neste aparelho". Aparece um código e um QR: no outro celular ou computador, aponte a câmera para o QR (ou digite o código em "Tenho um código"). Pronto: baralhos, progresso, ofensiva e conquistas passam a andar juntos.
+- **Sincroniza sozinho** ao abrir o app, ao terminar uma sessão e quando a internet volta. Sem internet, o app continua funcionando como sempre, e as novidades sobem depois.
+- **Tudo vai cifrado.** Só os seus aparelhos conseguem ler o que é sincronizado. Guarde o código: sem ele não há como recuperar os dados se você perder todos os aparelhos. Em Sincronizar dá para trocar o código ou desligar um aparelho.
+- **Restaurar backup ficou mais esperto:** junta cartão a cartão e não traz de volta o que você excluiu.
+
 ## [3.32.1] — 2026-11-25
 
 ### Correções

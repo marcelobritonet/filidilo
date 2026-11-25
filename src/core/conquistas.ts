@@ -118,7 +118,7 @@ export function marcoNovo(atingidos: Marco[], comemorados: Set<string>): { mostr
 
 // ── No aparelho ─────────────────────────────────────────────────────────────
 
-const CHAVE_MARCOS = 'marcos'
+export const CHAVE_MARCOS = 'marcos'
 
 async function lerComemorados(): Promise<Set<string> | null> {
   const m = await db.meta.get(CHAVE_MARCOS)

@@ -141,6 +141,40 @@
         "VITE_LINKS_URL": "http://127.0.0.1:8787",
         "VITE_LINK_PUBLICO": "http://127.0.0.1:8788"
       }
+    },
+    {
+      "name": "links-sync",
+      "runtimeExecutable": "worker/node_modules/.bin/wrangler",
+      "runtimeArgs": [
+        "dev",
+        "-c",
+        "worker/wrangler.toml",
+        "--port",
+        "8789",
+        "--ip",
+        "127.0.0.1",
+        "--inspector-port",
+        "9232",
+        "--var",
+        "ORIGENS:http://localhost:5177,http://127.0.0.1:5177"
+      ],
+      "port": 8789
+    },
+    {
+      "name": "filidilo-sync",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--port",
+        "5177",
+        "--strictPort",
+        "--host",
+        "127.0.0.1"
+      ],
+      "port": 5177,
+      "env": {
+        "VITE_LINKS_URL": "http://127.0.0.1:8789"
+      }
     }
   ]
 }

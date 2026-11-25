@@ -1,4 +1,5 @@
 import { db } from './db'
+import { desmarcarBaralho, marcarBaralhoExcluido } from './excluidos'
 import type { Baralho } from './types'
 
 /** Baralho que vem com o app, com os ids de cartões que versões anteriores tinham e ele não tem mais. */
@@ -19,7 +20,9 @@ export async function semear(sementes: Semente[]): Promise<void> {
       const semeado = await db.meta.get(marca)
       if (semeado && Number(semeado.valor) >= b.versao) continue
       const atual = await db.baralhos.get(b.id)
-      if (!semeado && !atual) await db.baralhos.put({ ...b, criadoEm: Date.now(), atualizadoEm: Date.now() })
+      // atualizadoEm 0: o baralho de fábrica recém-instalado perde para qualquer versão dele vinda de
+      // outro aparelho (e para a exclusão feita lá), ao juntar na sincronização ou no backup.
+      if (!semeado && !atual) await db.baralhos.put({ ...b, criadoEm: Date.now(), atualizadoEm: 0 })
       else if (semeado && atual) {
         const fora = new Set(retirados)
         const deFabrica = new Map(b.cartoes.map((c) => [c.id, c]))
@@ -33,7 +36,9 @@ export async function semear(sementes: Semente[]): Promise<void> {
   })
 }
 
-const CHAVE_ORDEM = 'ordem-baralhos'
+export const CHAVE_ORDEM = 'ordem-baralhos'
+/** Quando a ordem foi escolhida: ao juntar dois aparelhos, a ordem mais recente vence. */
+export const CHAVE_ORDEM_EM = 'ordem-baralhos-em'
 
 /**
  * Ordem da lista. Sem ordem salva, alfabética. Com ordem, os baralhos que não estão nela
@@ -48,7 +53,7 @@ export function aplicarOrdem(baralhos: Baralho[], ordem: string[] | null): Baral
   return [...novos, ...ordenados]
 }
 
-async function lerOrdem(): Promise<string[] | null> {
+export async function lerOrdem(): Promise<string[] | null> {
   const m = await db.meta.get(CHAVE_ORDEM)
   try {
     const v = m && JSON.parse(m.valor)
@@ -66,7 +71,19 @@ export async function ordenar(ids: string[]): Promise<void> {
   const ordem = [...new Set(ids)].filter((id) => existem.has(id))
   // Quem não foi citado (ex.: arquivados) vai para o fim, para não voltar ao topo como novo.
   const resto = (await db.baralhos.toArray()).filter((b) => !ordem.includes(b.id)).sort((a, z) => a.titulo.localeCompare(z.titulo, 'pt-BR'))
-  await db.meta.put({ chave: CHAVE_ORDEM, valor: JSON.stringify([...ordem, ...resto.map((b) => b.id)]) })
+  await gravarOrdem([...ordem, ...resto.map((b) => b.id)], Date.now())
+}
+
+export async function gravarOrdem(ids: string[], em: number): Promise<void> {
+  await db.meta.bulkPut([
+    { chave: CHAVE_ORDEM, valor: JSON.stringify(ids) },
+    { chave: CHAVE_ORDEM_EM, valor: String(em) },
+  ])
+}
+
+export async function lerOrdemEm(): Promise<number> {
+  const n = Number((await db.meta.get(CHAVE_ORDEM_EM))?.valor)
+  return Number.isFinite(n) ? n : 0
 }
 
 export const obter = (id: string) => db.baralhos.get(id)
@@ -106,6 +123,7 @@ export async function duplicar(id: string): Promise<Baralho> {
 export async function excluir(id: string): Promise<Baralho | undefined> {
   const b = await obter(id)
   await db.baralhos.delete(id)
+  await marcarBaralhoExcluido(id)
   return b
 }
 
@@ -114,6 +132,8 @@ export const arquivar = (b: Baralho) => salvar({ ...b, arquivadoEm: Date.now() }
 
 export const desarquivar = (b: Baralho) => salvar({ ...b, arquivadoEm: undefined })
 
+/** Desfaz a exclusão. Conta como mexido agora, para vencer a exclusão que outro aparelho já tenha recebido. */
 export async function restaurar(b: Baralho): Promise<void> {
-  await db.baralhos.put(b)
+  await db.baralhos.put({ ...b, atualizadoEm: Date.now() })
+  await desmarcarBaralho(b.id)
 }

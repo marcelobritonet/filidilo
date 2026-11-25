@@ -1179,3 +1179,29 @@ details.bloco > summary { font-weight: 650; }
 /* Compartilhar cada bloco do painel (P118) */
 .painel-acoes { display: flex; align-items: center; gap: 4px; }
 .painel-topo .icone-btn { margin: -8px -10px -8px 0; }
+
+/* Sincronizar aparelhos (P131) */
+.cabecalho-acoes { display: flex; align-items: center; gap: 4px; }
+.botao-sync { position: relative; color: var(--text-muted); }
+.botao-sync .ponto-sync { position: absolute; top: 9px; right: 9px; width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--bg); box-sizing: content-box; }
+.ponto-sync.ok { background: var(--success); }
+.ponto-sync.pendente { background: var(--marca-bronze); }
+.ponto-sync.erro { background: var(--danger); }
+.botao-sync.girando .icone-sync { animation: girar-sync 1s linear infinite; }
+@keyframes girar-sync { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .botao-sync.girando .icone-sync { animation: none; } }
+.sincronizar .bloco { display: grid; gap: 12px; }
+.sincronizar .bloco + .bloco { margin-top: 16px; }
+.sincronizar .btn.principal:has(.icone-linha) { flex-direction: row; gap: 8px; }
+.sincronizar .dica { margin: 0; color: var(--text-muted); font-size: 14px; }
+.sincronizar .dica.centro { text-align: center; }
+.sincronizar .codigo-sync { display: grid; gap: 8px; }
+.sincronizar .codigo-sync input { font-family: ui-monospace, monospace; letter-spacing: .04em; text-transform: uppercase; }
+.sincronizar .mostrar-codigo { display: grid; gap: 10px; justify-items: center; }
+.sincronizar .qr { width: min(200px, 60vw); aspect-ratio: 1; background: #fff; border-radius: var(--radius-sm); padding: 8px; }
+.sincronizar .qr svg { display: block; width: 100%; height: 100%; }
+.sincronizar .codigo { margin: 0; font-family: ui-monospace, monospace; font-size: 17px; letter-spacing: .04em; text-align: center; word-break: break-all; user-select: all; }
+.sincronizar .acoes-sync { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 16px; }
+.sincronizar .acoes-sync > .bloco { width: 100%; }
+.sincronizar .link.perigo { color: var(--danger); }
+.backup .dica { margin: 8px 0 0; color: var(--text-muted); font-size: 14px; }

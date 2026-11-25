@@ -3,7 +3,7 @@ import { useEffect, useState } from 'preact/hooks'
 import { exportar, importar } from '../core/backup'
 import { db } from '../core/db'
 
-export function Backup({ sair }: { sair: () => void }) {
+export function Backup({ sair, abrirSync }: { sair: () => void; abrirSync?: () => void }) {
   const [msg, setMsg] = useState('')
   const [respostas, setRespostas] = useState(0)
 
@@ -69,6 +69,15 @@ export function Backup({ sair }: { sair: () => void }) {
           Restaurar de um arquivo
           <input type="file" accept="application/json,.json" onChange={restaurar} />
         </label>
+        {abrirSync && (
+          <p class="dica">
+            Usa mais de um aparelho?{' '}
+            <button class="link" onClick={abrirSync}>
+              Sincronize os aparelhos
+            </button>{' '}
+            e o progresso vai sozinho de um para o outro.
+          </p>
+        )}
       </section>
 
       {msg && (

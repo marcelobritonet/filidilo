@@ -20,6 +20,7 @@ import { pecaSemana } from '../core/artes'
 import { CompartilharImagem, urlApp, type OpcaoImagem } from './CompartilharImagem'
 import { ordenar } from '../core/baralhos'
 import { OrdenarBaralhos } from './OrdenarBaralhos'
+import { BotaoSync, useSync } from './Sincronizar'
 
 const SEM_INTERNET = 'Precisa de internet para falar com a IA.'
 
@@ -53,6 +54,7 @@ const faixa = (t: string): 'curto' | 'medio' | 'longo' => (t.length <= 20 ? 'cur
 
 export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: Navegacao; versao: number }) {
   const estados = useEstados(versao)
+  const sync = useSync()
   const [pedido, setPedido] = useState('')
   const [semInternet, setSemInternet] = useState<'' | 'campo' | 'botao'>('')
   const [plano, setPlano] = useState<PlanoImportacao | null>(null)
@@ -185,7 +187,10 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
       <header class="cabecalho">
         <div class="cabecalho-ofensiva">
           <Marca />
-          {ofensiva.painel && (ofensiva.painel.sequencia > 0 || ofensiva.painel.folgas > 0) && <SeloOfensiva painel={ofensiva.painel} agora={ofensiva.agora} abrir={abrirSemana} />}
+          <div class="cabecalho-acoes">
+            {ofensiva.painel && (ofensiva.painel.sequencia > 0 || ofensiva.painel.folgas > 0) && <SeloOfensiva painel={ofensiva.painel} agora={ofensiva.agora} abrir={abrirSemana} />}
+            <BotaoSync abrir={() => nav.ir({ nome: 'sincronizar', de: 'icone' })} />
+          </div>
         </div>
         <h1>{saudacao(agora)}</h1>
         <p class="saudacao-frase">{frase}</p>
@@ -313,11 +318,14 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         <button class="btn terciario" onClick={() => nav.ir({ nome: 'backup' })}>
           Backup
         </button>
+        <button class="btn terciario" onClick={() => nav.ir({ nome: 'sincronizar', de: 'rodape' })}>
+          Sincronizar
+        </button>
         <button class="btn terciario" onClick={() => nav.ir({ nome: 'aparencia' })}>
           Preferências
         </button>
       </nav>
-      <p class="versao">Funciona sem internet · seus cartões ficam neste aparelho</p>
+      <p class="versao">{sync.estado ? 'Funciona sem internet · sincronizado com seus outros aparelhos' : 'Funciona sem internet · seus cartões ficam neste aparelho'}</p>
       {aviso && <AvisoRecebido titulo={aviso.titulo} texto={aviso.texto} fechar={() => setAviso(null)} />}
       {plano && <Importar plano={plano} nav={nav} fechar={() => setPlano(null)} />}
       {compartilhar && (
