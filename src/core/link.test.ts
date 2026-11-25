@@ -31,6 +31,15 @@ describe('link', () => {
     expect(l.url).toBe('https://filidilo.britin.workers.dev/Ab12345678')
   })
 
+  it('convites e imagens usam o endereço público, sem o nome no endereço', async () => {
+    const { urlPublicaDoApp, ENDERECO_VISIVEL } = await carregar('https://links.example/', 'https://filidilo.britin.workers.dev')
+    expect(urlPublicaDoApp('convite')).toBe('https://filidilo.britin.workers.dev/?de=convite')
+    expect(ENDERECO_VISIVEL).toBe('filidilo.britin.workers.dev')
+    const local = await (vi.resetModules(), carregar('https://links.example/', ''))
+    expect(local.urlPublicaDoApp('imagem')).toMatch(/^https:\/\/app\.example\/.*\?de=imagem$/)
+    expect(local.ENDERECO_VISIVEL).toBe('filidilo.britin.workers.dev')
+  })
+
   it('atualiza com a chave; null quando o link sumiu ou não é deste aparelho', async () => {
     const { atualizarLink, apagarLink } = await carregar()
     const f = vi.fn(async () => resposta(200, { expiraEm: '2026-12-25T20:00:00.000Z' }))

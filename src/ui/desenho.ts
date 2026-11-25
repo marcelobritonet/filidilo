@@ -1,5 +1,6 @@
 // Desenha a imagem de compartilhar num <canvas>, no aparelho (nada sai dele até ela compartilhar).
 import qrcode from 'qrcode-generator'
+import { ENDERECO_VISIVEL } from '../core/link'
 import { pseudoAleatorio, quebrar, TAMANHO, type Arte, type FimSessao, type Formato } from '../core/artes'
 import { PENAS, quadroComemoracao, DURACAO_COMEMORACAO } from './danca'
 
@@ -309,7 +310,7 @@ export function desenhar(canvas: HTMLCanvasElement, a: Arte, formato: Formato): 
   ctx.fillStyle = COR.suave
   ctx.textAlign = 'center'
   ctx.textBaseline = 'alphabetic'
-  ctx.fillText('marcelobritonet.github.io/filidilo', w / 2, h - base)
+  ctx.fillText(ENDERECO_VISIVEL, w / 2, h - base)
 
   // Miolo: diminui a escala até caber entre a marca e o endereço.
   const ini = topo + marcaTam + (quadrado ? 50 : 90)
@@ -521,7 +522,7 @@ function desenharFim(ctx: CanvasRenderingContext2D, a: Arte, f: FimSessao, w: nu
   /** Logotipo "filidilo" centrado com a linha de base em `y`, e o endereço embaixo. */
   const rodape = (alinhar: 'center' | 'left') => {
     const alt = quadrado ? 40 : 52
-    const ender = 'marcelobritonet.github.io/filidilo'
+    const ender = ENDERECO_VISIVEL
     const enderPx = quadrado ? 28 : 34
     const yEnder = h - base
     ctx.font = `500 ${enderPx}px ${SANS}`

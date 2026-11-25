@@ -18,6 +18,17 @@ export const linkLigado = () => !!URL_LINKS
  */
 export const URL_PUBLICA: string = (import.meta.env.VITE_LINK_PUBLICO ?? '').replace(/\/+$/, '')
 
+/** Endereço escrito nas imagens de compartilhar (sem https://). Fora do build publicado, o do ar. */
+export const ENDERECO_VISIVEL: string = (URL_PUBLICA || 'https://filidilo.britin.workers.dev').replace(/^https?:\/\//, '')
+
+/**
+ * Endereço do app para convites e imagens: a raiz da página pública, que leva ao app com os parâmetros.
+ * A marca `?de=` diz às estatísticas por onde a pessoa chegou; o app a tira do endereço.
+ */
+export function urlPublicaDoApp(de: 'convite' | 'imagem', origem = location.origin, base = import.meta.env.BASE_URL, publica = URL_PUBLICA): string {
+  return publica ? `${publica}/?de=${de}` : `${origem}${base}?de=${de}`
+}
+
 export const RE_CODIGO = /^[0-9A-Za-z]{10}$/
 
 export interface LinkCriado {

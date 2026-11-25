@@ -2,7 +2,7 @@
 
 Antes se chamava **tatino.**. O endereço e o repositório já usam o nome novo; os identificadores internos (banco, chaves do aparelho, formato dos arquivos) continuam com o nome antigo, para ninguém perder dados.
 
-No ar: https://marcelobritonet.github.io/filidilo/
+No ar: https://filidilo.britin.workers.dev/
 
 **Aprenda qualquer coisa.** Flashcards offline (PWA) para estudar o que você quiser. Funciona no celular e no computador, instalável pelo navegador, sem login.
 

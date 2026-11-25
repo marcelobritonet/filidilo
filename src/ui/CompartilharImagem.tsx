@@ -1,6 +1,7 @@
 import type { ComponentChildren } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import type { Formato, Peca } from '../core/artes'
+import { urlPublicaDoApp } from '../core/link'
 import { evento } from '../core/telemetria'
 import { desenhar, imagemPng } from './desenho'
 
@@ -146,6 +147,6 @@ export function CompartilharImagem({ opcoes, onde, avisar, fechar, extra }: { op
   )
 }
 
-/** Endereço do app, para o texto e o QR das imagens. A marca `?de=` diz às estatísticas que a pessoa chegou
- *  por um convite ou por uma imagem compartilhada (resultado, conquista, semana, progresso); o app a tira do endereço. */
-export const urlApp = (de: 'convite' | 'imagem' = 'imagem') => `${location.origin}${import.meta.env.BASE_URL}?de=${de}`
+/** Endereço do app, para o texto e o QR das imagens (convite, resultado, conquista, semana, progresso):
+ *  o endereço público (filidilo.britin.workers.dev), que leva ao app. Ver urlPublicaDoApp em core/link.ts. */
+export const urlApp = (de: 'convite' | 'imagem' = 'imagem') => urlPublicaDoApp(de)
