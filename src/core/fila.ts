@@ -1,7 +1,7 @@
 import type { Estado } from './db'
 import type { Baralho, Cartao } from './types'
 import { chave, vencido } from './srs'
-import { aleatorio, embaralhar } from './aleatorio'
+import { aleatorio, embaralhar, inteiro } from './aleatorio'
 
 export type Filtro = 'tudo' | 'teoria' | 'calculo'
 
@@ -24,14 +24,21 @@ function candidatos(b: Baralho, o: OpcoesFila, estados?: Map<string, Estado>): C
   )
 }
 
-/** A cada quantos cartões entra um nunca visto, enquanto houver. */
-export const NOVO_A_CADA = 3
+/** A cada quantos cartões entra um nunca visto, enquanto houver (o primeiro da fila já é um). */
+export const NOVO_A_CADA = 2
+
+/** Quantos cartões à frente se olha para trocar de tema sem bagunçar a prioridade da revisão. */
+const JANELA = 6
+const DIA = 86_400_000
 
 /**
- * Fila do "Estudar": a revisão segue a ordem 1. errados por último; 2. vencidos hoje
- * (repetição espaçada); 3. difíceis; 4. acertados, os acertados há mais tempo primeiro.
- * Os nunca vistos entram intercalados (um a cada NOVO_A_CADA), para toda sessão
- * avançar pelo baralho inteiro mesmo com muitos errados ou vencidos.
+ * Fila do "Estudar", em dois blocos:
+ * 1. o que precisa: errados da última vez e vencidos hoje (repetição espaçada), alternando
+ *    um a um com os nunca vistos, a começar por um nunca visto;
+ * 2. depois de acabar o bloco 1: difíceis e acertados que ainda não venceram, os respondidos
+ *    há mais dias primeiro, em ordem sorteada dentro do mesmo dia.
+ * Em toda a fila os temas se revezam: entra o tema usado há mais tempo, nunca dois seguidos
+ * do mesmo tema quando houver outro por perto.
  */
 export function filaProva(b: Baralho, estados: Map<string, Estado>, o: OpcoesFila = {}, rng = aleatorio, agora = Date.now()): Cartao[] {
   const grupo = (c: Cartao) => {
@@ -39,28 +46,24 @@ export function filaProva(b: Baralho, estados: Map<string, Estado>, o: OpcoesFil
     if (!e) return 2
     if (e.ultimaNota === 1) return 0
     if (vencido(e, agora)) return 1
-    return e.ultimaNota === 2 ? 3 : 4
+    return 3
   }
-  const grupos: Cartao[][] = [[], [], [], [], []]
+  const grupos: Cartao[][] = [[], [], [], []]
   for (const c of candidatos(b, o, estados)) grupos[grupo(c)].push(c)
-  const antigo = (c: Cartao) => estados.get(chave(b.id, c.id))?.ultimaData ?? 0
-  const ordenados = grupos.map((g, i) => (i === 4 ? embaralhar(g, rng).sort((x, y) => antigo(x) - antigo(y)) : embaralhar(g, rng)))
-  const novos = misturarTemas(ordenados[2])
-  const revisao = misturarTemas(ordenados.filter((_, i) => i !== 2).flat())
-  return intercalar(revisao, novos, NOVO_A_CADA).slice(0, o.tamanho ?? 20)
-}
+  const dia = (c: Cartao) => Math.floor((estados.get(chave(b.id, c.id))?.ultimaData ?? 0) / DIA)
+  const precisa = [...embaralhar(grupos[0], rng), ...embaralhar(grupos[1], rng)]
+  const novos = embaralhar(grupos[2], rng)
+  const depois = embaralhar(grupos[3], rng).sort((x, y) => dia(x) - dia(y))
 
-/** Põe um de `novos` a cada `n` cartões (posições n, 2n…); sobrando, seguem os de uma lista só. */
-export function intercalar<T>(revisao: T[], novos: T[], n: number): T[] {
-  const out: T[] = []
-  let r = 0
-  let k = 0
-  while (r < revisao.length || k < novos.length) {
-    const vezDoNovo = (out.length + 1) % n === 0
-    if (k < novos.length && (vezDoNovo || r >= revisao.length)) out.push(novos[k++])
-    else out.push(revisao[r++])
+  const temas = new Temas()
+  const out: Cartao[] = []
+  while (precisa.length || novos.length) {
+    const vezDoNovo = out.length % NOVO_A_CADA === 0
+    if (novos.length && (vezDoNovo || !precisa.length)) out.push(temas.tirar(novos, novos.length))
+    else out.push(temas.tirar(precisa, JANELA))
   }
-  return out
+  while (depois.length) out.push(temas.tirar(depois, JANELA))
+  return out.slice(0, o.tamanho ?? 20)
 }
 
 /** Revisão espaçada: cartões vencidos (FSRS) e até `novos` cartões novos. */
@@ -70,26 +73,41 @@ export function filaEspacada(b: Baralho, estados: Map<string, Estado>, o: Opcoes
   const vencidos = cs
     .filter((c) => estados.has(chave(b.id, c.id)) && vencido(estados.get(chave(b.id, c.id)), agora))
     .sort((x, y) => +new Date(estados.get(chave(b.id, x.id))!.fsrs.due) - +new Date(estados.get(chave(b.id, y.id))!.fsrs.due))
-  const nunca = embaralhar(cs.filter((c) => !estados.has(chave(b.id, c.id)))).slice(0, novos)
+  const nunca = espalharTemas(embaralhar(cs.filter((c) => !estados.has(chave(b.id, c.id)))).slice(0, novos))
   return [...vencidos, ...nunca].slice(0, o.tamanho ?? 50)
 }
 
-/** Evita três cartões seguidos do mesmo tema quando houver alternativa. */
-function misturarTemas(cs: Cartao[]): Cartao[] {
-  const out: Cartao[] = []
-  const resto = [...cs]
-  while (resto.length) {
-    const n = out.length
-    let i = 0
-    if (n >= 2 && out[n - 1].tema === out[n - 2].tema) {
-      const j = resto.findIndex((c) => c.tema !== out[n - 1].tema)
-      if (j > 0 && j < 6) i = j
+/** Lembra onde cada tema apareceu por último e tira de uma lista o cartão do tema mais esquecido. */
+class Temas {
+  private ultimo = new Map<string, number>()
+  private n = 0
+  /** Entre os `janela` primeiros de `resto`, tira o de tema usado há mais tempo (empate: o primeiro). */
+  tirar(resto: Cartao[], janela: number): Cartao {
+    let melhor = 0
+    let distancia = -1
+    for (let i = 0; i < Math.min(janela, resto.length); i++) {
+      const u = this.ultimo.get(resto[i].tema)
+      const d = u === undefined ? Infinity : this.n - u
+      if (d > distancia) {
+        melhor = i
+        distancia = d
+      }
     }
-    out.push(resto.splice(i, 1)[0])
+    const [c] = resto.splice(melhor, 1)
+    this.ultimo.set(c.tema, this.n++)
+    return c
   }
+}
+
+/** Reveza os temas de uma lista cuja ordem não importa. */
+function espalharTemas(cs: Cartao[]): Cartao[] {
+  const resto = [...cs]
+  const t = new Temas()
+  const out: Cartao[] = []
+  while (resto.length) out.push(t.tirar(resto, resto.length))
   return out
 }
 
-/** Próxima posição de um cartão errado na sessão: volta depois de 3 a 5 cartões. */
+/** Próxima posição de um cartão errado na sessão: volta depois de 6 a 10 cartões. */
 export const posicaoReinsercao = (atual: number, total: number, rng = aleatorio) =>
-  Math.min(total, atual + 3 + Math.floor(rng() * 3))
+  Math.min(total, atual + 6 + inteiro(5, rng))

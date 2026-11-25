@@ -2,6 +2,13 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.30.0] — 2026-11-25
+
+### Novidades
+- **Cartões mais misturados no Estudar.** Os temas se revezam de verdade, e cada sessão sai numa ordem nova, sem repetir a anterior.
+- **Mais cartões novos.** A sessão começa por um cartão que você nunca viu e alterna novos com os que precisam de revisão. Os que você já acertou esperam a vez deles e só voltam depois dos novos.
+- **O cartão que você errou volta um pouco mais tarde** na mesma sessão, depois de 6 a 10 cartões.
+
 ## [3.29.1] — 2026-11-24
 
 ### Novidades
