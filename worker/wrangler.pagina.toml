@@ -1,0 +1,16 @@
+# Página pública dos links do Filidilo: https://filidilo.britin.workers.dev/<codigo>.
+# (O nome do worker vira o endereço: "filidilo" sem trocar o subdomínio britin, que outros projetos usam.)
+# Mostra a prévia com o nome do baralho (tags og:) e leva ao app, que baixa o conteúdo pelo filidilo-links.
+# Lê o mesmo KV do filidilo-links (id fixo). Publicado pelo .github/workflows/deploy-worker.yml.
+# Local: npx wrangler dev -c wrangler.pagina.toml --port 8788 --var APP_URL:http://localhost:5173/filidilo/
+name = "filidilo"
+main = "src/entradaPagina.ts"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+[[kv_namespaces]]
+binding = "LINKS"
+id = "ae8549ab23824f36bf4aeb5d18ee6aef"
+
+[vars]
+APP_URL = "https://marcelobritonet.github.io/filidilo/"
