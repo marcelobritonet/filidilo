@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { useRegisterSW } from 'virtual:pwa-register/preact'
-import { pedirPersistencia } from '../core/db'
+import { db, pedirPersistencia } from '../core/db'
+import { limparLinks } from '../core/linksGuardados'
 import { registrarEstado } from '../core/metricas'
 import { aparelhoDeTeste, evento, registrarErro } from '../core/telemetria'
 import type { OpcoesFila } from '../core/fila'
@@ -94,6 +95,12 @@ export function App() {
     if (!baralhos || estadoEnviado.current) return
     estadoEnviado.current = true
     registrarEstado(baralhos).catch((e) => registrarErro('app_estado', e))
+    // Links de baralhos excluídos (o "Desfazer" já passou): apaga no worker. Arquivados continuam existindo.
+    db.baralhos
+      .toCollection()
+      .primaryKeys()
+      .then((ids) => limparLinks(ids as string[]))
+      .catch(() => undefined)
   }, [baralhos])
 
   useEffect(() => {

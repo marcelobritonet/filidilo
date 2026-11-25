@@ -30,6 +30,7 @@ jobs:
           BASE_PATH: /${{ github.event.repository.name }}/
           VITE_POSTHOG_KEY: ${{ vars.VITE_POSTHOG_KEY }}
           VITE_LINKS_URL: ${{ vars.VITE_LINKS_URL }}
+          VITE_LINK_PUBLICO: ${{ vars.VITE_LINK_PUBLICO }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

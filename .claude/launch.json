@@ -92,6 +92,55 @@
         "--strictPort"
       ],
       "port": 5175
+    },
+    {
+      "name": "links-p128",
+      "runtimeExecutable": "worker/node_modules/.bin/wrangler",
+      "runtimeArgs": [
+        "dev",
+        "-c",
+        "worker/wrangler.toml",
+        "--port",
+        "8787",
+        "--ip",
+        "127.0.0.1",
+        "--var",
+        "ORIGENS:http://localhost:5176"
+      ],
+      "port": 8787
+    },
+    {
+      "name": "b-p128",
+      "runtimeExecutable": "worker/node_modules/.bin/wrangler",
+      "runtimeArgs": [
+        "dev",
+        "-c",
+        "worker/wrangler.pagina.toml",
+        "--port",
+        "8788",
+        "--ip",
+        "127.0.0.1",
+        "--inspector-port",
+        "9231",
+        "--var",
+        "APP_URL:http://localhost:5176/filidilo/"
+      ],
+      "port": 8788
+    },
+    {
+      "name": "filidilo-p128",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--port",
+        "5176",
+        "--strictPort"
+      ],
+      "port": 5176,
+      "env": {
+        "VITE_LINKS_URL": "http://127.0.0.1:8787",
+        "VITE_LINK_PUBLICO": "http://127.0.0.1:8788"
+      }
     }
   ]
 }

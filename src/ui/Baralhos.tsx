@@ -30,7 +30,7 @@ const TONS = ['var(--marca-turquesa)', 'var(--marca-cobalto)', 'var(--marca-bron
 /** Título e texto do aviso quando o link (ou o arquivo compartilhado) não abre. */
 function textoDoAviso(via: 'arquivo' | 'link', motivo: MotivoLink | undefined, mensagem: string): { titulo: string; texto: string } {
   if (via === 'arquivo') return { titulo: 'Não consegui abrir o arquivo', texto: mensagem }
-  if (motivo === 'expirou') return { titulo: 'Este link expirou', texto: 'Os links do Filidilo valem 2 horas (desafios, 7 dias). Peça a quem enviou um link novo.' }
+  if (motivo === 'expirou') return { titulo: 'Este link expirou', texto: 'Peça a quem enviou um link novo.' }
   if (motivo === 'internet') return { titulo: 'Sem internet', texto: 'Conecte-se e abra o link de novo.' }
   return { titulo: 'Não consegui abrir o link', texto: mensagem }
 }

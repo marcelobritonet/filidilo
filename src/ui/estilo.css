@@ -944,9 +944,15 @@ details.bloco > summary { font-weight: 650; }
 .inicio .incentivo-ia { max-width: none; margin-top: 16px; }
 
 /* Enviar por link: QR code sempre em fundo branco, para a câmera ler também no tema escuro. */
-.modal.enviar .qr { justify-self: center; width: min(240px, 70vw); aspect-ratio: 1; background: #fff; border-radius: var(--radius-sm); padding: 8px; }
+/* P128: só os botões à vista; o QR e o arquivo ficam embaixo, discretos. */
+.modal.enviar .enviar-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.modal.enviar .enviar-qr { display: grid; gap: 6px; justify-items: center; }
+.modal.enviar .enviar-qr .dica { margin: 0; }
+.modal.enviar .qr { width: min(200px, 60vw); aspect-ratio: 1; background: #fff; border-radius: var(--radius-sm); padding: 8px; }
 .modal.enviar .qr svg { display: block; width: 100%; height: 100%; }
-.modal.enviar .link-gerado { width: 100%; font: inherit; font-size: 14px; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-subtle); color: var(--text); }
+.modal.enviar .enviar-mais { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.modal.enviar .enviar-mais .btn.terciario { min-height: 40px; padding: 8px 4px; font-size: 14px; white-space: nowrap; color: var(--text-muted); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--border); }
+.modal.enviar .enviar-mais .btn.terciario:hover { color: var(--text); }
 
 /* ---------- v3.8.2: a pergunta continua visível na folha de resultado ---------- */
 .folha-pergunta {

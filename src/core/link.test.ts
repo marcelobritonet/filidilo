@@ -5,8 +5,9 @@ afterEach(() => {
   vi.resetModules()
 })
 
-async function carregar(url = 'https://links.example/') {
+async function carregar(url = 'https://links.example/', publica = '') {
   vi.stubEnv('VITE_LINKS_URL', url)
+  vi.stubEnv('VITE_LINK_PUBLICO', publica)
   vi.stubGlobal('location', { origin: 'https://app.example' })
   return import('./link')
 }
@@ -16,18 +17,29 @@ const resposta = (status: number, corpo: unknown) => new Response(typeof corpo =
 describe('link', () => {
   it('cria o link do app com o código', async () => {
     const { criarLink } = await carregar()
-    const f = vi.fn(async () => resposta(201, { codigo: 'Ab12345678', expiraEm: '2026-11-19T20:00:00.000Z' }))
+    const f = vi.fn(async () => resposta(201, { codigo: 'Ab12345678', chave: 'k', expiraEm: '2026-11-19T20:00:00.000Z' }))
     const l = await criarLink('{"app":"tatino"}', f as unknown as typeof fetch)
-    expect(f).toHaveBeenCalledWith('https://links.example/l', expect.objectContaining({ method: 'POST', body: '{"app":"tatino"}' }))
+    expect(f).toHaveBeenCalledWith('https://links.example/l?validade=30d', expect.objectContaining({ method: 'POST', body: '{"app":"tatino"}' }))
     expect(l.url).toMatch(/^https:\/\/app\.example\/.*\?b=Ab12345678$/)
+    expect(l.chave).toBe('k')
     expect(l.expiraEm.toISOString()).toBe('2026-11-19T20:00:00.000Z')
   })
 
-  it('desafio pede 7 dias ao worker', async () => {
-    const { criarLink } = await carregar()
-    const f = vi.fn(async () => resposta(201, { codigo: 'Ab12345678', expiraEm: '2026-11-26T20:00:00.000Z' }))
-    await criarLink('{"app":"tatino"}', f as unknown as typeof fetch, '7d')
-    expect(f).toHaveBeenCalledWith('https://links.example/l?validade=7d', expect.anything())
+  it('com VITE_LINK_PUBLICO, o link é o da página pública', async () => {
+    const { criarLink } = await carregar('https://links.example/', 'https://filidilo.britin.workers.dev/')
+    const l = await criarLink('{}', (async () => resposta(201, { codigo: 'Ab12345678', chave: 'k', expiraEm: '2026-11-19T20:00:00.000Z' })) as unknown as typeof fetch)
+    expect(l.url).toBe('https://filidilo.britin.workers.dev/Ab12345678')
+  })
+
+  it('atualiza com a chave; null quando o link sumiu ou não é deste aparelho', async () => {
+    const { atualizarLink, apagarLink } = await carregar()
+    const f = vi.fn(async () => resposta(200, { expiraEm: '2026-12-25T20:00:00.000Z' }))
+    expect((await atualizarLink('Ab12345678', 'k', '{"x":1}', f as unknown as typeof fetch))?.toISOString()).toBe('2026-12-25T20:00:00.000Z')
+    expect(f).toHaveBeenCalledWith('https://links.example/l/Ab12345678?validade=30d', expect.objectContaining({ method: 'PUT', body: '{"x":1}', headers: expect.objectContaining({ 'x-chave': 'k' }) }))
+    expect(await atualizarLink('Ab12345678', 'k', '', (async () => resposta(404, {})) as unknown as typeof fetch)).toBeNull()
+    expect(await atualizarLink('Ab12345678', 'k', '', (async () => resposta(403, {})) as unknown as typeof fetch)).toBeNull()
+    const d = vi.fn(async () => { throw new TypeError('rede') })
+    await expect(apagarLink('Ab12345678', 'k', d as unknown as typeof fetch)).resolves.toBeUndefined()
   })
 
   it('erros ao criar viram mensagens', async () => {

@@ -1,6 +1,7 @@
 import qrcode from 'qrcode-generator'
 import { useEffect, useMemo, useState } from 'preact/hooks'
-import { criarLink, linkLigado, type LinkCriado } from '../core/link'
+import { linkLigado } from '../core/link'
+import { linkPara, type ComoLink } from '../core/linksGuardados'
 import { evento, registrarErro } from '../core/telemetria'
 import { enviarArquivo, type ConteudoEnvio } from './enviar'
 
@@ -12,33 +13,38 @@ function svgDoQr(url: string): string {
   return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true })
 }
 
-const hora = (d: Date) => d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-
-/** Texto que vai com o link no "Compartilhar" (WhatsApp etc.); a prévia com imagem vem das tags og: do index.html. */
-export function textoDoLink(c: Pick<ConteudoEnvio, 'o_que' | 'titulo' | 'cartoes'>, ate: string): string {
-  if (c.o_que !== 'baralho') return `${c.titulo}: toque para abrir. O link vale até ${ate}.`
-  const qtd = c.cartoes === 1 ? '1 cartão' : `${c.cartoes} cartões`
-  return `${c.titulo} no Filidilo, com ${qtd}: toque para estudar. O link vale até ${ate}.`
+/** Texto que vai com o link no "Compartilhar" (WhatsApp etc.); a prévia com o nome do baralho vem da página pública do link. */
+export function textoDoLink(c: Pick<ConteudoEnvio, 'o_que' | 'nomeBaralho' | 'cartoes' | 'progresso'>): string {
+  if (c.o_que !== 'baralho') return 'Consegue responder este cartão do Filidilo?'
+  if (c.progresso) return `${c.nomeBaralho} no Filidilo, com o meu progresso.`
+  return `Bora estudar ${c.nomeBaralho} comigo? ${c.cartoes === 1 ? 'É 1 cartão' : `São ${c.cartoes} cartões`} no Filidilo.`
 }
 
 /** O mesmo baralho com o progresso de quem envia (null se ela ainda não estudou nada dele). */
 export type ComProgresso = () => Promise<{ conteudo: ConteudoEnvio; estudados: number } | null>
 
+interface Link {
+  url: string
+  como: ComoLink
+}
+
 /**
- * Enviar baralho ou cartão: gera um link que vale 2 horas (o desafio, em Desafio.tsx, vale 7 dias) (com QR code para ler noutro celular)
- * e, embaixo, a opção de enviar como arquivo, que funciona sem internet.
+ * Enviar baralho ou cartão: um link (30 dias, reaproveitado por baralho: ver linksGuardados.ts),
+ * com Compartilhar e Copiar à vista; o QR code (para ler noutro celular) e o envio como arquivo
+ * (funciona sem internet) ficam embaixo, discretos. Nada de prazo nem do endereço escrito.
  * Para baralho, uma caixa (desmarcada) inclui o progresso, para levar a outro aparelho dela.
  */
-export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar, fechar, desafiar }: { conteudo: ConteudoEnvio; comProgresso?: ComProgresso; onde: string; avisar?: (texto: string) => void; fechar: () => void; /** Cartão: abre o "Desafiar amigos" (imagem para story ou grupo, link de 7 dias). */ desafiar?: () => void }) {
+export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar, fechar, desafiar }: { conteudo: ConteudoEnvio; comProgresso?: ComProgresso; onde: string; avisar?: (texto: string) => void; fechar: () => void; /** Cartão: abre o "Desafiar amigos" (imagem para story ou grupo). */ desafiar?: () => void }) {
   const [opcaoProgresso, setOpcaoProgresso] = useState<{ conteudo: ConteudoEnvio; estudados: number } | null>(null)
   const [incluir, setIncluir] = useState(false)
   const conteudo = incluir && opcaoProgresso ? opcaoProgresso.conteudo : semProgresso
-  const [links, setLinks] = useState<Record<string, LinkCriado>>({})
+  const [links, setLinks] = useState<Record<string, Link>>({})
   const chave = incluir ? 'com' : 'sem'
   const link = links[chave] ?? null
   const [erro, setErro] = useState(linkLigado() ? '' : 'off')
   const [copiado, setCopiado] = useState(false)
-  const qr = useMemo(() => (link ? svgDoQr(link.url) : ''), [link])
+  const [verQr, setVerQr] = useState(false)
+  const qr = useMemo(() => (link && verQr ? svgDoQr(link.url) : ''), [link, verQr])
   const podeCompartilhar = typeof navigator.share === 'function'
 
   useEffect(() => {
@@ -57,11 +63,11 @@ export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar
     if (!navigator.onLine) return setErro('Sem internet: dá para enviar como arquivo.')
     setErro('')
     let vivo = true
-    criarLink(conteudo.texto)
+    linkPara(conteudo.id, conteudo.baralho, conteudo.texto)
       .then((l) => {
         if (!vivo) return
-        setLinks((m) => ({ ...m, [chave]: l }))
-        evento('enviar', { o_que: conteudo.o_que, cartoes: conteudo.cartoes, onde, como: 'link', progresso: incluir })
+        setLinks((m) => ({ ...m, [chave]: { url: l.url, como: l.como } }))
+        evento('enviar', { o_que: conteudo.o_que, cartoes: conteudo.cartoes, onde, como: 'link', progresso: incluir, link: l.como })
       })
       .catch((e) => {
         if (!vivo) return
@@ -80,17 +86,22 @@ export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar
       await navigator.clipboard.writeText(link.url)
       setCopiado(true)
     } catch {
-      avisar?.('Não consegui copiar. Segure o link para copiar.')
+      avisar?.('Não consegui copiar o link.')
     }
   }
 
   const compartilhar = async () => {
     if (!link) return
     try {
-      await navigator.share({ title: conteudo.titulo, text: textoDoLink(conteudo, hora(link.expiraEm)), url: link.url })
+      await navigator.share({ title: conteudo.titulo, text: textoDoLink(conteudo), url: link.url })
     } catch {
       /* cancelado */
     }
+  }
+
+  const mostrarQr = () => {
+    if (!verQr) evento('enviar_qr', { o_que: conteudo.o_que, onde })
+    setVerQr((v) => !v)
   }
 
   const comoArquivo = async () => {
@@ -100,10 +111,17 @@ export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar
     if (r !== 'cancelado') fechar()
   }
 
+  const semLink = erro !== ''
+
   return (
     <div class="modal-fundo" onClick={(e) => e.target === e.currentTarget && fechar()}>
       <div class="modal enviar" role="dialog" aria-modal="true" aria-labelledby="titulo-enviar">
-        <h2 id="titulo-enviar">Enviar {conteudo.o_que === 'baralho' ? 'baralho' : 'cartão'}</h2>
+        <div class="enviar-topo">
+          <h2 id="titulo-enviar">Enviar {conteudo.o_que === 'baralho' ? 'baralho' : 'cartão'}</h2>
+          <button class="fechar-x" aria-label="Fechar" onClick={fechar}>
+            ×
+          </button>
+        </div>
 
         {desafiar && linkLigado() && (
           <button class="cartao-acao desafiar" onClick={desafiar}>
@@ -124,38 +142,45 @@ export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar
           </label>
         )}
 
-        {erro !== 'off' && (
+        {erro && erro !== 'off' && (
+          <p class="resultado erro" role="alert">
+            {erro}
+          </p>
+        )}
+
+        {!semLink && (
           <>
-            {!link && !erro && <p class="dica" role="status">Gerando o link…</p>}
-            {erro && (
-              <p class="resultado erro" role="alert">
-                {erro}
-              </p>
+            {podeCompartilhar && (
+              <button class="btn principal" disabled={!link} onClick={compartilhar}>
+                {link ? 'Compartilhar link' : 'Preparando o link…'}
+              </button>
             )}
-            {link && (
-              <>
+            <button class={`btn ${podeCompartilhar ? 'secundario' : 'principal'}`} disabled={!link} onClick={copiar}>
+              {copiado ? 'Link copiado ✓' : !link && !podeCompartilhar ? 'Preparando o link…' : 'Copiar link'}
+            </button>
+            {verQr && link && (
+              <div class="enviar-qr">
                 <div class="qr" role="img" aria-label="QR code do link" dangerouslySetInnerHTML={{ __html: qr }} />
-                <p class="dica">Aponte a câmera do outro celular para o código, ou mande o link. Vale até {hora(link.expiraEm)} (2 horas) e depois some.</p>
-                <input class="link-gerado" readOnly value={link.url} aria-label="Link" onFocus={(e) => (e.target as HTMLInputElement).select()} />
-                {podeCompartilhar && (
-                  <button class="btn principal" onClick={compartilhar}>
-                    Compartilhar link
-                  </button>
-                )}
-                <button class={`btn ${podeCompartilhar ? 'secundario' : 'principal'}`} onClick={copiar}>
-                  {copiado ? 'Link copiado ✓' : 'Copiar link'}
-                </button>
-              </>
+                <p class="dica">Aponte a câmera do outro celular.</p>
+              </div>
             )}
           </>
         )}
 
-        <button class={`btn ${erro ? 'principal' : 'secundario'}`} onClick={comoArquivo}>
-          Enviar como arquivo
-        </button>
-        <button class="btn terciario" onClick={fechar}>
-          Fechar
-        </button>
+        {semLink ? (
+          <button class="btn principal" onClick={comoArquivo}>
+            Enviar como arquivo
+          </button>
+        ) : (
+          <div class="enviar-mais">
+            <button class="btn terciario" disabled={!link} aria-expanded={verQr} onClick={mostrarQr}>
+              {verQr ? 'Esconder QR code' : 'Mostrar QR code'}
+            </button>
+            <button class="btn terciario" onClick={comoArquivo}>
+              Enviar como arquivo
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

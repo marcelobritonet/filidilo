@@ -2,7 +2,8 @@ import { useState } from 'preact/hooks'
 import { pecaDesafio } from '../core/artes'
 import { arquivoDoBaralho, arquivoDosCartoes } from '../core/compartilhar'
 import type { Nota } from '../core/db'
-import { criarLink, linkLigado, type LinkCriado } from '../core/link'
+import { linkLigado } from '../core/link'
+import { linkPara } from '../core/linksGuardados'
 import { NIVEIS_COM_ALTERNATIVAS } from '../core/lacunas'
 import { evento } from '../core/telemetria'
 import type { Baralho, Cartao } from '../core/types'
@@ -11,12 +12,12 @@ import { Confete } from './Confete'
 import { CartaoView, respostasDoBaralho } from './Sessao'
 
 /**
- * Desafiar amigos com um cartão: gera um link de 7 dias (com o cartão ou o baralho inteiro)
+ * Desafiar amigos com um cartão: gera um link (30 dias, reaproveitado por cartão; com o cartão ou o baralho inteiro)
  * e abre a prévia da imagem com a pergunta e o QR code.
  */
 export function DesafiarModal({ baralho, cartao, avisar, fechar }: { baralho: Baralho; cartao: Cartao; avisar?: (texto: string) => void; fechar: () => void }) {
   const [junto, setJunto] = useState<'cartao' | 'baralho'>('cartao')
-  const [link, setLink] = useState<LinkCriado | null>(null)
+  const [link, setLink] = useState<{ url: string } | null>(null)
   const [ocupado, setOcupado] = useState(false)
   const [erro, setErro] = useState(linkLigado() ? '' : 'O desafio precisa do envio por link, que não está ligado nesta versão.')
 
@@ -26,8 +27,9 @@ export function DesafiarModal({ baralho, cartao, avisar, fechar }: { baralho: Ba
     setErro('')
     try {
       const { texto } = junto === 'baralho' ? arquivoDoBaralho(baralho, undefined, cartao.id) : arquivoDosCartoes(baralho, [cartao], cartao.id)
-      setLink(await criarLink(texto, fetch, '7d'))
-      evento('desafio_enviado', { junto, tipo: cartao.tipo })
+      const l = await linkPara(`desafio:${baralho.id}:${cartao.id}:${junto}`, baralho.id, texto)
+      setLink(l)
+      evento('desafio_enviado', { junto, tipo: cartao.tipo, link: l.como })
     } catch (e) {
       setErro((e as Error).message)
     } finally {
@@ -68,7 +70,6 @@ export function DesafiarModal({ baralho, cartao, avisar, fechar }: { baralho: Ba
             </span>
           </label>
         </fieldset>
-        <p class="dica">O link vale 7 dias.</p>
         {erro && (
           <p class="resultado erro" role="alert">
             {erro}

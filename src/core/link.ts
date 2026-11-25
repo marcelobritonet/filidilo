@@ -1,5 +1,7 @@
-// Envio por link: o conteúdo (o mesmo JSON do arquivo) fica 2 horas no worker do Cloudflare (worker/)
-// e quem abre o link do app (…/filidilo/?b=<codigo>) baixa e vê o resumo de importação.
+// Envio por link: o conteúdo (o mesmo JSON do arquivo) fica 30 dias no worker do Cloudflare (worker/).
+// O link que vai para a conversa é o da página pública (VITE_LINK_PUBLICO/<codigo>, o worker "filidilo"), que mostra
+// a prévia com o nome do baralho e leva ao app (…/filidilo/?b=<codigo>), que baixa e mostra o resumo de importação.
+// Quem gerencia um link por baralho (reaproveitar, atualizar, renovar) é linksGuardados.ts.
 
 /**
  * Endereço do worker de links, vindo da variável VITE_LINKS_URL no build
@@ -10,24 +12,38 @@ export const URL_LINKS: string = (import.meta.env.VITE_LINKS_URL ?? '').replace(
 
 export const linkLigado = () => !!URL_LINKS
 
+/**
+ * Endereço da página pública do link (o worker "filidilo", https://filidilo.britin.workers.dev), vindo de
+ * VITE_LINK_PUBLICO no build. Sem ela (localhost), o link é o do próprio app com ?b=.
+ */
+export const URL_PUBLICA: string = (import.meta.env.VITE_LINK_PUBLICO ?? '').replace(/\/+$/, '')
+
 export const RE_CODIGO = /^[0-9A-Za-z]{10}$/
 
 export interface LinkCriado {
   url: string
   codigo: string
+  /** Segredo de quem criou: permite atualizar e apagar o link. Não vai para ninguém. */
+  chave: string
   expiraEm: Date
 }
 
-/** Endereço do app que abre o código. */
-export function urlDoApp(codigo: string, origem = location.origin, base = import.meta.env.BASE_URL): string {
-  return `${origem}${base}?b=${codigo}`
+/** Endereço que vai para a conversa: a página pública, ou o app com ?b= quando ela não existe. */
+export function urlDoApp(codigo: string, origem = location.origin, base = import.meta.env.BASE_URL, publica = URL_PUBLICA): string {
+  return publica ? `${publica}/${codigo}` : `${origem}${base}?b=${codigo}`
 }
 
-/** Quanto o link vale: 2 horas (enviar) ou 7 dias (desafio, que vai para story e grupo). */
-export type Validade = '2h' | '7d'
+/** Quanto o link vale. Desde a v3.31.0, 30 dias (envio e desafio); o 2h fica para os apps antigos. */
+export type Validade = '2h' | '7d' | '30d'
 
-/** Sobe o conteúdo e devolve o link do app. Lança erro com mensagem em português. */
-export async function criarLink(texto: string, f: typeof fetch = fetch, validade: Validade = '2h'): Promise<LinkCriado> {
+function erroDeEnvio(r: Response): Error {
+  if (r.status === 413) return new Error('O baralho é grande demais para enviar por link. Envie como arquivo.')
+  if (r.status === 429) return new Error('Muitos links em pouco tempo. Espere um minuto.')
+  return new Error('Não consegui gerar o link agora.')
+}
+
+/** Sobe o conteúdo e devolve o link. Lança erro com mensagem em português. */
+export async function criarLink(texto: string, f: typeof fetch = fetch, validade: Validade = '30d'): Promise<LinkCriado> {
   if (!URL_LINKS) throw new Error('O envio por link não está disponível.')
   let r: Response
   try {
@@ -35,11 +51,36 @@ export async function criarLink(texto: string, f: typeof fetch = fetch, validade
   } catch {
     throw new Error('Sem internet para gerar o link.')
   }
-  if (r.status === 413) throw new Error('O baralho é grande demais para enviar por link. Envie como arquivo.')
-  if (r.status === 429) throw new Error('Muitos links em pouco tempo. Espere um minuto.')
-  if (!r.ok) throw new Error('Não consegui gerar o link agora.')
-  const d = (await r.json()) as { codigo: string; expiraEm: string }
-  return { codigo: d.codigo, url: urlDoApp(d.codigo), expiraEm: new Date(d.expiraEm) }
+  if (!r.ok) throw erroDeEnvio(r)
+  const d = (await r.json()) as { codigo: string; chave: string; expiraEm: string }
+  return { codigo: d.codigo, chave: d.chave, url: urlDoApp(d.codigo), expiraEm: new Date(d.expiraEm) }
+}
+
+/**
+ * Troca o conteúdo de um link (ou, sem texto, só renova o prazo). Devolve a nova data de vencimento,
+ * ou null quando o link não existe mais ou não é deste aparelho (aí o certo é criar outro).
+ */
+export async function atualizarLink(codigo: string, chave: string, texto = '', f: typeof fetch = fetch, validade: Validade = '30d'): Promise<Date | null> {
+  if (!URL_LINKS) throw new Error('O envio por link não está disponível.')
+  let r: Response
+  try {
+    r = await f(`${URL_LINKS}/l/${codigo}?validade=${validade}`, { method: 'PUT', headers: { 'content-type': 'application/json', 'x-chave': chave }, body: texto })
+  } catch {
+    throw new Error('Sem internet para gerar o link.')
+  }
+  if (r.status === 404 || r.status === 403) return null
+  if (!r.ok) throw erroDeEnvio(r)
+  return new Date(((await r.json()) as { expiraEm: string }).expiraEm)
+}
+
+/** Apaga um link no worker. Sem erro: se falhar, ele vence sozinho. */
+export async function apagarLink(codigo: string, chave: string, f: typeof fetch = fetch): Promise<void> {
+  if (!URL_LINKS) return
+  try {
+    await f(`${URL_LINKS}/l/${codigo}`, { method: 'DELETE', headers: { 'x-chave': chave } })
+  } catch {
+    /* vence sozinho */
+  }
 }
 
 /** Por que o link não abriu: decide o título e o texto do aviso. */

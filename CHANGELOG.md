@@ -2,6 +2,15 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.32.0] — 2026-11-25
+
+### Novidades
+
+- **Compartilhar mais leve.** A folha Enviar ficou só com o que importa: Compartilhar link e Copiar link. O QR code e o envio como arquivo continuam lá, embaixo, num toque.
+- **Links valem 30 dias.** Antes eram 2 horas, e a mensagem avisava o horário. Agora o link dura 30 dias (desafios também) e ninguém precisa se preocupar com prazo.
+- **Mensagem nova junto com o link:** "Bora estudar Química comigo? São 24 cartões no Filidilo." No WhatsApp, a prévia mostra o nome do baralho e quantos cartões ele tem.
+- **Um link por baralho.** Mandar o mesmo baralho de novo usa o mesmo link. Se você mudar o baralho, quem já tem o link passa a abrir a versão nova.
+
 ## [3.31.0] — 2026-11-25
 
 ### Novidades
