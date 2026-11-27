@@ -296,7 +296,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
         )}
         {!formatar && (
           <>
-            <p class="rotulo">Quanto você já sabe sobre isso?</p>
+            <p class="rotulo rotulo-nivel">Quanto você já sabe sobre isso?</p>
             <div class="opcoes-nivel" role="radiogroup" aria-label="Quanto você já sabe">
               {NIVEIS.map((n) => (
                 <button
