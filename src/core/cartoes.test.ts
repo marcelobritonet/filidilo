@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { criar, obter } from './baralhos'
-import { adicionarCartoes, arquivarCartao, ativos, desarquivarCartao, excluirCartao, gravarCartao, lerLista, problemasDoCartao, reinserirCartao } from './cartoes'
+import { adicionarCartoes, arquivarCartao, ativos, favoritos, marcarFavorito, desarquivarCartao, excluirCartao, gravarCartao, lerLista, problemasDoCartao, reinserirCartao } from './cartoes'
 import { db } from './db'
 import type { Cartao } from './types'
 
@@ -88,5 +88,22 @@ describe('edição de cartões', () => {
     expect(ativos(editado).map((c) => c.id)).toEqual(['x1'])
     const volta = await desarquivarCartao(velho, 'x2')
     expect(ativos(volta).map((c) => c.id)).toEqual(['x1', 'x2'])
+  })
+  it('favoritar liga e desliga sem marcar edição; editar e arquivar não tiram o favorito', async () => {
+    const b = await gravarCartao(await criar('Fav'), { id: 'f1', tipo: 'conceito', tema: 'geral', frente: 'P', verso: 'R' })
+    const antes = b.cartoes[0]
+    const fav = await marcarFavorito(b, 'f1', true)
+    const f1 = fav.cartoes[0]
+    expect(f1.favoritoEm).toBeGreaterThan(0)
+    expect(f1.editado).toBe(antes.editado)
+    expect(f1.atualizadoEm).toBeGreaterThanOrEqual(antes.atualizadoEm!)
+    const editado = await gravarCartao(b, { id: 'f1', tipo: 'conceito', tema: 'geral', frente: 'P', verso: 'R novo' })
+    expect(editado.cartoes[0].favoritoEm).toBe(f1.favoritoEm)
+    expect(favoritos(editado).map((c) => c.id)).toEqual(['f1'])
+    const arq = await arquivarCartao(editado, 'f1')
+    expect(arq.cartoes[0].favoritoEm).toBe(f1.favoritoEm)
+    expect(favoritos(arq)).toEqual([])
+    const tirado = await marcarFavorito(await desarquivarCartao(arq, 'f1'), 'f1', false)
+    expect(tirado.cartoes[0].favoritoEm).toBeUndefined()
   })
 })

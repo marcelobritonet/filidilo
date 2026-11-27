@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { confere, formatar, lerNumero, preencher, sortear } from './calc'
 import { avaliar } from './expr'
 import { filaEspacada, filaProva, posicaoReinsercao } from './fila'
+import { aleatorio } from './aleatorio'
 import type { Estado } from './db'
 import type { Baralho, CartaoCalculo } from './types'
 
@@ -143,5 +144,32 @@ describe('fila do modo prova', () => {
     expect(filaProva(comArquivado, estados).map((c) => c.id).sort()).toEqual(['o1', 'p1'])
     expect(filaProva(comArquivado, estados, { soNovos: true }).map((c) => c.id)).toEqual(['o1'])
     expect(filaEspacada(comArquivado, estados).map((c) => c.id).sort()).toEqual(['o1', 'p1'])
+  })
+  describe('favoritos', () => {
+    const fav = (bar: Baralho, ids: string[]): Baralho => ({ ...bar, cartoes: bar.cartoes.map((c) => (ids.includes(c.id) ? { ...c, favoritoEm: 1 } : c)) })
+    it('favorito não respondido hoje vem antes de tudo, mesmo sem estar vencido', () => {
+      const estados = new Map([est('o2', 1), est('p1', 3)])
+      for (let s = 1; s <= 10; s++) expect(filaProva(fav(b, ['p1']), estados, {}, semente(s))[0].id).toBe('p1')
+    })
+    it('favorito respondido hoje segue o grupo normal dele', () => {
+      const agora = Date.now()
+      const [k, e] = est('p1', 3)
+      const estados = new Map([est('o2', 1), [k, { ...e, ultimaData: agora }] as [string, Estado]])
+      const f = filaProva(fav(b, ['p1']), estados, {}, aleatorio, agora)
+      expect(f[f.length - 1].id).toBe('p1')
+    })
+    it('favoritos ocupam no máximo metade da sessão na frente', () => {
+      const grande: Baralho = { ...b, temas: [{ id: 't', nome: 'T' }], cartoes: um(30) }
+      const ids = Array.from({ length: 20 }, (_, i) => `c${i}`)
+      const acertados = new Map(ids.map((id) => est(id, 3)))
+      const f = filaProva(fav(grande, ids), acertados, { tamanho: 10 }, semente(3))
+      expect(f.slice(0, 5).every((c) => ids.includes(c.id))).toBe(true)
+      expect(f.slice(5).every((c) => !ids.includes(c.id))).toBe(true)
+    })
+    it('soFavoritos só traz favoritos, e favorito arquivado fica de fora', () => {
+      const bar = fav(b, ['p1', 'o1', 'o2'])
+      const comArquivo = { ...bar, cartoes: bar.cartoes.map((c) => (c.id === 'o2' ? { ...c, arquivadoEm: 1 } : c)) }
+      expect(filaProva(comArquivo, new Map(), { soFavoritos: true }).map((c) => c.id).sort()).toEqual(['o1', 'p1'])
+    })
   })
 })

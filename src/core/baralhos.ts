@@ -1,6 +1,6 @@
 import { db } from './db'
 import { desmarcarBaralho, marcarBaralhoExcluido } from './excluidos'
-import type { Baralho } from './types'
+import type { Baralho, Cartao } from './types'
 
 /** Baralho que vem com o app, com os ids de cartões que versões anteriores tinham e ele não tem mais. */
 export type Semente = () => { baralho: Baralho; retirados?: string[] }
@@ -12,6 +12,12 @@ export type Semente = () => { baralho: Baralho; retirados?: string[] }
  * e recebe o conteúdo novo dos que continuam (menos os que a pessoa editou).
  * Os cartões que a pessoa criou, os que ela arquivou e o progresso ficam.
  */
+/** Marcas que são escolha de quem estuda, não conteúdo do cartão. */
+export const marcasPessoais = (c: Cartao): Pick<Cartao, 'arquivadoEm' | 'favoritoEm'> => ({
+  ...(c.arquivadoEm && { arquivadoEm: c.arquivadoEm }),
+  ...(c.favoritoEm && { favoritoEm: c.favoritoEm }),
+})
+
 export async function semear(sementes: Semente[]): Promise<void> {
   await db.transaction('rw', db.baralhos, db.meta, async () => {
     for (const s of sementes) {
@@ -26,7 +32,7 @@ export async function semear(sementes: Semente[]): Promise<void> {
       else if (semeado && atual) {
         const fora = new Set(retirados)
         const deFabrica = new Map(b.cartoes.map((c) => [c.id, c]))
-        const mantidos = atual.cartoes.filter((c) => !fora.has(c.id)).map((c) => (deFabrica.has(c.id) && !c.editado ? { ...deFabrica.get(c.id)!, ...(c.arquivadoEm && { arquivadoEm: c.arquivadoEm }) } : c))
+        const mantidos = atual.cartoes.filter((c) => !fora.has(c.id)).map((c) => (deFabrica.has(c.id) && !c.editado ? { ...deFabrica.get(c.id)!, ...marcasPessoais(c) } : c))
         const tem = new Set(mantidos.map((c) => c.id))
         const temas = [...atual.temas, ...b.temas.filter((t) => !atual.temas.some((x) => x.id === t.id))]
         await db.baralhos.put({ ...atual, versao: b.versao, temas, cartoes: [...mantidos, ...b.cartoes.filter((c) => !tem.has(c.id))], atualizadoEm: Date.now() })

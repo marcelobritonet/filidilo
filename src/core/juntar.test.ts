@@ -35,6 +35,13 @@ describe('juntarBaralho', () => {
     const ex = { baralhos: {}, cartoes: { 'b/1': 50, 'b/2': 50 } }
     expect(juntarBaralho(a, a, ex).cartoes.map((c) => c.id)).toEqual(['2'])
   })
+  it('favoritar num aparelho chega no outro (e desfavoritar também)', () => {
+    const outro = baralho('b', [cartao('1', '1', 10)])
+    const fav = baralho('b', [{ ...cartao('1', '1', 20), favoritoEm: 20 }])
+    expect(juntarBaralho(outro, fav, vazios()).cartoes[0].favoritoEm).toBe(20)
+    const tirou = baralho('b', [cartao('1', '1', 30)])
+    expect(juntarBaralho(fav, tirou, vazios()).cartoes[0].favoritoEm).toBeUndefined()
+  })
 })
 
 describe('mesclarTudo entre dois aparelhos', () => {

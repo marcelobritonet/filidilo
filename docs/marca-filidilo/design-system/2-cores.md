@@ -77,6 +77,7 @@ Nos cinco temas, todo texto passa de 4,5:1 sobre o fundo em que aparece, e conto
 
 - `acao` aparece uma vez por tela, no botão que a pessoa mais provavelmente vai tocar.
 - `conquista` só para o que foi conquistado. Não use bronze em botões, links ou avisos.
+- Exceção (P132, 27/11/2026): o ícone de favorito (fita de marcador com corte em V) usa `--gold` quando ligado, por pedido do Marcelo ("amarelo quase dourado"). Desligado, `--text-muted` com 30% de opacidade (quase transparente). É a única exceção.
 - Estado nunca só por cor: acerto leva ✓ e a palavra, erro leva ✕ e a palavra, aviso leva a frase inteira.
 - Turquesa e bronze nunca são cor de texto sobre fundo claro (2,7:1 a 3:1).
 - Cobalto não serve para texto sobre Noite (2,4:1): use `acao-texto`.

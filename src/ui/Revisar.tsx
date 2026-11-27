@@ -2,7 +2,7 @@ import { formasAceitas } from '../core/lacunas'
 import { useState } from 'preact/hooks'
 import { formatar, preencher, sortear } from '../core/calc'
 import type { Baralho, Cartao } from '../core/types'
-import { arquivarCartao, desarquivarCartao } from '../core/cartoes'
+import { arquivarCartao, desarquivarCartao, favoritos, marcarFavorito } from '../core/cartoes'
 import { evento } from '../core/telemetria'
 import type { Navegacao } from './App'
 import { conteudoCartao } from './enviar'
@@ -11,18 +11,29 @@ import { DesafiarModal } from './Desafio'
 import { podeDesafiar } from '../core/artes'
 import { nomeTema } from './estado'
 import { Tex } from './Tex'
+import { IconeFavorito } from './Icone'
 
 /** Lista dos cartões do baralho: escrever, colar lista, editar e enviar. */
 const ARQUIVADOS = '__arquivados'
+const FAVORITOS = '__favoritos'
 
 export function Revisar({ baralho, nav, arquivados: abrirArquivados }: { baralho: Baralho; nav: Navegacao; arquivados?: boolean }) {
   const nArquivados = baralho.cartoes.filter((c) => c.arquivadoEm).length
   const [escolhido, setTema] = useState(abrirArquivados && nArquivados ? ARQUIVADOS : '')
   // Sem arquivados (desarquivou o último), volta para Todos.
-  const tema = escolhido === ARQUIVADOS && !nArquivados ? '' : escolhido
+  const nFavoritos = favoritos(baralho).length
+  // Sem favoritos, também volta para Todos.
+  const tema = (escolhido === ARQUIVADOS && !nArquivados) || (escolhido === FAVORITOS && !nFavoritos) ? '' : escolhido
   const vendoArquivados = tema === ARQUIVADOS
   const ativos = baralho.cartoes.filter((c) => !c.arquivadoEm)
-  const lista = vendoArquivados ? baralho.cartoes.filter((c) => c.arquivadoEm) : ativos.filter((c) => !tema || c.tema === tema)
+  const lista = vendoArquivados ? baralho.cartoes.filter((c) => c.arquivadoEm) : tema === FAVORITOS ? favoritos(baralho) : ativos.filter((c) => !tema || c.tema === tema)
+
+  const favoritar = async (c: Cartao) => {
+    const sim = !c.favoritoEm
+    evento('cartao_favoritado', { onde: 'lista', sim })
+    await marcarFavorito(baralho, c.id, sim)
+    nav.mudou()
+  }
 
   const arquivar = async (c: Cartao) => {
     evento('cartao_arquivado', { onde: 'lista', tipo: c.tipo })
@@ -64,11 +75,12 @@ export function Revisar({ baralho, nav, arquivados: abrirArquivados }: { baralho
           Colar lista
         </button>
       </div>
-      {(baralho.temas.length > 1 || nArquivados > 0) && (
+      {(baralho.temas.length > 1 || nArquivados > 0 || nFavoritos > 0) && (
         <label class="campo">
           Mostrar
           <select value={tema} onChange={(e) => setTema((e.target as HTMLSelectElement).value)}>
             <option value="">Todos ({ativos.length})</option>
+            {nFavoritos > 0 && <option value={FAVORITOS}>Favoritos ({nFavoritos})</option>}
             {baralho.temas.length > 1 &&
               baralho.temas
                 .filter((t) => ativos.some((c) => c.tema === t.id))
@@ -89,6 +101,11 @@ export function Revisar({ baralho, nav, arquivados: abrirArquivados }: { baralho
               <span class="tema-chip">{nomeTema(baralho, c.tema)}</span>
               {c.arquivadoEm && <span class="etiqueta-arquivado">Arquivado</span>}
             </div>
+            {!c.arquivadoEm && (
+              <button class="icone-btn botao-favorito" aria-pressed={!!c.favoritoEm} aria-label={c.favoritoEm ? 'Tirar dos favoritos' : 'Favoritar'} title={c.favoritoEm ? 'Tirar dos favoritos' : 'Favoritar'} onClick={() => favoritar(c)}>
+                <IconeFavorito ligado={!!c.favoritoEm} colado />
+              </button>
+            )}
             <Conteudo c={c} />
             {c.fonte && (
               <p class="fonte">

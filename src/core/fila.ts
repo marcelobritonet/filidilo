@@ -2,6 +2,7 @@ import type { Estado } from './db'
 import type { Baralho, Cartao } from './types'
 import { chave, vencido } from './srs'
 import { aleatorio, embaralhar, inteiro } from './aleatorio'
+import { diaLocal } from './ofensiva'
 
 export type Filtro = 'tudo' | 'teoria' | 'calculo'
 
@@ -11,6 +12,8 @@ export interface OpcoesFila {
   tamanho?: number
   /** Só os cartões nunca vistos (sem estado neste aparelho). */
   soNovos?: boolean
+  /** Só os favoritos. */
+  soFavoritos?: boolean
 }
 
 
@@ -20,6 +23,7 @@ function candidatos(b: Baralho, o: OpcoesFila, estados?: Map<string, Estado>): C
       !c.arquivadoEm &&
       (!o.temas?.length || o.temas.includes(c.tema)) &&
       (!o.soNovos || !estados?.has(chave(b.id, c.id))) &&
+      (!o.soFavoritos || !!c.favoritoEm) &&
       (o.filtro === 'calculo' ? c.tipo === 'calculo' : o.filtro === 'teoria' ? c.tipo !== 'calculo' : true),
   )
 }
@@ -32,7 +36,8 @@ const JANELA = 6
 const DIA = 86_400_000
 
 /**
- * Fila do "Estudar", em dois blocos:
+ * Fila do "Estudar". Antes de tudo, os favoritos ainda não respondidos hoje (até metade da sessão);
+ * os que já foram respondidos hoje seguem o grupo normal deles. Depois, dois blocos:
  * 1. o que precisa: errados da última vez e vencidos hoje (repetição espaçada), alternando
  *    um a um com os nunca vistos, a começar por um nunca visto;
  * 2. depois de acabar o bloco 1: difíceis e acertados que ainda não venceram, os respondidos
@@ -48,8 +53,17 @@ export function filaProva(b: Baralho, estados: Map<string, Estado>, o: OpcoesFil
     if (vencido(e, agora)) return 1
     return 3
   }
+  const tamanho = o.tamanho ?? 20
+  const hoje = diaLocal(agora)
+  const fixado = (c: Cartao) => {
+    const e = estados.get(chave(b.id, c.id))
+    return !!c.favoritoEm && (!e || diaLocal(e.ultimaData) !== hoje)
+  }
+  const todos = candidatos(b, o, estados)
+  const primeiros = embaralhar(todos.filter(fixado), rng).slice(0, Math.ceil(tamanho / 2))
+  const naFrente = new Set(primeiros)
   const grupos: Cartao[][] = [[], [], [], []]
-  for (const c of candidatos(b, o, estados)) grupos[grupo(c)].push(c)
+  for (const c of todos) if (!naFrente.has(c)) grupos[grupo(c)].push(c)
   const dia = (c: Cartao) => Math.floor((estados.get(chave(b.id, c.id))?.ultimaData ?? 0) / DIA)
   const precisa = [...embaralhar(grupos[0], rng), ...embaralhar(grupos[1], rng)]
   const novos = embaralhar(grupos[2], rng)
@@ -57,13 +71,14 @@ export function filaProva(b: Baralho, estados: Map<string, Estado>, o: OpcoesFil
 
   const temas = new Temas()
   const out: Cartao[] = []
+  while (primeiros.length) out.push(temas.tirar(primeiros, JANELA))
   while (precisa.length || novos.length) {
     const vezDoNovo = out.length % NOVO_A_CADA === 0
     if (novos.length && (vezDoNovo || !precisa.length)) out.push(temas.tirar(novos, novos.length))
     else out.push(temas.tirar(precisa, JANELA))
   }
   while (depois.length) out.push(temas.tirar(depois, JANELA))
-  return out.slice(0, o.tamanho ?? 20)
+  return out.slice(0, tamanho)
 }
 
 /** Revisão espaçada: cartões vencidos (FSRS) e até `novos` cartões novos. */

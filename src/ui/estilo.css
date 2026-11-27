@@ -396,6 +396,22 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
 }
 .icone-btn:hover { background: var(--surface-subtle); }
 .meta-cartao .icone-btn { margin-left: auto; margin-block: -10px; }
+/* Favorito: cinza desligado, dourado ligado (o único dourado da paleta é o bronze; exceção à regra de conquistas, P132). */
+.icone-favorito { color: var(--text-muted); opacity: .3; }
+.icone-favorito.ligado { color: var(--gold); opacity: 1; }
+/* P132: ligada, a fita fica cheia de dourado fosco (o dourado misturado com o fundo do cartão), com a borda no dourado cheio. */
+.icone-favorito.ligado path { fill: color-mix(in srgb, var(--gold) 58%, var(--surface)); }
+.botao-favorito:hover .icone-favorito:not(.ligado) { opacity: .55; }
+/* No estudo, o favorito fica no canto de cima, à direita, do cartão. */
+.cartao-com-favorito { position: relative; }
+/* A fita sai de trás da borda de cima: o topo do desenho fica exatamente na borda (botão de 44px, ícone de 28px de altura centrado).
+   Na sessão o cartão está dentro de um invólucro sem borda; na lista, o item tem 1px de borda em cima. */
+.cartao-com-favorito > .botao-favorito { position: absolute; top: -8px; right: 14px; }
+.lista-revisao .item { position: relative; }
+.lista-revisao .item > .botao-favorito { position: absolute; top: -9px; right: 14px; }
+.lista-revisao .item > .cab { padding-right: 40px; }
+.cartao-com-favorito > .botao-favorito:hover, .lista-revisao .item > .botao-favorito:hover { background: transparent; }
+.cartao-com-favorito > .cartao > :first-child { padding-right: 40px; }
 .titulo-acoes { display: flex; align-items: center; gap: 8px; }
 .titulo-acoes h1 { flex: 1; min-width: 0; }
 .titulo-acoes .icone-btn { margin-right: -10px; }
@@ -521,6 +537,9 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
 .tema.sel { border-color: var(--sel); background: var(--accent-soft); }
 .tema.sel .marcador { background: var(--sel); border-color: var(--sel); }
 .tema .num { font-size: 14px; color: var(--text-muted); }
+/* Favoritos: primeira linha dos temas, com a fita dourada saindo de trás da borda de cima. */
+.tema.favoritos { position: relative; }
+.tema.favoritos > .icone-favorito { position: absolute; top: -1px; right: 24px; }
 
 /* ---------- Sessão de estudo ---------- */
 .progresso { height: 4px; background: var(--surface-subtle); border-radius: 4px; margin-bottom: 14px; overflow: hidden; }

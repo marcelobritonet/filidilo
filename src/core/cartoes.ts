@@ -1,4 +1,4 @@
-import { salvar } from './baralhos'
+import { marcasPessoais, salvar } from './baralhos'
 import { db } from './db'
 import { desmarcarCartao, marcarCartaoExcluido } from './excluidos'
 import type { Baralho, Cartao, CartaoConceito, Tema } from './types'
@@ -32,9 +32,8 @@ export async function gravarCartao(b: Baralho, c: Cartao): Promise<Baralho> {
   return mudarCartoes(b, (atual) => {
     const i = atual.cartoes.findIndex((x) => x.id === c.id)
     const cartoes = [...atual.cartoes]
-    // Arquivar não é conteúdo: editar um cartão arquivado o mantém arquivado.
-    const arquivadoEm = i >= 0 ? atual.cartoes[i].arquivadoEm : undefined
-    if (i >= 0) cartoes[i] = { ...c, editado: true, atualizadoEm: agora, ...(arquivadoEm && { arquivadoEm }) }
+    // Arquivar e favoritar não são conteúdo: editar o cartão mantém as marcas.
+    if (i >= 0) cartoes[i] = { ...c, editado: true, atualizadoEm: agora, ...marcasPessoais(atual.cartoes[i]) }
     else cartoes.push({ ...c, origem: c.origem ?? 'manual', atualizadoEm: agora })
     return { ...atual, cartoes }
   })
@@ -81,6 +80,18 @@ async function marcarArquivado(b: Baralho, id: string, arquivadoEm: number | und
 export const arquivarCartao = (b: Baralho, id: string) => marcarArquivado(b, id, Date.now())
 
 export const desarquivarCartao = (b: Baralho, id: string) => marcarArquivado(b, id, undefined)
+
+/** Favoritos que entram no estudo (os arquivados ficam de fora). */
+export const favoritos = (b: Baralho): Cartao[] => b.cartoes.filter((c) => c.favoritoEm && !c.arquivadoEm)
+
+/** A partir de quantos favoritos o "Como estudar?" oferece estudar só eles. */
+export const MINIMO_FAVORITOS = 5
+
+/** Liga ou desliga o favorito. Como arquivar: não conta como edição, mas a data muda, para valer ao juntar aparelhos. */
+export async function marcarFavorito(b: Baralho, id: string, sim: boolean): Promise<Baralho> {
+  const agora = Date.now()
+  return mudarCartoes(b, (atual) => ({ ...atual, cartoes: atual.cartoes.map((c) => (c.id === id ? { ...c, favoritoEm: sim ? agora : undefined, atualizadoEm: agora } : c)) }))
+}
 
 /** Desfaz a exclusão de um cartão. Conta como mexido agora, para vencer a exclusão que outro aparelho já tenha recebido. */
 export async function reinserirCartao(b: Baralho, c: Cartao, pos: number): Promise<Baralho> {

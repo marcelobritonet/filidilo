@@ -45,6 +45,14 @@ describe('baralhos no aparelho', () => {
     expect((await obter(fabrica.id))!.arquivadoEm).toBeUndefined()
   })
 
+  it('versão de fábrica nova mantém os favoritos', async () => {
+    await semear([semente])
+    const b = (await obter(fabrica.id))!
+    await salvar({ ...b, cartoes: b.cartoes.map((c, i) => (i === 0 ? { ...c, favoritoEm: 5 } : c)) })
+    await semear([() => ({ baralho: { ...structuredClone(fabrica), versao: fabrica.versao + 1 } })])
+    expect((await obter(fabrica.id))!.cartoes[0].favoritoEm).toBe(5)
+  })
+
   it('quem já usava o app recebe o baralho novo uma vez, sem perder os seus', async () => {
     // Aparelho da versão anterior: marca antiga e um baralho próprio.
     await db.meta.put({ chave: 'semeado', valor: '1' })

@@ -30,9 +30,9 @@ export function arquivoDoBaralho(b: Baralho, progresso?: Progresso, desafio?: st
   return { nome: `${titulo}${progresso ? ' com progresso' : ''} (Filidilo).txt`, texto: JSON.stringify(envelope) }
 }
 
-/** Tira a marca de arquivado do cartão: arquivar é escolha de quem estuda. */
+/** Tira as marcas de arquivado e favorito do cartão: são escolha de quem estuda. */
 const semArquivo = (c: Cartao): Cartao => {
-  const { arquivadoEm: _arq, ...resto } = c
+  const { arquivadoEm: _arq, favoritoEm: _fav, ...resto } = c
   return resto as Cartao
 }
 
@@ -169,7 +169,7 @@ export interface PlanoImportacao {
 }
 
 const semMeta = (c: Cartao) => {
-  const { atualizadoEm: _a, editado: _e, origem: _o, arquivadoEm: _arq, ...resto } = c
+  const { atualizadoEm: _a, editado: _e, origem: _o, arquivadoEm: _arq, favoritoEm: _fav, ...resto } = c
   return JSON.stringify(resto)
 }
 
@@ -217,11 +217,13 @@ export async function aplicarSoProgresso(p: PlanoImportacao): Promise<void> {
 async function aplicarCartoes(p: PlanoImportacao): Promise<Baralho> {
   if (!p.atual) return salvar({ ...p.recebido, cartoes: p.recebido.cartoes.map(marcarImportado), criadoEm: undefined })
   const trocar = new Map(p.atualizados.map((c) => [c.id, c]))
-  // Arquivado de um lado fica arquivado (o recebido só traz a marca quando veio com progresso, de outro aparelho dela).
-  const arquivadoNoRecebido = new Map(p.recebido.cartoes.filter((c) => c.arquivadoEm).map((c) => [c.id, c.arquivadoEm]))
+  // Arquivado ou favorito de um lado fica assim (o recebido só traz as marcas quando veio com progresso, de outro aparelho dela).
+  const recebidos = new Map(p.recebido.cartoes.map((c) => [c.id, c]))
   const comArquivo = (local: Cartao, c: Cartao): Cartao => {
-    const arquivadoEm = local.arquivadoEm ?? arquivadoNoRecebido.get(local.id)
-    return arquivadoEm ? { ...c, arquivadoEm } : c
+    const r = recebidos.get(local.id)
+    const arquivadoEm = local.arquivadoEm ?? r?.arquivadoEm
+    const favoritoEm = local.favoritoEm ?? r?.favoritoEm
+    return { ...c, ...(arquivadoEm && { arquivadoEm }), ...(favoritoEm && { favoritoEm }) }
   }
   const cartoes = [...p.atual.cartoes.map((c) => comArquivo(c, trocar.has(c.id) ? marcarImportado(trocar.get(c.id)!) : c)), ...p.novos.map(marcarImportado)]
   // Nome, objetivo e temas que ela já tem continuam os dela; só entram os temas novos e um objetivo que ela não tenha.

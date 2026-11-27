@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { confere, formatar, lerNumero, preencher, sortear, type Sorteio } from '../core/calc'
 import { embaralhar } from '../core/aleatorio'
-import { ativos, arquivarCartao, desarquivarCartao } from '../core/cartoes'
+import { ativos, arquivarCartao, desarquivarCartao, marcarFavorito, MINIMO_FAVORITOS } from '../core/cartoes'
 import { db, type Nota } from '../core/db'
 import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../core/fila'
 import { formaDaCerta, sortearAlternativas } from '../core/alternativas'
@@ -27,7 +27,7 @@ import { EditarCartao } from './EditarCartao'
 import { conteudoCartao } from './enviar'
 import { EnviarModal } from './EnviarModal'
 import { Folha } from './Folha'
-import { Icone } from './Icone'
+import { Icone, IconeFavorito } from './Icone'
 import { DesenhoOfensiva } from './Marca'
 import { Tex } from './Tex'
 import type { Aviso } from './App'
@@ -36,6 +36,8 @@ export type Modo = 'prova' | 'espacada' | 'calculo'
 /** Até onde vai a sessão: N cartões, X minutos ou livre (até a pessoa tocar em Terminar). */
 export type Limite = { tipo: 'acertos'; n: number } | { tipo: 'tempo'; minutos: number } | { tipo: 'livre' }
 
+/** Já mostrou a explicação do favorito neste aparelho. */
+const CHAVE_DICA_FAVORITO = 'tatino-dica-favorito'
 const TODOS = 10000 // com limite: a fila tem todos os cartões; o relógio, a meta ou o Terminar decidem o fim
 
 /** No modo livre, Terminar só conclui a sessão (vale o dia da ofensiva) com pelo menos estas respostas. */
@@ -303,6 +305,21 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
     })
   }
 
+  /** Favorito: liga ou desliga no baralho gravado. A primeira vez explica o que ele faz. */
+  const favoritar = async () => {
+    if (!cartao) return
+    const sim = !baralho.cartoes.find((x) => x.id === cartao.id)?.favoritoEm
+    const b = await marcarFavorito(baralho, cartao.id, sim)
+    setBaralho(b)
+    mudou?.()
+    evento('cartao_favoritado', { onde: 'estudo', sim })
+    if (sim && !localStorage.getItem(CHAVE_DICA_FAVORITO)) {
+      localStorage.setItem(CHAVE_DICA_FAVORITO, '1')
+      avisar?.({ texto: `Favoritos aparecem antes dos outros. Com ${MINIMO_FAVORITOS}, dá para estudar só eles.` })
+    }
+  }
+  const favorito = !!cartao && !!baralho.cartoes.find((x) => x.id === cartao.id)?.favoritoEm
+
   /** Cartão corrigido: troca na sessão e mostra de novo, para responder já com o conteúdo certo. */
   const corrigido = (c: Cartao, b: Baralho) => {
     setBaralho(b)
@@ -413,7 +430,12 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
               <Icone nome="enviar" />
             </button>
           </div>
-          <CartaoView key={`${pos}-${vez}-${cartao.id}`} cartao={cartao} acoes={acoes} semAlternativas={semAlt.has(cartao.id)} facil={!!baralho.objetivo?.nivel && (NIVEIS_COM_ALTERNATIVAS as readonly string[]).includes(baralho.objetivo.nivel)} distratores={respostasDoBaralho(baralho)} />
+          <div class="cartao-com-favorito">
+            <CartaoView key={`${pos}-${vez}-${cartao.id}`} cartao={cartao} acoes={acoes} semAlternativas={semAlt.has(cartao.id)} facil={!!baralho.objetivo?.nivel && (NIVEIS_COM_ALTERNATIVAS as readonly string[]).includes(baralho.objetivo.nivel)} distratores={respostasDoBaralho(baralho)} />
+            <button class="icone-btn botao-favorito" aria-pressed={favorito} aria-label={favorito ? 'Tirar dos favoritos' : 'Favoritar'} title={favorito ? 'Tirar dos favoritos' : 'Favoritar'} onClick={favoritar}>
+              <IconeFavorito ligado={favorito} colado />
+            </button>
+          </div>
           <div class="acoes-cartao">
             <button class="btn terciario" onClick={pular}>
               Pular

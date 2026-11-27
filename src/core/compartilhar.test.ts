@@ -64,6 +64,18 @@ describe('compartilhar baralho', () => {
     expect(cb.arquivadoEm).toBe(123)
   })
 
+  it('favorito não vai no arquivo sem progresso; atualizar mantém o favorito daqui', async () => {
+    const comFav = { ...base(), cartoes: base().cartoes.map((c) => (c.id === 'b' ? { ...c, favoritoEm: 77 } : c)) }
+    expect(lerBaralho(arquivoDoBaralho(comFav).texto).cartoes.every((c) => !c.favoritoEm)).toBe(true)
+    expect(lerBaralho(arquivoDoBaralho(comFav, { estados: [], revisoes: [], marcas: [] }).texto).cartoes[1].favoritoEm).toBe(77)
+    expect(JSON.parse(arquivoDosCartoes(comFav, [comFav.cartoes[1]]).texto).cartoes[0].favoritoEm).toBeUndefined()
+    await salvar(comFav)
+    expect((await planejar(base())).iguais).toBe(3)
+    const recebido = { ...base(), cartoes: base().cartoes.map((c) => (c.id === 'b' ? { ...c, verso: 'b novo' } : c)) }
+    const b = await aplicar(await planejar(recebido))
+    expect(b.cartoes.find((c) => c.id === 'b')!.favoritoEm).toBe(77)
+  })
+
   it('baralho novo entra inteiro, marcado como importado', async () => {
     const p = await planejar(base())
     expect(p.atual).toBeUndefined()

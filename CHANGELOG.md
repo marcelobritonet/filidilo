@@ -2,6 +2,16 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.34.0] — 2026-11-27
+
+### Novidades
+
+- **Favoritos: marque os cartões em que quer focar** (por exemplo, os que caem na prova). Toque na fita no canto de cima do cartão, no estudo ou na lista de cartões. Ligada, ela fica dourada.
+- **Favoritos vêm primeiro.** No Estudar, os favoritos que você ainda não respondeu hoje aparecem antes dos outros. Depois de respondidos, voltam no ritmo normal de revisão.
+- **Estude só os favoritos.** Com 5 ou mais, aparece a linha "Favoritos" no topo dos temas, em Como estudar?. Marque-a para uma rodada só com eles.
+- Na lista de cartões, "Mostrar" ganhou a opção "Favoritos".
+- Os favoritos vão no backup e na sincronização entre aparelhos. Ao enviar um baralho para outra pessoa, eles não vão junto.
+
 ## [3.33.0] — 2026-11-25
 
 ### Novidades

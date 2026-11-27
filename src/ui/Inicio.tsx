@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'preact/hooks'
 import { desarquivar } from '../core/baralhos'
-import { ativos } from '../core/cartoes'
+import { ativos, favoritos } from '../core/cartoes'
+import { cartoesDoRecorte, temLinhaFavoritos } from '../core/escolha'
 import type { Filtro } from '../core/fila'
 import { chave, dominado, vencido, visto } from '../core/srs'
 import type { Baralho } from '../core/types'
@@ -10,7 +11,7 @@ import { evento } from '../core/telemetria'
 import { conteudoBaralho, conteudoBaralhoComProgresso } from './enviar'
 import { EnviarModal } from './EnviarModal'
 import { useEstados } from './estado'
-import { Icone } from './Icone'
+import { Icone, IconeFavorito } from './Icone'
 import { Marca } from './Marca'
 import { MINIMO_LIVRE } from './Sessao'
 
@@ -24,9 +25,11 @@ interface Escolha {
   temas: string[]
   /** Só os cartões nunca vistos. */
   soNovos: boolean
+  /** Só os favoritos (no lugar dos temas). */
+  soFavoritos: boolean
 }
 
-const PADRAO: Escolha = { por: 'acertos', acertos: 10, minutos: 10, conteudo: 'tudo', temas: [], soNovos: false }
+const PADRAO: Escolha = { por: 'acertos', acertos: 10, minutos: 10, conteudo: 'tudo', temas: [], soNovos: false, soFavoritos: false }
 const OPCOES_ACERTOS = [5, 10, 20, 30]
 const OPCOES_MINUTOS = [5, 10, 15, 20]
 export const chaveEscolha = (id: string) => `tatino-ajuste-${id}`
@@ -66,6 +69,15 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
   }, [estados, baralho, cartoes])
 
   const temasComCartoes = baralho.temas.filter((t) => porTema.get(t.id)?.total)
+  // Favoritos: com poucos, só ganham a frente da fila; a partir do mínimo, viram a primeira linha dos temas.
+  const favs = useMemo(() => favoritos(baralho), [baralho])
+  const linhaFavoritos = temLinhaFavoritos(favs.length)
+  const soFavoritos = escolha.soFavoritos && linhaFavoritos
+  const porFavoritos = {
+    total: favs.length,
+    dominados: estados ? favs.filter((c) => dominado(estados.get(chave(id, c.id)))).length : 0,
+    vistos: estados ? favs.filter((c) => visto(estados.get(chave(id, c.id)))).length : 0,
+  }
   const total = cartoes.length
   const dominadosTotal = estados ? cartoes.filter((c) => dominado(estados.get(chave(id, c.id)))).length : 0
   const vistosTotal = estados ? cartoes.filter((c) => visto(estados.get(chave(id, c.id)))).length : 0
@@ -79,22 +91,18 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
   const marcados = marcadosSalvos.length ? marcadosSalvos : temasComCartoes.map((t) => t.id)
 
   const abrirPergunta = () => {
-    setEscolha({ ...escolha, temas: marcados })
+    setEscolha({ ...escolha, temas: soFavoritos ? [] : marcados, soFavoritos })
     setPerguntando(true)
   }
 
-  const alternarTema = (t: string) => setEscolha({ ...escolha, temas: escolha.temas.includes(t) ? escolha.temas.filter((x) => x !== t) : [...escolha.temas, t] })
+  const alternarFavoritos = () =>
+    setEscolha(soFavoritos ? { ...escolha, soFavoritos: false, temas: temasComCartoes.map((t) => t.id) } : { ...escolha, soFavoritos: true, temas: [] })
+  const alternarTema = (t: string) => setEscolha({ ...escolha, soFavoritos: false, temas: escolha.temas.includes(t) ? escolha.temas.filter((x) => x !== t) : [...escolha.temas, t] })
   const todosMarcados = temasComCartoes.every((t) => escolha.temas.includes(t.id))
   // Nunca vistos nos temas marcados e no conteúdo escolhido: é o que "Só os que nunca vi" vai estudar.
   const filtroAtual: Filtro = temCalculo ? escolha.conteudo : 'tudo'
-  const novosMarcados = estados
-    ? cartoes.filter(
-        (c) =>
-          escolha.temas.includes(c.tema) &&
-          (filtroAtual === 'calculo' ? c.tipo === 'calculo' : filtroAtual === 'teoria' ? c.tipo !== 'calculo' : true) &&
-          !visto(estados.get(chave(id, c.id))),
-      ).length
-    : 0
+  const novosMarcados = estados ? cartoesDoRecorte(cartoes, { temas: escolha.temas, soFavoritos, filtro: filtroAtual }).filter((c) => !visto(estados.get(chave(id, c.id)))).length : 0
+  const podeComecar = soFavoritos || escolha.temas.length > 0
   const soNovos = escolha.soNovos && novosMarcados > 0
 
   const [enviando, setEnviando] = useState(false)
@@ -107,13 +115,13 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
       /* sem armazenamento: vale só agora */
     }
     setPerguntando(false)
-    const todos = escolha.temas.length === temasComCartoes.length
-    evento('sessao_iniciada', { por: escolha.por, meta: escolha.por === 'tempo' ? escolha.minutos : escolha.por === 'livre' ? 0 : escolha.acertos, temas: escolha.temas.length, temas_total: temasComCartoes.length, cartoes: total, so_novos: soNovos, nunca_vistos: total - vistosTotal, origem_baralho: origemBaralho(baralho) })
+    const todos = soFavoritos || escolha.temas.length === temasComCartoes.length
+    evento('sessao_iniciada', { por: escolha.por, meta: escolha.por === 'tempo' ? escolha.minutos : escolha.por === 'livre' ? 0 : escolha.acertos, temas: escolha.temas.length, temas_total: temasComCartoes.length, cartoes: total, so_novos: soNovos, so_favoritos: soFavoritos, favoritos: favs.length, nunca_vistos: total - vistosTotal, origem_baralho: origemBaralho(baralho) })
     nav.ir({
       nome: 'sessao',
       id,
       modo: 'prova',
-      opcoes: { temas: todos ? [] : escolha.temas, filtro: filtroAtual, soNovos },
+      opcoes: { temas: todos ? [] : escolha.temas, filtro: filtroAtual, soNovos, soFavoritos },
       limite: escolha.por === 'tempo' ? { tipo: 'tempo', minutos: escolha.minutos } : escolha.por === 'livre' ? { tipo: 'livre' } : { tipo: 'acertos', n: escolha.acertos },
     })
   }
@@ -311,12 +319,30 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
                 <span class="campo-titulo">
                   Temas
                   {temasComCartoes.length > 1 && (
-                    <button class="btn terciario compacto" onClick={() => setEscolha({ ...escolha, temas: todosMarcados ? [] : temasComCartoes.map((t) => t.id) })}>
+                    <button class="btn terciario compacto" onClick={() => setEscolha({ ...escolha, soFavoritos: false, temas: todosMarcados ? [] : temasComCartoes.map((t) => t.id) })}>
                       {todosMarcados ? 'Desmarcar todos' : 'Marcar todos'}
                     </button>
                   )}
                 </span>
                 <ul class="temas">
+                  {linhaFavoritos && (
+                    <li>
+                      <button class={`tema favoritos ${soFavoritos ? 'sel' : ''}`} role="checkbox" aria-checked={soFavoritos} onClick={alternarFavoritos}>
+                        <span class="nome">
+                          <span class="marcador" aria-hidden="true">{soFavoritos ? '✓' : ''}</span>
+                          Favoritos
+                        </span>
+                        <IconeFavorito ligado colado />
+                        <span class="barra" aria-hidden="true">
+                          <span style={{ width: `${(100 * porFavoritos.dominados) / porFavoritos.total}%` }} />
+                        </span>
+                        <span class="num">
+                          {porFavoritos.dominados} de {porFavoritos.total}
+                          {porFavoritos.vistos < porFavoritos.total && <small> · {porFavoritos.total - porFavoritos.vistos} {porFavoritos.total - porFavoritos.vistos === 1 ? 'nunca visto' : 'nunca vistos'}</small>}
+                        </span>
+                      </button>
+                    </li>
+                  )}
                   {temasComCartoes.map((t) => {
                     const r = porTema.get(t.id)!
                     const sel = escolha.temas.includes(t.id)
@@ -342,12 +368,12 @@ export function Inicio({ baralho, nav, versao }: { baralho: Baralho; nav: Navega
               </div>
             </div>
             <div class="folha-acoes">
-              {!escolha.temas.length && (
+              {!podeComecar && (
                 <p class="resultado erro" role="alert">
                   Marque pelo menos um tema.
                 </p>
               )}
-              <button class="btn principal" disabled={!escolha.temas.length} onClick={comecar}>
+              <button class="btn principal" disabled={!podeComecar} onClick={comecar}>
                 Começar
               </button>
             </div>

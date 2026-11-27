@@ -33,3 +33,30 @@ export function Icone({ nome, tamanho = 24 }: { nome: NomeIcone; tamanho?: numbe
     </svg>
   )
 }
+
+/**
+ * Favorito: marcador de página em fita, com corte fundo em V na ponta, só no contorno.
+ * `colado`: sem a borda de cima, para a fita sair de trás da borda do cartão.
+ * Desligado quase transparente; ligado em dourado. A cor vem do CSS (.icone-favorito / .ligado);
+ * o estado também vai em aria-pressed no botão.
+ */
+export function IconeFavorito({ ligado = false, colado = false, tamanho = 24 }: { ligado?: boolean; colado?: boolean; tamanho?: number }) {
+  return (
+    <svg
+      class={`icone-linha icone-favorito ${ligado ? 'ligado' : ''} ${colado ? 'colado' : ''}`}
+      width={tamanho}
+      height={(tamanho * 21) / 18}
+      viewBox="3 4 18 21"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.4"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {/* Mesma largura dos outros ícones de linha (x de 5 a 19), porém mais alto que eles: a fita é comprida. */}
+      <path d={colado ? 'M5 4v20.4l7-5.8 7 5.8V4' : 'M5 5.8a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v18.6l-7-5.8-7 5.8z'} />
+    </svg>
+  )
+}
