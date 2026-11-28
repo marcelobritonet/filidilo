@@ -151,6 +151,23 @@ export function AvisoNivelAlto({ nivel }: { nivel?: string }) {
   )
 }
 
+/** Outros enunciados da mesma pergunta (o app sorteia um a cada vez). */
+function OutrasFrentes({ lista }: { lista?: string[] }) {
+  if (!lista?.length) return null
+  return (
+    <>
+      <p class="dica">Também pode aparecer como:</p>
+      <ul class="variantes">
+        {lista.map((f) => (
+          <li>
+            <Tex texto={f} />
+          </li>
+        ))}
+      </ul>
+    </>
+  )
+}
+
 export function Conteudo({ c }: { c: Cartao }) {
   switch (c.tipo) {
     case 'lacunas':
@@ -165,6 +182,7 @@ export function Conteudo({ c }: { c: Cartao }) {
       return (
         <>
           <Tex class="frente" texto={c.frente} />
+          <OutrasFrentes lista={c.outrasFrentes} />
           <Tex class="verso" texto={`→ ${c.verso}`} />
           {c.explicacao && <Tex class="explicacao" texto={c.explicacao} />}
         </>
@@ -177,12 +195,26 @@ export function Conteudo({ c }: { c: Cartao }) {
             → <strong>{c.resposta ? 'Verdadeiro' : 'Falso'}</strong>
           </p>
           {c.explicacao && <Tex class="explicacao" texto={c.explicacao} />}
+          {!!c.variantes?.length && (
+            <>
+              <p class="dica">Outras afirmações (uma aparece a cada vez):</p>
+              <ul class="variantes">
+                {c.variantes.map((v) => (
+                  <li>
+                    <Tex texto={v.frente} /> → <strong>{v.resposta ? 'Verdadeiro' : 'Falso'}</strong>
+                    {v.explicacao && <Tex class="explicacao" texto={v.explicacao} />}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </>
       )
     case 'associacao':
       return (
         <>
           <Tex class="frente" texto={c.frente} />
+          <OutrasFrentes lista={c.outrasFrentes} />
           <ul class="alternativas">
             {c.opcoes.map((o, i) => (
               <li class={i === c.correta ? 'certa' : ''}>

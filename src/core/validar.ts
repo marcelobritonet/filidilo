@@ -21,6 +21,18 @@ export function validarObjetivo(o: unknown): string[] {
   return erros
 }
 
+/** Máximo de opções num cartão de alternativas (1 certa e até 15 erradas). */
+export const MAX_OPCOES = 16
+
+/** Problemas de "outrasFrentes" (opcional): textos não vazios, sem repetir a frente nem entre si. */
+function problemasFrentes(frente: string | undefined, outras: unknown): string[] {
+  if (outras === undefined) return []
+  if (!Array.isArray(outras) || outras.some((f) => typeof f !== 'string' || !f.trim())) return ['outro enunciado vazio ou inválido ("outrasFrentes" deve ser uma lista de textos)']
+  const todas = [frente ?? '', ...outras].map((f) => f.trim())
+  if (new Set(todas).size !== todas.length) return ['enunciados repetidos ("outrasFrentes" repete a "frente" ou outro enunciado)']
+  return []
+}
+
 /** Lista os problemas de um baralho. Vazio = válido. */
 export function validar(b: Baralho, sorteios = 60): string[] {
   const erros: string[] = []
@@ -39,22 +51,36 @@ export function validar(b: Baralho, sorteios = 60): string[] {
     switch (c.tipo) {
       case 'conceito':
         if (!c.frente?.trim() || !c.verso?.trim()) e('frente ou verso vazio')
+        problemasFrentes(c.frente, c.outrasFrentes).forEach(e)
         break
       case 'vf':
         if (!c.frente?.trim()) e('frente vazia')
         if (typeof c.resposta !== 'boolean') e('resposta deve ser true ou false')
         if (!c.resposta && !c.explicacao?.trim()) e('V/F falso precisa de explicação (por que é falso)')
+        if (c.variantes !== undefined) {
+          if (!Array.isArray(c.variantes)) e('"variantes" deve ser uma lista de { "frente", "resposta" }')
+          else {
+            const frentes = [c.frente, ...c.variantes.map((v) => v?.frente)].map((f) => (typeof f === 'string' ? f.trim() : ''))
+            for (const v of c.variantes) {
+              if (!v || typeof v.frente !== 'string' || !v.frente.trim()) e('variante sem "frente"')
+              else if (typeof v.resposta !== 'boolean') e('variante: "resposta" deve ser true ou false')
+              else if (!v.resposta && !v.explicacao?.trim()) e('variante falsa precisa de "explicacao" (por que é falsa)')
+            }
+            if (frentes.every(Boolean) && new Set(frentes).size !== frentes.length) e('afirmações repetidas em "variantes"')
+          }
+        }
         break
       case 'associacao':
         if (!c.frente?.trim()) e('frente vazia')
         if (!Array.isArray(c.opcoes) || c.opcoes.length < 2) e('precisa de 2 ou mais opções')
         else if (!Number.isInteger(c.correta) || c.correta < 0 || c.correta >= c.opcoes.length) e('índice "correta" fora das opções')
         else if (new Set(c.opcoes).size !== c.opcoes.length) e('opções repetidas')
-        else if (c.opcoes.length > 10) e('no máximo 10 opções')
+        else if (c.opcoes.length > MAX_OPCOES) e(`no máximo ${MAX_OPCOES} opções`)
         if (c.outrasFormas !== undefined) {
           if (!Array.isArray(c.outrasFormas) || c.outrasFormas.some((f) => typeof f !== 'string' || !f.trim())) e('outra forma da correta vazia ou inválida ("outrasFormas" deve ser uma lista de textos)')
           else if (c.outrasFormas.some((f) => c.opcoes?.includes(f))) e('a outra forma da correta repete uma das alternativas ("outrasFormas")')
         }
+        problemasFrentes(c.frente, c.outrasFrentes).forEach(e)
         break
       case 'lacunas': {
         const n = contarLacunas(c.frente ?? '')

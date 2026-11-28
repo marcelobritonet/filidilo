@@ -61,13 +61,19 @@ function alternativaDoVerso(verso: string, opcoes: string[]): { correta: number;
 }
 
 /**
- * Questão de prova (até 5 alternativas): tira a outra forma da certa que for mais longa que todas as erradas,
- * porque entre opções curtas ela entregaria a resposta (o ChatGPT fez isso no teste da P90).
+ * Tira a outra forma da certa que for mais longa que todas as erradas: entre opções curtas ela entregaria a
+ * resposta (o ChatGPT fez isso numa questão de prova no teste da P90; o Gemini, com "Júpiter, o gigante gasoso", na P138).
  */
 function semFormaQueEntrega(c: CartaoAssociacao): CartaoAssociacao {
-  if (!Array.isArray(c.opcoes) || c.opcoes.length > 5 || !Array.isArray(c.outrasFormas)) return c
+  if (!Array.isArray(c.opcoes) || c.opcoes.length < 2 || !Array.isArray(c.outrasFormas)) return c
   const maior = Math.max(...c.opcoes.filter((_, i) => i !== c.correta).map((o) => String(o).length))
-  const formas = c.outrasFormas.filter((f) => typeof f === 'string' && f.length <= maior)
+  // Forma que só muda na pontuação ou nas maiúsculas ("Júpiter." para "Júpiter") também entrega: a única com ponto.
+  const vistas = new Set([normal(String(c.opcoes[c.correta] ?? ''))])
+  const formas = c.outrasFormas.filter((f) => {
+    if (typeof f !== 'string' || f.length > maior || vistas.has(normal(f))) return false
+    vistas.add(normal(f))
+    return true
+  })
   if (formas.length === c.outrasFormas.length) return c
   const { outrasFormas: _f, ...resto } = c
   return formas.length ? { ...resto, outrasFormas: formas } : resto

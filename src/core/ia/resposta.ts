@@ -104,6 +104,18 @@ function faltaFechar(s: string): boolean {
   return nivel > 0 || dentro
 }
 
+const booleano = (v: unknown) => (typeof v === 'string' ? v.trim().toLowerCase() === 'true' : v)
+
+/** Consertos de forma que a IA às vezes erra: texto solto onde vai uma lista, "true" entre aspas. Muda o cartão. */
+export function normalizarCampos(c: Cartao): void {
+  const r = c as unknown as Record<string, unknown>
+  for (const campo of ['outrasFormas', 'outrasFrentes']) if (typeof r[campo] === 'string') r[campo] = [r[campo]]
+  if (c.tipo === 'vf') {
+    r.resposta = booleano(r.resposta)
+    if (Array.isArray(c.variantes)) c.variantes = c.variantes.map((v) => (v && typeof v === 'object' ? { ...v, resposta: booleano(v.resposta) as boolean } : v))
+  }
+}
+
 const slug = (s: string) =>
   s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'geral'
 
@@ -157,8 +169,7 @@ export function lerResposta(dados: unknown, destino: Pick<Baralho, 'id' | 'titul
       origem: 'ia',
       fonte: bruto?.fonte ?? (fontePadrao ? { apostila: fontePadrao } : undefined),
     } as Cartao
-    if (c.tipo === 'associacao' && typeof c.outrasFormas === 'string') c.outrasFormas = [c.outrasFormas]
-    if (c.tipo === 'vf' && typeof c.resposta === 'string') c.resposta = (c.resposta as string).toLowerCase() === 'true'
+    normalizarCampos(c)
     // Alternativas (A, B, C…) dentro da pergunta: vira "associacao" ou volta no pedido de correção.
     const multipla = consertarMultipla(c)
     baralhoTeste.temas = temas

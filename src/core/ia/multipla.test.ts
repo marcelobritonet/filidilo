@@ -62,15 +62,18 @@ describe('questões de múltipla escolha (P90)', () => {
     expect(r.cartao).toMatchObject({ frente: PERGUNTA, opcoes: OPCOES, correta: 1 })
   })
 
-  it('questão de prova: tira a outra forma da certa mais longa que as erradas (P92)', () => {
+  it('tira a outra forma da certa mais longa que as erradas (P92, P138)', () => {
     const r = ler({ tipo: 'associacao', frente: PERGUNTA, opcoes: OPCOES, correta: 1, outrasFormas: ['Documento que estabelece os procedimentos de gerenciamento da água de lastro a bordo.'] })
     expect(r.erros).toEqual([])
     expect(r.cartao).not.toHaveProperty('outrasFormas')
     const curta = ler({ tipo: 'associacao', frente: 'Qual o anexo?', opcoes: ['óleo', 'esgoto', 'lixo', 'emissões atmosféricas'], correta: 2, outrasFormas: ['resíduos', 'Resíduos e materiais descartados pelos navios.'] })
     expect(curta.cartao).toMatchObject({ outrasFormas: ['resíduos'] })
-    // Cartão gerado (6 ou mais opções) segue a regra da instrução, sem corte automático.
-    const gerado = ler({ tipo: 'associacao', frente: 'Unidade de força?', opcoes: ['newton (N)', 'joule (J)', 'watt (W)', 'pascal (Pa)', 'dina (dyn)', 'quilograma (kg)'], correta: 0, outrasFormas: ['N, que equivale a kg·m/s²'] })
-    expect(gerado.cartao).toMatchObject({ outrasFormas: ['N, que equivale a kg·m/s²'] })
+    // Cartão gerado (6 ou mais opções): a mesma regra vale desde a P138 (o Gemini mandou "Júpiter, o gigante gasoso").
+    const gerado = ler({ tipo: 'associacao', frente: 'Maior planeta?', opcoes: ['Júpiter', 'Saturno', 'Urano', 'Netuno', 'Marte', 'o planeta Vênus'], correta: 0, outrasFormas: ['o Júpiter', 'Júpiter, o gigante gasoso'] })
+    expect(gerado.cartao).toMatchObject({ outrasFormas: ['o Júpiter'] })
+    // Só a pontuação muda: sai ("Júpiter." seria a única opção com ponto).
+    const ponto = ler({ tipo: 'associacao', frente: 'Maior planeta?', opcoes: ['Júpiter', 'Saturno', 'Urano', 'Netuno', 'Marte'], correta: 0, outrasFormas: ['Júpiter.', 'JÚPITER'] })
+    expect(ponto.cartao).not.toHaveProperty('outrasFormas')
   })
 
   it('a instrução de formatação proíbe outrasFormas em questão de prova (P92)', () => {

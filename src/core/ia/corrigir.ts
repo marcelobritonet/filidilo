@@ -1,14 +1,14 @@
 // Corrigir um cartão com ajuda da IA: monta o pedido e lê o cartão corrigido.
 import { problemasDoCartao } from '../cartoes'
 import { infoNivel, type Baralho, type Cartao, type Objetivo } from '../types'
-import { extrairJson } from './resposta'
+import { extrairJson, normalizarCampos } from './resposta'
 import { regraEntrega } from './instrucao'
 import { consertarMultipla, separarAlternativas } from './multipla'
 
 const REGRAS_TIPO: Record<Cartao['tipo'], string> = {
-  conceito: '"frente" (pergunta) e "verso" (resposta).',
-  vf: '"frente" (afirmação) e "resposta" (true ou false). Se for falsa, "explicacao" diz o que está errado.',
-  associacao: '"frente", "opcoes" (1 certa e 5 ou 6 erradas plausíveis, sem repetir), "correta" (índice da certa, começando em 0) e "outrasFormas" (1 outra forma de dizer a certa).',
+  conceito: '"frente" (pergunta), "verso" (resposta) e "outrasFrentes" (outros enunciados da mesma pergunta, com a mesma resposta).',
+  vf: '"frente" (afirmação), "resposta" (true ou false) e "variantes" (outras afirmações sobre o mesmo fato, cada uma { "frente", "resposta", "explicacao" }). Toda afirmação falsa precisa de "explicacao" dizendo o que está errado.',
+  associacao: '"frente", "outrasFrentes" (outros enunciados da mesma pergunta), "opcoes" (1 certa e até 12 erradas plausíveis, sem repetir), "correta" (índice da certa, começando em 0) e "outrasFormas" (outras formas de dizer a certa, sem ser mais longas que as erradas).',
   lacunas: '"frente" com ____ em cada lacuna e "respostas" (uma por lacuna, na ordem; use / para sinônimos).',
   calculo:
     '"titulo", "enunciado" com {variavel}, "parametros" { nome: { min, max, passo, unidade } }, "derivados" opcional, e "etapas" com "pergunta", "expr", "unidade", "casas" e "resolucao". Expressões só com números, + - * / ^, parênteses e as funções sqrt, abs, sin, cos, tan, sind, cosd, tand, asin, log10, ln, exp, min, max, round, floor, ceil, se(cond, a, b), pi e e.',
@@ -49,7 +49,7 @@ Cartão atual (JSON):
 ${JSON.stringify(paraIA(c), null, 1)}
 \`\`\`
 
-Confira o conteúdo com cuidado. Se houver erro, corrija; se estiver certo, devolva igual. Confira também se a pergunta entrega a resposta (o termo pedido, uma palavra da mesma família ou uma pista óbvia); se entregar, reescreva a pergunta. ${tipoTexto(c)}
+Confira o conteúdo com cuidado, inclusive cada enunciado de "outrasFrentes", cada afirmação de "variantes" e cada errada (nenhuma pode também ser certa). Se houver erro, corrija; se estiver certo, devolva igual. Confira também se a pergunta entrega a resposta (o termo pedido, uma palavra da mesma família ou uma pista óbvia); se entregar, reescreva a pergunta. ${tipoTexto(c)}
 Use "explicacao" curta para dizer por que a resposta é essa.
 
 Responda SOMENTE com um bloco de código JSON contendo o cartão corrigido, em português do Brasil.
@@ -72,7 +72,7 @@ export function lerCartaoCorrigido(texto: string, b: Baralho, original: Cartao):
     origem: original.origem,
     fonte: bruto.fonte ?? original.fonte,
   } as Cartao
-  if (cartao.tipo === 'vf' && typeof cartao.resposta === 'string') cartao.resposta = (cartao.resposta as string).toLowerCase() === 'true'
+  normalizarCampos(cartao)
   const multipla = consertarMultipla(cartao)
   const erros = problemasDoCartao(b, multipla.cartao)
   return { cartao: multipla.cartao, erros: multipla.erro ? [multipla.erro, ...erros] : erros }

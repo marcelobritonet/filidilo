@@ -4,13 +4,13 @@ import { embaralhar } from '../core/aleatorio'
 import { ativos, arquivarCartao, desarquivarCartao, marcarFavorito, MINIMO_FAVORITOS } from '../core/cartoes'
 import { db, type Nota } from '../core/db'
 import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../core/fila'
-import { formaDaCerta, sortearAlternativas } from '../core/alternativas'
+import { formaDaCerta, sortearAlternativas, sortearFrente, sortearVF } from '../core/alternativas'
 import { chave, registrar, semAlternativas } from '../core/srs'
 import { origemBaralho } from '../core/metricas'
 import { evento, registrarErro } from '../core/telemetria'
 import { temaComPoucosCartoes } from '../core/sugestao'
 import { formasAceitas, NIVEIS_COM_ALTERNATIVAS, partesDaFrente } from '../core/lacunas'
-import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, CartaoLacunas, Objetivo } from '../core/types'
+import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, CartaoLacunas, CartaoVF, Objetivo } from '../core/types'
 import { LAYOUTS_FIM, pecaFimSessao } from '../core/artes'
 import { fecharSessao, type Marco } from '../core/conquistas'
 import { concluirSessao, type Conclusao } from '../core/ofensiva'
@@ -683,7 +683,7 @@ export function CartaoView({ cartao, acoes, semAlternativas, facil, distratores 
     case 'conceito':
       return <Conceito c={cartao} acoes={acoes} />
     case 'vf':
-      return <Escolha c={cartao} pergunta={cartao.frente} opcoes={['Verdadeiro', 'Falso']} correta={cartao.resposta ? 0 : 1} acoes={acoes} rotulo="Verdadeiro ou falso" />
+      return <VF c={cartao} acoes={acoes} />
     case 'associacao':
       return <Associacao c={cartao} acoes={acoes} semAlternativas={semAlternativas} />
     case 'calculo':
@@ -799,17 +799,26 @@ function Lacunas({ c, acoes, facil, distratores }: { c: CartaoLacunas; acoes: Ac
 function Associacao({ c, acoes, semAlternativas }: { c: CartaoAssociacao; acoes: Acoes; semAlternativas?: boolean }) {
   const sorteio = useMemo(() => sortearAlternativas(c), [c])
   const resposta = useMemo(() => formaDaCerta(c), [c])
-  if (semAlternativas) return <Conceito c={c} verso={resposta} rotulo="Sem alternativas" acoes={acoes} />
-  return <Escolha c={c} pergunta={c.frente} opcoes={sorteio.opcoes} correta={sorteio.correta} acoes={acoes} />
+  const frente = useMemo(() => sortearFrente(c), [c])
+  if (semAlternativas) return <Conceito c={c} verso={resposta} frente={frente} rotulo="Sem alternativas" acoes={acoes} />
+  return <Escolha c={c} pergunta={frente} opcoes={sorteio.opcoes} correta={sorteio.correta} acoes={acoes} />
 }
 
-function Conceito({ c, acoes, verso, rotulo = 'Pergunta' }: { c: Cartao & { frente: string }; acoes: Acoes; verso?: string; rotulo?: string }) {
+/** V/F: a cada vez, a afirmação principal ou uma das variantes (cada uma com a sua resposta). */
+function VF({ c, acoes }: { c: CartaoVF; acoes: Acoes }) {
+  const v = useMemo(() => sortearVF(c), [c])
+  return <Escolha c={c} pergunta={v.frente} opcoes={['Verdadeiro', 'Falso']} correta={v.resposta ? 0 : 1} acoes={acoes} rotulo="Verdadeiro ou falso" explicacao={v.explicacao} />
+}
+
+function Conceito({ c, acoes, verso, frente: frenteDada, rotulo = 'Pergunta' }: { c: Cartao & { frente: string; outrasFrentes?: string[] }; acoes: Acoes; verso?: string; frente?: string; rotulo?: string }) {
   const [virado, setVirado] = useState(false)
   const [naoSabia, setNaoSabia] = useState(false)
+  const sorteada = useMemo(() => sortearFrente(c), [c])
+  const frente = frenteDada ?? sorteada
   return (
     <article class="cartao">
       <p class="rotulo">{rotulo}</p>
-      <Tex class="frente" texto={c.frente} />
+      <Tex class="frente" texto={frente} />
       {!virado && (
         <>
           <button class="btn principal virar" onClick={() => setVirado(true)}>
@@ -822,7 +831,7 @@ function Conceito({ c, acoes, verso, rotulo = 'Pergunta' }: { c: Cartao & { fren
         <Folha
           titulo={naoSabia ? 'Tudo bem, veja a resposta' : 'Resposta'}
           tom={naoSabia ? 'neutro' : undefined}
-          pergunta={<Tex texto={c.frente} />}
+          pergunta={<Tex texto={frente} />}
           rodape={naoSabia ? <BotoesNota avaliar={acoes.avaliar} acertou={false} /> : <><p class="dica centro">Como foi?</p><BotoesNota avaliar={acoes.avaliar} /></>}
         >
           <Tex class="verso" texto={verso ?? (c.tipo === 'conceito' ? c.verso : '')} />
@@ -835,7 +844,7 @@ function Conceito({ c, acoes, verso, rotulo = 'Pergunta' }: { c: Cartao & { fren
   )
 }
 
-function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta: number; acoes: Acoes; embaralhar?: boolean; rotulo?: string }) {
+function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta: number; acoes: Acoes; embaralhar?: boolean; rotulo?: string; explicacao?: string }) {
   const { c, pergunta, opcoes, correta, acoes } = props
   const ordem = useMemo(() => {
     const idx = opcoes.map((_, i) => i)
@@ -847,6 +856,7 @@ function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta
   const acertou = escolhida === correta
   const naoSabia = escolhida === -1
   const certaTexto = opcoes[correta].replace(/[*$]/g, '')
+  const explicacao = props.explicacao ?? c.explicacao
   return (
     <article class="cartao">
       <p class="rotulo">{props.rotulo ?? 'Escolha a alternativa correta'}</p>
@@ -878,7 +888,7 @@ function Escolha(props: { c: Cartao; pergunta: string; opcoes: string[]; correta
               Resposta certa: <strong>{certaTexto}</strong>
             </p>
           )}
-          {c.explicacao && <Explicacao texto={c.explicacao} />}
+          {explicacao && <Explicacao texto={explicacao} />}
           <Fonte c={c} />
           <BotaoCorrigir acoes={acoes} />
         </Folha>

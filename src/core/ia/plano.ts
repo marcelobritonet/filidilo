@@ -3,7 +3,7 @@
 import { infoNivel, type Cartao, type Nivel, type Tema } from '../types'
 import { fonteDe, origemTexto, quantidadeArquivo, regraNaoEntregar, regraPagina, regrasTextoJson, regrasTipos } from './instrucao'
 
-export const VERSAO_PLANO = 8
+export const VERSAO_PLANO = 9
 
 export interface PedidoPlano {
   /** O que a pessoa digitou em "Aprender uma coisa nova hoje". Com arquivo, pode ficar vazio. */
@@ -37,6 +37,11 @@ export const EXEMPLO_PLANO: {
       id: 'c1', tipo: 'conceito', tema: 'regras',
       frente: 'Qual a diferença entre xeque e xeque-mate?',
       verso: 'No xeque, o rei está atacado e precisa sair da ameaça. No xeque-mate, não existe lance que salve o rei.',
+      outrasFrentes: [
+        'O que separa um xeque de um xeque-mate?',
+        'Quando um xeque passa a ser xeque-mate?',
+        'Para o rei, qual a diferença entre levar xeque e levar xeque-mate?',
+      ],
       fonte: { apostila: 'Gerado por IA' },
     },
     {
@@ -44,14 +49,24 @@ export const EXEMPLO_PLANO: {
       frente: 'Empate por afogamento acontece quando o rei está em xeque.',
       resposta: false,
       explicacao: 'No afogamento, o rei não está em xeque e o jogador da vez não tem nenhum lance legal.',
+      variantes: [
+        { frente: 'No afogamento, o rei do jogador da vez não está em xeque.', resposta: true },
+        { frente: 'Quem afoga o rei adversário vence a partida.', resposta: false, explicacao: 'O afogamento termina a partida empatada.' },
+        { frente: 'Sem nenhum lance legal e sem estar em xeque, o jogador da vez empata a partida.', resposta: true },
+      ],
       fonte: { apostila: 'Gerado por IA' },
     },
     {
       id: 'c3', tipo: 'associacao', tema: 'pecas',
       frente: 'Qual peça se move em forma de L?',
-      opcoes: ['Cavalo', 'Bispo', 'Torre', 'Dama', 'Rei', 'Peão'],
-      correta: 0,
-      outrasFormas: ['O cavalo'],
+      outrasFrentes: [
+        'Qual peça pode pular por cima das outras?',
+        'Qual peça anda duas casas numa direção e uma para o lado?',
+        'Que peça começa o jogo entre a torre e o bispo?',
+      ],
+      opcoes: ['Bispo', 'Cavalo', 'Torre', 'Dama', 'Rei', 'Peão'],
+      correta: 1,
+      outrasFormas: ['O cavalo', 'Cavalo (C)'],
       explicacao: 'O cavalo salta duas casas numa direção e uma na perpendicular.',
       fonte: { apostila: 'Gerado por IA' },
     },

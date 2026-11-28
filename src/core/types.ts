@@ -111,12 +111,24 @@ export interface CartaoConceito extends CartaoBase {
   tipo: 'conceito'
   frente: string
   verso: string
+  /** Outros enunciados da mesma pergunta; a cada vez o app sorteia um (o progresso é o mesmo). */
+  outrasFrentes?: string[]
+}
+
+/** Outra afirmação sobre o mesmo fato de um V/F (pode ter a resposta oposta à da principal). */
+export interface VarianteVF {
+  frente: string
+  resposta: boolean
+  /** Por que é falsa (obrigatória quando `resposta` é false); sem ela, vale a do cartão. */
+  explicacao?: string
 }
 
 export interface CartaoVF extends CartaoBase {
   tipo: 'vf'
   frente: string
   resposta: boolean
+  /** Outras afirmações sobre o mesmo fato; a cada vez o app sorteia uma (a principal ou uma destas). */
+  variantes?: VarianteVF[]
 }
 
 export interface CartaoAssociacao extends CartaoBase {
@@ -127,6 +139,8 @@ export interface CartaoAssociacao extends CartaoBase {
   correta: number // índice em opcoes
   /** Outras formas de dizer a resposta certa; o app alterna entre elas, para a certa não ficar sempre igual. */
   outrasFormas?: string[]
+  /** Outros enunciados da mesma pergunta; a cada vez o app sorteia um. */
+  outrasFrentes?: string[]
 }
 
 /** Parâmetro sorteado: faixa numérica ou lista de opções com rótulo. */

@@ -4,7 +4,7 @@ import type { Baralho, Cartao, Objetivo, Tema } from '../types'
 import { infoNivel } from '../types'
 import { jaCobertos } from './cobertos'
 
-export const VERSAO_INSTRUCAO = 11
+export const VERSAO_INSTRUCAO = 12
 
 export type Origem = 'arquivo' | 'texto' | 'tema'
 export type Mistura = 'misto' | 'teoria' | 'calculo'
@@ -34,6 +34,11 @@ export const EXEMPLOS: { temas: Tema[]; cartoes: Cartao[] } = {
       id: 'c1', tipo: 'conceito', tema: 'cinematica',
       frente: 'O que é velocidade média?',
       verso: 'A razão entre o deslocamento e o intervalo de tempo: $v_m = \\Delta s / \\Delta t$.',
+      outrasFrentes: [
+        'Como se calcula a velocidade média de um móvel?',
+        'Que conta dá a velocidade média de um carro entre dois pontos da estrada?',
+        'Qual a definição de velocidade média na cinemática?',
+      ],
       explicacao: 'Não depende do caminho percorrido, só das posições inicial e final.',
       fonte: { apostila: 'Aula 2 - Cinemática', pagina: 4 },
     },
@@ -42,14 +47,31 @@ export const EXEMPLOS: { temas: Tema[]; cartoes: Cartao[] } = {
       frente: 'Se a força resultante sobre um corpo é nula, ele está necessariamente parado.',
       resposta: false,
       explicacao: 'Ele pode estar em movimento retilíneo uniforme (1ª lei de Newton).',
+      variantes: [
+        { frente: 'Um corpo com força resultante nula pode estar em movimento retilíneo uniforme.', resposta: true },
+        {
+          frente: 'Para manter a velocidade constante, um corpo precisa de uma força resultante diferente de zero.',
+          resposta: false,
+          explicacao: 'Com resultante nula, o corpo mantém a velocidade que tem (1ª lei de Newton); força muda a velocidade.',
+        },
+        { frente: 'Um carro a 80 km/h constantes, em linha reta, tem força resultante nula.', resposta: true },
+      ],
       fonte: { apostila: 'Aula 3 - Dinâmica', pagina: 2 },
     },
     {
       id: 'c3', tipo: 'associacao', tema: 'dinamica',
       frente: 'Qual a unidade de força no SI?',
-      opcoes: ['newton (N)', 'joule (J)', 'watt (W)', 'pascal (Pa)', 'dina (dyn)', 'quilograma (kg)'],
-      correta: 0,
-      outrasFormas: ['N, que equivale a kg·m/s²'],
+      outrasFrentes: [
+        'Em que unidade do SI se mede o peso de um corpo?',
+        'Um dinamômetro graduado no SI mostra a leitura em qual unidade?',
+        'Na fórmula F = m·a, com massa e aceleração no SI, em que unidade sai F?',
+      ],
+      opcoes: [
+        'joule (J)', 'watt (W)', 'newton (N)', 'pascal (Pa)', 'dina (dyn)', 'quilograma (kg)', 'quilograma-força (kgf)',
+        'libra-força (lbf)', 'coulomb (C)', 'ampère (A)', 'hertz (Hz)', 'kelvin (K)', 'tesla (T)',
+      ],
+      correta: 2,
+      outrasFormas: ['N', 'o newton'],
       explicacao: '1 N = 1 kg·m/s².',
       fonte: { apostila: 'Aula 3 - Dinâmica', pagina: 5 },
     },
@@ -87,13 +109,17 @@ const PROPORCAO: Record<Mistura, string> = {
   calculo: 'Crie só cartões do tipo "calculo", cobrindo as fórmulas e os tipos de problema do material.',
 }
 
+const REGRA_CONCEITO_VF = `- "conceito": "frente" (pergunta), "verso" (resposta) e "outrasFrentes" (3 ou 4 outros enunciados da mesma pergunta; veja "Variações").
+- "vf": "frente" (afirmação), "resposta" (true ou false) e "variantes" (3 ou 4 outras afirmações sobre o mesmo fato, cada uma { "frente", "resposta", "explicacao" }). Misture verdadeiras e falsas: pelo menos uma variante com a resposta oposta à da principal. Toda afirmação falsa, a principal ou uma variante, precisa de "explicacao" dizendo o que está errado.`
+
+const REGRA_ASSOCIACAO = `- "associacao": "frente" (pergunta), "outrasFrentes" (3 ou 4 outros enunciados da mesma pergunta), "opcoes" (1 certa e até 12 erradas plausíveis, sem repetir), "correta" (índice da certa, começando em 0) e "outrasFormas" (lista com 2 outras formas de dizer a resposta certa, com palavras diferentes e o mesmo sentido). Crie só erradas boas: da mesma categoria da certa e que alguém que estuda poderia escolher. Se o assunto não tiver 12 assim (ex.: as 6 peças do xadrez), crie as que houver, no mínimo 5: é melhor 6 erradas boas que 12 com itens fracos ou de outra categoria (luas numa pergunta sobre planetas, grupos de outra época). As 2 outras formas têm o tamanho da certa e só dizem o mesmo de outro jeito ("newton" → "N", "o newton"): nunca acrescente descrição ("Júpiter, o gigante gasoso"). O app mostra 4 de cada vez (uma das 3 formas da certa e 3 erradas sorteadas), então nenhuma errada pode ser obviamente absurda e nenhuma forma da certa pode ser maior nem mais detalhada que as erradas. Varie a posição da correta. Confira cada errada: nenhuma pode também responder à pergunta, nem num caso particular.`
+
 /** Regras de cada tipo de cartão. Usadas pela instrução de cartões e pela de planejamento (plano.ts). `fonte` é o trecho JSON da fonte. */
 export function regrasTipos(fonte: string): string {
   return `Cada cartão tem "id" (curto e único, ex.: "c1"), "tipo", "tema" (o id de um tema), "explicacao" (curta, opcional) e ${fonte}. Por tipo:
-- "conceito": "frente" (pergunta) e "verso" (resposta).
-- "vf": "frente" (afirmação) e "resposta" (true ou false). Toda afirmação falsa precisa de "explicacao" dizendo o que está errado.
-- Nunca ponha alternativas (A, B, C…) dentro de "frente" ou "verso": pergunta com alternativas é sempre "associacao", com cada alternativa em "opcoes". Questão que já vem com alternativas (de prova, de lista) é a exceção à regra abaixo: use só as alternativas dela, sem criar erradas novas, e sem "outrasFormas".
-- "associacao": "frente" (pergunta), "opcoes" (1 certa e 5 ou 6 erradas plausíveis, sem repetir), "correta" (índice da certa, começando em 0) e "outrasFormas" (lista com 1 outra forma de dizer a resposta certa, com palavras diferentes e o mesmo sentido). O app mostra 4 de cada vez e alterna as formas da certa, então nenhuma errada pode ser obviamente absurda e a outra forma não pode ser maior nem mais detalhada que as erradas. Varie a posição da correta. Confira cada errada: nenhuma pode também responder à pergunta, nem num caso particular.
+${REGRA_CONCEITO_VF}
+- Nunca ponha alternativas (A, B, C…) dentro de "frente" ou "verso": pergunta com alternativas é sempre "associacao", com cada alternativa em "opcoes". Questão que já vem com alternativas (de prova, de lista) é a exceção à regra abaixo: use só as alternativas dela, sem criar erradas novas, e sem "outrasFormas". Ela pode ganhar "outrasFrentes".
+${REGRA_ASSOCIACAO}
 - "lacunas": "frente" com ____ no lugar de cada palavra a completar (ex.: "A Terra gira em torno do ____.") e "respostas", uma por lacuna, na ordem. Use "/" para sinônimos aceitos ("Sol/astro-rei"). A frase precisa fazer sentido completa. Cada lacuna precisa ter uma resposta certa clara (mais os sinônimos); se várias palavras diferentes completassem bem, reescreva a frase.
 - "calculo": exercício com números sorteados. A conta precisa combinar com o nível: nos níveis "expert" e "extremo", só crie cálculo com uma sutileza (caso-limite, hipótese que falha, armadilha comum), nunca a aplicação direta de uma fórmula. Campos:
   - "titulo" e "enunciado"; no enunciado, {nome} mostra o valor sorteado.
@@ -102,15 +128,27 @@ export function regrasTipos(fonte: string): string {
   - "condicao" (opcional): expressão que precisa dar verdadeira; senão o app sorteia de novo.
   - "etapas": lista de passos. Cada um com "pergunta", "expr" (a conta da resposta), "unidade", "casas" (casas decimais) e "resolucao" (lista de linhas explicando o passo). "nome" guarda o resultado para as etapas seguintes. Etapa de escolha: "opcoes" (lista) e uma "expr" que devolve o índice da opção certa.
   - Expressões: números com ponto (1.5, 1e-5), + - * / ^, parênteses, comparações (< > <= >= == !=) e as funções sqrt, abs, sin, cos, tan (radianos), sind, cosd, tand (graus), asin, log10, ln, exp, min, max, round(x, casas), floor, ceil, se(condição, valor_se_sim, valor_se_não), além de pi e e. Sem outras funções, sem texto e sem unidades dentro da expressão.
-  - Nos textos, {nome:2} mostra o valor com 2 casas e {resultado} é a resposta da última etapa.`
+  - Nos textos, {nome:2} mostra o valor com 2 casas e {resultado} é a resposta da última etapa.
+
+${regraVariacoes()}`
+}
+
+/** Por que e como variar enunciados e respostas: a pessoa vê o mesmo cartão muitas vezes. */
+export function regraVariacoes(): string {
+  return `## Variações
+A pessoa vê o mesmo cartão muitas vezes. Para ela estudar o conteúdo, e não decorar a tela (lembrar das erradas e chutar a que sobrou), a cada vez o app sorteia um enunciado, uma forma da certa e 3 das erradas. Por isso:
+- Cada enunciado de "outrasFrentes" pergunta exatamente o mesmo fato, com a mesma resposta certa (leia cada um com a resposta: ela precisa servir sem ajuste), por outro caminho: outro ponto de partida, um exemplo ou uma situação concreta, a definição no lugar do nome, a consequência no lugar da causa. Trocar uma palavra por sinônimo não vale.
+- Cada enunciado, sozinho, funciona com todas as formas da certa e todas as erradas: nenhuma errada pode virar certa em outro enunciado, e nenhum enunciado pode entregar uma forma da certa.
+- As erradas são do mesmo tipo e do mesmo tamanho da certa (se a certa é o nome de uma lei, as erradas são nomes de leis) e cobrem as confusões comuns de quem está estudando.
+- As "variantes" do V/F falam do mesmo fato por ângulos diferentes; cada uma é verdadeira ou falsa por si, sem depender da principal.`
 }
 
 /** O enunciado não pode entregar a resposta. Vai nas instruções de cartões, de formatação e de plano. */
 export function regraNaoEntregar(): string {
   return `## Não entregue a resposta
-O que a pessoa vê antes de responder ("frente", "titulo", "enunciado", a "pergunta" de cada etapa e as "opcoes") não pode trazer a resposta: nem ela inteira, nem parte dela, nem sinônimo, palavra da mesma família, sigla por extenso, tradução literal ou outra pista que a deixe óbvia. Erros comuns, por tipo:
+O que a pessoa vê antes de responder ("frente", cada enunciado de "outrasFrentes", cada afirmação de "variantes", "titulo", "enunciado", a "pergunta" de cada etapa e as "opcoes") não pode trazer a resposta: nem ela inteira, nem parte dela, nem sinônimo, palavra da mesma família, sigla por extenso, tradução literal ou outra pista que a deixe óbvia. Erros comuns, por tipo:
 - "conceito": a pergunta já traz o termo pedido. Errado: "O que é a fotossíntese, processo em que a planta faz fotossíntese com luz?". Certo: "Como se chama o processo em que a planta usa luz para produzir glicose?" Se a resposta é um nome (de lei, teorema, processo, obra), a pergunta descreve a ideia, sem citar nenhuma palavra do nome. Errado: "Qual o nome do teorema de Pitágoras?". Certo: "Como se chama o teorema segundo o qual, no triângulo retângulo, $a^2 = b^2 + c^2$?"
-- "associacao": a certa é a única que repete palavras da pergunta, ou é a mais longa e detalhada. Todas as opções precisam parecer igualmente possíveis para quem não sabe.
+- "associacao": a certa (em qualquer das suas formas) é a única que repete palavras de algum enunciado, ou é a mais longa e detalhada. Todas as opções precisam parecer igualmente possíveis para quem não sabe.
 - "lacunas": a palavra da lacuna (ou da mesma família) aparece em outro ponto da frase ou numa outra lacuna. Errado: "O ____ bombeia o sangue; o coração tem quatro cavidades." com resposta "coração".
 - "vf": nada de pista como "(falso)", e não use "sempre", "nunca" ou "apenas" só nas afirmações falsas.
 - "calculo": o enunciado e as perguntas das etapas não trazem o valor que a etapa pede.
@@ -125,7 +163,7 @@ export function regrasTextoJson(): string {
 ## Entrega
 ${regraEntrega()}
 - Antes de responder, confira se o JSON abre num parser.
-- Se não couber numa resposta só, divida em blocos de até 25 cartões, cada bloco um JSON completo no mesmo formato (com "temas" e "cartoes"). Avise no fim que há mais blocos.`
+- Se não couber numa resposta só, divida em blocos de até 15 cartões, cada bloco um JSON completo no mesmo formato (com "temas" e "cartoes"). Avise no fim que há mais blocos.`
 }
 
 /** Como entregar o JSON: bloco único na conversa, escapes certos. Também vai no pedido de correção e no Corrigir cartão. */
@@ -152,7 +190,7 @@ export function origemTexto(p: Pick<PedidoIA, 'origem' | 'texto' | 'assunto'>): 
 
 /** Quantidade quando o material é arquivo: a IA pergunta e respeita o limite por resposta. */
 export function quantidadeArquivo(): string {
-  return 'Crie a quantidade de cartões que eu pedir, no máximo 40 por resposta. Se eu pedir mais de 40, entregue 40 e avise que posso pedir o resto nesta mesma conversa.'
+  return 'Crie a quantidade de cartões que eu pedir, no máximo 30 por resposta. Se eu pedir mais de 30, entregue 30 e avise que posso pedir o resto nesta mesma conversa.'
 }
 
 /** Campo "fonte" do exemplo de cartão, conforme o material. */
@@ -242,8 +280,14 @@ export function montarMaisDoMaterial(p: { baralho: Pick<Baralho, 'temas' | 'cart
 - Use primeiro as páginas ou imagens que ainda não viraram cartão; depois, aprofunde o que já foi visto.
 - Pergunte quantos cartões eu quero (sugira um número) e espere. ${quantidadeArquivo()}
 - ${PROPORCAO[p.mistura]}
-- Siga as mesmas regras e o mesmo formato de cartão da primeira instrução, com "fonte.pagina".
+- Siga as mesmas regras e o mesmo formato de cartão da primeira instrução, com "fonte.pagina". Se a primeira instrução não pedia os campos de variação abaixo, use-os mesmo assim: este formato vale a partir de agora.
 ${temas ? `- Reaproveite os temas que o baralho já tem, com o mesmo "id": ${temas}.\n` : ''}${cobertos ? `\nJá tenho estes (não repita a mesma pergunta):\n${cobertos}\n` : ''}
+## Campos de variação
+${REGRA_CONCEITO_VF}
+${REGRA_ASSOCIACAO}
+
+${regraVariacoes()}
+
 ## Entrega
 Depois da quantidade, responda SOMENTE com um objeto JSON {"temas": [...], "cartoes": [...]}, sem texto antes ou depois.
 ${regraEntrega()}
@@ -282,7 +326,9 @@ ${p.texto.trim()}
   - "opcoes": o texto de cada alternativa, sem a letra, na ordem original. Use só as alternativas originais: não crie erradas novas.
   - "correta": o índice (começando em 0) da alternativa certa segundo o gabarito, que pode estar junto da questão ou numa lista no fim ("31-B", "Gabarito: B").
   - Sem gabarito, resolva a questão com conhecimento consolidado, marque a certa e diga em "explicacao" por que ela é a certa. Nunca mande uma questão de múltipla escolha para "naoConvertidos" por falta de gabarito.
-  - Não use "outrasFormas" aqui: as alternativas já vêm da questão, e uma outra forma da certa (mais longa ou com palavras da pergunta) entregaria a resposta.
+  - Não use "outrasFormas" aqui: as alternativas já vêm da questão, e uma outra forma da certa (mais longa ou com palavras da pergunta) entregaria a resposta. Crie só "outrasFrentes" (outros enunciados da mesma pergunta, que funcionem com as mesmas alternativas).
+- Fora as questões de múltipla escolha, crie as variações de cada tipo (veja "Variações"): "outrasFrentes" e, no V/F, "variantes". Elas só reescrevem o que o item já diz, sem acrescentar fato novo; a resposta continua a da pessoa.
+- A "frente" é a pergunta da pessoa: não a troque por outra. No tipo "conceito" (pergunta aberta), não crie "outrasFrentes": outro enunciado costuma pedir outra coisa que não a resposta que a pessoa escreveu (ex.: pedir o nome quando ela respondeu com a definição).
 - Se um item não couber em nenhum tipo ou não tiver resposta (fora a questão de múltipla escolha sem gabarito, que você resolve), não crie cartão para ele: liste o texto dele em "naoConvertidos".
 - Se o item tiver fonte (página, aula), mantenha; senão use "Perguntas próprias".
 

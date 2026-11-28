@@ -680,6 +680,8 @@ textarea { line-height: 1.5; resize: vertical; }
 .status-marca.nota { color: var(--warning); }
 .alternativas { margin: 0; padding-left: 4px; list-style: none; }
 .alternativas .certa { color: var(--success); font-weight: 650; }
+.variantes { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 15px; color: var(--text-muted); }
+.variantes .explicacao { font-size: 14px; }
 .reporte { margin: 0; color: var(--danger); font-size: 15px; background: var(--danger-soft); padding: 8px 12px; border-radius: var(--radius-sm); }
 .marcas { display: flex; gap: 8px; flex-wrap: wrap; }
 .resumo-importacao { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }

@@ -34,7 +34,7 @@ describe('instrução para o Gemini', () => {
     const t = montarInstrucao({ origem: 'arquivo', quantidade: 20, mistura: 'teoria', baralho: { titulo: 'Física', temas: destino.temas } })
     // Com arquivo, a IA pergunta a quantidade: o número do app não entra.
     expect(t).not.toContain('Crie 20 cartões')
-    expect(t).toContain('Crie a quantidade de cartões que eu pedir, no máximo 40 por resposta')
+    expect(t).toContain('Crie a quantidade de cartões que eu pedir, no máximo 30 por resposta')
     expect(t).toContain('Não crie "calculo"')
     // Nome e páginas vêm da conversa com a IA, não do app.
     expect(t).toContain('Quer usar o material todo ou só algumas páginas?')
@@ -126,7 +126,7 @@ describe('lendo a resposta', () => {
 
 describe('instrução v3 (objetivo e cobertos)', () => {
   it('versão 3', () => {
-    expect(VERSAO_INSTRUCAO).toBe(11)
+    expect(VERSAO_INSTRUCAO).toBe(12)
   })
 
   it('com objetivo: seção, nível, foco, evitar (spoilers), descrição do tema e prioridade', () => {

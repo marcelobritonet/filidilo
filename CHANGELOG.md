@@ -2,6 +2,14 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.37.0] — 2026-11-28
+
+- **A mesma pergunta, de jeitos diferentes.** Os cartões criados com IA agora vêm com variações: a pergunta aparece com outros enunciados, a resposta certa com outras palavras e as alternativas erradas mudam a cada vez. Assim você estuda o conteúdo, e não a posição das respostas. O progresso continua sendo o do cartão.
+- **Verdadeiro ou falso com outras afirmações.** Cada cartão de V/F traz outras afirmações sobre o mesmo fato, umas verdadeiras e outras falsas, e uma delas aparece a cada vez, com a explicação dela.
+- **Erradas melhores.** A IA passa a mandar só alternativas erradas que fazem sentido para o assunto, e o app tira formas da resposta certa que a entregariam (mais longas que as outras ou só com um ponto a mais).
+- **Mais cartões na mesma conversa.** O pedido de mais cartões já traz as regras novas, mesmo numa conversa começada antes desta versão.
+- Os cartões que você já tem continuam como estão. Nos cartões novos, a lista de cartões mostra os outros enunciados e afirmações.
+
 ## [3.36.0] — 2026-11-27
 
 - **Estilo Suave para todos.** Cantos redondos, cartões em degradê com as cores da logo e botões arredondados viram o jeito padrão do Filidilo. Prefere o visual de antes? Em Preferências → Estilo, escolha Clássico.

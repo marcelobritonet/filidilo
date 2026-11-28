@@ -54,8 +54,11 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav, naSessao }: 
       origem: original?.origem,
     }
     if (ehCalculo) return { ...original!, tema }
-    if (tipo === 'conceito') return { id, tipo, tema, frente: frente.trim(), verso: verso.trim(), ...extra }
-    if (tipo === 'vf') return { id, tipo, tema, frente: frente.trim(), resposta: resposta as boolean, ...extra }
+    // Os outros enunciados e as variantes do V/F ainda não se editam aqui: ficam como estavam.
+    const outrasFrentes = original && (original.tipo === 'conceito' || original.tipo === 'associacao') ? original.outrasFrentes : undefined
+    const variantes = original?.tipo === 'vf' ? original.variantes : undefined
+    if (tipo === 'conceito') return { id, tipo, tema, frente: frente.trim(), verso: verso.trim(), outrasFrentes, ...extra }
+    if (tipo === 'vf') return { id, tipo, tema, frente: frente.trim(), resposta: resposta as boolean, variantes, ...extra }
     if (tipo === 'lacunas') {
       const n = contarLacunas(frente)
       return { id, tipo, tema, frente: frente.trim(), respostas: Array.from({ length: n }, (_, i) => (respostasLacunas[i] ?? '').trim()), ...extra }
@@ -66,7 +69,7 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav, naSessao }: 
     const limpas = ops.filter(Boolean)
     // Edita a primeira outra forma; se a IA tiver mandado mais, as demais ficam.
     const formas = [outraForma.trim(), ...(original?.tipo === 'associacao' ? (original.outrasFormas ?? []).slice(1) : [])].filter(Boolean)
-    return { id, tipo, tema, frente: frente.trim(), opcoes: limpas, correta: Math.max(0, limpas.indexOf(corretaTexto)), outrasFormas: formas.length ? formas : undefined, ...extra }
+    return { id, tipo, tema, frente: frente.trim(), opcoes: limpas, correta: Math.max(0, limpas.indexOf(corretaTexto)), outrasFormas: formas.length ? formas : undefined, outrasFrentes, ...extra }
   }
 
   const verificar = (c: Cartao): string[] => {
