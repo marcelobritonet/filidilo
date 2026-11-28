@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { criar, obter } from './baralhos'
-import { adicionarCartoes, arquivarCartao, ativos, favoritos, marcarFavorito, desarquivarCartao, excluirCartao, gravarCartao, lerLista, problemasDoCartao, reinserirCartao } from './cartoes'
+import { adicionarCartoes, arquivarCartao, ativos, favoritos, marcarFavorito, desarquivarCartao, excluirCartao, gravarCartao, lerLista, problemasDoCartao, reinserirCartao, renovarCartoes } from './cartoes'
 import { db } from './db'
 import type { Cartao } from './types'
 
@@ -29,6 +29,20 @@ describe('edição de cartões', () => {
   beforeEach(async () => {
     await db.delete()
     await db.open()
+  })
+  it('renovar mantém id, favorito e arquivado, marca editado e renovado, e acrescenta as partes novas (P139)', async () => {
+    let b = await criar('Teste')
+    b = await adicionarCartoes(b, [
+      { id: 'r1', tipo: 'conceito', tema: 'geral', frente: 'P?', verso: 'R', favoritoEm: 7 },
+      { id: 'r2', tipo: 'vf', tema: 'geral', frente: 'A', resposta: true },
+    ])
+    b = await renovarCartoes(b, [{ id: 'r1', tipo: 'conceito', tema: 'geral', frente: 'P?', verso: 'R', outrasFrentes: ['Outra P?'] }], [{ id: 'ia-n1', tipo: 'vf', tema: 'geral', frente: 'B', resposta: false, explicacao: 'x' }])
+    const [r1, r2, n1] = b.cartoes
+    expect(r1).toMatchObject({ id: 'r1', outrasFrentes: ['Outra P?'], favoritoEm: 7, editado: true })
+    expect(r1.renovadoEm).toBeTypeOf('number')
+    expect(r2.renovadoEm).toBeUndefined()
+    expect(n1).toMatchObject({ id: 'ia-n1', origem: 'ia' })
+    expect(n1.renovadoEm).toBeTypeOf('number')
   })
   it('grava novo como manual, marca edição, exclui e desfaz', async () => {
     let b = await criar('Teste')

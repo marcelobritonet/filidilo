@@ -3,6 +3,7 @@ import { arquivar, desarquivar, duplicar, excluir, novoId, obter, restaurar, sal
 import { NIVEIS, normalizarNivel, type Baralho, type Nivel, type Objetivo, type Tema } from '../core/types'
 import type { Navegacao } from './App'
 import { evento } from '../core/telemetria'
+import { precisaRenovar } from '../core/ia/renovar'
 import { conteudoBaralho, conteudoBaralhoComProgresso } from './enviar'
 import { EnviarModal } from './EnviarModal'
 
@@ -117,6 +118,7 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
   }
 
   const [enviando, setEnviando] = useState(false)
+  const paraRenovar = baralho.cartoes.filter(precisaRenovar).length
   const enviar = () => setEnviando(true)
 
   return (
@@ -132,6 +134,11 @@ export function ConfigBaralho({ baralho, nav }: { baralho: Baralho; nav: Navegac
         <button class="btn secundario" onClick={() => nav.ir({ nome: 'ia', id: baralho.id })}>
           Criar com IA
         </button>
+        {paraRenovar > 0 && (
+          <button class="btn secundario" onClick={() => { evento('renovar_aberto', { faltam: paraRenovar }); nav.ir({ nome: 'renovar', id: baralho.id }) }}>
+            Renovar com IA ({paraRenovar})
+          </button>
+        )}
         <button class="btn secundario" onClick={() => nav.ir({ nome: 'revisar', id: baralho.id })}>
           Ver e editar ({baralho.cartoes.length})
         </button>

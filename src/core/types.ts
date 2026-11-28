@@ -105,6 +105,8 @@ interface CartaoBase {
   arquivadoEm?: number
   /** Quando foi marcado como favorito: volta antes dos outros (uma vez por dia) e pode ser estudado à parte. */
   favoritoEm?: number
+  /** Quando a IA renovou o cartão (variações acrescentadas, P139): não volta para a lista de renovar. */
+  renovadoEm?: number
 }
 
 export interface CartaoConceito extends CartaoBase {

@@ -50,6 +50,25 @@ export async function adicionarCartoes(b: Baralho, novos: Cartao[], temasNovos: 
   })
 }
 
+/**
+ * Renovação com IA (P139): substitui os cartões renovados, mantendo id, favorito e arquivado (o progresso
+ * fica, porque é guardado pelo id), e acrescenta as partes que viraram cartões novos. Todos ficam com `renovadoEm`;
+ * os renovados ficam `editado`, para a atualização de baralho de fábrica não desfazer a renovação.
+ */
+export async function renovarCartoes(b: Baralho, renovados: Cartao[], novos: Cartao[]): Promise<Baralho> {
+  const agora = Date.now()
+  return mudarCartoes(b, (atual) => {
+    const porId = new Map(renovados.map((c) => [c.id, c]))
+    const cartoes = atual.cartoes.map((c) => {
+      const r = porId.get(c.id)
+      return r ? { ...r, editado: true, atualizadoEm: agora, renovadoEm: agora, ...marcasPessoais(c) } : c
+    })
+    const ids = new Set(cartoes.map((c) => c.id))
+    for (const n of novos) if (!ids.has(n.id)) cartoes.push({ ...n, origem: 'ia', atualizadoEm: agora, renovadoEm: agora })
+    return { ...atual, cartoes }
+  })
+}
+
 /** Remove um cartão; devolve o baralho novo e a posição, para permitir desfazer. */
 export async function excluirCartao(b: Baralho, id: string): Promise<{ baralho: Baralho; cartao?: Cartao; pos: number }> {
   let pos = -1

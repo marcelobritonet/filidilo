@@ -2,6 +2,13 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.38.0] — 2026-11-28
+
+- **Renove os cartões que você já tem.** Em Configurar baralho → Renovar com IA, escolha um tema: a IA acrescenta aos cartões antigos outros enunciados, outras formas da resposta certa e outras alternativas, como nos cartões novos. Vai em blocos de até 15 cartões, na mesma conversa com a IA, e dá para parar e continuar depois.
+- **O progresso continua.** Cada cartão renovado é o mesmo cartão: acertos, favorito e arquivado ficam como estavam.
+- **Perguntas abertas viram alternativas** quando dá: "Quem é Coby?" passa a mostrar descrições para você escolher, e assim fica claro se você acertou.
+- Antes de salvar, você confere cada cartão e desmarca o que não quiser trocar.
+
 ## [3.37.0] — 2026-11-28
 
 - **A mesma pergunta, de jeitos diferentes.** Os cartões criados com IA agora vêm com variações: a pergunta aparece com outros enunciados, a resposta certa com outras palavras e as alternativas erradas mudam a cada vez. Assim você estuda o conteúdo, e não a posição das respostas. O progresso continua sendo o do cartão.

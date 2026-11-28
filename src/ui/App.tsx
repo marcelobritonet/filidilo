@@ -17,6 +17,7 @@ import { EditarCartao } from './EditarCartao'
 import { useBaralhos } from './estado'
 import { Inicio } from './Inicio'
 import { Progresso } from './Progresso'
+import { RenovarCartoes } from './RenovarCartoes'
 import { atualizarSozinho, chegouAlgo } from './recebido'
 import { Revisar } from './Revisar'
 import { Sessao, type Limite, type Modo } from './Sessao'
@@ -37,6 +38,7 @@ export type Tela =
   | { nome: 'progresso' }
   | { nome: 'aprender'; pedido?: string }
   | { nome: 'ia'; id: string; assunto?: string; temaId?: string }
+  | { nome: 'renovar'; id: string }
 
 const AVISO_NOME = 'filidilo-aviso-nome'
 
@@ -200,6 +202,7 @@ export function App() {
     )
   else if (tela.nome === 'baralho') conteudo = <Inicio baralho={baralho} nav={nav} versao={versao} />
   else if (tela.nome === 'ia') conteudo = <CriarComIA baralho={baralho} assuntoInicial={tela.assunto} temaId={tela.temaId} nav={nav} />
+  else if (tela.nome === 'renovar') conteudo = <RenovarCartoes baralho={baralho} nav={nav} />
   else if (tela.nome === 'sessao') conteudo = <Sessao baralho={baralho} modo={tela.modo} opcoes={tela.opcoes} limite={tela.limite} sair={nav.voltar} criarMais={(assunto, temaId) => nav.substituir({ nome: 'ia', id: baralho.id, assunto, temaId })} mudou={nav.mudou} avisar={nav.avisar} />
   else if (tela.nome === 'revisar') conteudo = <Revisar baralho={baralho} nav={nav} arquivados={tela.arquivados} />
   else if (tela.nome === 'cartao') conteudo = <EditarCartao key={tela.cartaoId ?? 'novo'} baralho={baralho} cartaoId={tela.cartaoId} temaInicial={tela.tema} nav={nav} />
