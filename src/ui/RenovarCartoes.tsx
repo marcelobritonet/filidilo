@@ -6,8 +6,7 @@ import { evento } from '../core/telemetria'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
 import { AbrirIA } from './AbrirIA'
-import { useConferencia } from './Conferencia'
-import { Conteudo } from './Revisar'
+import { ItemConferencia, useAbrirTodos, useConferencia } from './Conferencia'
 
 const plural = (n: number, um: string, varios: string) => `${n} ${n === 1 ? um : varios}`
 const textoCurto = (s: string) => s.replace(/[*$]/g, '')
@@ -31,6 +30,7 @@ export function RenovarCartoes({ baralho, nav }: { baralho: Baralho; nav: Navega
   const [desmarcados, setDesmarcados] = useState<Set<string>>(new Set())
   const [salvando, setSalvando] = useState(false)
   const conf = useConferencia()
+  const todos = useAbrirTodos()
 
   const restantes = temaId ? cartoesParaRenovar(baralho, temaId) : []
   const bloco = useMemo(() => restantes.slice(0, TAMANHO_BLOCO), [temaId, baralho])
@@ -130,7 +130,7 @@ export function RenovarCartoes({ baralho, nav }: { baralho: Baralho; nav: Navega
           <p>
             {plural(validos.length, 'cartão renovado', 'cartões renovados')}
             {novosValidos.length > 0 && <>, {plural(novosValidos.length, 'cartão novo', 'cartões novos')}</>}
-            {comErro.length > 0 && <>, {comErro.length} com problema</>}. Desmarque o que não quiser trocar.
+            {comErro.length > 0 && <>, {comErro.length} com problema</>}. Toque num cartão para ver como ficou; desmarque o que não quiser trocar.
           </p>
           {lida.faltando.length > 0 && (
             <p class="dica">
@@ -163,37 +163,33 @@ export function RenovarCartoes({ baralho, nav }: { baralho: Baralho; nav: Navega
             </div>
           )}
 
-          <ul class="lista-revisao">
-            {validos.map((r) => {
-              const marcado = !desmarcados.has(r.cartao.id)
-              return (
-                <li class={`item ${marcado ? 'ok' : ''}`}>
-                  <label class="check">
-                    <input type="checkbox" checked={marcado} onChange={() => alternar(r.cartao.id)} />
-                    Trocar
-                  </label>
-                  {r.antes.tipo !== r.cartao.tipo ? (
+          {validos.length + novosValidos.length > 0 && <p class="linha-abrir-todos">{todos.botao}</p>}
+          <ul class="lista-revisao lista-conf" key={todos.chave}>
+            {validos.map((r) => (
+              <ItemConferencia
+                c={r.cartao}
+                marcado={!desmarcados.has(r.cartao.id)}
+                alternar={() => alternar(r.cartao.id)}
+                rotuloCaixa="Trocar"
+                aberto={todos.abertos}
+                nota={
+                  r.antes.tipo !== r.cartao.tipo ? (
                     <p class="dica antes">Era uma pergunta aberta: agora tem alternativas.</p>
                   ) : 'frente' in r.antes && 'frente' in r.cartao && r.antes.frente !== r.cartao.frente ? (
                     <p class="dica antes">Antes: {textoCurto(r.antes.frente)}</p>
-                  ) : null}
-                  <Conteudo c={r.cartao} />
-                </li>
-              )
-            })}
-            {novosValidos.map((n) => {
-              const marcado = !desmarcados.has(n.cartao.id)
-              return (
-                <li class={`item ${marcado ? 'ok' : ''}`}>
-                  <label class="check">
-                    <input type="checkbox" checked={marcado} onChange={() => alternar(n.cartao.id)} />
-                    Incluir
-                  </label>
-                  <p class="dica antes">Novo: uma parte de outro cartão que virou cartão próprio</p>
-                  <Conteudo c={n.cartao} />
-                </li>
-              )
-            })}
+                  ) : null
+                }
+              />
+            ))}
+            {novosValidos.map((n) => (
+              <ItemConferencia
+                c={n.cartao}
+                marcado={!desmarcados.has(n.cartao.id)}
+                alternar={() => alternar(n.cartao.id)}
+                aberto={todos.abertos}
+                nota={<p class="dica antes">Novo: uma parte de outro cartão que virou cartão próprio.</p>}
+              />
+            ))}
           </ul>
 
           <div class="rodape-fixo">

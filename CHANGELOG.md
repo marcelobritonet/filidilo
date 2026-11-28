@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.42.0] — 2026-11-28
+
+- **Conferir cartões sem rolar tanto.** Depois de criar com IA, cada cartão aparece fechado, só com o tipo e a pergunta, sem a resposta. Toque para abrir e ver tudo (os outros enunciados, as alternativas, os pares); toque de novo para fechar. Dá para desmarcar sem abrir, e "Abrir todos" abre a lista inteira de uma vez.
+- Vale para Criar com IA, Aprender e Renovar com IA.
+
 ## [3.41.0] — 2026-11-28
 
 - **Respostas curtas, de um fato só.** A IA passa a criar cada cartão com uma pergunta e uma resposta só, de até 15 palavras. Resposta em lista ("cite as 5 causas…") vira um cartão para cada parte, e você sabe na hora se acertou.
