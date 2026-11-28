@@ -4,7 +4,7 @@
 
 - Arquivo `simbolo-app.svg`: fundo `marca-noite`, símbolo em 72% do quadrado, canto `raio-icone`.
 - Versão "maskable" (Android): o mesmo fundo até a borda, símbolo em 60% do quadrado para caber em qualquer recorte.
-- Tamanhos gerados: 512, 192, 180 (Apple), 32 e 16 (favicon). Em 16px o brilho central pode sumir.
+- Tamanhos gerados: 512, 192 e 180 (Apple). O favicon (32 e 16) é só a pena, sem o quadrado, para ler bem em aba clara e escura; em 16px o brilho central pode sumir.
 - O ícone é o mesmo em todos os temas: a Noite é a cor de identidade.
 
 ## Tela de abertura

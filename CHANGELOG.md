@@ -7,6 +7,13 @@ Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As ve
 - **Baralho recebido não se perde mais.** Ao abrir um link de baralho, a janela "Baralho recebido" não fecha mais com um toque fora dela e mostra algumas perguntas do baralho.
 - **"Agora não" guarda para depois.** Se você ainda não quiser adicionar, o baralho fica esperando no topo de Meus baralhos, com "Ver o baralho" e "Descartar", por até 7 dias.
 
+## [3.34.4] — 2026-11-27
+
+### Correções
+
+- Em Meus baralhos, os links do rodapé (Progresso, Backup, Sincronizar e Preferências) ficam em duas colunas alinhadas. Antes, no celular, Preferências caía sozinho na linha de baixo.
+- Ícone da aba do navegador mais nítido: só a pena, sem o quadrado escuro, que sumia nas abas escuras.
+
 ## [3.34.3] — 2026-11-27
 
 ### Correções

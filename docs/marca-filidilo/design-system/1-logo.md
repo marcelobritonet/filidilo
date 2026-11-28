@@ -34,7 +34,8 @@ Construção, numa grade de 100 × 100:
 
 | Versão | Arquivo | Quando usar |
 |---|---|---|
-| Ícone do app | `simbolo-app.svg` | Ícone do app instalado, favicon, foto de perfil. Fundo `marca-noite`, canto `raio-icone`. |
+| Ícone do app | `simbolo-app.svg` | Ícone do app instalado, foto de perfil. Fundo `marca-noite`, canto `raio-icone`. |
+| Favicon | `public/icon.svg`, `favicon-16/32.png`, `favicon.ico` | Aba do navegador: só a pena, sem o quadrado, ocupando a altura toda (decisão do Marcelo, 27/11/2026, P134: o quadrado Noite sumia em aba escura e a pena ficava minúscula). |
 | Símbolo | `simbolo.svg` | Sobre fundos lisos, claros ou escuros, quando o nome já aparece por perto. |
 | Símbolo em uma cor (noite) | `simbolo-mono-noite.svg` | Impressão em uma cor, carimbos, marcas d'água sobre fundo claro. |
 | Símbolo em uma cor (névoa) | `simbolo-mono-nevoa.svg` | O mesmo, sobre fundo escuro ou foto. |
@@ -46,7 +47,7 @@ Construção, numa grade de 100 × 100:
 ## Área de proteção e tamanho mínimo
 
 - Deixe livre em volta do logo um espaço igual à altura do ocelo do nome (0,6em). No ícone do app, o símbolo ocupa 72% do quadrado e fica centralizado.
-- Símbolo: mínimo de 24px de altura com os quatro anéis. Entre 16px e 24px (favicon), use o ícone do app; o brilho central pode sumir.
+- Símbolo: mínimo de 24px de altura com os quatro anéis. Entre 16px e 24px (favicon), use só a pena, sem o quadrado; o brilho central pode sumir.
 - Nome: mínimo de 14px de altura de letra. Abaixo disso, use só o símbolo.
 
 ## Não faça

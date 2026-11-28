@@ -959,6 +959,11 @@ details.bloco > summary { font-weight: 650; }
 .rodape + .versao { margin-top: 4px; font-size: 13px; text-wrap: balance; }
 .tela:has(> .rodape + .versao) { padding-bottom: 8px; }
 .rodape .btn.terciario:hover { color: var(--text); }
+/* P134: com 3 ou mais links (Meus baralhos), uma linha não cabe no celular e o último caía sozinho, com o ponto
+   solto na frente. Vira uma grade de 2 colunas, sem os pontos. Com 2 links (tela do baralho), fica a linha com ponto. */
+.rodape:has(> .btn:nth-child(3)) { display: grid; grid-template-columns: 1fr 1fr; justify-items: center; gap: 0 8px; }
+.rodape:has(> .btn:nth-child(3)) .btn.terciario + .btn.terciario { margin-left: 0; }
+.rodape:has(> .btn:nth-child(3)) .btn.terciario + .btn.terciario::before { content: none; }
 .cabecalho-linha .btn.compacto { white-space: nowrap; font-size: 14px; padding: 8px 6px; }
 
 /* ---------- Opções de resposta: uma por linha ---------- */
