@@ -12,14 +12,12 @@ interface DadosTema {
   paleta: string
   /** Cor do fundo, usada também na barra do navegador. */
   fundo: string
-  /** Tema especial (P127): terceiro grupo, bloqueado até ser liberado (evento, hora do dia…). */
-  especial?: boolean
 }
 
 export const TEMAS: Record<Tema, DadosTema> = {
   lagoa: { tipo: 'light', paleta: 'lagoa', fundo: '#EBF4F4' },
-  plumagem: { tipo: 'light', paleta: 'plumagem', fundo: '#F5F0EC', especial: true },
-  ocelo: { tipo: 'light', paleta: 'ocelo', fundo: '#E3A6A3', especial: true },
+  plumagem: { tipo: 'light', paleta: 'plumagem', fundo: '#F5F0EC' },
+  ocelo: { tipo: 'light', paleta: 'ocelo', fundo: '#E3A6A3' },
   areia: { tipo: 'light', paleta: 'areia', fundo: '#F6F2EA' },
   dark: { tipo: 'dark', paleta: 'noite', fundo: '#0B1E3F' },
   cobalto: { tipo: 'dark', paleta: 'cobalto', fundo: '#131C30' },
@@ -34,29 +32,11 @@ export function ehTema(v: unknown): v is Tema {
   return typeof v === 'string' && Object.prototype.hasOwnProperty.call(TEMAS, v)
 }
 
-// Temas especiais (P127): ficam bloqueados por enquanto. A regra de liberação (modo evento, horas do dia)
-// ainda vai ser decidida; até lá, só um aparelho liberado com ?especiais=1 (index.html grava a chave;
-// ?especiais=0 tira) pode escolher um deles.
-const CHAVE_ESPECIAIS = 'tatino-especiais-liberados'
-
-export function especiaisLiberados(): boolean {
-  try {
-    return localStorage.getItem(CHAVE_ESPECIAIS) === '1'
-  } catch {
-    return false
-  }
-}
-
-/** Tema que pode ser usado agora neste aparelho. */
-export function temaDisponivel(t: Tema): boolean {
-  return !TEMAS[t].especial || especiaisLiberados()
-}
-
-/** Tema gravado; sem escolha (ou especial bloqueado), Areia ou Noite conforme o modo do aparelho. */
+/** Tema gravado; sem escolha, Areia ou Noite conforme o modo do aparelho. */
 export function lerPreferencia(): Tema {
   try {
     const v = localStorage.getItem(CHAVE)
-    if (ehTema(v) && temaDisponivel(v)) return v
+    if (ehTema(v)) return v
     if (v === 'light') return 'areia'
   } catch {
     /* sem localStorage: segue o aparelho */
@@ -84,7 +64,6 @@ export function terminarAbertura() {
 }
 
 export function salvarPreferencia(t: Tema) {
-  if (!temaDisponivel(t)) return
   try {
     localStorage.setItem(CHAVE, t)
   } catch {
@@ -98,20 +77,7 @@ export function salvarPreferencia(t: Tema) {
 export type Estilo = 'suave' | 'classico'
 const CHAVE_ESTILO = 'tatino-estilo'
 
-// Suave desligado por enquanto (P124): ainda está em refinamento. Todo mundo fica no Clássico; só um
-// aparelho liberado com ?suave=1 no endereço (index.html grava a chave; ?suave=0 tira) vê e escolhe o Suave.
-const CHAVE_SUAVE = 'tatino-suave-liberado'
-
-export function suaveLiberado(): boolean {
-  try {
-    return localStorage.getItem(CHAVE_SUAVE) === '1'
-  } catch {
-    return false
-  }
-}
-
 export function lerEstilo(): Estilo {
-  if (!suaveLiberado()) return 'classico'
   try {
     return localStorage.getItem(CHAVE_ESTILO) === 'classico' ? 'classico' : 'suave'
   } catch {
@@ -120,7 +86,6 @@ export function lerEstilo(): Estilo {
 }
 
 export function salvarEstilo(e: Estilo) {
-  if (e === 'suave' && !suaveLiberado()) return
   try {
     localStorage.setItem(CHAVE_ESTILO, e)
   } catch {

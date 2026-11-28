@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.36.0] — 2026-11-27
+
+- **Estilo Suave para todos.** Cantos redondos, cartões em degradê com as cores da logo e botões arredondados viram o jeito padrão do Filidilo. Prefere o visual de antes? Em Preferências → Estilo, escolha Clássico.
+- **Dois temas novos: Plumagem e Ocelo.** Inspirados no pavão de leque aberto, agora ficam junto dos outros temas em Preferências.
+
 ## [3.35.1] — 2026-11-27
 
 - **Sai o "Desafiar amigos".** A opção ficava escondida dentro de "Enviar cartão" e quase ninguém usava. Links de desafio que você já mandou continuam abrindo: quem tocar responde o cartão e pode salvar.
