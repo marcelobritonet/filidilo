@@ -339,6 +339,8 @@
 :root[data-theme='dark'] { color-scheme: dark; }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
+/* P134: nada passa da largura da tela (sem rolagem para o lado, mesmo com a fonte do sistema grande). */
+html, body { overflow-x: clip; }
 body {
   margin: 0;
   background: var(--bg);
@@ -375,6 +377,10 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
 .cabecalho { display: grid; gap: 10px; padding: 8px 0 20px; }
 .cabecalho-linha { display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 8px; }
 .cabecalho-linha .marca { justify-self: start; }
+/* P134: em tela estreita a marca encolhe e o botão quebra a linha, em vez de a grade estourar a tela. */
+.cabecalho-linha > *, .barra-sessao > * { min-width: 0; }
+.cabecalho-linha .marca { max-width: 100%; }
+.cabecalho-linha .marca-nome { flex: 0 1 auto; min-width: 0; max-width: 100%; }
 
 .barra-sessao { display: grid; grid-template-columns: 44px 1fr 72px; align-items: center; gap: 8px; margin-bottom: 12px; }
 .barra-sessao.livre { grid-template-columns: 44px 1fr auto auto; }
@@ -413,7 +419,7 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
 .cartao-com-favorito > .botao-favorito:hover, .lista-revisao .item > .botao-favorito:hover { background: transparent; }
 .cartao-com-favorito > .cartao > :first-child { padding-right: 40px; }
 .titulo-acoes { display: flex; align-items: center; gap: 8px; }
-.titulo-acoes h1 { flex: 1; min-width: 0; }
+.titulo-acoes h1 { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .titulo-acoes .icone-btn { margin-right: -10px; }
 .contador { color: var(--text-muted); font-size: 15px; text-align: right; font-variant-numeric: tabular-nums; }
 
@@ -939,7 +945,7 @@ details.bloco > summary { font-weight: 650; }
 .rodape + .versao { margin-top: 4px; font-size: 13px; text-wrap: balance; }
 .tela:has(> .rodape + .versao) { padding-bottom: 8px; }
 .rodape .btn.terciario:hover { color: var(--text); }
-.cabecalho-linha .btn.compacto { white-space: nowrap; font-size: 14px; padding: 8px 6px; }
+.cabecalho-linha .btn.compacto { font-size: 14px; padding: 8px 6px; text-align: right; line-height: 1.25; }
 
 /* ---------- Opções de resposta: uma por linha ---------- */
 .notas { grid-template-columns: 1fr; gap: 8px; }
