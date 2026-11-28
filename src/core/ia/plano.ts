@@ -2,8 +2,9 @@
 // Versão da instrução: mude ao alterar regras (como em VERSAO_INSTRUCAO).
 import { infoNivel, type Cartao, type Nivel, type Tema } from '../types'
 import { fonteDe, origemTexto, quantidadeArquivo, regraNaoEntregar, regraPagina, regrasTextoJson, regrasTipos } from './instrucao'
+import { textoProporcaoExata, textoProporcaoPorcentagem } from './proporcao'
 
-export const VERSAO_PLANO = 10
+export const VERSAO_PLANO = 11
 
 export interface PedidoPlano {
   /** O que a pessoa digitou em "Aprender uma coisa nova hoje". Com arquivo, pode ficar vazio. */
@@ -87,6 +88,9 @@ export const EXEMPLO_PLANO: {
   ],
 }
 
+/** No plano, o padrão é sem cálculo: no teste da P141, com cálculo na conta, a IA inventou contas para fotossíntese do 9º ano. */
+const CALCULO_NO_PLANO = 'Só crie "calculo" se o assunto pedir contas que a pessoa precise fazer (física, química, matemática, finanças): aí troque 2 "associacao" (ou até 15% dos cartões) por "calculo". Nos outros assuntos, não crie "calculo".'
+
 /** Instrução de planejamento completa para colar na IA. */
 export function montarPlano(p: PedidoPlano): string {
   const material = p.origem
@@ -116,7 +120,7 @@ Se o pedido for vago demais para montar um bom plano (não dá para saber o obje
 - Crie de 3 a 8 temas, na ordem em que se aprende, cada um com uma frase de descrição.
 
 ## Cartões
-${arquivo ? quantidadeArquivo() : 'Crie 15 cartões.'} Distribua os cartões pelos temas, começando pelos primeiros. Adeque a dificuldade ao nível da pessoa. Os tipos devem combinar com o assunto: "calculo" só se houver contas; para idiomas, use "conceito" e "associacao".
+${arquivo ? `${quantidadeArquivo()} ${textoProporcaoPorcentagem(false)}` : `Crie 15 cartões. ${textoProporcaoExata(15, false)}`} ${CALCULO_NO_PLANO} Distribua os cartões pelos temas, começando pelos primeiros. Adeque a dificuldade ao nível da pessoa. Para idiomas, use "colunas" para palavra e tradução e não crie "calculo".
 
 ## Formato da resposta
 Um objeto JSON com "baralho", "temas" e "cartoes":

@@ -4,6 +4,7 @@ import { adicionarCartoes } from '../core/cartoes'
 import { ganharFolga, MAX_FOLGAS } from '../core/ofensiva'
 import { avaliarBaralho, type Avaliacao } from '../core/desempenho'
 import { EXEMPLOS, VERSAO_INSTRUCAO, montarCorrecao, montarInstrucao, montarInstrucaoFormatacao, montarMaisDoMaterial, type Mistura, type Origem } from '../core/ia/instrucao'
+import { contarTipos } from '../core/ia/proporcao'
 import { extrairJson, lerResposta, parecePerguntas, type RespostaLida } from '../core/ia/resposta'
 import { infoNivel, normalizarNivel, type Baralho } from '../core/types'
 import type { Navegacao } from './App'
@@ -112,7 +113,7 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
         for (const t of r.temasNovos) if (!temas.some((x) => x.id === t.id)) temas.push(t)
         return { temasNovos: temas, cartoes: [...ant.cartoes.filter((c) => !c.erros.length), ...r.cartoes] }
       })
-      evento('ia_resposta_lida', { cartoes: r.cartoes.length, com_erro: r.cartoes.filter((c) => c.erros.length).length })
+      evento('ia_resposta_lida', { cartoes: r.cartoes.length, com_erro: r.cartoes.filter((c) => c.erros.length).length, versao_instrucao: VERSAO_INSTRUCAO, formatar, ...contarTipos(r.cartoes.map((c) => c.cartao)) })
       return null
     } catch (e) {
       evento('ia_resposta_invalida')

@@ -3,8 +3,9 @@
 import type { Baralho, Cartao, Objetivo, Tema } from '../types'
 import { infoNivel } from '../types'
 import { jaCobertos } from './cobertos'
+import { textoProporcaoExata, textoProporcaoPorcentagem } from './proporcao'
 
-export const VERSAO_INSTRUCAO = 13
+export const VERSAO_INSTRUCAO = 14
 
 export type Origem = 'arquivo' | 'texto' | 'tema'
 export type Mistura = 'misto' | 'teoria' | 'calculo'
@@ -117,10 +118,12 @@ export const EXEMPLOS: { temas: Tema[]; cartoes: Cartao[] } = {
   ],
 }
 
-const PROPORCAO: Record<Mistura, string> = {
-  misto: 'Misture os tipos: cerca de 25% "conceito", 25% "vf", 20% "associacao", 10% "lacunas" e, se o material tiver fórmulas e contas, 15% "calculo". Sem contas no material, não crie "calculo". Quando o material tiver coisas que formam pares (termos e definições, autores e obras, causas e efeitos), crie também alguns "colunas".',
-  teoria: 'Use só os tipos "conceito", "vf", "associacao", "lacunas" e "colunas" (este quando houver coisas que formam pares), em proporções parecidas. Não crie "calculo".',
-  calculo: 'Crie só cartões do tipo "calculo", cobrindo as fórmulas e os tipos de problema do material.',
+/** Proporção dos tipos (P141): números exatos com a quantidade conhecida; porcentagens com teto quando a IA pergunta a quantidade. */
+export function textoProporcao(mistura: Mistura, quantidade?: number): string {
+  if (mistura === 'calculo') return 'Crie só cartões do tipo "calculo", cobrindo as fórmulas e os tipos de problema do material.'
+  const comContas = mistura === 'misto'
+  const texto = quantidade ? textoProporcaoExata(quantidade, comContas) : textoProporcaoPorcentagem(comContas)
+  return comContas ? texto : `${texto} Não crie "calculo".`
 }
 
 export const REGRA_COLUNAS = `- "colunas" (ligar colunas): "frente" (o comando, ex.: "Ligue cada país à sua capital"), "outrasFrentes" (3 ou 4 outros jeitos de dar o mesmo comando) e "pares" (de 6 a 8 { "esquerda": "...", "direita": "..." }). Use para coisas que formam pares: termo e definição, autor e obra, causa e efeito, país e capital. Textos curtos, até 8 palavras. Os itens da esquerda são todos do mesmo tipo, os da direita também, e nenhum item se repete: cada item da direita combina com um só da esquerda (dois livros do mesmo autor não entram no mesmo cartão). O app mostra 4 pares de cada vez, sorteados, e qualquer combinação de 4 precisa ter uma resposta só.`
@@ -261,7 +264,7 @@ export function montarInstrucao(p: PedidoIA): string {
 ${origemTexto(p)}
 
 ## Quantidade e tipos
-${arquivo ? quantidadeArquivo() : `Crie ${p.quantidade} cartões.`} ${PROPORCAO[p.mistura]}
+${arquivo ? `${quantidadeArquivo()} ${textoProporcao(p.mistura)}` : `Crie ${p.quantidade} cartões. ${textoProporcao(p.mistura, p.quantidade)}`}
 
 ${objetivo}## Temas
 ${temasTexto(p)}
@@ -297,7 +300,7 @@ export function montarMaisDoMaterial(p: { baralho: Pick<Baralho, 'temas' | 'cart
   return `Quero mais flashcards do mesmo material desta conversa (não vou anexar de novo).
 - Use primeiro as páginas ou imagens que ainda não viraram cartão; depois, aprofunde o que já foi visto.
 - Pergunte quantos cartões eu quero (sugira um número) e espere. ${quantidadeArquivo()}
-- ${PROPORCAO[p.mistura]}
+- ${textoProporcao(p.mistura)}
 - Siga as mesmas regras e o mesmo formato de cartão da primeira instrução, com "fonte.pagina". Se a primeira instrução não pedia os campos de variação abaixo, use-os mesmo assim: este formato vale a partir de agora.
 ${temas ? `- Reaproveite os temas que o baralho já tem, com o mesmo "id": ${temas}.\n` : ''}${cobertos ? `\nJá tenho estes (não repita a mesma pergunta):\n${cobertos}\n` : ''}
 ## Campos de variação

@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.40.0] — 2026-11-28
+
+- **Mais cartões de escolher, menos perguntas abertas.** A IA passa a receber a quantidade exata de cada tipo: a maioria vira alternativas, verdadeiro ou falso, lacunas e ligar colunas, em que você sabe na hora se acertou. A pergunta aberta fica em no máximo 15% dos cartões.
+- Em Aprender, cartões de cálculo só aparecem quando o assunto pede contas (física, matemática, finanças…).
+
 ## [3.39.0] — 2026-11-28
 
 - **Novo tipo de cartão: ligar colunas.** Para o que vem em pares (autor e obra, termo e definição, país e capital): toque num item da esquerda e depois no da direita que combina. A cada vez aparecem 4 pares diferentes, com a ordem trocada, e só conta acerto com todos certos; no fim, você vê quais pares acertou.

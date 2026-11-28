@@ -5,7 +5,7 @@ import { extrairJson } from './resposta'
 
 describe('instrução de planejamento (Aprender)', () => {
   it('versão 1', () => {
-    expect(VERSAO_PLANO).toBe(10)
+    expect(VERSAO_PLANO).toBe(11)
   })
 
   it('o exemplo passa no validador do app', () => {

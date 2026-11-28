@@ -126,7 +126,7 @@ describe('lendo a resposta', () => {
 
 describe('instrução v3 (objetivo e cobertos)', () => {
   it('versão 3', () => {
-    expect(VERSAO_INSTRUCAO).toBe(13)
+    expect(VERSAO_INSTRUCAO).toBe(14)
   })
 
   it('com objetivo: seção, nível, foco, evitar (spoilers), descrição do tema e prioridade', () => {

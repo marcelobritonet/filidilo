@@ -2,7 +2,8 @@ import { useMemo, useState } from 'preact/hooks'
 import { novoId, salvar } from '../core/baralhos'
 import { ganharFolga, MAX_FOLGAS } from '../core/ofensiva'
 import { montarCorrecao, montarInstrucaoFormatacao } from '../core/ia/instrucao'
-import { EXEMPLO_PLANO, montarPlano } from '../core/ia/plano'
+import { EXEMPLO_PLANO, montarPlano, VERSAO_PLANO } from '../core/ia/plano'
+import { contarTipos } from '../core/ia/proporcao'
 import { extrairJson, lerPlano, parecePerguntas, type PlanoLido } from '../core/ia/resposta'
 import { evento } from '../core/telemetria'
 import { NIVEIS, type Baralho, type Cartao, type Nivel, type Objetivo } from '../core/types'
@@ -118,6 +119,9 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
         nivel: r.baralho.objetivo?.nivel ?? 'nenhum',
         com_baralho: !!r.baralho.objetivo,
         modo,
+        versao_plano: VERSAO_PLANO,
+        // P141: quantos de cada tipo vieram, para ver se as IAs cumprem a proporção pedida.
+        ...contarTipos(r.cartoes.map((c) => c.cartao)),
       })
       const fora = (dados as { naoConvertidos?: unknown })?.naoConvertidos
       if (formatar && Array.isArray(fora)) setNaoConvertidos((ant) => [...ant, ...fora.filter((x): x is string => typeof x === 'string')])
