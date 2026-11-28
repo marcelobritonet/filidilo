@@ -1,10 +1,10 @@
 // Harness "Aprender uma coisa nova hoje": monta a instrução que a pessoa cola na IA para planejar um baralho.
 // Versão da instrução: mude ao alterar regras (como em VERSAO_INSTRUCAO).
 import { infoNivel, type Cartao, type Nivel, type Tema } from '../types'
-import { fonteDe, origemTexto, quantidadeArquivo, regraNaoEntregar, regraPagina, regrasTextoJson, regrasTipos } from './instrucao'
+import { fonteDe, origemTexto, quantidadeArquivo, regraNaoEntregar, regraPagina, regraRespostaCurta, regrasTextoJson, regrasTipos } from './instrucao'
 import { textoProporcaoExata, textoProporcaoPorcentagem } from './proporcao'
 
-export const VERSAO_PLANO = 11
+export const VERSAO_PLANO = 12
 
 export interface PedidoPlano {
   /** O que a pessoa digitou em "Aprender uma coisa nova hoje". Com arquivo, pode ficar vazio. */
@@ -36,12 +36,12 @@ export const EXEMPLO_PLANO: {
   cartoes: [
     {
       id: 'c1', tipo: 'conceito', tema: 'regras',
-      frente: 'Qual a diferença entre xeque e xeque-mate?',
-      verso: 'No xeque, o rei está atacado e precisa sair da ameaça. No xeque-mate, não existe lance que salve o rei.',
+      frente: 'Quando um xeque vira xeque-mate?',
+      verso: 'Quando nenhum lance tira o rei do ataque.',
       outrasFrentes: [
-        'O que separa um xeque de um xeque-mate?',
-        'Quando um xeque passa a ser xeque-mate?',
-        'Para o rei, qual a diferença entre levar xeque e levar xeque-mate?',
+        'O que falta a um rei em xeque-mate?',
+        'Em que situação o xeque termina a partida?',
+        'O que torna um xeque impossível de escapar?',
       ],
       fonte: { apostila: 'Gerado por IA' },
     },
@@ -131,6 +131,8 @@ Um objeto JSON com "baralho", "temas" e "cartoes":
 ${regrasTipos(fonte)}
 
 ${regraNaoEntregar()}
+
+${regraRespostaCurta()}
 
 ## Regras
 - Português do Brasil (menos o conteúdo do idioma estudado, se for o caso). Uma ideia por cartão. Pergunta que se entende sozinha.

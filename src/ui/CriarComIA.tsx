@@ -100,7 +100,7 @@ export function CriarComIA({ baralho, assuntoInicial, temaId, nav }: { baralho: 
   const lerTexto = (texto: string): string | null => {
     try {
       const dados = extrairJson(texto)
-      const r = lerResposta(dados, baralho, fontePadrao)
+      const r = lerResposta(dados, baralho, fontePadrao, { conferirTamanho: !formatar })
       const exemplo = new Set(EXEMPLOS.cartoes.map((c) => ('frente' in c ? c.frente : c.titulo)))
       if (r.cartoes.every((c) => exemplo.has('frente' in c.cartao ? c.cartao.frente : c.cartao.titulo)))
         throw new Error('Você colou a instrução. Cole a resposta que a IA deu.')

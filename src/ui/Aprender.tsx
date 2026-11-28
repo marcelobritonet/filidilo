@@ -109,7 +109,7 @@ export function Aprender({ pedido: pedidoInicial = '', nav }: { pedido?: string;
       return { texto: (e as Error).message, erro: true }
     }
     try {
-      const r = formatar ? lerPlano(dados, nome.trim() || 'Minhas perguntas', 'Perguntas próprias') : lerPlano(dados, pedido.trim() || 'Meu material', origemMaterial === 'arquivo' ? 'Arquivo' : undefined)
+      const r = formatar ? lerPlano(dados, nome.trim() || 'Minhas perguntas', 'Perguntas próprias') : lerPlano(dados, pedido.trim() || 'Meu material', origemMaterial === 'arquivo' ? 'Arquivo' : undefined, { conferirTamanho: true })
       if (r.cartoes.length && r.cartoes.every((c) => DO_EXEMPLO.has(textoBase(c.cartao))))
         throw new Error('Você colou a instrução. Cole a resposta que a IA deu.')
       evento('aprender_resposta_lida', {

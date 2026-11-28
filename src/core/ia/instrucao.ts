@@ -5,7 +5,7 @@ import { infoNivel } from '../types'
 import { jaCobertos } from './cobertos'
 import { textoProporcaoExata, textoProporcaoPorcentagem } from './proporcao'
 
-export const VERSAO_INSTRUCAO = 14
+export const VERSAO_INSTRUCAO = 15
 
 export type Origem = 'arquivo' | 'texto' | 'tema'
 export type Mistura = 'misto' | 'teoria' | 'calculo'
@@ -163,6 +163,16 @@ A pessoa vê o mesmo cartão muitas vezes. Para ela estudar o conteúdo, e não 
 - As "variantes" do V/F falam do mesmo fato por ângulos diferentes; cada uma é verdadeira ou falsa por si, sem depender da principal.`
 }
 
+/** Uma resposta, um fato (P142): resposta longa ou com várias partes deixa a pessoa sem saber se acertou. Não vale para as perguntas da própria pessoa. */
+export function regraRespostaCurta(): string {
+  return `## Uma resposta, um fato
+A pessoa precisa saber, sem dúvida, se acertou. Por isso:
+- Cada cartão pergunta uma coisa só e tem uma resposta só.
+- Resposta de "conceito": no máximo 15 palavras, sem lista e sem "e também". Se a resposta tem partes (uma lista, etapas, características, causas), crie um cartão para cada parte, ou use "colunas" quando as partes formam pares.
+- Nunca peça "Cite os 5…", "Quais são as características…" ou "Explique…": pergunte por uma parte de cada vez.
+- Alternativas de "associacao": no máximo 12 palavras cada, todas mais ou menos do mesmo tamanho.`
+}
+
 /** O enunciado não pode entregar a resposta. Vai nas instruções de cartões, de formatação e de plano. */
 export function regraNaoEntregar(): string {
   return `## Não entregue a resposta
@@ -277,6 +287,8 @@ ${regrasTipos(fonte)}
 
 ${regraNaoEntregar()}
 
+${regraRespostaCurta()}
+
 ## Regras
 - Português do Brasil. Uma ideia por cartão. Pergunta que se entende sozinha, sem "segundo o texto".
 - Fiel ao material: não invente dados, valores ou fórmulas que não estejam nele${p.origem === 'tema' ? ' (aqui, fiel ao conhecimento estabelecido)' : ''}.
@@ -309,6 +321,8 @@ ${REGRA_ASSOCIACAO}
 ${REGRA_COLUNAS}
 
 ${regraVariacoes()}
+
+${regraRespostaCurta()}
 
 ## Entrega
 Depois da quantidade, responda SOMENTE com um objeto JSON {"temas": [...], "cartoes": [...]}, sem texto antes ou depois.

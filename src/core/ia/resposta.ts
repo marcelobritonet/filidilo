@@ -2,6 +2,7 @@
 import { problemasDoCartao, novoIdCartao } from '../cartoes'
 import { normalizarNivel, type Baralho, type Cartao, type Objetivo, type Tema } from '../types'
 import { consertarMultipla } from './multipla'
+import { problemasDeTamanho } from './tamanho'
 
 export interface CartaoLido {
   cartao: Cartao
@@ -126,7 +127,7 @@ const slug = (s: string) =>
  * - pergunta com as alternativas no texto vira "associacao" (ou é recusada com o motivo);
  * - cada cartão validado separadamente (um cartão ruim não derruba os outros).
  */
-export function lerResposta(dados: unknown, destino: Pick<Baralho, 'id' | 'titulo' | 'versao' | 'temas'>, fontePadrao?: string): RespostaLida {
+export function lerResposta(dados: unknown, destino: Pick<Baralho, 'id' | 'titulo' | 'versao' | 'temas'>, fontePadrao?: string, opcoes: { conferirTamanho?: boolean } = {}): RespostaLida {
   const d = dados as { temas?: unknown; cartoes?: unknown; cards?: unknown } | unknown[]
   const lista = (Array.isArray(d) ? d : (d.cartoes ?? d.cards)) as unknown
   if (!Array.isArray(lista) || !lista.length) throw new Error('A resposta não tem uma lista "cartoes".')
@@ -173,7 +174,8 @@ export function lerResposta(dados: unknown, destino: Pick<Baralho, 'id' | 'titul
     // Alternativas (A, B, C…) dentro da pergunta: vira "associacao" ou volta no pedido de correção.
     const multipla = consertarMultipla(c)
     baralhoTeste.temas = temas
-    const erros = problemasDoCartao(baralhoTeste, multipla.cartao)
+    // Resposta longa volta para a IA dividir (P142); as perguntas da própria pessoa ficam como ela escreveu.
+    const erros = [...problemasDoCartao(baralhoTeste, multipla.cartao), ...(opcoes.conferirTamanho ? problemasDeTamanho(multipla.cartao) : [])]
     return { cartao: multipla.cartao, idIA, erros: multipla.erro ? [multipla.erro, ...erros] : erros }
   })
   return { temasNovos, cartoes }
@@ -197,7 +199,7 @@ const lista = (v: unknown): string[] =>
  * Lê o plano da instrução "Aprender": bloco `baralho` (com limites), temas e cartões.
  * Sem o bloco `baralho`, o título é o pedido cortado em 40 caracteres e não há objetivo.
  */
-export function lerPlano(dados: unknown, pedido: string, fontePadrao = 'Gerado por IA'): PlanoLido {
+export function lerPlano(dados: unknown, pedido: string, fontePadrao = 'Gerado por IA', opcoes: { conferirTamanho?: boolean } = {}): PlanoLido {
   const d = (Array.isArray(dados) ? { cartoes: dados } : (dados ?? {})) as Record<string, unknown>
   const bruto = d.baralho && typeof d.baralho === 'object' ? (d.baralho as Record<string, unknown>) : undefined
   const pedidoLimpo = pedido.trim()
@@ -220,7 +222,7 @@ export function lerPlano(dados: unknown, pedido: string, fontePadrao = 'Gerado p
     ? d.temas.map((t) => (t && typeof t === 'object' ? { ...(t as object), descricao: aparar((t as Record<string, unknown>).descricao, 120) || undefined } : t))
     : d.temas
   // O id só existe para o validador (que exige id e título); o baralho ainda não foi criado.
-  const r = lerResposta({ ...d, temas }, { id: 'novo', titulo, versao: 1, temas: [] }, fontePadrao)
+  const r = lerResposta({ ...d, temas }, { id: 'novo', titulo, versao: 1, temas: [] }, fontePadrao, opcoes)
   return { baralho: objetivo ? { titulo, objetivo } : { titulo }, temasNovos: r.temasNovos, cartoes: r.cartoes }
 }
 

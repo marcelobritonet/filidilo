@@ -2,6 +2,13 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.41.0] — 2026-11-28
+
+- **Respostas curtas, de um fato só.** A IA passa a criar cada cartão com uma pergunta e uma resposta só, de até 15 palavras. Resposta em lista ("cite as 5 causas…") vira um cartão para cada parte, e você sabe na hora se acertou.
+- Se a IA mandar uma resposta longa, o app pede a ela para dividir, no pedido de correção.
+- Em Renovar com IA, os cartões que você já tem com resposta longa também aparecem, para serem divididos.
+- As perguntas que você mesmo escreveu ("Já tenho as perguntas") continuam com as suas palavras.
+
 ## [3.40.0] — 2026-11-28
 
 - **Mais cartões de escolher, menos perguntas abertas.** A IA passa a receber a quantidade exata de cada tipo: a maioria vira alternativas, verdadeiro ou falso, lacunas e ligar colunas, em que você sabe na hora se acertou. A pergunta aberta fica em no máximo 15% dos cartões.

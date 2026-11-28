@@ -2,7 +2,8 @@
 // formas da certa, erradas, afirmações do V/F) mantendo o id, e o progresso continua. Por tema, em blocos.
 import { novoIdCartao, problemasDoCartao } from '../cartoes'
 import { infoNivel, type Baralho, type Cartao, type CartaoAssociacao } from '../types'
-import { REGRA_ASSOCIACAO, REGRA_CONCEITO_VF, regraEntrega, regraNaoEntregar, regraVariacoes } from './instrucao'
+import { REGRA_ASSOCIACAO, REGRA_CONCEITO_VF, regraEntrega, regraNaoEntregar, regraRespostaCurta, regraVariacoes } from './instrucao'
+import { problemasDeTamanho, respostaLonga } from './tamanho'
 import { consertarMultipla } from './multipla'
 import { extrairJson, normalizarCampos } from './resposta'
 
@@ -18,8 +19,12 @@ export function temVariacoes(c: Cartao): boolean {
   return false
 }
 
-/** Entra na renovação: pergunta aberta, V/F ou alternativas, não arquivado, sem variações e ainda não renovado. */
-export const precisaRenovar = (c: Cartao): boolean => TIPOS.has(c.tipo) && !c.arquivadoEm && !c.renovadoEm && !temVariacoes(c)
+/**
+ * Entra na renovação: pergunta aberta, V/F ou alternativas, não arquivado e (sem variações e ainda não renovado,
+ * ou com resposta longa: P142). Um cartão renovado sai curto, porque a leitura recusa resposta longa.
+ */
+export const precisaRenovar = (c: Cartao): boolean =>
+  TIPOS.has(c.tipo) && !c.arquivadoEm && ((!c.renovadoEm && !temVariacoes(c)) || respostaLonga(c))
 
 export const cartoesParaRenovar = (b: Pick<Baralho, 'cartoes'>, temaId: string): Cartao[] =>
   b.cartoes.filter((c) => c.tema === temaId && precisaRenovar(c))
@@ -79,6 +84,8 @@ ${REGRA_ASSOCIACAO}
 ${regraVariacoes()}
 
 ${regraNaoEntregar()}
+
+${regraRespostaCurta()}
 
 ## Cartões (bloco ${p.numero} de ${p.total}, ${bloco.length} ${bloco.length === 1 ? 'cartão' : 'cartões'})
 \`\`\`json
@@ -142,14 +149,14 @@ export function lerRenovacao(texto: string, b: Baralho, bloco: Cartao[]): Renova
       }
       const multipla = consertarMultipla(c)
       c = multipla.cartao
-      renovados.push({ antes, cartao: c, erros: [...(multipla.erro ? [multipla.erro] : []), ...erros, ...problemasDoCartao(b, c)] })
+      renovados.push({ antes, cartao: c, erros: [...(multipla.erro ? [multipla.erro] : []), ...erros, ...problemasDoCartao(b, c), ...problemasDeTamanho(c)] })
     } else if (/^novo/i.test(idIA)) {
       const temaValido = typeof bruto.tema === 'string' && b.temas.some((t) => t.id === bruto.tema)
       let c = { ...bruto, id: novoIdCartao('ia'), tema: temaValido ? bruto.tema : temaPadrao, origem: 'ia', fonte: bruto.fonte ?? { apostila: 'Gerado por IA' } } as Cartao
       normalizarCampos(c)
       const multipla = consertarMultipla(c)
       c = multipla.cartao
-      novos.push({ cartao: c, idIA, erros: [...(multipla.erro ? [multipla.erro] : []), ...problemasDoCartao(b, c)] })
+      novos.push({ cartao: c, idIA, erros: [...(multipla.erro ? [multipla.erro] : []), ...problemasDoCartao(b, c), ...problemasDeTamanho(c)] })
     }
   }
   if (!renovados.length && !novos.length) throw new Error('Nenhum cartão da resposta é deste bloco. Confira se colou a resposta certa.')
