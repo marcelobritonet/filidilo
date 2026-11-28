@@ -756,6 +756,24 @@ textarea { line-height: 1.5; resize: vertical; }
 .instalar-card h2 { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; }
 .instalar-card h2 .brilho { flex: none; fill: var(--accent-text); }
 
+/* ---------- Baralho recebido: amostra na folha e lembrete na tela inicial ---------- */
+.amostra-cartoes { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.amostra-cartoes li {
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg);
+  font-size: 15px; line-height: 1.35; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.amostra-mais { margin: 0; }
+.agora-nao { justify-self: center; align-self: center; color: var(--text-muted); font-size: 15px; }
+.recebido-pendente {
+  display: grid; gap: 8px; margin: 16px 0; padding: 16px; border: 1px solid var(--border);
+  border-radius: var(--radius-md); background: var(--surface);
+}
+.recebido-pendente h2 { font-size: 17px; margin: 0; }
+.recebido-pendente p { margin: 0; }
+.recebido-pendente-acoes { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+.recebido-pendente-acoes .btn { flex: 1; }
+
 /* ---------- Meus baralhos: saudação e frases de seção (os dois estilos) ---------- */
 .meus-baralhos .cabecalho { gap: 6px; }
 .meus-baralhos .saudacao-frase { margin: 0; font-size: 17px; line-height: 1.45; color: var(--text-muted); }

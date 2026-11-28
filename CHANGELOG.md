@@ -2,6 +2,11 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.35.0] — 2026-11-27
+
+- **Baralho recebido não se perde mais.** Ao abrir um link de baralho, a janela "Baralho recebido" não fecha mais com um toque fora dela e mostra algumas perguntas do baralho.
+- **"Agora não" guarda para depois.** Se você ainda não quiser adicionar, o baralho fica esperando no topo de Meus baralhos, com "Ver o baralho" e "Descartar", por até 7 dias.
+
 ## [3.34.3] — 2026-11-27
 
 ### Correções

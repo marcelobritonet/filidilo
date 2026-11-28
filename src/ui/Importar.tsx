@@ -4,9 +4,14 @@ import { criar } from '../core/baralhos'
 import { adicionarCartoesRecebidos, aplicar, aplicarSoProgresso, importarComoCopia, type CartoesRecebidos, type PlanoImportacao } from '../core/compartilhar'
 import type { Baralho } from '../core/types'
 import type { Navegacao } from './App'
+import { perguntaDoCartao } from '../core/artes'
 
-/** Resumo do baralho recebido e as opções de importar. */
-export function Importar({ plano, nav, fechar }: { plano: PlanoImportacao; nav: Navegacao; fechar: () => void }) {
+/** Quantos cartões aparecem de amostra no baralho recebido. */
+const AMOSTRA = 3
+
+/** Resumo do baralho recebido e as opções de importar.
+ *  Não fecha com toque fora: só por "Agora não", que deixa um lembrete na tela inicial (`adiar`). */
+export function Importar({ plano, nav, fechar, adiar }: { plano: PlanoImportacao; nav: Navegacao; fechar: () => void; adiar?: () => void }) {
   const [ocupado, setOcupado] = useState(false)
   const [trazer, setTrazer] = useState(true)
   const { recebido, atual } = plano
@@ -27,7 +32,7 @@ export function Importar({ plano, nav, fechar }: { plano: PlanoImportacao; nav: 
   }
 
   return (
-    <div class="modal-fundo" onClick={(e) => e.target === e.currentTarget && fechar()}>
+    <div class="modal-fundo">
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-importar">
         <h2 id="titulo-importar">{atual && !igual ? 'Atualizar baralho' : 'Baralho recebido'}</h2>
         <p>
@@ -69,7 +74,12 @@ export function Importar({ plano, nav, fechar }: { plano: PlanoImportacao; nav: 
           </>
         ) : !atual ? (
           <>
-            <p class="dica">Ele vai aparecer em Meus baralhos, pronto para estudar.</p>
+            <ul class="amostra-cartoes" aria-label="Alguns cartões">
+              {recebido.cartoes.slice(0, AMOSTRA).map((c) => (
+                <li>{perguntaDoCartao(c).texto}</li>
+              ))}
+            </ul>
+            {recebido.cartoes.length > AMOSTRA && <p class="dica amostra-mais">e mais {n(recebido.cartoes.length - AMOSTRA, 'cartão', 'cartões')}</p>}
             <button class="btn principal" disabled={ocupado} onClick={() => concluir(() => aplicar(plano, { comProgresso }), '“{t}” adicionado.')}>
               Adicionar baralho
             </button>
@@ -96,9 +106,15 @@ export function Importar({ plano, nav, fechar }: { plano: PlanoImportacao; nav: 
             </button>
           </>
         )}
-        <button class="btn secundario" onClick={fechar}>
-          Cancelar
-        </button>
+        {igual && atual ? (
+          <button class="btn secundario" onClick={fechar}>
+            Cancelar
+          </button>
+        ) : (
+          <button class="link agora-nao" disabled={ocupado} onClick={adiar ?? fechar}>
+            Agora não
+          </button>
+        )}
       </div>
     </div>
   )

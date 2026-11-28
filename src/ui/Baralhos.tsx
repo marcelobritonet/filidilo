@@ -11,6 +11,7 @@ import { useEstados } from './estado'
 import { Importar, ImportarCartoes } from './Importar'
 import { Marca } from './Marca'
 import { abriuPorLink, pegarRecebido } from './recebido'
+import { esquecerPendente, guardarPendente, lerPendente, type RecebidoPendente } from './recebidoPendente'
 import type { MotivoLink } from '../core/link'
 import { InstalarCard } from './InstalarCard'
 import { registrarAbertura } from './instalar'
@@ -58,6 +59,9 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
   const [pedido, setPedido] = useState('')
   const [semInternet, setSemInternet] = useState<'' | 'campo' | 'botao'>('')
   const [plano, setPlano] = useState<PlanoImportacao | null>(null)
+  // Texto do baralho recebido que está na folha (para guardar se ela deixar para depois).
+  const [textoRecebido, setTextoRecebido] = useState('')
+  const [pendente, setPendente] = useState<RecebidoPendente | null>(lerPendente)
   const [cartoesRecebidos, setCartoesRecebidos] = useState<CartoesRecebidos | null>(null)
   const [aviso, setAviso] = useState<{ titulo: string; texto: string } | null>(null)
   // Desafio recebido: responde o cartão primeiro; "Salvar" segue para a importação de sempre.
@@ -87,6 +91,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         setAviso(null)
         const lido = lerRecebido(r.texto)
         avisarLink(true, { tipo: lido.tipo })
+        setTextoRecebido(r.texto)
         if (lido.desafio) {
           evento('desafio_aberto', { junto: lido.tipo === 'baralho' ? 'baralho' : 'cartao', tipo: lido.desafio.tipo })
           if (lido.tipo === 'cartoes') {
@@ -116,6 +121,40 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
       .then(setResumo)
       .catch(() => undefined)
   }, [versao])
+
+  // "Agora não" na folha do baralho recebido: guarda e mostra o lembrete na tela inicial.
+  const adiarImportar = () => {
+    if (!plano) return
+    evento('recebido_adiado', { cartoes: plano.recebido.cartoes.length, atualizar: !!plano.atual })
+    guardarPendente({ texto: textoRecebido, titulo: plano.recebido.titulo, cartoes: plano.recebido.cartoes.length })
+    setPendente(lerPendente())
+    setPlano(null)
+  }
+  // Adicionou, atualizou ou abriu: o lembrete não serve mais.
+  const fecharImportar = () => {
+    esquecerPendente()
+    setPendente(null)
+    setPlano(null)
+  }
+  const retomarPendente = async () => {
+    if (!pendente) return
+    try {
+      const lido = lerRecebido(pendente.texto)
+      if (lido.tipo !== 'baralho') throw new Error('não é baralho')
+      evento('recebido_retomado', { cartoes: pendente.cartoes })
+      setTextoRecebido(pendente.texto)
+      setPlano(await planejar(lido.baralho, lido.progresso))
+    } catch {
+      esquecerPendente()
+      setPendente(null)
+      setAviso({ titulo: 'Não consegui abrir o baralho', texto: 'Peça a quem enviou para mandar de novo.' })
+    }
+  }
+  const descartarPendente = () => {
+    evento('recebido_descartado', { cartoes: pendente?.cartoes ?? 0 })
+    esquecerPendente()
+    setPendente(null)
+  }
 
   const semana = resumo?.semana
   const agora = new Date()
@@ -200,6 +239,23 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
         <p class="resultado" role="status">
           Abrindo o baralho do link…
         </p>
+      )}
+
+      {pendente && !plano && (
+        <section class="recebido-pendente" aria-labelledby="recebido-pendente-titulo">
+          <h2 id="recebido-pendente-titulo">Baralho recebido</h2>
+          <p>
+            <strong>{pendente.titulo}</strong> · {pendente.cartoes} {pendente.cartoes === 1 ? 'cartão' : 'cartões'}
+          </p>
+          <div class="recebido-pendente-acoes">
+            <button class="btn principal" onClick={retomarPendente}>
+              Ver o baralho
+            </button>
+            <button class="link" onClick={descartarPendente}>
+              Descartar
+            </button>
+          </div>
+        </section>
       )}
 
       {ofensiva.painel && !ofensiva.painel.hojeFeito && ativos.length > 0 && (
@@ -327,7 +383,7 @@ export function Baralhos({ baralhos, nav, versao }: { baralhos: Baralho[]; nav: 
       </nav>
       <p class="versao">{sync.estado ? 'Funciona sem internet · sincronizado com seus outros aparelhos' : 'Funciona sem internet · seus cartões ficam neste aparelho'}</p>
       {aviso && <AvisoRecebido titulo={aviso.titulo} texto={aviso.texto} fechar={() => setAviso(null)} />}
-      {plano && <Importar plano={plano} nav={nav} fechar={() => setPlano(null)} />}
+      {plano && <Importar plano={plano} nav={nav} fechar={fecharImportar} adiar={textoRecebido ? adiarImportar : undefined} />}
       {compartilhar && (
         <CompartilharImagem
           opcoes={compartilhar.opcoes}
