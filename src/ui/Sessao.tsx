@@ -5,12 +5,13 @@ import { ativos, arquivarCartao, desarquivarCartao, marcarFavorito, MINIMO_FAVOR
 import { db, type Nota } from '../core/db'
 import { filaEspacada, filaProva, posicaoReinsercao, type OpcoesFila } from '../core/fila'
 import { formaDaCerta, sortearAlternativas, sortearFrente, sortearVF } from '../core/alternativas'
+import { acertouColunas, sortearPares } from '../core/colunas'
 import { chave, registrar, semAlternativas } from '../core/srs'
 import { origemBaralho } from '../core/metricas'
 import { evento, registrarErro } from '../core/telemetria'
 import { temaComPoucosCartoes } from '../core/sugestao'
 import { formasAceitas, NIVEIS_COM_ALTERNATIVAS, partesDaFrente } from '../core/lacunas'
-import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, CartaoLacunas, CartaoVF, Objetivo } from '../core/types'
+import type { Baralho, Cartao, CartaoAssociacao, CartaoCalculo, CartaoColunas, CartaoLacunas, CartaoVF, Objetivo } from '../core/types'
 import { LAYOUTS_FIM, pecaFimSessao } from '../core/artes'
 import { fecharSessao, type Marco } from '../core/conquistas'
 import { concluirSessao, type Conclusao } from '../core/ofensiva'
@@ -690,7 +691,122 @@ export function CartaoView({ cartao, acoes, semAlternativas, facil, distratores 
       return <Calculo c={cartao} acoes={acoes} />
     case 'lacunas':
       return <Lacunas c={cartao} acoes={acoes} facil={facil} distratores={distratores ?? []} />
+    case 'colunas':
+      return <Colunas c={cartao} acoes={acoes} />
   }
+  // Tipo criado numa versão mais nova do app (chegou pela sincronização): avisa em vez de mostrar um cartão vazio.
+  return (
+    <article class="cartao">
+      <p class="rotulo">Cartão de um tipo novo</p>
+      <p>Esta versão do Filidilo ainda não mostra este cartão. Atualize o app ou toque em Pular.</p>
+    </article>
+  )
+}
+
+/**
+ * Ligar colunas (P140): 4 pares sorteados, a direita embaralhada. Toca um item da esquerda e um da direita
+ * para ligar; tocar de novo num item ligado desfaz. Só conta acerto com todos os pares certos.
+ */
+function Colunas({ c, acoes }: { c: CartaoColunas; acoes: Acoes }) {
+  const s = useMemo(() => sortearPares(c), [c])
+  const frente = useMemo(() => sortearFrente(c), [c])
+  const [ligacoes, setLigacoes] = useState<(number | null)[]>(() => s.esquerda.map(() => null))
+  const [escolhida, setEscolhida] = useState<number | null>(null)
+  const [conferido, setConferido] = useState(false)
+  const [naoSabia, setNaoSabia] = useState(false)
+  const respondeu = conferido || naoSabia
+  const acertou = conferido && !naoSabia && acertouColunas(ligacoes, s.certo)
+  // Número de cada ligação, na ordem dos itens da esquerda: o mesmo número aparece nos dois lados.
+  const numeroDaDireita = (d: number) => {
+    const i = ligacoes.indexOf(d)
+    return i >= 0 ? i + 1 : null
+  }
+  const tocarEsquerda = (i: number) => {
+    if (respondeu) return
+    if (ligacoes[i] !== null) {
+      setLigacoes(ligacoes.map((l, k) => (k === i ? null : l)))
+      setEscolhida(i)
+      return
+    }
+    // Já escolhido (o app escolhe o próximo sozinho depois de cada ligação): continua escolhido.
+    setEscolhida(i)
+  }
+  const tocarDireita = (d: number) => {
+    if (respondeu) return
+    const ligadaA = ligacoes.indexOf(d)
+    if (escolhida === null) {
+      // Sem item escolhido à esquerda: tocar num item ligado desfaz a ligação.
+      if (ligadaA >= 0) setLigacoes(ligacoes.map((l, k) => (k === ligadaA ? null : l)))
+      return
+    }
+    setLigacoes(ligacoes.map((l, k) => (k === escolhida ? d : l === d ? null : l)))
+    // Passa para o próximo item ainda solto da esquerda.
+    const proxima = ligacoes.findIndex((l, k) => k !== escolhida && l === null)
+    setEscolhida(proxima >= 0 ? proxima : null)
+  }
+  const completo = ligacoes.every((l) => l !== null)
+  const classe = (certo: boolean) => (respondeu ? (certo ? ' certa' : ' errada') : '')
+  return (
+    <article class="cartao colunas">
+      <p class="rotulo">Ligue as colunas</p>
+      <Tex class="frente" texto={frente} />
+      {/* Grade única: cada linha tem um item de cada coluna, com a mesma altura. */}
+      <div class="colunas-grade">
+        {s.esquerda.map((t, i) => {
+          const n = numeroDaDireita(i)
+          return (
+            <>
+              <button
+                class={`opcao item-coluna${escolhida === i && !respondeu ? ' escolhida' : ''}${ligacoes[i] !== null ? ' ligada' : ''}${conferido && !naoSabia ? classe(ligacoes[i] === s.certo[i]) : ''}`}
+                aria-pressed={escolhida === i}
+                disabled={respondeu}
+                onClick={() => tocarEsquerda(i)}
+              >
+                {ligacoes[i] !== null && <span class="num-ligacao">{i + 1}</span>}
+                <Tex texto={t} />
+              </button>
+              <button class={`opcao item-coluna${n ? ' ligada' : ''}`} disabled={respondeu} onClick={() => tocarDireita(i)}>
+                {n && <span class="num-ligacao">{n}</span>}
+                <Tex texto={s.direita[i]} />
+              </button>
+            </>
+          )
+        })}
+      </div>
+      {!respondeu && (
+        <>
+          <p class="dica centro">{escolhida !== null ? 'Agora toque no item da direita que combina.' : completo ? 'Tudo ligado. Confira quando quiser.' : 'Toque num item da esquerda e depois no da direita.'}</p>
+          <button class="btn principal" disabled={!completo} onClick={() => setConferido(true)}>
+            Conferir
+          </button>
+          <BotaoNaoSei tipo={c.tipo} aoTocar={() => setNaoSabia(true)} />
+        </>
+      )}
+      {respondeu && (
+        <Folha
+          titulo={acertou ? '✓ Certo!' : naoSabia ? 'Tudo bem, veja a resposta' : '✕ Não foi dessa vez'}
+          tom={acertou ? 'ok' : naoSabia ? 'neutro' : 'erro'}
+          pergunta={<Tex texto={frente} />}
+          rodape={<BotoesNota avaliar={acoes.avaliar} acertou={acertou} />}
+        >
+          <ul class="pares-certos">
+            {s.esquerda.map((t, i) => {
+              const certo = !naoSabia && ligacoes[i] === s.certo[i]
+              return (
+                <li class={naoSabia ? '' : certo ? 'certo' : 'errado'}>
+                  {!naoSabia && <span aria-label={certo ? 'certo' : 'errado'}>{certo ? '✓' : '✕'} </span>}
+                  <Tex texto={t} /> → <strong><Tex texto={s.direita[s.certo[i]]} /></strong>
+                </li>
+              )
+            })}
+          </ul>
+          {c.explicacao && <Explicacao texto={c.explicacao} />}
+          <Fonte c={c} />
+          <BotaoCorrigir acoes={acoes} />
+        </Folha>
+      )}
+    </article>
+  )
 }
 
 /**

@@ -184,7 +184,25 @@ export interface CartaoLacunas extends CartaoBase {
   respostas: string[]
 }
 
-export type Cartao = CartaoConceito | CartaoVF | CartaoAssociacao | CartaoCalculo | CartaoLacunas
+/** Um par de "ligar colunas": o item da esquerda e o da direita que combina com ele. */
+export interface ParColunas {
+  esquerda: string
+  direita: string
+}
+
+/** Ligar colunas (P140): a IA cria de 6 a 8 pares; a cada vez o app mostra 4, com a direita embaralhada. */
+export interface CartaoColunas extends CartaoBase {
+  tipo: 'colunas'
+  /** O comando, ex.: "Ligue cada país à sua capital". */
+  frente: string
+  outrasFrentes?: string[]
+  pares: ParColunas[]
+}
+
+/** Tipos que esta versão do app sabe mostrar. Cartão de tipo desconhecido (de uma versão mais nova) é deixado de fora ao receber. */
+export const TIPOS_CARTAO = ['conceito', 'vf', 'associacao', 'calculo', 'lacunas', 'colunas'] as const
+
+export type Cartao = CartaoConceito | CartaoVF | CartaoAssociacao | CartaoCalculo | CartaoLacunas | CartaoColunas
 
 export interface Baralho {
   id: string

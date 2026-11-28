@@ -232,6 +232,22 @@ export function Conteudo({ c }: { c: Cartao }) {
           {c.explicacao && <Tex class="explicacao" texto={c.explicacao} />}
         </>
       )
+    case 'colunas':
+      return (
+        <>
+          <Tex class="frente" texto={c.frente} />
+          <OutrasFrentes lista={c.outrasFrentes} />
+          <p class="dica">Pares (aparecem 4 de cada vez):</p>
+          <ul class="variantes">
+            {c.pares.map((p) => (
+              <li>
+                <Tex texto={p.esquerda} /> → <strong><Tex texto={p.direita} /></strong>
+              </li>
+            ))}
+          </ul>
+          {c.explicacao && <Tex class="explicacao" texto={c.explicacao} />}
+        </>
+      )
     case 'calculo': {
       const s = sortear(c)
       return (

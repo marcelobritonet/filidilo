@@ -3,7 +3,7 @@
 import { infoNivel, type Cartao, type Nivel, type Tema } from '../types'
 import { fonteDe, origemTexto, quantidadeArquivo, regraNaoEntregar, regraPagina, regrasTextoJson, regrasTipos } from './instrucao'
 
-export const VERSAO_PLANO = 9
+export const VERSAO_PLANO = 10
 
 export interface PedidoPlano {
   /** O que a pessoa digitou em "Aprender uma coisa nova hoje". Com arquivo, pode ficar vazio. */
@@ -68,6 +68,20 @@ export const EXEMPLO_PLANO: {
       correta: 1,
       outrasFormas: ['O cavalo', 'Cavalo (C)'],
       explicacao: 'O cavalo salta duas casas numa direção e uma na perpendicular.',
+      fonte: { apostila: 'Gerado por IA' },
+    },
+    {
+      id: 'c4', tipo: 'colunas', tema: 'pecas',
+      frente: 'Ligue cada peça ao jeito como ela anda',
+      outrasFrentes: ['Associe cada peça do xadrez ao seu movimento', 'Como anda cada peça?', 'Combine a peça com o movimento que ela faz'],
+      pares: [
+        { esquerda: 'Torre', direita: 'Em linha reta, na horizontal ou vertical' },
+        { esquerda: 'Bispo', direita: 'Só nas diagonais' },
+        { esquerda: 'Cavalo', direita: 'Em L, pulando outras peças' },
+        { esquerda: 'Rei', direita: 'Uma casa em qualquer direção' },
+        { esquerda: 'Dama', direita: 'Em linha reta ou na diagonal, quantas casas quiser' },
+        { esquerda: 'Peão', direita: 'Para a frente, uma casa por vez' },
+      ],
       fonte: { apostila: 'Gerado por IA' },
     },
   ],

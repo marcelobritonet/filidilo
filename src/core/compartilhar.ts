@@ -1,6 +1,6 @@
 import { novoId, obter, salvar } from './baralhos'
 import { filtrarProgresso, mesclarProgresso, trocarBaralho, type Progresso } from './progresso'
-import type { Baralho, Cartao } from './types'
+import { TIPOS_CARTAO, type Baralho, type Cartao } from './types'
 import { validar } from './validar'
 
 /** Envelope do arquivo compartilhado. Aceitamos também um Baralho "cru". */
@@ -146,6 +146,8 @@ export function lerBaralho(texto: string): Baralho {
   if (d.app === 'tatino' && d.estados) throw new Error('Este arquivo é um backup. Use Backup → Restaurar.')
   const b = (d.tipo === 'baralho' ? d.baralho : d) as Baralho
   if (!b || typeof b.id !== 'string' || !Array.isArray(b.cartoes) || !Array.isArray(b.temas)) throw new Error('Este arquivo não é do Filidilo.')
+  // Cartão de um tipo que esta versão não conhece (criado numa versão mais nova) fica de fora, em vez de recusar o baralho.
+  b.cartoes = b.cartoes.filter((c) => (TIPOS_CARTAO as readonly string[]).includes(c?.tipo))
   const erros = validar(b, 20)
   if (erros.length) throw new Error(`O baralho tem ${erros.length} problema(s), por exemplo: ${erros[0]}`)
   return b

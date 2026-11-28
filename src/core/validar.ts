@@ -21,6 +21,10 @@ export function validarObjetivo(o: unknown): string[] {
   return erros
 }
 
+/** Ligar colunas: de 4 a 10 pares (a IA cria de 6 a 8; o app mostra 4 por vez). */
+export const MIN_PARES = 4
+export const MAX_PARES = 10
+
 /** Máximo de opções num cartão de alternativas (1 certa e até 15 erradas). */
 export const MAX_OPCOES = 16
 
@@ -88,6 +92,22 @@ export function validar(b: Baralho, sorteios = 60): string[] {
         else if (n === 0) e('sem lacuna: use ____ no texto')
         else if (!Array.isArray(c.respostas) || c.respostas.length !== n) e(`${n} lacuna(s) pedem ${n} resposta(s)`)
         else if (c.respostas.some((r) => typeof r !== 'string' || !r.trim())) e('resposta de lacuna vazia')
+        break
+      }
+      case 'colunas': {
+        if (!c.frente?.trim()) e('frente vazia')
+        problemasFrentes(c.frente, c.outrasFrentes).forEach(e)
+        if (!Array.isArray(c.pares) || c.pares.length < MIN_PARES || c.pares.length > MAX_PARES) {
+          e(`ligar colunas precisa de ${MIN_PARES} a ${MAX_PARES} pares em "pares"`)
+          break
+        }
+        if (c.pares.some((p) => !p || typeof p.esquerda !== 'string' || typeof p.direita !== 'string' || !p.esquerda.trim() || !p.direita.trim()))
+          e('cada par precisa de "esquerda" e "direita" com texto')
+        else {
+          const norm = (s: string) => s.trim().toLowerCase()
+          if (new Set(c.pares.map((p) => norm(p.esquerda))).size !== c.pares.length) e('itens da esquerda repetidos')
+          if (new Set(c.pares.map((p) => norm(p.direita))).size !== c.pares.length) e('itens da direita repetidos: cada um combina com um só da esquerda')
+        }
         break
       }
       case 'calculo': {

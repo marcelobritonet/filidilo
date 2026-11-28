@@ -2,6 +2,12 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.39.0] — 2026-11-28
+
+- **Novo tipo de cartão: ligar colunas.** Para o que vem em pares (autor e obra, termo e definição, país e capital): toque num item da esquerda e depois no da direita que combina. A cada vez aparecem 4 pares diferentes, com a ordem trocada, e só conta acerto com todos certos; no fim, você vê quais pares acertou.
+- A IA passa a criar cartões de ligar colunas quando o assunto tiver pares, em Aprender e em Criar com IA.
+- Um baralho recebido de uma versão mais nova do Filidilo entra mesmo se tiver um tipo de cartão que esta versão ainda não conhece: só esse cartão fica de fora.
+
 ## [3.38.0] — 2026-11-28
 
 - **Renove os cartões que você já tem.** Em Configurar baralho → Renovar com IA, escolha um tema: a IA acrescenta aos cartões antigos outros enunciados, outras formas da resposta certa e outras alternativas, como nos cartões novos. Vai em blocos de até 15 cartões, na mesma conversa com a IA, e dá para parar e continuar depois.

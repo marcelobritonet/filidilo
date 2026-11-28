@@ -9,6 +9,7 @@ const REGRAS_TIPO: Record<Cartao['tipo'], string> = {
   conceito: '"frente" (pergunta), "verso" (resposta) e "outrasFrentes" (outros enunciados da mesma pergunta, com a mesma resposta).',
   vf: '"frente" (afirmação), "resposta" (true ou false) e "variantes" (outras afirmações sobre o mesmo fato, cada uma { "frente", "resposta", "explicacao" }). Toda afirmação falsa precisa de "explicacao" dizendo o que está errado.',
   associacao: '"frente", "outrasFrentes" (outros enunciados da mesma pergunta), "opcoes" (1 certa e até 12 erradas plausíveis, sem repetir), "correta" (índice da certa, começando em 0) e "outrasFormas" (outras formas de dizer a certa, sem ser mais longas que as erradas).',
+  colunas: '"frente" (o comando, ex.: "Ligue cada país à sua capital"), "outrasFrentes" (outros jeitos de dar o mesmo comando) e "pares" (de 6 a 8 { "esquerda", "direita" }, textos curtos; cada item da direita combina com um só da esquerda).',
   lacunas: '"frente" com ____ em cada lacuna e "respostas" (uma por lacuna, na ordem; use / para sinônimos).',
   calculo:
     '"titulo", "enunciado" com {variavel}, "parametros" { nome: { min, max, passo, unidade } }, "derivados" opcional, e "etapas" com "pergunta", "expr", "unidade", "casas" e "resolucao". Expressões só com números, + - * / ^, parênteses e as funções sqrt, abs, sin, cos, tan, sind, cosd, tand, asin, log10, ln, exp, min, max, round, floor, ceil, se(cond, a, b), pi e e.',

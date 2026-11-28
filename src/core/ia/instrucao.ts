@@ -4,7 +4,7 @@ import type { Baralho, Cartao, Objetivo, Tema } from '../types'
 import { infoNivel } from '../types'
 import { jaCobertos } from './cobertos'
 
-export const VERSAO_INSTRUCAO = 12
+export const VERSAO_INSTRUCAO = 13
 
 export type Origem = 'arquivo' | 'texto' | 'tema'
 export type Mistura = 'misto' | 'teoria' | 'calculo'
@@ -100,14 +100,30 @@ export const EXEMPLOS: { temas: Tema[]; cartoes: Cartao[] } = {
       ],
       fonte: { apostila: 'Aula 3 - Dinâmica', pagina: 7 },
     },
+    {
+      id: 'c5', tipo: 'colunas', tema: 'dinamica',
+      frente: 'Ligue cada grandeza à sua unidade no SI',
+      outrasFrentes: ['Associe cada grandeza física à unidade usada no SI', 'Qual unidade do SI mede cada grandeza?', 'Combine a grandeza com a unidade em que ela é medida no SI'],
+      pares: [
+        { esquerda: 'Força', direita: 'newton (N)' },
+        { esquerda: 'Energia', direita: 'joule (J)' },
+        { esquerda: 'Potência', direita: 'watt (W)' },
+        { esquerda: 'Pressão', direita: 'pascal (Pa)' },
+        { esquerda: 'Massa', direita: 'quilograma (kg)' },
+        { esquerda: 'Tempo', direita: 'segundo (s)' },
+      ],
+      fonte: { apostila: 'Aula 3 - Dinâmica', pagina: 5 },
+    },
   ],
 }
 
 const PROPORCAO: Record<Mistura, string> = {
-  misto: 'Misture os tipos: cerca de 25% "conceito", 25% "vf", 20% "associacao", 10% "lacunas" e, se o material tiver fórmulas e contas, 15% "calculo". Sem contas no material, não crie "calculo".',
-  teoria: 'Use só os tipos "conceito", "vf", "associacao" e "lacunas", em proporções parecidas. Não crie "calculo".',
+  misto: 'Misture os tipos: cerca de 25% "conceito", 25% "vf", 20% "associacao", 10% "lacunas" e, se o material tiver fórmulas e contas, 15% "calculo". Sem contas no material, não crie "calculo". Quando o material tiver coisas que formam pares (termos e definições, autores e obras, causas e efeitos), crie também alguns "colunas".',
+  teoria: 'Use só os tipos "conceito", "vf", "associacao", "lacunas" e "colunas" (este quando houver coisas que formam pares), em proporções parecidas. Não crie "calculo".',
   calculo: 'Crie só cartões do tipo "calculo", cobrindo as fórmulas e os tipos de problema do material.',
 }
+
+export const REGRA_COLUNAS = `- "colunas" (ligar colunas): "frente" (o comando, ex.: "Ligue cada país à sua capital"), "outrasFrentes" (3 ou 4 outros jeitos de dar o mesmo comando) e "pares" (de 6 a 8 { "esquerda": "...", "direita": "..." }). Use para coisas que formam pares: termo e definição, autor e obra, causa e efeito, país e capital. Textos curtos, até 8 palavras. Os itens da esquerda são todos do mesmo tipo, os da direita também, e nenhum item se repete: cada item da direita combina com um só da esquerda (dois livros do mesmo autor não entram no mesmo cartão). O app mostra 4 pares de cada vez, sorteados, e qualquer combinação de 4 precisa ter uma resposta só.`
 
 export const REGRA_CONCEITO_VF = `- "conceito": "frente" (pergunta), "verso" (resposta) e "outrasFrentes" (3 ou 4 outros enunciados da mesma pergunta; veja "Variações").
 - "vf": "frente" (afirmação), "resposta" (true ou false) e "variantes" (3 ou 4 outras afirmações sobre o mesmo fato, cada uma { "frente", "resposta", "explicacao" }). Misture verdadeiras e falsas: pelo menos uma variante com a resposta oposta à da principal. Toda afirmação falsa, a principal ou uma variante, precisa de "explicacao" dizendo o que está errado.`
@@ -121,6 +137,7 @@ ${REGRA_CONCEITO_VF}
 - Nunca ponha alternativas (A, B, C…) dentro de "frente" ou "verso": pergunta com alternativas é sempre "associacao", com cada alternativa em "opcoes". Questão que já vem com alternativas (de prova, de lista) é a exceção à regra abaixo: use só as alternativas dela, sem criar erradas novas, e sem "outrasFormas". Ela pode ganhar "outrasFrentes".
 ${REGRA_ASSOCIACAO}
 - "lacunas": "frente" com ____ no lugar de cada palavra a completar (ex.: "A Terra gira em torno do ____.") e "respostas", uma por lacuna, na ordem. Use "/" para sinônimos aceitos ("Sol/astro-rei"). A frase precisa fazer sentido completa. Cada lacuna precisa ter uma resposta certa clara (mais os sinônimos); se várias palavras diferentes completassem bem, reescreva a frase.
+${REGRA_COLUNAS}
 - "calculo": exercício com números sorteados. A conta precisa combinar com o nível: nos níveis "expert" e "extremo", só crie cálculo com uma sutileza (caso-limite, hipótese que falha, armadilha comum), nunca a aplicação direta de uma fórmula. Campos:
   - "titulo" e "enunciado"; no enunciado, {nome} mostra o valor sorteado.
   - "parametros": { "nome": { "min": n, "max": n, "passo": n, "unidade": "..." } }. Escolha faixas realistas.
@@ -151,6 +168,7 @@ O que a pessoa vê antes de responder ("frente", cada enunciado de "outrasFrente
 - "associacao": a certa (em qualquer das suas formas) é a única que repete palavras de algum enunciado, ou é a mais longa e detalhada. Todas as opções precisam parecer igualmente possíveis para quem não sabe.
 - "lacunas": a palavra da lacuna (ou da mesma família) aparece em outro ponto da frase ou numa outra lacuna. Errado: "O ____ bombeia o sangue; o coração tem quatro cavidades." com resposta "coração".
 - "vf": nada de pista como "(falso)", e não use "sempre", "nunca" ou "apenas" só nas afirmações falsas.
+- "colunas": um item da esquerda repete palavras do seu par da direita ("Lei da inércia" → "inércia dos corpos").
 - "calculo": o enunciado e as perguntas das etapas não trazem o valor que a etapa pede.
 Teste cada cartão: leia só o que a pessoa vê antes de responder e pergunte "dá para acertar sem saber o conteúdo?". Se der, reescreva a pergunta.`
 }
@@ -285,6 +303,7 @@ ${temas ? `- Reaproveite os temas que o baralho já tem, com o mesmo "id": ${tem
 ## Campos de variação
 ${REGRA_CONCEITO_VF}
 ${REGRA_ASSOCIACAO}
+${REGRA_COLUNAS}
 
 ${regraVariacoes()}
 
@@ -320,7 +339,7 @@ ${p.texto.trim()}
 ## Como converter
 - Converta cada item em um cartão, mantendo o sentido e as palavras da pessoa. Não invente, não complete e não corrija conteúdo (a única coisa que você completa é o gabarito que falta numa questão de múltipla escolha). Se a resposta original estiver incompleta ou incorreta, mantenha como está.
 - Única exceção ao "não corrija": se a pergunta original entregar a resposta (veja "Não entregue a resposta"), reescreva só a pergunta, ou troque o tipo (por exemplo, de "lacunas" para "conceito"), para que ela não entregue. A resposta continua a da pessoa, com as palavras dela. As alternativas erradas que você criar seguem a mesma regra.
-- Um cartão por ideia. Escolha o tipo que melhor encaixa: "conceito" para pergunta aberta com resposta, "vf" para afirmação verdadeira ou falsa, "associacao" para pergunta com alternativas ou com resposta curta, "lacunas" para frase de completar (com ____ ou espaço em branco no original), "calculo" só se houver exercício com números.
+- Um cartão por ideia. Escolha o tipo que melhor encaixa: "conceito" para pergunta aberta com resposta, "vf" para afirmação verdadeira ou falsa, "associacao" para pergunta com alternativas ou com resposta curta, "lacunas" para frase de completar (com ____ ou espaço em branco no original), "colunas" para uma lista de pares (termo e definição, autor e obra; os pares da pessoa, sem inventar outros), "calculo" só se houver exercício com números.
 - Questão de múltipla escolha (alternativas marcadas com A) B) C), a., (a), 1) 2) ou parecido) vira SEMPRE "associacao", nunca "conceito":
   - "frente": só a pergunta, sem as alternativas e sem número ou cabeçalho da questão ("Questão 31 | BWM", "31."). A sigla ou assunto do cabeçalho pode virar o tema.
   - "opcoes": o texto de cada alternativa, sem a letra, na ordem original. Use só as alternativas originais: não crie erradas novas.

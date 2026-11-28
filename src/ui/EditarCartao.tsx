@@ -28,10 +28,11 @@ export interface EdicaoNaSessao {
  */
 export function EditarCartao({ baralho, cartaoId, temaInicial, nav, naSessao }: { baralho: Baralho; cartaoId?: string; temaInicial?: string; nav?: Navegacao; naSessao?: EdicaoNaSessao }) {
   const original = cartaoId ? baralho.cartoes.find((c) => c.id === cartaoId) : undefined
-  const ehCalculo = original?.tipo === 'calculo'
+  // Cálculo e ligar colunas ainda não se editam aqui: só o tema e a exclusão.
+  const ehCalculo = original?.tipo === 'calculo' || original?.tipo === 'colunas'
   const temaPadrao = temaInicial ?? original?.tema ?? baralho.temas[0]?.id ?? 'geral'
 
-  const [tipo, setTipo] = useState<TipoEditavel>(original && original.tipo !== 'calculo' ? original.tipo : 'conceito')
+  const [tipo, setTipo] = useState<TipoEditavel>(original && original.tipo !== 'calculo' && original.tipo !== 'colunas' ? original.tipo : 'conceito')
   const [tema, setTema] = useState(temaPadrao)
   const [frente, setFrente] = useState(original && 'frente' in original ? original.frente : '')
   const [verso, setVerso] = useState(original?.tipo === 'conceito' ? original.verso : '')
@@ -153,9 +154,9 @@ export function EditarCartao({ baralho, cartaoId, temaInicial, nav, naSessao }: 
       {ehCalculo ? (
         <section class="bloco">
           <p>
-            <strong>{original.titulo}</strong>
+            <strong>{original.tipo === 'calculo' ? original.titulo : original.frente}</strong>
           </p>
-          <p class="dica">Cálculos são criados com IA. Aqui dá para mudar o tema ou excluir.</p>
+          <p class="dica">{original.tipo === 'calculo' ? 'Cálculos' : 'Cartões de ligar colunas'} são criados com IA. Aqui dá para mudar o tema ou excluir.</p>
         </section>
       ) : (
         <div class="segmentado" role="radiogroup" aria-label="Tipo de cartão">

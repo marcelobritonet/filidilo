@@ -31,6 +31,9 @@ describe('compartilhar baralho', () => {
     expect(nome).toBe('Física (Filidilo).txt')
     expect(lerBaralho(texto)).toEqual(base())
     expect(lerBaralho(JSON.stringify(base()))).toEqual(base()) // baralho "cru"
+    // Cartão de um tipo de uma versão mais nova fica de fora; o resto do baralho entra (P140).
+    const comNovo = { ...base(), cartoes: [...base().cartoes, { id: 'n1', tipo: 'tipo-do-futuro', tema: base().temas[0].id }] }
+    expect(lerBaralho(JSON.stringify(comNovo))).toEqual(base())
     expect(() => lerBaralho('{"app":"tatino","estados":[]}')).toThrow(/backup/)
     expect(() => lerBaralho('olá')).toThrow(/não é do Filidilo/)
     expect(() => lerBaralho(JSON.stringify({ ...base(), cartoes: [{ id: 'x', tipo: 'vf', tema: 'zz', frente: 'f', resposta: true }] }))).toThrow(/problema/)

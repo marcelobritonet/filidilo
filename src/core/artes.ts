@@ -169,6 +169,8 @@ export function perguntaDoCartao(c: Cartao): { texto: string; dica: string } {
       return { texto: textoSimples(c.frente), dica: 'Qual é a resposta?' }
     case 'calculo':
       return { texto: textoSimples(c.titulo), dica: 'Resolva' }
+    case 'colunas':
+      return { texto: textoSimples(c.frente), dica: 'Ligue as colunas' }
   }
 }
 
