@@ -1079,10 +1079,6 @@ details.bloco > summary { font-weight: 650; }
 }
 .selo-sequencia { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--accent-text); font-weight: 700; font-size: 15px; }
 .cabecalho .selo-sequencia { justify-self: start; }
-.modal.enviar .desafiar { display: grid; gap: 4px; text-align: left; padding: 14px 16px; border-radius: var(--radius-md); border: 2px solid var(--sel); background: var(--accent-soft); color: var(--text); }
-.modal.enviar .desafiar small { color: var(--text-muted); font-size: 14px; }
-.opcoes-desafio { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
-.opcoes-desafio legend { font-weight: 650; margin-bottom: 6px; }
 
 /* ---------- Ofensiva ---------- */
 .cabecalho-ofensiva { display: flex; align-items: center; justify-content: space-between; gap: 8px; }

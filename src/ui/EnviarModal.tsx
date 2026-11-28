@@ -34,7 +34,7 @@ interface Link {
  * (funciona sem internet) ficam embaixo, discretos. Nada de prazo nem do endereço escrito.
  * Para baralho, uma caixa (desmarcada) inclui o progresso, para levar a outro aparelho dela.
  */
-export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar, fechar, desafiar }: { conteudo: ConteudoEnvio; comProgresso?: ComProgresso; onde: string; avisar?: (texto: string) => void; fechar: () => void; /** Cartão: abre o "Desafiar amigos" (imagem para story ou grupo). */ desafiar?: () => void }) {
+export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar, fechar }: { conteudo: ConteudoEnvio; comProgresso?: ComProgresso; onde: string; avisar?: (texto: string) => void; fechar: () => void }) {
   const [opcaoProgresso, setOpcaoProgresso] = useState<{ conteudo: ConteudoEnvio; estudados: number } | null>(null)
   const [incluir, setIncluir] = useState(false)
   const conteudo = incluir && opcaoProgresso ? opcaoProgresso.conteudo : semProgresso
@@ -122,13 +122,6 @@ export function EnviarModal({ conteudo: semProgresso, comProgresso, onde, avisar
             ×
           </button>
         </div>
-
-        {desafiar && linkLigado() && (
-          <button class="cartao-acao desafiar" onClick={desafiar}>
-            <strong>Desafiar amigos</strong>
-            <small>Imagem com a pergunta para o story ou o grupo; quem abrir responde no Filidilo.</small>
-          </button>
-        )}
 
         {opcaoProgresso && (
           <label class="opcao-check">

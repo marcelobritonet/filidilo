@@ -81,7 +81,7 @@ Consultas SQL (só leitura) no projeto 740606, eventos `$lib` `tatino` e `filidi
 | A9 | Ações sem evento | `atualizar_versao`, `ia_cartoes_descartados {cartoes}` | Pequeno | ✅ Feito (aguarda o Marcelo testar) |
 | A10 | Fila corta em 500 sem aviso | Deixar como está (só quem fica muito tempo sem internet perde os mais antigos) | — | Registrado |
 | A11 | Nenhum aparelho foi marcado como teste: os do Marcelo contam como usuários | Marcelo abre `https://marcelobritonet.github.io/filidilo/?teste=1` em cada aparelho e navegador (no iPhone, no Safari e no app da tela inicial). Os eventos antigos desses aparelhos saem das contas junto | Nenhum (só o Marcelo) | Marcelo faz |
-| A12 | Desafios (v3.11.0) nunca usados | Não é da telemetria: decidir se o desafio fica mais visível ou sai | — | Marcelo decide |
+| A12 | Desafios (v3.11.0) nunca usados | Não é da telemetria: decidir se o desafio fica mais visível ou sai | — | Decidido (27/11): sai (P136) |
 
 ## 6. O que foi implementado (A3–A9)
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { LAYOUTS_FIM, pecaDesafio, pecaFimSessao, pecaResultado, pecaSemana, podeDesafiar, quebrar, textoSimples } from './artes'
+import { LAYOUTS_FIM, pecaFimSessao, pecaResultado, pecaSemana, quebrar, textoSimples } from './artes'
 
 const URL = 'https://app.example/filidilo/'
 
@@ -30,18 +30,6 @@ describe('artes', () => {
     expect(sem.arte.fim).toMatchObject({ titulo: 'Meta atingida!', baralho: 'Motivação', placar: '15 acertos, 4 erros e 1 chute em 20 respostas' })
     expect(sem.arte.fim?.conquista).toBeUndefined()
     expect(sem.texto).toContain('“Motivação”')
-  })
-
-  it('desafio mostra a pergunta e nunca a resposta', () => {
-    const p = pecaDesafio({ id: 'a', tipo: 'conceito', tema: 'g', frente: 'Derivada de $x^2$?', verso: '$2x$' }, { baralho: 'Cálculo', comNome: false, url: 'https://x/?b=1' })
-    expect(p.arte.texto).toBe('Derivada de x^2?')
-    expect(JSON.stringify(p)).not.toContain('2x')
-    expect(p.arte.qr).toBe('https://x/?b=1')
-    expect(p.texto).toContain('https://x/?b=1')
-  })
-
-  it('cálculo não vira desafio', () => {
-    expect(podeDesafiar({ id: 'c', tipo: 'calculo', tema: 'g', titulo: 'T', enunciado: '', parametros: {}, etapas: [] })).toBe(false)
   })
 
   it('semana', () => {

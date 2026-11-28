@@ -156,9 +156,6 @@ export function textoSimples(s: string): string {
     .trim()
 }
 
-/** O cartão pode virar desafio? Cálculo sorteia números a cada vez: fica de fora. */
-export const podeDesafiar = (c: Cartao) => c.tipo !== 'calculo'
-
 /** A pergunta do cartão, sem a resposta. */
 export function perguntaDoCartao(c: Cartao): { texto: string; dica: string } {
   switch (c.tipo) {
@@ -172,14 +169,6 @@ export function perguntaDoCartao(c: Cartao): { texto: string; dica: string } {
       return { texto: textoSimples(c.frente), dica: 'Qual é a resposta?' }
     case 'calculo':
       return { texto: textoSimples(c.titulo), dica: 'Resolva' }
-  }
-}
-
-export function pecaDesafio(c: Cartao, d: { baralho: string; comNome: boolean; url: string }): Peca {
-  const { texto, dica } = perguntaDoCartao(c)
-  return {
-    arte: { modelo: 'desafio', selo: 'Desafio', titulo: d.comNome ? d.baralho : undefined, texto, linhas: [dica], qr: d.url, chamada: 'Você sabe? Responda no Filidilo.' },
-    texto: `Te desafio: ${texto.length > 120 ? `${texto.slice(0, 117)}…` : texto} Responda no Filidilo: ${d.url}`,
   }
 }
 

@@ -19,8 +19,6 @@ import { sincronizar } from '../core/sync'
 import { CompartilharImagem, urlApp, type OpcaoImagem } from './CompartilharImagem'
 import { Confete } from './Confete'
 import { Pavao } from './Leque'
-import { DesafiarModal } from './Desafio'
-import { podeDesafiar } from '../core/artes'
 import { nomeTema } from './estado'
 import { CorrigirCartao } from './CorrigirCartao'
 import { EditarCartao } from './EditarCartao'
@@ -90,7 +88,6 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
   }
   const fecharEditor = () => history.back()
   const [enviando, setEnviando] = useState<Cartao | null>(null)
-  const [desafiando, setDesafiando] = useState<Cartao | null>(null)
   // Erros e chutes por tema, para sugerir onde criar mais cartões no fim.
   const [fracos, setFracos] = useState<Record<string, number>>({})
   // Primeira sessão do baralho (nenhum cartão estudado antes): no fim, sugere o tema com poucos cartões.
@@ -448,8 +445,7 @@ export function Sessao({ baralho: inicial, modo, opcoes, limite, sair, criarMais
             </button>
           </div>
           {corrigindo && <CorrigirCartao baralho={baralho} cartao={cartao} aoSalvar={corrigido} fechar={() => setCorrigindo(false)} corrigirEuMesmo={abrirEditor} />}
-          {enviando && <EnviarModal conteudo={conteudoCartao(baralho, enviando)} onde="estudo" fechar={() => setEnviando(null)} desafiar={podeDesafiar(enviando) ? () => { setDesafiando(enviando); setEnviando(null) } : undefined} />}
-          {desafiando && <DesafiarModal baralho={baralho} cartao={desafiando} fechar={() => setDesafiando(null)} />}
+          {enviando && <EnviarModal conteudo={conteudoCartao(baralho, enviando)} onde="estudo" fechar={() => setEnviando(null)} />}
         </>
       )}
     </main>
