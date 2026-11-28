@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-    <!-- P134: o app ignora o tamanho de fonte do sistema (o Chrome Android o aplicava como zoom e a tela
-         estourava para o lado); o CSS usa px, então a letra fica no tamanho do app. -->
+    <!-- P134: o app fica no tamanho do manual da marca mesmo com a fonte ou o zoom do sistema aumentados
+         (ver o script de compensação abaixo); o CSS usa px, então esta meta não aumenta a letra. -->
     <meta name="text-scale" content="scale" />
     <meta name="theme-color" content="#0B1E3F" />
     <meta name="description" content="Aprenda qualquer coisa: flashcards com IA, estudados no seu ritmo, offline" />
@@ -28,11 +28,12 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png?v=3" />
     <title>Filidilo</title>
     <script>
-      // Liberações por aparelho, pelo endereço: ?suave=1|0 (estilo Suave, P124) e ?especiais=1|0 (temas
-      // especiais, P127). Grava ou tira a chave e o parâmetro sai do endereço.
+      // Liberações por aparelho, pelo endereço: ?suave=1|0 (estilo Suave, P124), ?especiais=1|0 (temas
+      // especiais, P127) e ?diag=1|0 (medidas de tela no rodapé, P134). Grava ou tira a chave e o parâmetro
+      // sai do endereço.
       try {
         var q = new URLSearchParams(location.search)
-        var flags = { suave: 'tatino-suave-liberado', especiais: 'tatino-especiais-liberados' }
+        var flags = { suave: 'tatino-suave-liberado', especiais: 'tatino-especiais-liberados', diag: 'tatino-diag' }
         var mudou = false
         for (var f in flags) {
           var v = q.get(f)
@@ -47,6 +48,28 @@
           var resto = q.toString()
           history.replaceState(history.state, '', location.pathname + (resto ? '?' + resto : '') + location.hash)
         }
+      } catch (e) {}
+      // P134: no celular, a fonte ou o zoom do sistema chegam como zoom da página (o Chrome encolhe a largura
+      // útil: 412px viram ~317px e tudo fica 30% maior, a splash sai do centro). Aqui o app desfaz esse zoom
+      // e volta ao tamanho do manual da marca. Fator = largura da tela / largura da janela; só em tela de toque
+      // de celular. A chave tatino-fator-teste força um fator, para testar no computador.
+      try {
+        var raiz = document.documentElement
+        var medirZoom = function () {
+          var f = 1
+          var teste = parseFloat(localStorage.getItem('tatino-fator-teste') || '')
+          if (teste > 0) f = teste
+          else if (matchMedia('(pointer: coarse)').matches && screen.width <= 900 && innerWidth > 0) {
+            var r = screen.width / innerWidth
+            if (r > 1.04 && r < 3) f = r
+          }
+          window.__fatorZoom = f
+          raiz.style.zoom = f === 1 ? '' : String(1 / f)
+          // vw/vh/dvh encolhem junto com o zoom: o CSS multiplica por --z (estilo.css) para seguirem a tela inteira
+          raiz.style.setProperty('--z', String(f))
+        }
+        medirZoom()
+        addEventListener('resize', medirZoom)
       } catch (e) {}
       // Aplica o tema antes de pintar a tela (evita piscar claro→escuro). Lógica completa em src/ui/tema.ts.
       try {

@@ -2,6 +2,13 @@
 
 Mudanças do Filidilo (antes tatino.), da mais recente para a mais antiga. As versões seguem [SemVer](https://semver.org/lang/pt-BR/): o primeiro número sobe quando o jeito de usar muda, o do meio a cada novidade, o último a cada correção. A versão em uso aparece no rodapé de todas as telas.
 
+## [3.34.3] — 2026-11-27
+
+### Correções
+
+- Em celulares com a fonte ou o zoom do sistema aumentados, o Filidilo aparecia todo maior que o normal: letras e botões grandes, o nome do app espremido no topo e a abertura fora do centro. Agora o app volta ao tamanho dele em qualquer celular, com a mesma proporção entre títulos, textos e botões.
+- O nome **filidilo** no topo das telas voltou ao tamanho normal (tinha ficado pequeno na versão 3.34.2).
+
 ## [3.34.2] — 2026-11-27
 
 ### Correções

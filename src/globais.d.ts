@@ -9,3 +9,8 @@ interface ImportMetaEnv {
   /** Endereço da página pública dos links (worker "filidilo"), que vai para a conversa. */
   readonly VITE_LINK_PUBLICO?: string
 }
+
+/** P134: zoom do aparelho que o index.html desfaz (1 = nenhum). */
+interface Window {
+  __fatorZoom?: number
+}

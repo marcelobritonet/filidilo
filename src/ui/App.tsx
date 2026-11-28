@@ -55,6 +55,17 @@ export interface Navegacao {
   avisar: (a: Aviso) => void
 }
 
+/** P134: com ?diag=1, o rodapé mostra as medidas da tela, para conferir o zoom do aparelho (index.html). */
+function medidasDeTela(): string {
+  try {
+    if (localStorage.getItem('tatino-diag') !== '1') return ''
+  } catch {
+    return ''
+  }
+  const f = window.__fatorZoom ?? 1
+  return ` · tela ${screen.width} · janela ${innerWidth} · dpr ${devicePixelRatio.toFixed(2)} · zoom ${f.toFixed(2)}`
+}
+
 export function App() {
   // Pilha de telas sincronizada com o histórico: o "voltar" do Android volta uma tela.
   const [pilha, setPilha] = useState<Tela[]>([{ nome: 'baralhos' }])
@@ -208,7 +219,7 @@ export function App() {
         </div>
       )}
       {conteudo}
-      <footer class="rodape-versao">Filidilo v{__VERSAO__}{aparelhoDeTeste() && ' · aparelho de teste'}</footer>
+      <footer class="rodape-versao">Filidilo v{__VERSAO__}{aparelhoDeTeste() && ' · aparelho de teste'}{medidasDeTela()}</footer>
       {aviso && (
         <div class="toast" role="status" aria-live="polite">
           <span>{aviso.texto}</span>

@@ -106,7 +106,8 @@ export function OrdenarBaralhos({ baralhos, mudar }: { baralhos: Baralho[]; muda
     requestAnimationFrame(() => lista.current?.querySelectorAll<HTMLElement>('.alca')[j]?.focus())
   }
 
-  /** Quanto cada linha se desloca durante o arrasto. */
+  /** Quanto cada linha se desloca durante o arrasto, em pixels da tela. Com o zoom do aparelho desfeito
+   *  (P134, index.html), o px do CSS vale menos que o da tela: o estilo multiplica pelo fator. */
   const deslocamento = (i: number): number => {
     if (!arrasto) return 0
     const { de, para, dy, passo } = arrasto
@@ -121,7 +122,7 @@ export function OrdenarBaralhos({ baralhos, mudar }: { baralhos: Baralho[]; muda
       <p class="dica organizar-dica">Arraste pelo ⠿ para mudar a ordem.</p>
       <ul ref={lista} class={`lista-baralhos organizando${arrasto ? ' arrastando' : ''}${assentando ? ' assentando' : ''}`}>
         {baralhos.map((b, i) => (
-          <li key={b.id} class={`baralho-ordem${arrasto?.de === i ? ' pego' : ''}`} style={{ transform: `translateY(${deslocamento(i)}px)` }}>
+          <li key={b.id} class={`baralho-ordem${arrasto?.de === i ? ' pego' : ''}`} style={{ transform: `translateY(${deslocamento(i) * (window.__fatorZoom ?? 1)}px)` }}>
             <span class="titulo">{b.titulo}</span>
             <button
               class="alca"

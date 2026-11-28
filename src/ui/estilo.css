@@ -350,8 +350,8 @@ body {
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 h1, h2 { font-family: var(--font-display); font-weight: 700; letter-spacing: -.02em; margin: 0; }
-h1 { font-size: clamp(28px, 7vw, 34px); line-height: 1.15; }
-h2 { font-size: clamp(22px, 5.5vw, 24px); line-height: 1.2; margin: 28px 0 8px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+h1 { font-size: clamp(28px, calc(7vw * var(--z, 1)), 34px); line-height: 1.15; }
+h2 { font-size: clamp(22px, calc(5.5vw * var(--z, 1)), 24px); line-height: 1.2; margin: 28px 0 8px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 p { margin: 0 0 12px; }
 strong { font-weight: 650; }
 code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; font-size: .92em; }
@@ -377,15 +377,11 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
 .cabecalho { display: grid; gap: 10px; padding: 8px 0 20px; }
 .cabecalho-linha { display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 8px; }
 .cabecalho-linha .marca { justify-self: start; }
-/* P134: em tela estreita a marca encolhe e o botão quebra a linha, em vez de a grade estourar a tela. */
-.cabecalho-linha > *, .barra-sessao > * { min-width: 0; }
-.cabecalho-linha .marca { max-width: 100%; }
-.cabecalho-linha .marca-nome { flex: 0 1 auto; min-width: 0; max-width: 100%; }
 
 .barra-sessao { display: grid; grid-template-columns: 44px 1fr 72px; align-items: center; gap: 8px; margin-bottom: 12px; }
 .barra-sessao.livre { grid-template-columns: 44px 1fr auto auto; }
 .barra-sessao .terminar { justify-self: end; }
-.titulo-barra { font-family: var(--font-display); font-size: clamp(18px, 5vw, 22px); font-weight: 700; line-height: 1.2; text-align: center; margin: 0; }
+.titulo-barra { font-family: var(--font-display); font-size: clamp(18px, calc(5vw * var(--z, 1)), 22px); font-weight: 700; line-height: 1.2; text-align: center; margin: 0; }
 .fechar, .voltar {
   width: 44px; height: 44px; border: 1px solid transparent; border-radius: 50%;
   background: transparent; color: var(--text); font-size: 1.35rem; line-height: 1;
@@ -558,7 +554,7 @@ code { background: var(--surface-subtle); padding: 1px 6px; border-radius: 6px; 
   box-shadow: var(--shadow-card); padding: 24px 20px;
 }
 .rotulo { margin: 0 0 14px; font: 700 12px/1.2 var(--font-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
-.frente { display: block; font-family: var(--font-display); font-weight: 700; font-size: clamp(26px, 6vw, 30px); line-height: 1.35; overflow-wrap: anywhere; }
+.frente { display: block; font-family: var(--font-display); font-weight: 700; font-size: clamp(26px, calc(6vw * var(--z, 1)), 30px); line-height: 1.35; overflow-wrap: anywhere; }
 .verso { display: block; font-size: 19px; line-height: 1.55; }
 .explicacao {
   display: grid; gap: 6px; margin-top: 16px; padding: 14px 16px;
@@ -598,7 +594,7 @@ hr { border: 0; border-top: 1px dashed var(--border); margin: 20px 0; }
 .nota.n4 { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .nota small { color: inherit; opacity: .9; }
 
-.calculo .frente { font-size: clamp(22px, 5.5vw, 26px); }
+.calculo .frente { font-size: clamp(22px, calc(5.5vw * var(--z, 1)), 26px); }
 .etapas { padding-left: 26px; margin: 20px 0 0; display: grid; gap: 20px; }
 .etapas > li { padding-left: 4px; }
 .etapas > li::marker { font-weight: 700; color: var(--text-muted); }
@@ -714,7 +710,7 @@ textarea { line-height: 1.5; resize: vertical; }
 /* ---------- Modal, aviso e toast ---------- */
 .modal-fundo { position: fixed; inset: 0; background: var(--overlay); display: flex; align-items: flex-end; justify-content: center; z-index: 50; }
 .modal {
-  background: var(--surface); color: var(--text); width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto;
+  background: var(--surface); color: var(--text); width: 100%; max-width: 640px; max-height: calc(90vh * var(--z, 1)); overflow-y: auto;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0; border: 1px solid var(--border);
   padding: 24px 20px calc(20px + env(safe-area-inset-bottom)); display: grid; gap: 12px;
 }
@@ -771,10 +767,10 @@ textarea { line-height: 1.5; resize: vertical; }
 /* ---------- Estilo Suave (padrão; P121) ----------
    Jeito "Now brief": saudação grande, cartões sem borda com degradê das cores da logo, botões em pílula.
    Vale com data-estilo="suave" (src/ui/tema.ts); no Clássico tudo fica como antes. */
-[data-estilo='suave'] .meus-baralhos { min-height: 100vh; min-height: 100dvh; }
+[data-estilo='suave'] .meus-baralhos { min-height: calc(100vh * var(--z, 1)); min-height: calc(100dvh * var(--z, 1)); }
 [data-estilo='suave'] body:has(.meus-baralhos) { background: var(--fundo-grad), var(--bg); background-repeat: no-repeat; }
 [data-estilo='suave'] .meus-baralhos .cabecalho { padding-bottom: 8px; }
-[data-estilo='suave'] .meus-baralhos .cabecalho h1 { font-size: clamp(36px, 10vw, 44px); line-height: 1.1; margin-top: 28px; }
+[data-estilo='suave'] .meus-baralhos .cabecalho h1 { font-size: clamp(36px, calc(10vw * var(--z, 1)), 44px); line-height: 1.1; margin-top: 28px; }
 [data-estilo='suave'] .meus-baralhos .saudacao-frase { font-size: 19px; line-height: 1.4; }
 [data-estilo='suave'] .meus-baralhos .secao-frase { margin: 32px 0 12px; font-weight: 500; font-size: 18px; }
 [data-estilo='suave'] .meus-baralhos .secao-linha { margin: 32px 0 12px; }
@@ -873,7 +869,7 @@ textarea.instrucao { font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monosp
 }
 .folha {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 41;
-  max-width: 640px; margin: 0 auto; max-height: 78vh; max-height: 78dvh;
+  max-width: 640px; margin: 0 auto; max-height: calc(78vh * var(--z, 1)); max-height: calc(78dvh * var(--z, 1));
   display: grid; grid-template-rows: auto auto 1fr auto;
   background: var(--surface); color: var(--text);
   border: 1px solid var(--border); border-bottom: 0;
@@ -923,7 +919,7 @@ details.bloco > summary { font-weight: 650; }
 /* ---------- Sessão por tempo: fio que encurta no topo ---------- */
 .fio-tempo { position: fixed; top: 0; left: 0; right: 0; height: 4px; z-index: 30; background: var(--surface-subtle); }
 .fio-tempo > div { height: 100%; background: var(--barra); transition: width 1s linear; }
-.placar-final { font: 700 clamp(28px, 7vw, 34px)/1.1 var(--font-display); margin: 0; color: var(--text); }
+.placar-final { font: 700 clamp(28px, calc(7vw * var(--z, 1)), 34px)/1.1 var(--font-display); margin: 0; color: var(--text); }
 
 /* ---------- Abrir uma IA ---------- */
 .abrir-ia { display: grid; gap: 6px; }
@@ -945,7 +941,7 @@ details.bloco > summary { font-weight: 650; }
 .rodape + .versao { margin-top: 4px; font-size: 13px; text-wrap: balance; }
 .tela:has(> .rodape + .versao) { padding-bottom: 8px; }
 .rodape .btn.terciario:hover { color: var(--text); }
-.cabecalho-linha .btn.compacto { font-size: 14px; padding: 8px 6px; text-align: right; line-height: 1.25; }
+.cabecalho-linha .btn.compacto { white-space: nowrap; font-size: 14px; padding: 8px 6px; }
 
 /* ---------- Opções de resposta: uma por linha ---------- */
 .notas { grid-template-columns: 1fr; gap: 8px; }
@@ -973,7 +969,7 @@ details.bloco > summary { font-weight: 650; }
 .modal.enviar .enviar-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .modal.enviar .enviar-qr { display: grid; gap: 6px; justify-items: center; }
 .modal.enviar .enviar-qr .dica { margin: 0; }
-.modal.enviar .qr { width: min(200px, 60vw); aspect-ratio: 1; background: #fff; border-radius: var(--radius-sm); padding: 8px; }
+.modal.enviar .qr { width: min(200px, calc(60vw * var(--z, 1))); aspect-ratio: 1; background: #fff; border-radius: var(--radius-sm); padding: 8px; }
 .modal.enviar .qr svg { display: block; width: 100%; height: 100%; }
 .modal.enviar .enviar-mais { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .modal.enviar .enviar-mais .btn.terciario { min-height: 40px; padding: 8px 4px; font-size: 14px; white-space: nowrap; color: var(--text-muted); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--border); }
@@ -1013,14 +1009,14 @@ details.bloco > summary { font-weight: 650; }
 .confete .c1 { background: var(--marca-turquesa); }
 .confete .c2 { background: var(--marca-cobalto); width: 9px; height: 9px; }
 .confete .c3 { background: var(--marca-bronze); width: 8px; height: 8px; }
-@keyframes confete-cair { 0% { translate: 0 0; opacity: 1; } 85% { opacity: 1; } 100% { translate: 30px 105vh; rotate: 540deg; opacity: 0; } }
+@keyframes confete-cair { 0% { translate: 0 0; opacity: 1; } 85% { opacity: 1; } 100% { translate: 30px calc(105vh * var(--z, 1)); rotate: 540deg; opacity: 0; } }
 @keyframes pulo { 0% { transform: scale(.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) {
   .confete { display: none; }
   .fim.comemorando .icone-fim { animation: none; }
 }
 /* Folha de altura fixa: a prévia encolhe para caber e os botões ficam sempre à vista, sem rolar. */
-.modal.compartilhar-imagem { display: flex; flex-direction: column; height: min(92dvh, 860px); max-height: 92dvh; overflow: hidden; padding-top: 16px; gap: 10px; }
+.modal.compartilhar-imagem { display: flex; flex-direction: column; height: min(calc(92dvh * var(--z, 1)), 860px); max-height: calc(92dvh * var(--z, 1)); overflow: hidden; padding-top: 16px; gap: 10px; }
 .compartilhar-imagem > * { flex: none; }
 .compartilhar-lado { display: contents; }
 .compartilhar-lado > * { flex: none; }
@@ -1041,11 +1037,11 @@ details.bloco > summary { font-weight: 650; }
 @media (min-width: 760px) {
   .modal-fundo:has(.compartilhar-imagem) { align-items: center; padding: 24px; }
   .modal.compartilhar-imagem {
-    --alto: min(88dvh, 680px);
+    --alto: min(calc(88dvh * var(--z, 1)), 680px);
     --previa-alto: calc(var(--alto) - 56px - 40px);
     --previa-largo: calc(var(--previa-alto) * 9 / 16 + 40px);
     display: grid; grid-template-columns: 340px var(--previa-largo); column-gap: 28px;
-    width: auto; max-width: calc(100vw - 48px); height: var(--alto); max-height: none;
+    width: auto; max-width: calc(calc(100vw * var(--z, 1)) - 48px); height: var(--alto); max-height: none;
     border-radius: var(--radius-lg); padding: 28px;
   }
   .modal.compartilhar-imagem:has(.previa.quadrado) { --previa-largo: min(calc(var(--previa-alto) + 40px), 460px); }
@@ -1153,11 +1149,12 @@ details.bloco > summary { font-weight: 650; }
 
 /* ---------- Abertura (a cauda que abre) ---------- */
 .abertura {
-  position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center;
+  position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   background: var(--marca-noite, #0B1E3F); overflow: hidden; cursor: pointer;
   transition: opacity 250ms ease-out;
 }
-.abertura svg { overflow: visible; max-width: none; }
+/* P134: o desenho (360×640) encolhe para caber em tela estreita, sem sair do centro. */
+.abertura svg { overflow: visible; width: min(360px, 100%); height: auto; max-height: 100%; }
 .abertura.saindo { opacity: 0; pointer-events: none; }
 
 /* ---------- Seu progresso (P117) ---------- */
@@ -1223,7 +1220,7 @@ details.bloco > summary { font-weight: 650; }
 .sincronizar .codigo-sync { display: grid; gap: 8px; }
 .sincronizar .codigo-sync input { font-family: ui-monospace, monospace; letter-spacing: .04em; text-transform: uppercase; }
 .sincronizar .mostrar-codigo { display: grid; gap: 10px; justify-items: center; }
-.sincronizar .qr { width: min(200px, 60vw); aspect-ratio: 1; background: #fff; border-radius: var(--radius-sm); padding: 8px; }
+.sincronizar .qr { width: min(200px, calc(60vw * var(--z, 1))); aspect-ratio: 1; background: #fff; border-radius: var(--radius-sm); padding: 8px; }
 .sincronizar .qr svg { display: block; width: 100%; height: 100%; }
 .sincronizar .codigo { margin: 0; font-family: ui-monospace, monospace; font-size: 17px; letter-spacing: .04em; text-align: center; word-break: break-all; user-select: all; }
 .sincronizar .acoes-sync { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 16px; }
